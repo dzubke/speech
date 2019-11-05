@@ -2,4 +2,4 @@
 
 timit_path=$1
 python preprocess.py $timit_path
-ln -s $timit_path data
+#ln -s $timit_path data

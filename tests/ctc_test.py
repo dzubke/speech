@@ -1,6 +1,9 @@
+import sys
+# print(sys.path)
 
 import torch
 import torch.autograd as autograd
+
 
 from speech.models import CTC
 
@@ -41,3 +44,7 @@ def test_argmax_decode():
     pre = [0, 0, 0]
     post = []
     assert CTC.max_decode(pre, blank) == post
+
+
+if __name__ == "__main__":
+    pass

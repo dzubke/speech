@@ -1,10 +1,10 @@
 {
     "seed" : 2017,
-    "save_path" : "examples/timit/models/ctc_best",
+    "save_path" : "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/ctc_best",
 
     "data" : {
-        "train_set" : "examples/timit/data/timit/train.json",
-        "dev_set" : "examples/timit/data/timit/dev.json",
+        "train_set" : "/Users/dustin/CS/consulting/firstlayerai/data/timit/train.json",
+        "dev_set" : "/Users/dustin/CS/consulting/firstlayerai/data/timit/dev.json",
         "start_and_end" : false
     },
 
