@@ -29,7 +29,7 @@ def run_epoch(model, optimizer, train_ldr, it, avg_loss):
         loss = model.loss(batch)
         loss.backward()
 
-        grad_norm = nn.utils.clip_grad_norm(model.parameters(), 200)
+        grad_norm = nn.utils.clip_grad_norm_(model.parameters(), 200)
         loss = loss.data[0]
 
         optimizer.step()
@@ -85,6 +85,7 @@ def run(config):
                         preproc, batch_size)
 
     # Model
+    # I don't understand how the line below works. I can infer what it does but am not sure how it does it
     model_class = eval("models." + model_cfg["class"])
     model = model_class(preproc.input_dim,
                         preproc.vocab_size,
