@@ -32,6 +32,7 @@ class Preprocessor():
         # Compute data mean, std from sample
         audio_files = [d['audio'] for d in data]
         random.shuffle(audio_files)
+        # the mean and std are of the log of the spectogram of the audio files
         self.mean, self.std = compute_mean_std(audio_files[:max_samples])
         self._input_dim = self.mean.shape[0]
 
