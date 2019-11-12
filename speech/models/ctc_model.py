@@ -32,6 +32,7 @@ class CTC(model.Model):
         return x
 
     def loss(self, batch):
+        # print([i for b in batch for i in b])
         x, y, x_lens, y_lens = self.collate(*batch)
         out = self.forward_impl(x)
 
@@ -40,6 +41,18 @@ class CTC(model.Model):
         return loss
 
     def collate(self, inputs, labels):
+        r"""
+
+        Arguements
+        ----------
+
+
+        Returns
+        --------
+
+        """
+        #print(f"collate inp len: {len(inputs)}")
+        #print(f"collate lbl len : {len(labels)}")
         max_t = max(i.shape[0] for i in inputs)
         max_t = self.conv_out_size(max_t, 0)
         x_lens = torch.IntTensor([max_t] * len(inputs))
