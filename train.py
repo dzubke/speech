@@ -136,13 +136,19 @@ def run(config):
         # in any of the lines below run_epoch, so that you don't have to wait for run_epoch to complete
         # before encountering the bugs
         
-        if model_cfg["from_pickle"] and e==0: 
-            with open(model_cfg["pickle_path"], 'rb') as f:
-                run_state = pickle.load(f)
+        if model_cfg["load_model"] and e==0: 
+            with open(model_cfg["it_loss_path"], 'rb') as f:
+                run_state = pickle.load(f)  # loads tuple of previous iteration and avg_loss: (it and avg_loss)
+                print(run_state)
+                with open(model_cfg["model_path"], 'rb') as model_f:
+                    model = torch.load(model_f)
+                    print("inside the load model")
+            print(run_state)
+
         
         else:
             run_state = run_epoch(model, optimizer, train_ldr, *run_state)
-            with open(model_cfg["pickle_path"],'wb') as model_fn:
+            with open(model_cfg["it_loss_path"],'wb') as model_fn:
                 pickle.dump(run_state, model_fn)
 
         msg = "Epoch {} completed in {:.2f} (s)."

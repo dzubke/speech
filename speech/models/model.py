@@ -10,6 +10,20 @@ import torch.nn as nn
 class Model(nn.Module):
 
     def __init__(self, input_dim, config):
+        """
+
+        Parameters
+        -----------
+
+        conv_cfg: [out_c]
+            list of list that define the parameters of the convolutions with format [out_c, h, w, s] 
+            where out_c is the size of the output channel, h and w specify the height and width of the kernel or filter, 
+            and s is the stride of the kernel and the stride is symmetric
+
+
+        """
+
+        
         super().__init__()
         self.input_dim = input_dim
 
@@ -18,9 +32,12 @@ class Model(nn.Module):
 
         convs = []
         in_c = 1
-        for out_c, h, w, s in conv_cfg:
-            conv = nn.Conv2d(in_c, out_c, (h, w),
-                             stride=(s, s), padding=0)
+        for out_c, h, w, s in conv_cfg:     
+            conv = nn.Conv2d(in_channels=in_c, 
+                             out_channels=out_c, 
+                             kernel_size=(h, w),
+                             stride=(s, s), 
+                             padding=0)
             convs.extend([conv, nn.ReLU()])
             if config["dropout"] != 0:
                 convs.append(nn.Dropout(p=config["dropout"]))
