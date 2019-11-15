@@ -17,8 +17,9 @@
 
     "model" : {
         "class" : "CTC",
-        "pickle_path" : "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/run_state_pickle/CTC_run_state.pickle",
-        "from_pickle" : true,
+        "load_model" : true,
+        "model_path" : "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/ctc_best/model",
+        "it_loss_path" : "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/run_state_pickle/CTC_run_state.pickle",
         "dropout" : 0.4,
         "encoder" : {
             "conv" : [
