@@ -1,10 +1,10 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke//awni_speech/speech/examples/timit/models/ctc_best",
+    "save_path" : "~/awni_speech/speech/examples/timit/models/ctc_best",
 
     "data" : {
-        "train_set" : "/home/dzubke/awni_speech/data/timit/train.json",
-        "dev_set" : "/home/dzubke/awni_speech/data/timit/dev.json",
+        "train_set" : "~/data/timit/train.json",
+        "dev_set" : "~/data/timit/dev.json",
         "start_and_end" : false
     },
 
@@ -17,9 +17,9 @@
 
     "model" : {
         "class" : "CTC",
-        "load_model" : false,
-        "model_path" : "/home/dzubke/awni_speech/speech/examples/timit/models/ctc_best/model",
-        "it_loss_path" : "/home/dzubke/awni_speech/speech/examples/timit/models/run_state_pickle/CTC_run_state.pickle",
+        "load_model" : true,
+        "model_path" : "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/ctc_best/model",
+        "it_loss_path" : "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/run_state_pickle/CTC_run_state.pickle",
         "dropout" : 0.4,
         "encoder" : {
             "conv" : [
