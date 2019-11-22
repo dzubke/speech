@@ -12,7 +12,7 @@ import speech.loader as loader
 def eval_loop(model, ldr):
     all_preds = []; all_labels = []
     for batch in tqdm.tqdm(ldr):
-        temp_batch = list(batch)
+        temp_batch = list(batch)    #dustin: my modification because the iteratable batch was being exhausted when it was called
         preds = model.infer(temp_batch)
         all_preds.extend(preds)
         all_labels.extend(temp_batch[1])
@@ -25,7 +25,7 @@ def run(model_path, dataset_json,
     use_cuda = torch.cuda.is_available()
 
     model, preproc = speech.load(model_path, tag=tag)
-    ldr = loader.make_loader(dataset_json,
+    ldr =  (dataset_json,
             preproc, batch_size)
 
     model.cuda() if use_cuda else model.cpu()
