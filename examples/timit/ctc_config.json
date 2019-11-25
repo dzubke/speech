@@ -1,6 +1,6 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/timit/models/ctc_best",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/timit/models/20191121",
 
     "data" : {
         "train_set" : "/home/dzubke/awni_speech/data/timit/train.json",
@@ -18,8 +18,8 @@
     "model" : {
         "class" : "CTC",
         "load_model" : false,
-        "model_path" : "/home/dzubke/awni_speech/speech/examples/timit/models/ctc_best/model",
-        "it_loss_path" : "/home/dzubke/awni_speech/speech/examples/timit/models/run_state_pickle/CTC_run_state.pickle",
+        "model_path" : "/home/dzubke/awni_speech/speech/examples/timit/models/20191121/model",
+        "it_loss_path" : "/home/dzubke/awni_speech/speech/examples/timit/models/run_state_pickle/20191121/CTC_run_state.pickle",
         "dropout" : 0.4,
         "encoder" : {
             "conv" : [
@@ -28,7 +28,7 @@
             ],
             "rnn" : {
                 "dim" : 256,
-                "bidirectional" : true,
+                "bidirectional" : false,
                 "layers" : 4
             }
         }
