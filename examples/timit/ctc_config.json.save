@@ -1,0 +1,36 @@
+{
+    "seed" : 2017,
+    "save_path" : "~/awni_speech/speech/examples/timit/models/ctc_best",
+
+    "data" : {
+        "train_set" : "~/awni_speech/data/timit/train.json",
+        "dev_set" : "~/awni_speech/data/timit/dev.json",
+        "start_and_end" : false
+    },
+
+    "optimizer" : {
+        "batch_size" : 8,
+        "epochs" : 32,
+        "learning_rate" : 1e-3,
+        "momentum" : 0.0
+    },
+
+    "model" : {
+        "class" : "CTC",
+        "load_model" : true,
+        "model_path" : "~/awni_speech/speech/examples/timit/models/ctc_best/model",
+        "it_loss_path" : "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/run_state_pickle/CTC_run_state.pickle",
+        "dropout" : 0.4,
+        "encoder" : {
+            "conv" : [
+                [32, 5, 32, 2],
+                [32, 5, 32, 1]
+            ],
+            "rnn" : {
+                "dim" : 256,
+                "bidirectional" : true,
+                "layers" : 4
+            }
+        }
+    }
+}
