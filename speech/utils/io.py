@@ -20,9 +20,9 @@ def save(model, preproc, path, tag=""):
 
 def load(path, tag=""):
     model_n, preproc_n = get_names(path, tag)
-    model = torch.load(model_n)
+    model = torch.load(model_n, map_location=torch.device('cpu'))
     with open(preproc_n, 'rb') as fid:
         preproc = pickle.load(fid)
     return model, preproc
 
-
+ 

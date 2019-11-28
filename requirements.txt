@@ -1,3 +1,4 @@
+# the commented out files are to installable via conda, so they are installed in a separate command via pip
 #editdistance==0.4
 #protobuf==3.4.0
 #pytest==3.2.3
