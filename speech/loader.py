@@ -152,6 +152,7 @@ def make_loader(dataset_json, preproc,
 
 def log_specgram_from_file(audio_file):
     audio, sr = wave.array_from_wave(audio_file)
+    #print(f"audio shape: {audio.shape}, sample rate {sr}")
     return log_specgram(audio, sr)
 
 def log_specgram(audio, sample_rate, window_size=20,
@@ -164,6 +165,7 @@ def log_specgram(audio, sample_rate, window_size=20,
                     nperseg=nperseg,
                     noverlap=noverlap,
                     detrend=False)
+    #print(f"log spectrogram shape: {spec.shape}")
     return np.log(spec.T.astype(np.float32) + eps)
 
 def read_data_json(data_json):

@@ -25,7 +25,7 @@ def run(model_path, dataset_json,
     use_cuda = torch.cuda.is_available()
 
     model, preproc = speech.load(model_path, tag=tag)
-    ldr =  (dataset_json,
+    ldr =  loader.make_loader(dataset_json,
             preproc, batch_size)
 
     model.cuda() if use_cuda else model.cpu()
