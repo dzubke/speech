@@ -45,7 +45,7 @@ python eval.py <path_to_model> examples/timit/data/timit/test.json --save predic
 To score using the reduced phoneme set (39 phonemes) run 
 
 ```
-python examples/timit/score.py predictions.json 
+python ./examples/timit/score.py predictions.json 
 ```
 
 ## Results

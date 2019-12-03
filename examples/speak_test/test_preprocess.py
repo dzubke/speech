@@ -51,7 +51,7 @@ if __name__ == "__main__":
     print(f"test dataset path: {path}")
 
     print("Converting files to standard wave format...")
-    # convert_to_wav(path)
+    convert_to_wav(path)
 
     print("Preprocessing labels")
     test_data = load_transcripts(path)
