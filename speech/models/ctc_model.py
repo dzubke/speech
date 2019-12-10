@@ -23,10 +23,12 @@ class CTC(model.Model):
         return self.forward_impl(x)
 
     def forward_impl(self, x, softmax=False):
+        """conducts a forward pass through the CNN and RNN layers specified in the encoder
+        """
         if self.is_cuda:
             x = x.cuda()
-        x = self.encode(x)
-        x = self.fc(x)
+        x = self.encode(x)      # propogates the data through the encoder
+        x = self.fc(x)          # propogates the data through a fully-connected layer
         if softmax:
             return torch.nn.functional.softmax(x, dim=2)
         return x
@@ -35,22 +37,12 @@ class CTC(model.Model):
         # print([i for b in batch for i in b])
         x, y, x_lens, y_lens = self.collate(*batch)
         out = self.forward_impl(x)
-
         loss_fn = ctc.CTCLoss()
         loss = loss_fn(out, y, x_lens, y_lens)
         return loss
 
     def collate(self, inputs, labels):
-        r"""
 
-        Arguements
-        ----------
-
-
-        Returns
-        --------
-
-        """
         #print(f"collate inp len: {len(inputs)}")
         #print(f"collate lbl len : {len(labels)}")
         max_t = max(i.shape[0] for i in inputs)
@@ -69,7 +61,7 @@ class CTC(model.Model):
         x, y, x_lens, y_lens = self.collate(*batch)
         probs = self.forward_impl(x, softmax=True)
         probs = probs.data.cpu().numpy()
-        return [decode(p, beam_size=1, blank=self.blank)[0]
+        return [decode(p, beam_size=3, blank=self.blank)[0]
                     for p in probs]
 
     @staticmethod

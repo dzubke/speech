@@ -9,6 +9,7 @@ import scipy.signal
 import torch
 import torch.autograd as autograd
 import torch.utils.data as tud
+import matplotlib.pyplot as plt
 
 from speech.utils import wave
 
@@ -65,6 +66,7 @@ class Preprocessor():
 
     def preprocess(self, wave_file, text):
         inputs = log_specgram_from_file(wave_file)
+        # print(f"log spec size: {inputs.shape}")
         inputs = (inputs - self.mean) / self.std
         targets = self.encode(text)
         return inputs, targets
@@ -89,14 +91,16 @@ class AudioDataset(tud.Dataset):
 
     def __init__(self, data_json, preproc, batch_size):
 
-        data = read_data_json(data_json)
-        self.preproc = preproc
+        data = read_data_json(data_json)        #loads the data_json into a list
+        print(f"data[0]: {data[0]}")
+        self.preproc = preproc                  # assign the preproc object
 
-        bucket_diff = 4
-        max_len = max(len(x['text']) for x in data)
-        num_buckets = max_len // bucket_diff
-        buckets = [[] for _ in range(num_buckets)]
-        for d in data:
+        # I'm not fully certain what is going on here
+        bucket_diff = 4                         # number of different buckets
+        max_len = max(len(x['text']) for x in data) # max number of phoneme labels in data
+        num_buckets = max_len // bucket_diff        # the number of buckets
+        buckets = [[] for _ in range(num_buckets)]  # creating an empy list for the buckets
+        for d in data:                          
             bid = min(len(d['text']) // bucket_diff, num_buckets - 1)
             buckets[bid].append(d)
 
@@ -105,7 +109,10 @@ class AudioDataset(tud.Dataset):
                               len(x['text']))
         for b in buckets:
             b.sort(key=sort_fn)
+        
+        # unpack the data in the buckets into a list
         data = [d for b in buckets for d in b]
+        print(f"len of data: {len(data)}")
         self.data = data
 
     def __len__(self):
@@ -125,9 +132,15 @@ class BatchRandomSampler(tud.sampler.Sampler):
     """
 
     def __init__(self, data_source, batch_size):
+        
+        if len(data_source) < batch_size + 1:
+            raise ValueError("batch_size is greater than data length")
+
         it_end = len(data_source) - batch_size + 1
+        print(f"it_end: {it_end}")
         self.batches = [range(i, i + batch_size)
                 for i in range(0, it_end, batch_size)]
+        print(f"self.batches: {self.batches}")
         self.data_source = data_source
 
     def __iter__(self):
@@ -141,7 +154,9 @@ def make_loader(dataset_json, preproc,
                 batch_size, num_workers=4):
     dataset = AudioDataset(dataset_json, preproc,
                            batch_size)
+    #print(f"dataset: {[i for i in dataset]}")
     sampler = BatchRandomSampler(dataset, batch_size)
+    print(f"sampler: {[i for i in sampler]}")
     loader = tud.DataLoader(dataset,
                 batch_size=batch_size,
                 sampler=sampler,
@@ -150,23 +165,67 @@ def make_loader(dataset_json, preproc,
                 drop_last=True)
     return loader
 
-def log_specgram_from_file(audio_file):
+def log_specgram_from_file(audio_file: str, channel: int=0, plot=False):
+    """Computes the log of the spectrogram from from a input audio file string
+
+    Arguments
+    ----------
+        audio_file: str, the filename of the audio file
+        channel: int, zero-indexed optional keyword argument specifying the channel to use
+        plot: bool, if true a plot of the spectrogram will be generated
+
+    Returns
+    -------
+        np.ndarray, the transposed log of the spectrogram as returned by log_specgram
+    """
+    
     audio, sr = wave.array_from_wave(audio_file)
-    #print(f"audio shape: {audio.shape}, sample rate {sr}")
-    return log_specgram(audio, sr)
+    print(f"audio_file: {audio_file}")
+    print(f"audio shape: {audio.shape}, sample rate {sr}")
+
+    if len(audio.shape)>1:     # there are multiple channels
+        _, num_channels = audio.shape
+        print(f"are audio channels empty: channel 0: {sum(audio[:,0])==0}, channel 1: {sum(audio[:,1])==0}")
+        assert channel <= num_channels, "channel argument greater than audio channels"
+        audio = audio[:,channel]
+   
+    return log_specgram(audio, sr, plot=plot)
 
 def log_specgram(audio, sample_rate, window_size=20,
-                 step_size=10, eps=1e-10):
+                 step_size=10, eps=1e-10, plot=False):
     nperseg = int(window_size * sample_rate / 1e3)
     noverlap = int(step_size * sample_rate / 1e3)
-    _, _, spec = scipy.signal.spectrogram(audio,
+    print(f"nperseg: {nperseg}, noverlap: {noverlap}, sample_rate: {sample_rate}")
+    f, t, spec = scipy.signal.spectrogram(audio,
                     fs=sample_rate,
                     window='hann',
                     nperseg=nperseg,
                     noverlap=noverlap,
                     detrend=False)
-    #print(f"log spectrogram shape: {spec.shape}")
+    print(f"log spectrogram shape: {spec.shape}, f.shape:{f.shape}, t.shape: {t.shape}")
+    if plot==True:
+        plot_spectrogram(f,t, spec)
     return np.log(spec.T.astype(np.float32) + eps)
+
+def plot_spectrogram(f, t, Sxx):
+    """This function plots a spectrogram using matplotlib
+
+    Arguements
+    ----------
+    f: the frequency output of the scipy.signal.spectrogram
+    t: the time series output of the scipy.signal.spectrogram
+    Sxx: the spectrogram output of scipy.signal.spectrogram
+
+    Returns
+    --------
+    None
+
+    Note: the function scipy.signal.spectrogram returns f, t, Sxx in that order
+    """
+    plt.pcolormesh(t, f, Sxx)
+    plt.ylabel('Frequency [Hz]')
+    plt.xlabel('Time [sec]')
+    plt.show()
 
 def read_data_json(data_json):
     with open(data_json) as fid:

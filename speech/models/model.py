@@ -75,6 +75,10 @@ class Model(nn.Module):
         raise NotImplementedError
 
     def encode(self, x):
+        """this function processes the input data x through the CNN and RNN layers specified
+            in the encoder config.
+
+        """
         x = x.unsqueeze(1)
         x = self.conv(x)
 

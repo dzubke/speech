@@ -27,19 +27,19 @@ def save_distance(data, out_file):
             for d in data: 
                 dist = editdistance.eval(d['label'], d['prediction'])
                 total = len(d['label'])
-                CER = dist/total
+                PER = dist/total
                 d_dict = {"predi": d['prediction'],
                           "label": d['label'], 
                           "dist" : dist,
                           "label_length": total,
-                          "CER": CER}
+                          "PER": PER}
                 json.dump(d_dict, fid)
                 fid.write("\n")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="CER on Timit with reduced phoneme set.")
+        description="PER on Timit with reduced phoneme set.")
 
     parser.add_argument("data_json",
         help="JSON with the transcripts.")
@@ -57,7 +57,7 @@ if __name__ == "__main__":
                 for d in data)
     total = sum(len(d['label']) for d in data)
 
-    print("CER {:.3f}".format(dist / total))
+    print("PER {:.3f}".format(dist / total))
     
 
 

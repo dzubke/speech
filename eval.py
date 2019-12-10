@@ -12,30 +12,36 @@ import speech.loader as loader
 def eval_loop(model, ldr):
     all_preds = []; all_labels = []
     for batch in tqdm.tqdm(ldr):
-        temp_batch = list(batch)    #dustin: my modification because the iteratable batch was being exhausted when it was called
+        #dustin: my modification because the iteratable batch was being exhausted when it was called
+        temp_batch = list(batch)    
+        # print(f"temp_bach: {temp_batch}")
         preds = model.infer(temp_batch)
         all_preds.extend(preds)
         all_labels.extend(temp_batch[1])
+    # print(f"all labels: {all_labels}, all preds: {all_preds}")
     return list(zip(all_labels, all_preds))
 
 def run(model_path, dataset_json,
-        batch_size=8, tag="best",
+        batch_size=1, tag="best",
         out_file=None):
 
     use_cuda = torch.cuda.is_available()
 
     model, preproc = speech.load(model_path, tag=tag)
+    # print(f"preproc mean shape: {len(preproc.mean)}, preproc std shape: {len(preproc.std)}")
     ldr =  loader.make_loader(dataset_json,
             preproc, batch_size)
-
+    # print(f"ldr: {[i for i in ldr]}")
     model.cuda() if use_cuda else model.cpu()
     model.set_eval()
 
     results = eval_loop(model, ldr)
+    print(f"number of examples: {len(results)}")
     results = [(preproc.decode(label), preproc.decode(pred))
                for label, pred in results]
-    cer = speech.compute_cer(results)
-    print("CER {:.3f}".format(cer))
+    print(f"results: {results}")
+    per = speech.compute_per(results)
+    print("PER for 48-phonemes {:.3f}".format(per))
 
     if out_file is not None:
         with open(out_file, 'w') as fid:
@@ -43,7 +49,7 @@ def run(model_path, dataset_json,
                 res = {'prediction' : pred,
                        'label' : label}
                 json.dump(res, fid)
-                fid.write("\n")
+                fid.write("\n") 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

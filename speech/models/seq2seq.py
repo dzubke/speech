@@ -66,7 +66,7 @@ class Seq2Seq(model.Model):
     def forward_impl(self, x, y):
         x = self.encode(x)
         out, alis = self.decode(x, y)
-        return out, alis
+        return out, alisf
 
     def forward(self, batch):
         x, y = self.collate(*batch)
@@ -99,7 +99,7 @@ class Seq2Seq(model.Model):
 
             if sx is not None:
                 ix = ix + sx
-
+            
             hx = self.dec_rnn(ix.squeeze(dim=1), hx)
             ox = hx.unsqueeze(dim=1)
 
