@@ -87,12 +87,12 @@ def eval_dev(model, ldr, preproc):
         loss = model.loss(temp_batch)
         losses.append(loss.data[0])
         all_preds.extend(preds)
-        all_labels.extend(temp_batch[1])
+        all_labels.extend(temp_batch[1])        #add the labels in the batch object
 
     model.set_train()
 
     loss = sum(losses) / len(losses)
-    results = [(preproc.decode(l), preproc.decode(p))
+    results = [(preproc.decode(l), preproc.decode(p))              # decodes back to phoneme labels
                for l, p in zip(all_labels, all_preds)]
     cer = speech.compute_cer(results)
     print("Dev: Loss {:.3f}, CER {:.3f}".format(loss, cer))
