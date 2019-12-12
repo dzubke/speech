@@ -40,8 +40,9 @@ def to_wave(audio_file, wave_file, use_avconv=USE_AVCONV):
     Convert audio file to wave format.
     """
     prog = AVCONV if use_avconv else FFMPEG
-    args = [prog, "-y", "-i", audio_file, "-ar", "16000","-f", "wav", wave_file]
+    args = [prog, "-y", "-i", audio_file, "-f", "wav", wave_file]
     subprocess.check_output(args, stderr=subprocess.STDOUT)
+    #"-ar", "16000",
 
 if __name__ == "__main__":
     print("Use avconv", USE_AVCONV)

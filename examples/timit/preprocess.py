@@ -69,7 +69,7 @@ def split_by_speaker(data, dev_speakers=50):
 def convert_to_wav(path):
     data_helpers.convert_full_set(path, "*/*/*/*.WAV",
             new_ext=WAV_EXT,
-            use_avconv=False)
+            use_avconv=True)
 
 def build_json(data, path, set_name):
     basename = set_name + os.path.extsep + "json"
@@ -97,7 +97,7 @@ if __name__ == "__main__":
     print(f"timit path: {path}")
 
     print("Converting files from NIST to standard wave format...")
-    # convert_to_wav(path)
+    convert_to_wav(path)
 
     print("Preprocessing train")
     train = load_transcripts(os.path.join(path, "TRAIN"))

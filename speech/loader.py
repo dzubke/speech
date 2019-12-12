@@ -207,10 +207,63 @@ def log_specgram(audio, sample_rate, window_size=20,
         plot_spectrogram(f,t, spec)
     return np.log(spec.T.astype(np.float32) + eps)
 
+
+def compare_log_spec_from_file(audio_file_1: str, audio_file_2: str, plot=False):
+    """This function takes in two audio paths and calculates the difference between the spectrograms 
+        by subtracting them. 
+
+    """
+    audio_1, sr_1 = wave.array_from_wave(audio_file_1)
+    audio_2, sr_2 = wave.array_from_wave(audio_file_2)
+
+    if len(audio_1.shape)>1:
+        audio_1 = audio_1[:,0]  # take the first channel
+    if len(audio_2.shape)>1:
+        audio_2 = audio_2[:,0]  # take the first channel
+    
+    window_size = 20
+    step_size = 10
+
+    nperseg_1 = int(window_size * sr_1 / 1e3)
+    noverlap_1 = int(step_size * sr_1 / 1e3)
+
+    print(f"nperseg_1:{nperseg_1}, noverlap_1:{noverlap_1}")
+
+    nperseg_2 = int(window_size * sr_2 / 1e3)
+    noverlap_2 = int(step_size * sr_2 / 1e3)
+
+    freq_1, time_1, spec_1 = scipy.signal.spectrogram(audio_1,
+                    fs=sr_1,
+                    window='hann',
+                    nperseg=nperseg_1,
+                    noverlap=noverlap_1,
+                    detrend=False)
+
+    freq_2, time_2, spec_2 = scipy.signal.spectrogram(audio_2,
+                    fs=sr_2,
+                    window='hann',
+                    nperseg=nperseg_2,
+                    noverlap=noverlap_2,
+                    detrend=False)
+    
+    spec_diff = spec_1 - spec_2 
+    freq_diff = freq_1 - freq_2
+    time_diff = time_1 - time_2
+
+    if plot:
+        plot_spectrogram(freq_diff, time_diff, spec_diff)
+        #plot_spectrogram(freq_1, time_1, spec_2)
+        #plot_spectrogram(freq_2, time_2, spec_2)
+
+    print(f"sum of spectrogram difference: {np.sum(spec_diff)}")
+    
+    return spec_diff
+
+
 def plot_spectrogram(f, t, Sxx):
     """This function plots a spectrogram using matplotlib
 
-    Arguements
+    Arguments
     ----------
     f: the frequency output of the scipy.signal.spectrogram
     t: the time series output of the scipy.signal.spectrogram
