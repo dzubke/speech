@@ -61,7 +61,7 @@ class Seq2Seq(model.Model):
         loss = nn.functional.cross_entropy(out, y,
                 size_average=False)
         loss = loss / batch_size
-        return loss
+        return loss 
 
     def forward_impl(self, x, y):
         x = self.encode(x)

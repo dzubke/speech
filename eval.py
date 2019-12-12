@@ -10,16 +10,18 @@ import speech
 import speech.loader as loader
 
 def eval_loop(model, ldr):
-    all_preds = []; all_labels = []
+    all_preds = []; all_labels = []; all_preds_dist=[]
     for batch in tqdm.tqdm(ldr):
         #dustin: my modification because the iteratable batch was being exhausted when it was called
         temp_batch = list(batch)    
         # print(f"temp_bach: {temp_batch}")
         preds = model.infer(temp_batch)
+        preds_top3 = model.infer_distribution(temp_batch, 5)
         all_preds.extend(preds)
         all_labels.extend(temp_batch[1])
+        all_preds_dist.extend(preds_top3)
     # print(f"all labels: {all_labels}, all preds: {all_preds}")
-    return list(zip(all_labels, all_preds))
+    return list(zip(all_labels, all_preds)), all_preds_dist
 
 def run(model_path, dataset_json,
         batch_size=1, tag="best",
@@ -35,8 +37,10 @@ def run(model_path, dataset_json,
     model.cuda() if use_cuda else model.cpu()
     model.set_eval()
 
-    results = eval_loop(model, ldr)
+    results, results_dist = eval_loop(model, ldr)
     print(f"number of examples: {len(results)}")
+    print(f"results_dist: {results_dist}")
+
     results = [(preproc.decode(label), preproc.decode(pred))
                for label, pred in results]
     print(f"results: {results}")

@@ -9,6 +9,7 @@ import torch.autograd as autograd
 import functions.ctc as ctc
 from . import model
 from .ctc_decoder import decode
+from .ctc_decoder_dist import decode_dist
 
 class CTC(model.Model):
     def __init__(self, freq_dim, output_dim, config):
@@ -62,6 +63,14 @@ class CTC(model.Model):
         probs = self.forward_impl(x, softmax=True)
         probs = probs.data.cpu().numpy()
         return [decode(p, beam_size=3, blank=self.blank)[0]
+                    for p in probs]
+    
+    def infer_distribution(self, batch, num_results):
+        x, y, x_lens, y_lens = self.collate(*batch)
+        probs = self.forward_impl(x, softmax=True)
+        probs = probs.data.cpu().numpy()
+        valueError
+        return [decode(p, beam_size=3, blank=self.blank)[0:num_results]
                     for p in probs]
 
     @staticmethod

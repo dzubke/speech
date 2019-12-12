@@ -1,4 +1,7 @@
 """
+This file is a modification of the file: ctc_decoder.py so that the top number of results from
+beam search are outputed rather than just the top result.
+
 Author: Awni Hannun
 
 This is an example CTC decoder written in Python. The code is
@@ -35,7 +38,7 @@ def logsumexp(*args):
                       for a in args))
   return a_max + lsp
 
-def decode(probs, beam_size=10, blank=0):
+def decode_dist(probs, beam_size=10, blank=0, dist_size=5):
   """
   Performs inference for the given output probabilities.
 
@@ -110,7 +113,10 @@ def decode(probs, beam_size=10, blank=0):
     beam = beam[:beam_size]
 
   best = beam[0]
-  return best[0], -logsumexp(*best[1])
+  best_dist = beam[:dist_size]
+
+  #return best[0], -logsumexp(*best[1])
+  return best_dist
 
 if __name__ == "__main__":
   np.random.seed(3)
