@@ -46,7 +46,7 @@ class Model(nn.Module):
         self.conv = nn.Sequential(*convs)
         conv_out = out_c * self.conv_out_size(input_dim, 1)
         print(f"conv_out: {conv_out}")
-        print(f"conv_out_size 1: {self.conv_out_size(input_dim, 0)}, conv_out_size 1: {self.conv_out_size(input_dim, 1)}")
+        print(f"conv_out_size 0: {self.conv_out_size(input_dim, 0)}, conv_out_size 1: {self.conv_out_size(input_dim, 1)}")
 
         assert conv_out > 0, \
           "Convolutional ouptut frequency dimension is negative."
@@ -64,7 +64,7 @@ class Model(nn.Module):
     def conv_out_size(self, n, dim):
         for c in self.conv.children():
             if type(c) == nn.Conv2d:
-                # assuming a valid convolution
+                # assuming a valid convolution meaning no padding
                 k = c.kernel_size[dim]
                 s = c.stride[dim]
                 n = (n - k + 1) / s
@@ -79,10 +79,10 @@ class Model(nn.Module):
 
     def encode(self, x):
         """this function processes the input data x through the CNN and RNN layers specified
-            in the encoder config.
+            in the model encoder config.
 
         """
-        x = x.unsqueeze(1)
+        x = x.unsqueeze(1)      #
         x = self.conv(x)
 
         # At this point x should have shape
@@ -92,7 +92,7 @@ class Model(nn.Module):
         # Reshape x to be (batch, time, freq * channels)
         # for the RNN
         b, t, f, c = x.size()
-        x = x.view((b, t, f * c))
+        x = x.view((b, t, f * c))   
 
         x, h = self.rnn(x)
 
@@ -159,8 +159,13 @@ class LinearND(nn.Module):
 def zero_pad_concat(inputs):
     max_t = max(inp.shape[0] for inp in inputs)
     shape = (len(inputs), max_t, inputs[0].shape[1])
+    print(f"zero_pad_concat shape: {shape}")
     input_mat = np.zeros(shape, dtype=np.float32)
+    # this loops over all of the examples in inputs and adds them to the zero's array input_mat
+    # so that for examples with length less than the max have zero's from the end of the example
+    # until max_t
     for e, inp in enumerate(inputs):
+        print(f"inp shape:{inp.shape}")
         input_mat[e, :inp.shape[0], :] = inp
     return input_mat
 

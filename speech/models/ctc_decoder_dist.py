@@ -114,6 +114,10 @@ def decode_dist(probs, beam_size=10, blank=0, dist_size=5):
 
   best = beam[0]
   best_dist = beam[:dist_size]
+  print(f"ctc_decoder_dist best_dist size: {len(best_dist)}")
+  probs = [-logsumexp(*dist[1]) for dist in best_dist]
+  preds = [dist[0] for dist in best_dist]
+  best_dist = preds, probs
 
   #return best[0], -logsumexp(*best[1])
   return best_dist

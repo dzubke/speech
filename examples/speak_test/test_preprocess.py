@@ -17,7 +17,7 @@ def load_phone_map():
     return m60_48, m48_39
 
 def convert_to_wav(path):
-    data_helpers.convert_full_set(path, "*.wav",
+    data_helpers.convert_full_set(path, "*.flac",
             new_ext='wv',
             use_avconv=False)
 
@@ -86,8 +86,9 @@ if __name__ == "__main__":
     print(f"test dataset path: {path}")
 
     print("Converting files to standard wave format...")
-    convert_to_wav(path)
-
+    #convert_to_wav(path)
+    
+    
     print("Preprocessing labels")
     if args.list_transcripts.lower() == 'true':
         test_data = load_transcripts_list(path)
@@ -98,3 +99,4 @@ if __name__ == "__main__":
 
     print("Done loading transcripts")
     build_json(test_data, path, args.json_filename)
+    

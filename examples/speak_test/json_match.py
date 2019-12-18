@@ -48,7 +48,8 @@ def consolidate_score(score_path: str, test_path: str, cons_path:str):
                     #sorted(test_json, key = lambda x: x['duration'])
 
                     for j in range(len(test_json)):     # find the filename for the matching label
-                        if score_json[i]['label'] == remap48_39(test_json[j]['text']):
+                        if editdistance.eval(score_json[i]['label'], remap48_39(test_json[j]['text'])) < 15 :
+                        # if score_json[i]['label'] == remap48_39(test_json[j]['text']):
                             filename = test_json[j]['audio']
                             cons_entry = {'audio': filename,
                                             'dist': dist, 

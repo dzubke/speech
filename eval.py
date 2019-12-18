@@ -16,12 +16,12 @@ def eval_loop(model, ldr):
         temp_batch = list(batch)    
         # print(f"temp_bach: {temp_batch}")
         preds = model.infer(temp_batch)
-        preds_top3 = model.infer_distribution(temp_batch, 5)
+        #preds_dist, prob_dist = model.infer_distribution(temp_batch, 5)
         all_preds.extend(preds)
         all_labels.extend(temp_batch[1])
-        all_preds_dist.extend(preds_top3)
+        #all_preds_dist.extend(((preds_dist, temp_batch[1]),prob_dist))
     # print(f"all labels: {all_labels}, all preds: {all_preds}")
-    return list(zip(all_labels, all_preds)), all_preds_dist
+    return list(zip(all_labels, all_preds))#, all_preds_dist
 
 def run(model_path, dataset_json,
         batch_size=1, tag="best",
@@ -37,14 +37,20 @@ def run(model_path, dataset_json,
     model.cuda() if use_cuda else model.cpu()
     model.set_eval()
 
-    results, results_dist = eval_loop(model, ldr)
+    results = eval_loop(model, ldr)
     print(f"number of examples: {len(results)}")
-    print(f"results_dist: {results_dist}")
-
+    #print(f"results_dist: {results_dist}")
+    #results_dist = [[(preproc.decode(pred[0]), preproc.decode(pred[1]), prob)] 
+    #                for example_dist in results_dist
+    #                for pred, prob in example_dist]
+    #print(f"results_dist: {results_dist}")
     results = [(preproc.decode(label), preproc.decode(pred))
                for label, pred in results]
     print(f"results: {results}")
     per = speech.compute_per(results)
+
+
+
     print("PER for 48-phonemes {:.3f}".format(per))
 
     if out_file is not None:
