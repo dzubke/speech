@@ -25,10 +25,14 @@ class CTC(model.Model):
 
     def forward_impl(self, x, softmax=False):
         """conducts a forward pass through the CNN and RNN layers specified in the encoder
+
+            Returns
+            --------
+            torch tensor of shape (batch x ?? x vocab_size)
         """
         if self.is_cuda:
             x = x.cuda()
-        x = self.encode(x)      # propogates the data through the encoder
+        x = self.encode(x)      # propogates the data through the CNN and RNN encoder
         x = self.fc(x)          # propogates the data through a fully-connected layer
         if softmax:
             return torch.nn.functional.softmax(x, dim=2)
@@ -53,6 +57,8 @@ class CTC(model.Model):
         y_lens = torch.IntTensor([len(l) for l in labels])
         y = torch.IntTensor([l for label in labels for l in label])
         batch = [x, y, x_lens, y_lens]
+        print(f"Size: x: {x.size()}, y: {y.size()}")
+        print(f"Size: x_lens: {x_lens.size()}, y_lens: {y_lens.size()}")
         if self.volatile:
             for v in batch:
                 v.volatile = True
@@ -61,7 +67,9 @@ class CTC(model.Model):
     def infer(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
         probs = self.forward_impl(x, softmax=True)
+        # convert the torch tensor into a numpy array
         probs = probs.data.cpu().numpy()
+        print(f"ctc_model infer probs: {probs.shape}")
         return [decode(p, beam_size=3, blank=self.blank)[0]
                     for p in probs]
     
@@ -69,8 +77,7 @@ class CTC(model.Model):
         x, y, x_lens, y_lens = self.collate(*batch)
         probs = self.forward_impl(x, softmax=True)
         probs = probs.data.cpu().numpy()
-        valueError
-        return [decode(p, beam_size=3, blank=self.blank)[0:num_results]
+        return [decode_dist(p, beam_size=3, blank=self.blank)
                     for p in probs]
 
     @staticmethod

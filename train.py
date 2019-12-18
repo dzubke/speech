@@ -116,6 +116,7 @@ def run(config):
     # Model
     # dustin: I don't understand how the line below works. I can infer what it does but am not sure how it does it
     model_class = eval("models." + model_cfg["class"])
+    print(f"preproc.input_dim:{preproc.input_dim}, preproc.vocab_size: {preproc.vocab_size}")
     model = model_class(preproc.input_dim,
                         preproc.vocab_size,
                         model_cfg)

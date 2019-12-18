@@ -133,7 +133,7 @@ class BatchRandomSampler(tud.sampler.Sampler):
 
     def __init__(self, data_source, batch_size):
         
-        if len(data_source) < batch_size + 1:
+        if len(data_source) < batch_size:
             raise ValueError("batch_size is greater than data length")
 
         it_end = len(data_source) - batch_size + 1
