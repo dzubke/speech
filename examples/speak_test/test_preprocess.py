@@ -17,7 +17,7 @@ def load_phone_map():
     return m60_48, m48_39
 
 def convert_to_wav(path):
-    data_helpers.convert_full_set(path, "*.flac",
+    data_helpers.convert_full_set(path, "*.wav",
             new_ext='wv',
             use_avconv=False)
 
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     print(f"test dataset path: {path}")
 
     print("Converting files to standard wave format...")
-    #convert_to_wav(path)
+    convert_to_wav(path)
     
     
     print("Preprocessing labels")
