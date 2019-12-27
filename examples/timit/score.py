@@ -57,7 +57,7 @@ if __name__ == "__main__":
                 for d in data)
     total = sum(len(d['label']) for d in data)
 
-    print("PER {:.3f}".format(dist / total))
+    print("PER for 39-phonemes {:.3f}".format(dist / total))
     
 
 

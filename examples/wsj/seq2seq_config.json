@@ -5,7 +5,8 @@
     "data" : {
         "train_set" : "examples/wsj/data/train_si284.json",
         "dev_set" : "examples/wsj/data/test_dev93.json",
-        "start_and_end" : false
+        "start_and_end" : false,
+        "use_mfcc": false
     },
 
     "optimizer" : {

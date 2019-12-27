@@ -25,4 +25,6 @@ def load(path, tag=""):
         preproc = pickle.load(fid)
     return model, preproc
 
- 
+def save_dict(dct, path):
+    with open(path, 'wb') as fid:
+        pickle.dump(dct, fid)
