@@ -34,7 +34,7 @@ def load_phone_map():
 
 def load_transcripts(path):
     pattern = os.path.join(path, "*/*/*.PHN")
-    m60_48, _ = load_phone_map()
+    m60_48, m48_39 = load_phone_map()
     files = glob.glob(pattern)
     # Standard practic is to remove all "sa" sentences
     # for each speaker since they are the same for all.
@@ -46,6 +46,8 @@ def load_transcripts(path):
             lines = (l.strip() for l in fid)
             phonemes = (l.split()[-1] for l in lines)
             phonemes = [m60_48[p] for p in phonemes if p in m60_48]
+            phonemes = [m48_39[p] for p in phonemes if p in m48_39]
+            phonemes = [p for p in phonemes if p != "sil"]
             data[f] = phonemes
     return data
 

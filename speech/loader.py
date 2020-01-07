@@ -21,8 +21,7 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, max_samples=100, start_and_end=True):
-        #, use_mfcc=False
+    def __init__(self, data_json, max_samples=100, start_and_end=True, use_mfcc=False):
         """
         Builds a preprocessor from a dataset.
         Arguments:
@@ -34,13 +33,13 @@ class Preprocessor():
             use_mfcc (bool): if true, mfcc processing will be used
         """
         data = read_data_json(data_json)
-        #self.use_mfcc = False      #boolean if true, mfcc processing will be used
+        self.use_mfcc = False      #boolean if true, mfcc processing will be used
 
         # Compute data mean, std from sample
         audio_files = [d['audio'] for d in data]
         random.shuffle(audio_files)
         # the mean and std are of the log of the spectogram of the audio files
-        self.mean, self.std = compute_mean_std(audio_files[:max_samples])#, self.use_mfcc)
+        self.mean, self.std = compute_mean_std(audio_files[:max_samples], self.use_mfcc)
         self._input_dim = self.mean.shape[0]
 
 
@@ -72,11 +71,11 @@ class Preprocessor():
         return text[s:e]
 
     def preprocess(self, wave_file, text):
-        # if use_mfcc is true, use mfcc values
-        #if self.use_mfcc: 
-        #    inputs = mfcc_from_file(wave_file)
-        #else: 
-        inputs = log_specgram_from_file(wave_file)
+        #if use_mfcc is true, use mfcc values
+        if self.use_mfcc: 
+            inputs = mfcc_from_file(wave_file)
+        else: 
+            inputs = log_specgram_from_file(wave_file)
             # print(f"log spec size: {inputs.shape}")
         inputs = (inputs - self.mean) / self.std
         targets = self.encode(text)
@@ -90,12 +89,12 @@ class Preprocessor():
     def vocab_size(self):
         return len(self.int_to_char)
 
-def compute_mean_std(audio_files): #, use_mfcc: bool):
-    #if use_mfcc:        # if use_mfcc true, use mfcc processing
-    #    samples = [mfcc_from_file(af)
-    #           for af in audio_files]
-    #else:              # else, use log_specgram processing
-    samples = [log_specgram_from_file(af)
+def compute_mean_std(audio_files, use_mfcc: bool):
+    if use_mfcc:        # if use_mfcc true, use mfcc processing
+        samples = [mfcc_from_file(af)
+               for af in audio_files]
+    else:              # else, use log_specgram processing
+        samples = [log_specgram_from_file(af)
                 for af in audio_files]
     print(f"samples shape: {samples[0].shape}")
     samples = np.vstack(samples)

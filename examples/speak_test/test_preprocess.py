@@ -64,7 +64,7 @@ def build_json(data, path, set_name):
             fid.write("\n")
 
 if __name__ == "__main__":
-    ## format of command is >>python test_processes.py <path_to_dataset> <json_name> --list_transcripts <True/False> 
+    ## format of command is >>python test_preprocess.py <path_to_dataset> <json_name> --list_transcripts <True/False> 
     # where the optional --list_transcripts argument is whether the phoneme lable transcrips are in list form.    
 
     parser = argparse.ArgumentParser(

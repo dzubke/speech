@@ -18,3 +18,5 @@ def wav_duration(file_name):
     duration = nframes / samp_rate
     return duration
  
+def array_to_wave(path:str, array, samplerate:int):
+    soundfile.write(path, array, samplerate)
