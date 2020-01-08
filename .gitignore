@@ -108,4 +108,4 @@ ENV/
 .mypy_cache/
 
 # pretrained models
-/deepspeech_pretrained/
+/deepspeech_pretrained/*
