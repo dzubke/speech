@@ -266,14 +266,14 @@ def log_specgram(audio, sample_rate, window_size=20,
                  step_size=10, eps=1e-10, plot=False):
     nperseg = int(window_size * sample_rate / 1e3)
     noverlap = int(step_size * sample_rate / 1e3)
-    print(f"nperseg: {nperseg}, noverlap: {noverlap}, sample_rate: {sample_rate}")
+    #print(f"nperseg: {nperseg}, noverlap: {noverlap}, sample_rate: {sample_rate}")
     f, t, spec = scipy.signal.spectrogram(audio,
                     fs=sample_rate,
                     window='hann',
                     nperseg=nperseg,
                     noverlap=noverlap,
                     detrend=False)
-    print(f"log spectrogram shape: {spec.T.shape}, f.shape:{f.shape}, t.shape: {t.shape}")
+    #print(f"log spectrogram shape: {spec.T.shape}, f.shape:{f.shape}, t.shape: {t.shape}")
     if plot==True:
         plot_spectrogram(f,t, spec)
     return np.log(spec.T.astype(np.float32) + eps)

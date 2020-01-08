@@ -14,9 +14,9 @@ def eval_loop(model, ldr):
     for batch in tqdm.tqdm(ldr):
         #dustin: my modification because the iteratable batch was being exhausted when it was called
         temp_batch = list(batch)
-        print(f"# examples in batch: {len(temp_batch)}")   
-        print(f"batch : {len(temp_batch[0])}")   
-        print(f"batch: {temp_batch}")
+        #print(f"# examples in batch: {len(temp_batch)}")   
+        #print(f"batch : {len(temp_batch[0])}")   
+        #print(f"batch: {temp_batch}")
         #print(f"numpy [0][0]: {type(temp_batch[0])}")   
         # print(f"temp_bach: {temp_batch}")
         preds = model.infer(temp_batch)

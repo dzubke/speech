@@ -6,6 +6,7 @@ import subprocess
 import numpy as np
 import soundfile
 from speech.loader import log_specgram
+from time import sleep, time
 
 
 
@@ -25,22 +26,29 @@ def predict_from_stream(model_path: str):
     model, preproc = speech.load(model_path, tag='')
     num_buffers = 250
     all_preds=[]
+    count = 0
     try:
         while True:
-            print('You can start speaking now. Press Control-C to stop recording.')
+            print('Start recording. Press contrl+C to exit')
+            sleep(0.1)
             np_array = np.array([], dtype=np.int16)
             for _ in range(num_buffers):
                 data = subproc.stdout.read(512)
                 np_data = np.frombuffer(data, dtype=np.int16)
                 np_array = np.append(np_array, np_data)
-
+            
+            print('Stopped recoding')
+            start= time()
             log_spec = log_specgram(np_array, sample_rate=16000)
             norm_log_spec = (log_spec - preproc.mean) / preproc.std
             fake_label = [27]
             dummy_batch = ((norm_log_spec,), (fake_label,))  # model.infer expects 2-element tuple
             preds = model.infer(dummy_batch)
             preds = [preproc.decode(pred) for pred in preds]
-            print(preds)
+            end = time()
+
+            count +=1 
+            print(f"#{count} predictions ({round(end-start,2)} s) : {preds}\n")
             all_preds.append(preds)
 
     except KeyboardInterrupt:

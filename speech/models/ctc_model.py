@@ -57,8 +57,8 @@ class CTC(model.Model):
         y_lens = torch.IntTensor([len(l) for l in labels])
         y = torch.IntTensor([l for label in labels for l in label])
         batch = [x, y, x_lens, y_lens]
-        print(f"Size: x: {x.size()}, y: {y.size()}")
-        print(f"Size: x_lens: {x_lens.size()}, y_lens: {y_lens.size()}")
+        #print(f"Size: x: {x.size()}, y: {y.size()}")
+        #print(f"Size: x_lens: {x_lens.size()}, y_lens: {y_lens.size()}")
         if self.volatile:
             for v in batch:
                 v.volatile = True
@@ -69,7 +69,7 @@ class CTC(model.Model):
         probs = self.forward_impl(x, softmax=True)
         # convert the torch tensor into a numpy array
         probs = probs.data.cpu().numpy()
-        print(f"ctc_model infer probs shape: {probs.shape}")
+        #print(f"ctc_model infer probs shape: {probs.shape}")
         return [decode(p, beam_size=3, blank=self.blank)[0]
                     for p in probs]
     
