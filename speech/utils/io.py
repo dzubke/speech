@@ -25,10 +25,13 @@ def load(path, tag=""):
         preproc = pickle.load(fid)
     return model, preproc
 
+<<<<<<< HEAD:speech/utils/io.py
 def load_pretrained(model_path):
     model = torch.load(model_path, map_location=torch.device('cpu'))
     return model
 
+=======
+>>>>>>> 1e43cf196f74037ea590b7710741769f87e11c08:utils/io.py
 def save_dict(dct, path):
     with open(path, 'wb') as fid:
         pickle.dump(dct, fid)

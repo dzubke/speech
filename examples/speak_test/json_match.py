@@ -32,8 +32,11 @@ def consolidate_score(score_path: str, test_path: str, cons_path:str):
     None: writes to json
 
     """
+<<<<<<< HEAD
     use_timit = False #flag used to alter code if the timit dataset is being used because a remapping for a 48-phoneme set occurs to a 39-phoneme set
 
+=======
+>>>>>>> 1e43cf196f74037ea590b7710741769f87e11c08
 
     with open(score_path, 'r') as score_fid:
         score_json = [json.loads(l) for l in score_fid]
@@ -49,6 +52,7 @@ def consolidate_score(score_path: str, test_path: str, cons_path:str):
                     predi = score_json[i]['predi']
                     #sorted(test_json, key = lambda x: x['duration'])
 
+<<<<<<< HEAD
                     match = False # if the score example and test json examples are matches, create a dictionary entry
                     for j in range(len(test_json)):     # find the filename for the matching label
                         
@@ -62,6 +66,11 @@ def consolidate_score(score_path: str, test_path: str, cons_path:str):
                                 match = True
                         
                         if match:
+=======
+                    for j in range(len(test_json)):     # find the filename for the matching label
+                        if editdistance.eval(score_json[i]['label'], remap48_39(test_json[j]['text'])) < 15 :
+                        # if score_json[i]['label'] == remap48_39(test_json[j]['text']):
+>>>>>>> 1e43cf196f74037ea590b7710741769f87e11c08
                             filename = test_json[j]['audio']
                             cons_entry = {'audio': filename,
                                             'dist': dist, 
@@ -73,13 +82,20 @@ def consolidate_score(score_path: str, test_path: str, cons_path:str):
                             json.dump(cons_entry, fid)
                             fid.write("\n")
                             
+<<<<<<< HEAD
                         match = False
+=======
+>>>>>>> 1e43cf196f74037ea590b7710741769f87e11c08
                             
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     ## format of command is:
     # python json_match.py <path_to_score_json> <path_to_test_json> <path_to_cons_json>  
+=======
+    ## format of command is >>python score.py <path_to_score_json> <path_to_test_json> <path_to_cons_json>  
+>>>>>>> 1e43cf196f74037ea590b7710741769f87e11c08
     parser = argparse.ArgumentParser(
             description="Consolidate the score jsons.")
 

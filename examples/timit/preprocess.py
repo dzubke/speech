@@ -34,7 +34,11 @@ def load_phone_map():
 
 def load_transcripts(path):
     pattern = os.path.join(path, "*/*/*.PHN")
+<<<<<<< HEAD
     m60_48, m48_39 = load_phone_map()
+=======
+    m60_48, _ = load_phone_map()
+>>>>>>> 1e43cf196f74037ea590b7710741769f87e11c08
     files = glob.glob(pattern)
     # Standard practic is to remove all "sa" sentences
     # for each speaker since they are the same for all.
