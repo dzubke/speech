@@ -149,10 +149,12 @@ class LinearND(nn.Module):
 
     def forward(self, x):
         size = x.size()
+        print(f"fc input size: {x.size()}")
         n = int(np.prod(size[:-1]))
         out = x.contiguous().view(n, size[-1])
         out = self.fc(out)
         size = list(size)
+        print(f"fc output size: {out.size()}")
         size[-1] = out.size()[-1]
         return out.view(size)
 
