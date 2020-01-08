@@ -108,21 +108,24 @@ def check_phones():
     Discrepencies in the CMU-39 and timit-39 phoneme sets and the librispeech phonemes: 
      - included in CMU-39 but not timit-39:  ao, zh, 
      - included timit-39 but not CMU-39: dx, sil
-     - not included in CMU or timit:  u
     """
     # standard 39 phones in the timit used by awni dictionary
-    timit_dct39 = set(['ae', 'ah', 'aa', 'aw', 'er', 'ay', 'b', 'ch', 'd', 'dh', 'dx', 'eh', 'l', 'm', 'n', 'ng', 'ey', 'f', 'g', 'hh', 'ih', 'iy', 'jh', 'k', 'l', 'ow', 'oy', 'p', 'r', 's', 'sh', 't', 'th', 'uh', 'uw', 'v', 'w', 'y', 'z', 'sil'])
-    print(f"length of timit_dict: {len(timit_dct39)}")
-    error_phones = []
+    timit_phones39 = set(['ae', 'ah', 'aa', 'aw', 'er', 'ay', 'b', 'ch', 'd', 'dh', 'dx', 'eh', 'l', 'm', 'n', 'ng', 'ey', 'f', 'g', 'hh', 'ih', 'iy', 'jh', 'k', 'l', 'ow', 'oy', 'p', 'r', 's', 'sh', 't', 'th', 'uh', 'uw', 'v', 'w', 'y', 'z', 'sil'])
+    cmu_phones = set(['aa', 'ae', 'ah', 'ao', 'aw', 'ay',  'b', 'ch', 'd', 'dh', 'eh', 'er', 'ey', 'f', 'g', 'hh', 'ih', 'iy', 'jh', 'k', 'l', 'm', 'n', 'ng', 'ow', 'oy', 'p', 'r', 's', 'sh', 't', 'th', 'uh', 'uw', 'v', 'w', 'y', 'z', 'zh'])
+    print(f"length of timit_dict: {len(timit_phones39)}")
+    librispeech_phones = set()
     
-    # looping over every phone list in the word_to_phoneme mapping
+    # greating a set of the librispeech phones by looping over every phone list in the word_to_phoneme mapping
     for phones in word_to_phoneme.values():
-        # looping over every phone in the specific list
+        # looping over every phone in the word pronunciation
         for phone in phones:
-            if phone not in awni_dct39:
-                error_phones.append(phone)
-    error_phones = set(error_phones)
-    print(f"there were {len(error_phones)} extra phones: {error_phones} ")
+            if phone not in librispeech_phones:
+                librispeech_phones.add(phone)
+
+    print(f"phones in librispeech but not cmu: {librispeech_phones.difference(cmu_phones)}")
+    print(f"phones in cmu but not librispeech: {cmu_phones.difference(librispeech_phones)}")
+    print(f"phones in timit but not cmu: {timit_phones39.difference(cmu_phones)}")
+    print(f"phones in cmubut not timit: {cmu_phones.difference(timit_phones39)}")
 
 
 
