@@ -110,7 +110,7 @@ def decode(probs, beam_size=10, blank=0):
     beam = beam[:beam_size]
 
   best = beam[0]
-  #print(f"ctc_decoder best: {best}")
+  #print(f"ctsc_decoder best: {best}")
   return best[0], -logsumexp(*best[1])
 
 if __name__ == "__main__":
