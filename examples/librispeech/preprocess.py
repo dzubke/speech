@@ -8,16 +8,11 @@ import json
 import os
 import tqdm
 import wave
-<<<<<<< HEAD
-from collections import defaultdict
-import string
-=======
 import sys
 from collections import defaultdict
 import pickle
 import string
 
->>>>>>> 1e43cf196f74037ea590b7710741769f87e11c08
 
 from speech.utils import data_helpers
 from speech.utils import wave
@@ -116,8 +111,8 @@ def check_phones():
      - not included in CMU or timit:  u
     """
     # standard 39 phones in the timit used by awni dictionary
-    awni_dct39 = set(['ae', 'ah', 'aa', 'aw', 'er', 'ay', 'b', 'ch', 'd', 'dh', 'dx', 'eh', 'l', 'm', 'n', 'ng', 'ey', 'f', 'g', 'hh', 'ih', 'iy', 'jh', 'k', 'l', 'ow', 'oy', 'p', 'r', 's', 'sh', 't', 'th', 'uh', 'uw', 'v', 'w', 'y', 'z', 'sil'])
-    print(f"length of cmu_dict: {len(awni_dct39)}")
+    timit_dct39 = set(['ae', 'ah', 'aa', 'aw', 'er', 'ay', 'b', 'ch', 'd', 'dh', 'dx', 'eh', 'l', 'm', 'n', 'ng', 'ey', 'f', 'g', 'hh', 'ih', 'iy', 'jh', 'k', 'l', 'ow', 'oy', 'p', 'r', 's', 'sh', 't', 'th', 'uh', 'uw', 'v', 'w', 'y', 'z', 'sil'])
+    print(f"length of timit_dict: {len(timit_dct39)}")
     error_phones = []
     
     # looping over every phone list in the word_to_phoneme mapping

@@ -3,13 +3,8 @@
     "save_path" : "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/ctc_models/20191219/",
 
     "data" : {
-<<<<<<< HEAD
-        "train_set" : "/Users/dustin/CS/consulting/firstlayerai/data/LibriSpeech/train-clean-100.json",
-        "dev_set" : "/Users/dustin/CS/consulting/firstlayerai/data/LibriSpeech/dev-clean.json",
-=======
         "train_set" : "/Users/dustin/CS/consulting/firstlayerai/data/timit/train.json",
         "dev_set" : "/Users/dustin/CS/consulting/firstlayerai/data/timit/dev.json",
->>>>>>> 1e43cf196f74037ea590b7710741769f87e11c08
         "start_and_end" : false,
         "use_mfcc": false
     },

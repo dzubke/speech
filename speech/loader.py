@@ -21,12 +21,7 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-<<<<<<< HEAD
     def __init__(self, data_json, max_samples=100, start_and_end=True, use_mfcc=False):
-=======
-    def __init__(self, data_json, max_samples=100, start_and_end=True):
-        #, use_mfcc=False
->>>>>>> 1e43cf196f74037ea590b7710741769f87e11c08
         """
         Builds a preprocessor from a dataset.
         Arguments:
@@ -38,21 +33,13 @@ class Preprocessor():
             use_mfcc (bool): if true, mfcc processing will be used
         """
         data = read_data_json(data_json)
-<<<<<<< HEAD
         self.use_mfcc = False      #boolean if true, mfcc processing will be used
-=======
-        #self.use_mfcc = False      #boolean if true, mfcc processing will be used
->>>>>>> 1e43cf196f74037ea590b7710741769f87e11c08
 
         # Compute data mean, std from sample
         audio_files = [d['audio'] for d in data]
         random.shuffle(audio_files)
         # the mean and std are of the log of the spectogram of the audio files
-<<<<<<< HEAD
         self.mean, self.std = compute_mean_std(audio_files[:max_samples], self.use_mfcc)
-=======
-        self.mean, self.std = compute_mean_std(audio_files[:max_samples])#, self.use_mfcc)
->>>>>>> 1e43cf196f74037ea590b7710741769f87e11c08
         self._input_dim = self.mean.shape[0]
 
 
@@ -84,19 +71,11 @@ class Preprocessor():
         return text[s:e]
 
     def preprocess(self, wave_file, text):
-<<<<<<< HEAD
         #if use_mfcc is true, use mfcc values
         if self.use_mfcc: 
             inputs = mfcc_from_file(wave_file)
         else: 
             inputs = log_specgram_from_file(wave_file)
-=======
-        # if use_mfcc is true, use mfcc values
-        #if self.use_mfcc: 
-        #    inputs = mfcc_from_file(wave_file)
-        #else: 
-        inputs = log_specgram_from_file(wave_file)
->>>>>>> 1e43cf196f74037ea590b7710741769f87e11c08
             # print(f"log spec size: {inputs.shape}")
         inputs = (inputs - self.mean) / self.std
         targets = self.encode(text)
@@ -110,21 +89,12 @@ class Preprocessor():
     def vocab_size(self):
         return len(self.int_to_char)
 
-<<<<<<< HEAD
 def compute_mean_std(audio_files, use_mfcc: bool):
     if use_mfcc:        # if use_mfcc true, use mfcc processing
         samples = [mfcc_from_file(af)
                for af in audio_files]
     else:              # else, use log_specgram processing
         samples = [log_specgram_from_file(af)
-=======
-def compute_mean_std(audio_files): #, use_mfcc: bool):
-    #if use_mfcc:        # if use_mfcc true, use mfcc processing
-    #    samples = [mfcc_from_file(af)
-    #           for af in audio_files]
-    #else:              # else, use log_specgram processing
-    samples = [log_specgram_from_file(af)
->>>>>>> 1e43cf196f74037ea590b7710741769f87e11c08
                 for af in audio_files]
     print(f"samples shape: {samples[0].shape}")
     samples = np.vstack(samples)
@@ -296,22 +266,14 @@ def log_specgram(audio, sample_rate, window_size=20,
                  step_size=10, eps=1e-10, plot=False):
     nperseg = int(window_size * sample_rate / 1e3)
     noverlap = int(step_size * sample_rate / 1e3)
-<<<<<<< HEAD
     #print(f"nperseg: {nperseg}, noverlap: {noverlap}, sample_rate: {sample_rate}")
-=======
-    print(f"nperseg: {nperseg}, noverlap: {noverlap}, sample_rate: {sample_rate}")
->>>>>>> 1e43cf196f74037ea590b7710741769f87e11c08
     f, t, spec = scipy.signal.spectrogram(audio,
                     fs=sample_rate,
                     window='hann',
                     nperseg=nperseg,
                     noverlap=noverlap,
                     detrend=False)
-<<<<<<< HEAD
     #print(f"log spectrogram shape: {spec.T.shape}, f.shape:{f.shape}, t.shape: {t.shape}")
-=======
-    print(f"log spectrogram shape: {spec.T.shape}, f.shape:{f.shape}, t.shape: {t.shape}")
->>>>>>> 1e43cf196f74037ea590b7710741769f87e11c08
     if plot==True:
         plot_spectrogram(f,t, spec)
     return np.log(spec.T.astype(np.float32) + eps)
