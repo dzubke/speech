@@ -19,7 +19,7 @@ def eval_loop(model, ldr):
     return list(zip(all_labels, all_preds))
 
 def run(model_path, dataset_json,
-        batch_size=8, tag="best",
+        batch_size=1, tag="best",
         out_file=None):
 
     use_cuda = torch.cuda.is_available()

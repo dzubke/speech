@@ -54,17 +54,26 @@ class Seq2Seq(model.Model):
         if self.is_cuda:
             x = x.cuda()
             y = y.cuda()
+        #print(f"y device: {y.device}, x device: {x.device}")
+        #print(f"x size 1: {x.size()}, y size 1: {y.size()}")
         out, alis = self.forward_impl(x, y)
+        #print(f"out size 1: {out.size()}, alis size 1: {alis.size()}")
         batch_size, _, out_dim = out.size()
         out = out.view((-1, out_dim))
+        #print(f"out size 2: {out.size()}")
         y = y[:,1:].contiguous().view(-1)
+        #print(f"y size 2: {y.size()}")
+        #print(f"y min: {np.min(y.data.cpu().numpy())}, y max: {np.max(y.data.cpu().numpy())}")
         loss = nn.functional.cross_entropy(out, y,
                 size_average=False)
+        #print(f"loss:{loss}")
         loss = loss / batch_size
         return loss
 
     def forward_impl(self, x, y):
         x = self.encode(x)
+        #print(f"for impl: x size: {x.size()}, y size: {y.size()},")
+        #print(f"y device: {y.device}, x device: {x.device}")
         out, alis = self.decode(x, y)
         return out, alis
 
@@ -86,8 +95,11 @@ class Seq2Seq(model.Model):
         out = []; aligns = []
 
         hx = torch.zeros((x.shape[0], x.shape[2]), requires_grad=False)
+        #print(f"hx 1: {hx.device}")
+        #print(f".is_cuda:{self.is_cuda}")
         if self.is_cuda:
-            hx.cuda()
+            hx = hx.cuda()
+        #print(f"hx 2: {hx.device}")
         ax = None; sx = None;
         for t in range(y.size()[1] - 1):
             sample = (out and self.scheduled_sampling)
@@ -100,9 +112,10 @@ class Seq2Seq(model.Model):
             if sx is not None:
                 ix = ix + sx
 
+            #print(f"ix device: {ix.device}, hx device: {hx.device}")
             hx = self.dec_rnn(ix.squeeze(dim=1), hx)
             ox = hx.unsqueeze(dim=1)
-
+            #print(f"ox device: {ox.device}, hx device: {hx.device}")
             sx, ax = self.attend(x, ox, ax)
             aligns.append(ax)
             out.append(self.fc(ox + sx))
@@ -119,7 +132,7 @@ class Seq2Seq(model.Model):
         if state is None:
             hx = torch.zeros((x.shape[0], x.shape[2]), requires_grad=False)
             if self.is_cuda:
-                hx.cuda()
+                hx = hx.cuda()
             ax = None; sx = None;
         else:
             hx, ax, sx = state
@@ -143,6 +156,7 @@ class Seq2Seq(model.Model):
         return [seq.tolist() for seq in argmaxs]
 
     def infer_decode(self, x, y, end_tok, max_len):
+        #print(f"x device: {x.device}, y device: {y.device}, end_tok: {end_tok}, max_len: {max_len}")
         probs = []
         argmaxs = [y]
         state = None
@@ -152,7 +166,13 @@ class Seq2Seq(model.Model):
             y = torch.max(out, dim=1)[1]
             y = y.unsqueeze(dim=1)
             argmaxs.append(y)
-            if torch.sum(y.data == end_tok) == y.numel():
+            #print(f"x device: {x.device}, y device: {y.device}, end_tok: {end_tok}, max_len: {max_len}")            
+            #print(f"nummel: {y.numel()}")
+            #print(f"y to numpy: {type(y.cpu().data.numpy())}, shape: {y.cpu().data.numpy().shape}")
+            #print(f"test1:{torch.sum(y.cpu().data.numpy() == end_tok)} ")
+
+            if torch.sum(y.cpu().data.numpy() == end_tok) == y.numel():
+                #print("infer_decode break")
                 break
 
         probs = torch.cat(probs)

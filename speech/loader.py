@@ -9,6 +9,7 @@ import scipy.signal
 import torch
 import torch.autograd as autograd
 import torch.utils.data as tud
+import python_speech_features
 
 from speech.utils import wave
 
@@ -17,7 +18,7 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, max_samples=100, start_and_end=True):
+    def __init__(self, data_json, max_samples=100, start_and_end=True, use_mfcc=False):
         """
         Builds a preprocessor from a dataset.
         Arguments:
@@ -26,14 +27,16 @@ class Preprocessor():
             max_samples (int): The maximum number of examples to be used
                 in computing summary statistics.
             start_and_end (bool): Include start and end tokens in labels.
+	    use_mfcc (bool): if true, mfcc processing will be used
         """
         data = read_data_json(data_json)
+        self.use_mfcc = use_mfcc           #boolean if true, mfcc processing will be used
 
         # Compute data mean, std from sample
         audio_files = [d['audio'] for d in data]
         random.shuffle(audio_files)
         # the mean and std are of the log of the spectogram of the audio files
-        self.mean, self.std = compute_mean_std(audio_files[:max_samples])
+        self.mean, self.std = compute_mean_std(audio_files[:max_samples], self.use_mfcc)
         self._input_dim = self.mean.shape[0]
 
         # Make char map
@@ -64,7 +67,12 @@ class Preprocessor():
         return text[s:e]
 
     def preprocess(self, wave_file, text):
-        inputs = log_specgram_from_file(wave_file)
+        # if use_mfcc is true, use mfcc values
+        if self.use_mfcc: 
+            inputs = mfcc_from_file(wave_file)
+        else: 
+            inputs = log_specgram_from_file(wave_file)
+            # print(f"log spec size: {inputs.shape}")
         inputs = (inputs - self.mean) / self.std
         targets = self.encode(text)
         return inputs, targets
@@ -77,12 +85,19 @@ class Preprocessor():
     def vocab_size(self):
         return len(self.int_to_char)
 
-def compute_mean_std(audio_files):
-    samples = [log_specgram_from_file(af)
+def compute_mean_std(audio_files, use_mfcc: bool):
+    if use_mfcc:        # if use_mfcc true, use mfcc processing
+        samples = [mfcc_from_file(af)
                for af in audio_files]
+    else:              # else, use log_specgram processing
+        samples = [log_specgram_from_file(af)
+                for af in audio_files]
     samples = np.vstack(samples)
+    #print(f"cms samples shape: {samples.shape}")
     mean = np.mean(samples, axis=0)
+    #print(f"cms mean shape: {mean.shape}")
     std = np.std(samples, axis=0)
+    #print(f"cms std shape: {std.shape}")
     return mean, std
 
 class AudioDataset(tud.Dataset):
@@ -165,6 +180,63 @@ def log_specgram(audio, sample_rate, window_size=20,
                     noverlap=noverlap,
                     detrend=False)
     return np.log(spec.T.astype(np.float32) + eps)
+
+def mfcc_from_file(audio_file: str):
+    """Computes the Mel Frequency Cepstral Coefficients (MFCC) from an audio file path by calling the mfcc method
+
+    Arguments
+    ----------
+    audio_file: str, the filename of the audio file
+
+    Returns
+    -------
+        np.ndarray, the transposed log of the spectrogram as returned by mfcc
+    """
+    audio, sample_rate = wave.array_from_wave(audio_file)
+    #print(f"audio_file: {audio_file}")
+    #print(f"audio shape: {audio.shape}, sample rate {sample_rate}")
+
+    if len(audio.shape)>1:     # if there are multiple channels, take the first channel
+        audio = audio[:,0]
+   
+    return create_mfcc(audio, sample_rate)
+
+def create_mfcc(audio, sample_rate: int, esp=1e-10):
+    """Calculates the mfcc using python_speech_features and can return the mfcc's and its derivatives, if desired. 
+    If num_mfcc is set to 13 or less: Output consists of 12 MFCC and 1 energy
+    if num_mfcc is set to 26 or less: ouput consists of 12 mfcc, 1 energy, as well as the first derivative of these
+    if num_mfcc is set to 39 or less: ouput consists of above as well as the second derivative of these
+    """
+
+    num_mfcc = 39   # the number of mfcc's in the output
+    mfcc = python_speech_features.mfcc(audio, sample_rate, winlen=0.025, winstep=0.01, numcep=13, nfilt=26, preemph=0.97, appendEnergy=True)
+    out = mfcc
+    
+    # the if-statement waterfall appends the desired number of derivatives to the output value
+    if num_mfcc > 13:
+        derivative = np.zeros(mfcc.shape)
+        for i in range(1, mfcc.shape[0] - 1):
+            derivative[i, :] = mfcc[i + 1, :] - mfcc[i - 1, :] 
+
+        mfcc_derivative = np.concatenate((mfcc, derivative), axis=1)
+        out = mfcc_derivative
+        if num_mfcc > 26:
+            derivative2 = np.zeros(derivative.shape)
+            for i in range(1, derivative.shape[0] - 1):
+                derivative2[i, :] = derivative[i + 1, :] - derivative[i - 1, :]
+
+            out = np.concatenate((mfcc, derivative, derivative2), axis=1)
+            if num_mfcc > 39:
+                derivative3 = np.zeros(derivative2.shape)
+                for i in range(1, derivative2.shape[0] - 1):
+                    derivative3[i, :] = derivative2[i + 1, :] - derivative2[i - 1, :]
+
+                out = np.concatenate((mfcc, derivative, derivative2, derivative3), axis=1)
+
+    #print(f"mfcc shape: {out.shape}")
+    return out.astype(np.float32)
+
+
 
 def read_data_json(data_json):
     with open(data_json) as fid:
