@@ -104,14 +104,18 @@ class StreamInfer():
                     mic_buffer = self.audio_q.get()
                     np_mic_buffer = np.frombuffer(mic_buffer, dtype=np.int16)
                     audio_buffer = np.append(audio_buffer, np_mic_buffer)
-                
-                #print(f"audio_buffer shape: {audio_buffer.shape}")
+                    #print(f"audio_buffer shape: {audio_buffer.shape}")
+
                 # add the audio_buffer to the preprocess_q
                 self.preprocess_q.put(audio_buffer)
         except KeyboardInterrupt:
             print("exiting audio_collection")
-
     
+    def start_preprocess(self, preproc):
+
+        preprocess_thread = Thread(target=self.preprocess, args=(preproc,))
+        preprocess_thread.start()
+
     def preprocess(self, preproc):
         """this function gets
 
@@ -125,6 +129,11 @@ class StreamInfer():
         except KeyboardInterrupt:
             print("exitting preprocesss")
 
+    def start_infer(self, model, preproc):
+
+        infer_thread = Thread(target=self.infer, args=(model, preproc))
+        infer_thread.start()
+
     def infer(self, model, preproc):
 
         # loading the model conducting inference and the preprocessing object preproc
@@ -135,7 +144,7 @@ class StreamInfer():
                 dummy_batch = ((norm_log_spec,), (fake_label,))  # model.infer expects 2-element tuple
                 preds = model.infer(dummy_batch)
                 preds = [preproc.decode(pred) for pred in preds]
-                self.predictions.extend(preds)
+                self.predictions.extend(*preds)
 
         except KeyboardInterrupt:
             print("exitting infer")
@@ -159,7 +168,9 @@ def main(model_path: str):
 
     """
 
-    audio_buffer_size = 10
+    audio_buffer_size = 100
+
+    assert audio_buffer_size > 9, "audio_buffer size must be greater than 9"
 
     stream_infer = StreamInfer()
 
@@ -169,27 +180,21 @@ def main(model_path: str):
     
     model, preproc = speech.load(model_path, tag='')
 
-    stream_infer.preprocess(preproc)      # continually gets audio buffers from preprocess_q, preprocesses it, and puts it on the model_q
+    stream_infer.start_preprocess(preproc)      # continually gets audio buffers from preprocess_q, preprocesses it, and puts it on the model_q
 
-    stream_infer.infer(model, preproc)     # continually getss preprocessed objects from model_q and updates the predictions list with the predictions 
-
-    for _ in range (20):
-        sleep(0.5)
-        stream_infer.check_queue_size() # output the final predictions
-        print(stream_infer.predictions)
+    stream_infer.start_infer(model, preproc)     # continually getss preprocessed objects from model_q and updates the predictions list with the predictions 
 
 
-    """
+
     try:
         while True:
-            sleep(0.5)
-            stream_infer.check_queue_size() # output the final predictions
+            sleep(0.25)
+            #stream_infer.check_queue_size() # output the final predictions
             print(stream_infer.predictions)
 
     except KeyboardInterrupt:
         #soundfile.write('new_file.wav', np_array, 16000)
         print('All predictions:', stream_infer.predictions)
-    """
 
 
 

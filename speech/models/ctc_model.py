@@ -69,7 +69,7 @@ class CTC(model.Model):
         probs = self.forward_impl(x, softmax=True)
         # convert the torch tensor into a numpy array
         probs = probs.data.cpu().numpy()
-        print(f"probs type: {type(probs)}, probs len: {probs.shape}")
+        #print(f"probs type: {type(probs)}, probs len: {probs.shape}")
         #print(f"ctc_model infer probs shape: {probs.shape}")
         return [decode(p, beam_size=3, blank=self.blank)[0]
                     for p in probs]
