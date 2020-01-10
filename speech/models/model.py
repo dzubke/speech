@@ -149,25 +149,25 @@ class LinearND(nn.Module):
 
     def forward(self, x):
         size = x.size()
-        print(f"fc input size: {x.size()}")
+        #print(f"fc input size: {x.size()}")
         n = int(np.prod(size[:-1]))
         out = x.contiguous().view(n, size[-1])
         out = self.fc(out)
         size = list(size)
-        print(f"fc output size: {out.size()}")
+        #print(f"fc output size: {out.size()}")
         size[-1] = out.size()[-1]
         return out.view(size)
 
 def zero_pad_concat(inputs):
     max_t = max(inp.shape[0] for inp in inputs)
     shape = (len(inputs), max_t, inputs[0].shape[1])
-    print(f"zero_pad_concat shape: {shape}")
+    #print(f"zero_pad_concat shape: {shape}")
     input_mat = np.zeros(shape, dtype=np.float32)
     # this loops over all of the examples in inputs and adds them to the zero's array input_mat
     # so that for examples with length less than the max have zero's from the end of the example
     # until max_t
     for e, inp in enumerate(inputs):
-        print(f"inp shape:{inp.shape}")
+        #print(f"inp shape:{inp.shape}")
         input_mat[e, :inp.shape[0], :] = inp
     return input_mat
 
