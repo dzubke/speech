@@ -97,7 +97,7 @@ if __name__ == "__main__":
     print(f"timit path: {path}")
 
     print("Converting files from NIST to standard wave format...")
-    convert_to_wav(path)
+    #convert_to_wav(path)
 
     print("Preprocessing train")
     train = load_transcripts(os.path.join(path, "TRAIN"))
