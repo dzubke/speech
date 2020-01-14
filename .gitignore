@@ -109,3 +109,6 @@ ENV/
 
 # pretrained models
 examples/librispeech/models/deepspeech_pretrained/librispeech_pretrained_v2.pth
+
+# onnx git examples
+onnx/examples

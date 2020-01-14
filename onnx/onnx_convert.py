@@ -10,7 +10,8 @@ def onnx_export(input_path, output_path):
         dummy_input = pickle.load(fid) 
     #dummy_tensor = (torch.from_numpy(dummy_input[0][0]).float().to('cpu'), [27])
     #dummy_tensor = [torch.FloatTensor(1, 200, 161), torch.IntTensor(1, 41)]
-    dummy_tensor = [torch.randn(1, 200, 161, device='cpu'), torch.randn(1,10, device='cpu')]
+    #dummy_tensor = [torch.randn(1, 200, 161, device='cpu'), torch.randn(1,10, device='cpu')]
+    dummy_tensor = [torch.FloatTensor(1, 200, 161), torch.IntTensor(1, 41)]
     onnx_model = torch.onnx.export(torch_model, dummy_tensor, output_path)
 
 
