@@ -17,7 +17,7 @@ def load_phone_map():
     return m60_48, m48_39
 
 def convert_to_wav(path):
-    data_helpers.convert_full_set(path, "*.flac",
+    data_helpers.convert_full_set(path, "*.wav",
             new_ext='wv',
             use_avconv=False)
 
@@ -64,7 +64,7 @@ def build_json(data, path, set_name):
             fid.write("\n")
 
 if __name__ == "__main__":
-    ## format of command is >>python test_processes.py <path_to_dataset> <json_name> --list_transcripts <True/False> 
+    ## format of command is >>python test_preprocess.py <path_to_dataset> <json_name> --list_transcripts <True/False> 
     # where the optional --list_transcripts argument is whether the phoneme lable transcrips are in list form.    
 
     parser = argparse.ArgumentParser(
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     print(f"test dataset path: {path}")
 
     print("Converting files to standard wave format...")
-    #convert_to_wav(path)
+    convert_to_wav(path)
     
     
     print("Preprocessing labels")

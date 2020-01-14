@@ -27,9 +27,9 @@ def check_ffmpeg():
     """
     return check_install(FFMPEG, "-version")
 
-
 USE_AVCONV = check_avconv()
 USE_FFMPEG = check_ffmpeg()
+
 if not (USE_AVCONV or USE_FFMPEG):
     raise OSError(("Must have avconv or ffmpeg "
                    "installed to use conversion functions."))

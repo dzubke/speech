@@ -1,0 +1,18 @@
+{"prediction": ["er", "ey", "k", "aa", "r", "ow", "iy", "z", "ih", "hh", "iy", "z", "sh", "uw", "s"], "label": ["w", "ah", "k", "er", "l", "ah", "ih", "s", "ah", "hh", "ih", "z", "sh", "uw", "s"]}
+{"prediction": ["k", "ao", "r", "ng", "ow", "f", "eh", "d", "ih", "d", "dh", "ih", "ae", "t", "ah", "dh"], "label": ["hh", "uw", "aa", "r", "y", "ao", "r", "f", "eh", "r", "ah", "d", "eh", "s", "p", "eh", "r", "ah", "d", "eh", "s"]}
+{"prediction": ["ay", "l", "ay", "k", "iy", "t", "uw", "ih", "z", "b", "ae", "n", "t", "ay", "l", "iy", "d", "ih", "d", "f", "ae", "n", "s"], "label": ["ay", "l", "ay", "k", "t", "uw", "s", "p", "eh", "n", "t", "ay", "m", "w", "ih", "d", "ah", "f", "r", "eh", "n", "z"]}
+{"prediction": ["d", "ao", "d", "iy"], "label": ["d", "aa", "er", "t", "iy", "n"]}
+{"prediction": ["hh", "aa", "r", "d", "uw", "uw", "d", "t", "iy", "t", "er"], "label": ["hh", "uw", "aa", "l", "y", "ow", "t", "iy", "ch", "er"]}
+{"prediction": ["ay", "r", "ih", "r", "iy", "dh", "ow", "r", "ay", "f", "f", "r", "ah", "dh", "er", "l", "ah"], "label": ["ay", "r", "ih", "r", "iy", "d", "ow", "n", "r", "ay", "k", "v", "ah", "n", "ih", "l", "ah"]}
+{"prediction": ["w", "ih", "y", "uh", "t", "w", "uw", "ay", "r", "ih", "r", "v", "iy", "f", "aw", "th", "w", "r", "er", "ay", "ih", "n", "ah", "dh", "y", "ah", "f", "uw"], "label": ["ay", "r", "ih", "r", "iy", "d", "ow", "n", "t", "r", "ay", "k", "ih", "n", "d", "iy", "ae", "n", "f", "uw"]}
+{"prediction": ["dh", "eh", "s", "dh", "ow", "g", "r", "ow", "z", "ih", "ng", "aa"], "label": ["w", "eh", "n", "s", "d", "ah", "k", "l", "ow", "z", "ih", "ng", "t", "ay"]}
+{"prediction": ["iy", "y", "uh", "r", "aw", "r", "ah", "z", "ah", "n"], "label": ["hh", "w", "ih", "ch", "y", "ah", "r", "p", "eh", "r", "ah", "n", "t", "s"]}
+{"prediction": ["ay", "l", "ao", "f", "ah", "n", "aw", "ae", "f", "ah", "l"], "label": ["ah", "l", "eh", "v", "ah", "n", "ah", "l", "eh", "v", "ah", "n"]}
+{"prediction": ["d", "ao", "t"], "label": ["d", "aa", "l", "t", "iy", "n"]}
+{"prediction": ["d", "ow", "l", "ow", "n", "d", "ao", "n", "dh", "iy", "d", "dh", "eh", "ow", "t", "er", "l", "ae", "m", "p"], "label": ["d", "ah", "l", "uw", "m", "d", "ow", "n", "t", "n", "iy", "d", "ih", "ah", "l", "ae", "m", "p", "ah"]}
+{"prediction": ["m", "ay", "f", "ey", "l", "er", "iy", "m", "ow", "b", "iy", "iy", "z", "ah", "n", "n", "ah", "l", "dh", "iy", "b", "ow"], "label": ["m", "ay", "f", "eh", "v", "er", "ih", "m", "uw", "b", "iy", "ih", "z", "n", "ow", "t", "b", "uh"]}
+{"prediction": ["w", "ah", "s", "ah", "t", "ay", "m"], "label": ["w", "aa", "t", "s", "ah", "t", "ay"]}
+{"prediction": ["ay", "f", "oy", "f", "aa", "r", "er", "ow", "k", "ao", "ae", "n", "p", "l", "uh", "th"], "label": ["ay", "f", "r", "iy", "f", "er", "k", "aa", "r", "iy", "ae", "n", "p", "uw", "d"]}
+{"prediction": ["w", "ih", "t", "ih", "d", "ae", "d", "ah", "p", "m", "ao", "l", "b", "ih", "l", "ah", "t", "w", "ih", "th", "ah", "b", "y", "uw", "t", "ih", "d", "p", "uh", "k", "ae", "t", "b", "ih", "dh", "er", "l"], "label": ["w", "iy", "s", "t", "ey", "d", "ae", "t", "ah", "s", "m", "ao", "l", "v", "ih", "l", "ah", "jh", "w", "ih", "d", "ah", "b", "y", "uw", "t", "ah", "f", "ah", "l", "k", "ae", "th", "iy", "d", "r", "ah", "l"]}
+{"prediction": ["hh", "iy", "f", "eh", "ah", "ae", "ay", "ih", "l", "ay", "z", "aa", "ay", "sh", "ae", "l", "aa", "er", "er"], "label": ["iy", "v", "ih", "n", "ae", "d", "m", "ih", "d", "n", "ay", "t", "ay", "m", "ih", "n", "d", "ah", "jh", "iy", "m"]}
+{"prediction": ["w", "eh", "s", "uw", "f", "aa", "t", "iy"], "label": ["w", "eh", "n", "s", "y", "aa", "r", "f", "aa", "r", "d", "iy"]}

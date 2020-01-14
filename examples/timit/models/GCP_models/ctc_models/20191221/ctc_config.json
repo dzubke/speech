@@ -1,0 +1,37 @@
+{
+    "seed" : 2017,
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/timit/models/ctc_models/20191221",
+
+    "data" : {
+        "train_set" : "/home/dzubke/awni_speech/data/timit_formats/sph2pipe/timit/train.json",
+        "dev_set" : "/home/dzubke/awni_speech/data/timit_formats/sph2pipe/timit/dev.json",
+        "start_and_end" : false,
+        "use_mfcc": false
+    },
+
+    "optimizer" : {
+        "batch_size" : 8,
+        "epochs" : 150,
+        "learning_rate" : 1e-3,
+        "momentum" : 0.0
+    },
+
+    "model" : {
+        "class" : "CTC",
+        "load_model" : false,
+        "model_path" : "/home/dzubke/awni_speech/speech/examples/timit/models/ctc_models/20191221",
+        "it_loss_path" : "/home/dzubke/awni_speech/speech/examples/timit/models/ctc_models/20191221/CTC_run_state.pickle",
+        "dropout" : 0.4,
+        "encoder" : {
+            "conv" : [
+                [32, 5, 3, 1],
+                [32, 5, 3, 1]
+            ],
+            "rnn" : {
+                "dim" : 256,
+                "bidirectional" : false,
+                "layers" : 4
+            }
+        }
+    }
+}

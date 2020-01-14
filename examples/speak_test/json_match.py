@@ -32,6 +32,8 @@ def consolidate_score(score_path: str, test_path: str, cons_path:str):
     None: writes to json
 
     """
+    use_timit = False #flag used to alter code if the timit dataset is being used because a remapping for a 48-phoneme set occurs to a 39-phoneme set
+
 
     with open(score_path, 'r') as score_fid:
         score_json = [json.loads(l) for l in score_fid]
@@ -47,20 +49,35 @@ def consolidate_score(score_path: str, test_path: str, cons_path:str):
                     predi = score_json[i]['predi']
                     #sorted(test_json, key = lambda x: x['duration'])
 
+                    match = False # if the score example and test json examples are matches, create a dictionary entry
                     for j in range(len(test_json)):     # find the filename for the matching label
-                        if editdistance.eval(score_json[i]['label'], remap48_39(test_json[j]['text'])) < 15 :
-                        # if score_json[i]['label'] == remap48_39(test_json[j]['text']):
-                            filename = test_json[j]['audio']
-                            cons_entry = {'audio': filename,
-                                            'dist': dist, 
-                                            'length': length,
-                                            'PER': per,
-                                            'label': label,
-                                            'predi': predi}
-                            print(cons_entry)
-                            json.dump(cons_entry, fid)
-                            fid.write("\n")
-                            
+                        
+                        if use_timit:       # if timit-flag at top of function is true
+                            #if editdistance.eval(score_json[i]['label'], remap48_39(test_json[j]['text'])) < 15 :
+                            if score_json[i]['label'] == remap48_39(test_json[j]['text']):
+                                match = True
+
+                        else: 
+                            if score_json[i]['label'] == test_json[j]['text']:
+                                match = True
+                        
+                        if match:
+                            for j in range(len(test_json)):     # find the filename for the matching label
+                                if editdistance.eval(score_json[i]['label'], remap48_39(test_json[j]['text'])) < 15 :
+                                # if score_json[i]['label'] == remap48_39(test_json[j]['text']):
+                                    filename = test_json[j]['audio']
+                                    cons_entry = {'audio': filename,
+                                                    'dist': dist, 
+                                                    'length': length,
+                                                    'PER': per,
+                                                    'label': label,
+                                                    'predi': predi}
+                                    print(cons_entry)
+                                    json.dump(cons_entry, fid)
+                                    fid.write("\n")
+
+                        match = False
+
                             
 
 

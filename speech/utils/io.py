@@ -1,4 +1,3 @@
-
 import os
 import pickle
 import torch
@@ -25,4 +24,10 @@ def load(path, tag=""):
         preproc = pickle.load(fid)
     return model, preproc
 
- 
+def load_pretrained(model_path):
+    model = torch.load(model_path, map_location=torch.device('cpu'))
+    return model
+
+def save_dict(dct, path):
+    with open(path, 'wb') as fid:
+        pickle.dump(dct, fid)
