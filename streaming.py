@@ -48,9 +48,9 @@ class StreamInfer():
         self.audio_q = Queue()
         self.preprocess_q = Queue()
         self.model_q = Queue()
-
         self.predictions = []   # a list to contain the final predictions from the ctc_decoder
-
+        self.audio_collection_count: int = 0    # to debug, a count of the number of audio collections created
+        self.mic_put_time: float = 0.0       # to debug, sorts cummulative time to assign mic buffers
     
 
     def start_stream(self, audio_buffer_size: int = 10):
@@ -77,7 +77,10 @@ class StreamInfer():
         try:
             while True:
                 mic_buffer = subproc.stdout.read(512)
+                put_start = time()
                 self.audio_q.put(mic_buffer)
+                put_stop = time()
+                self.mic_put_time += (put_stop - put_start)
         
         except KeyboardInterrupt:
             print("exiting mic_record")
@@ -88,29 +91,60 @@ class StreamInfer():
 
         mic_thread = Thread(target=self.audio_collection, args=(audio_buffer_size,))
         mic_thread.start()
-
         
     def audio_collection(self, audio_buffer_size):
         """This function collects the number of mic_buffers specified in audio_buffer_size into 
             a numpy array and puts it on the proprocess_q
         """
-    
-        # this will run for 100 loops, later this will be changed to a try-except with a keyboard interrupt
+        overlap = 5  # the amount of overlapping mic_buffers between each audio_buffer
+        tail_cache = np.array([], dtype=np.int16)
+        head_cache = np.array([], dtype=np.int16)
+
         try:
             while True:
-                # reinitialize the audio buffer
-                audio_buffer = np.array([], dtype=np.int16)
-                for _ in range(audio_buffer_size):
-                    mic_buffer = self.audio_q.get()
-                    np_mic_buffer = np.frombuffer(mic_buffer, dtype=np.int16)
-                    audio_buffer = np.append(audio_buffer, np_mic_buffer)
-                    #print(f"audio_buffer shape: {audio_buffer.shape}")
+                # reinitialize the audio buffer to the tail_cache
+                
+                audio_buffer = tail_cache
+
+                for _ in range(audio_buffer_size - 2*overlap):
+                    audio_buffer = self.bufferq_to_numpy(audio_buffer)
+                
+                if  tail_cache.shape[0] != 0:       # the if statement avoids the first loop when the tail_cache is empty
+                    assert audio_buffer.shape[0] == (audio_buffer_size)*256, \
+                        "incorrect intermediate audio_buffer shape. expected: %i, actual %i" % (int(audio_buffer_size*256), audio_buffer.shape[0])
+                
+                for _ in range(2*overlap):
+                    head_cache = self.bufferq_to_numpy(head_cache)
+
+                assert head_cache.shape[0] == 2*overlap*256, \
+                    "incorrect head cache shape, expected: %i, actual %i" % (int(2*overlap*256), head_cache.shape[0])
+
+                audio_buffer = np.append(audio_buffer, head_cache)
+            
+                if  tail_cache.shape[0] != 0:       # the if statement avoids the first loop when the tail_cache is empty
+                    assert audio_buffer.shape[0] == (audio_buffer_size + 2*overlap)*256, \
+                        "incorrect final audio_buffer shape.  expected: %i, actual %i" % (int((audio_buffer_size + 2*overlap)*256), audio_buffer.shape[0])
 
                 # add the audio_buffer to the preprocess_q
                 self.preprocess_q.put(audio_buffer)
+                self.audio_collection_count += 1
+                tail_cache = head_cache
+                head_cache = np.array([], dtype=np.int16)   # setting head_cache back to zero
+
+
         except KeyboardInterrupt:
             print("exiting audio_collection")
+
+    def bufferq_to_numpy(self, audio_array: np.ndarray) -> np.ndarray:
+        """gets a mic_buffer from the audio_q, converts it to a numpy array and appends
+            it to the input audio_array
+        """
+        mic_buffer = self.audio_q.get()
+        np_mic_buffer = np.frombuffer(mic_buffer, dtype=np.int16)
+        audio_array = np.append(audio_array, np_mic_buffer)
+        return audio_array
     
+
     def start_preprocess(self, preproc):
 
         preprocess_thread = Thread(target=self.preprocess, args=(preproc,))
@@ -127,7 +161,8 @@ class StreamInfer():
                 norm_log_spec = (log_spec - preproc.mean) / preproc.std
                 self.model_q.put(norm_log_spec)
         except KeyboardInterrupt:
-            print("exitting preprocesss")
+            print("existing preprocess")
+
 
     def start_infer(self, model, preproc):
 
@@ -145,18 +180,19 @@ class StreamInfer():
                 preds = model.infer(dummy_batch)
                 preds = [preproc.decode(pred) for pred in preds]
                 self.predictions.extend(*preds)
-
+                pickel_once +=1
         except KeyboardInterrupt:
-            print("exitting infer")
+            print("existing infer")
+
     
     def check_queue_size(self):
         """Checks the size of the preprocess_q and model_q
         """
         
-        print(f"audio_q size: {self.preprocess_q.qsize()}")
-        print(f"preprocess_q size: {self.preprocess_q.qsize()}")
-        print(f"model_q size: {self.model_q.qsize()}")
-        print(f"predictions length: {len(self.predictions)}")
+        print(f"audio_q size: {self.preprocess_q.qsize()}, \
+                preprocess_q size: {self.preprocess_q.qsize()}, \
+                model_q size: {self.model_q.qsize()}, \
+                predictions length: {len(self.predictions)}")
 
 
 
@@ -165,7 +201,6 @@ def main(model_path: str):
     """This function takes in a path to a pytorch model and prints predictions of the model from live streaming
         audio from a computer microphone.
 
-
     """
 
     audio_buffer_size = 100
@@ -173,6 +208,8 @@ def main(model_path: str):
     assert audio_buffer_size > 9, "audio_buffer size must be greater than 9"
 
     stream_infer = StreamInfer()
+
+    main_start_time = time()
 
     stream_infer.start_stream()     # collects audio from the microphone into audio buffer and puts it on the preprocess queue
     
@@ -188,12 +225,19 @@ def main(model_path: str):
 
     try:
         while True:
-            sleep(0.25)
-            #stream_infer.check_queue_size() # output the final predictions
+            sleep(0.1)
+            stream_infer.check_queue_size() # output the final predictions
             print(stream_infer.predictions)
 
     except KeyboardInterrupt:
         #soundfile.write('new_file.wav', np_array, 16000)
+        main_stop_time = time()
+        time_duration = round(main_stop_time-main_start_time, 6)
+        time_collected = stream_infer.audio_collection_count*audio_buffer_size*0.016
+        print(f"time duration: {time_duration} sec")
+        print(f"time collected: {time_collected} sec")
+        print(f"time difference: {time_duration - time_collected} sec")
+        print(f"mic_put_time: {stream_infer.mic_put_time} sec")
         print('All predictions:', stream_infer.predictions)
 
 
