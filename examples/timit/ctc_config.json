@@ -1,11 +1,12 @@
 {
     "seed" : 2017,
-    "save_path" : "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/20191211/ctc_best",
+    "save_path" : "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/ctc_models/20191219/",
 
     "data" : {
         "train_set" : "/Users/dustin/CS/consulting/firstlayerai/data/timit/train.json",
         "dev_set" : "/Users/dustin/CS/consulting/firstlayerai/data/timit/dev.json",
-        "start_and_end" : false
+        "start_and_end" : false,
+        "use_mfcc": false
     },
 
     "optimizer" : {
@@ -18,20 +19,19 @@
     "model" : {
         "class" : "CTC",
         "load_model" : false,
-        "model_path" : "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/ctc_best/model",
-        "it_loss_path" : "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/run_state_pickle/CTC_run_state.pickle",
+        "model_path" : "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/ctc_models/20191219/",
+        "it_loss_path" : "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/ctc_model/20191219/CTC_run_state.pickle",
         "dropout" : 0.4,
         "encoder" : {
             "conv" : [
-                [32, 5, 16, 2],
-                [32, 5, 16, 1], 
-                [64, 5, 16, 1],
-                [128, 5, 12, 1]
+                [32, 5, 3, 1],
+                [32, 5, 3, 1]
+
             ],
             "rnn" : {
                 "dim" : 256,
-                "bidirectional" : true,
-                "layers" : 8
+                "bidirectional" : false,
+                "layers" : 4
             }
         }
     }

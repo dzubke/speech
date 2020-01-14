@@ -107,7 +107,7 @@ def run(config):
     # Loaders
     batch_size = opt_cfg["batch_size"]
     preproc = loader.Preprocessor(data_cfg["train_set"],
-                  start_and_end=data_cfg["start_and_end"])
+                  start_and_end=data_cfg["start_and_end"], use_mfcc=data_cfg["use_mfcc"])
     train_ldr = loader.make_loader(data_cfg["train_set"],
                         preproc, batch_size)
     dev_ldr = loader.make_loader(data_cfg["dev_set"],

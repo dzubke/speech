@@ -13,7 +13,11 @@ def eval_loop(model, ldr):
     all_preds = []; all_labels = []; all_preds_dist=[]
     for batch in tqdm.tqdm(ldr):
         #dustin: my modification because the iteratable batch was being exhausted when it was called
-        temp_batch = list(batch)    
+        temp_batch = list(batch)
+        #print(f"# examples in batch: {len(temp_batch)}")   
+        #print(f"batch : {len(temp_batch[0])}")   
+        #print(f"batch: {temp_batch}")
+        #print(f"numpy [0][0]: {type(temp_batch[0])}")   
         # print(f"temp_bach: {temp_batch}")
         preds = model.infer(temp_batch)
         #preds_dist, prob_dist = model.infer_distribution(temp_batch, 5)
@@ -21,7 +25,7 @@ def eval_loop(model, ldr):
         all_labels.extend(temp_batch[1])
         #all_preds_dist.extend(((preds_dist, temp_batch[1]),prob_dist))
     # print(f"all labels: {all_labels}, all preds: {all_preds}")
-    return list(zip(all_labels, all_preds))#, all_preds_dist
+    return list(zip(all_labels, all_preds)) #, all_preds_dist
 
 def run(model_path, dataset_json,
         batch_size=1, tag="best",
@@ -30,7 +34,7 @@ def run(model_path, dataset_json,
     use_cuda = torch.cuda.is_available()
 
     model, preproc = speech.load(model_path, tag=tag)
-    # print(f"preproc mean shape: {len(preproc.mean)}, preproc std shape: {len(preproc.std)}")
+    # print(f"preproc dean shape: {len(preproc.mean)}, preproc std shape: {len(preproc.std)}")
     ldr =  loader.make_loader(dataset_json,
             preproc, batch_size)
     # print(f"ldr: {[i for i in ldr]}")
@@ -56,6 +60,7 @@ def run(model_path, dataset_json,
     if out_file is not None:
         with open(out_file, 'w') as fid:
             for label, pred in results:
+                
                 res = {'prediction' : pred,
                        'label' : label}
                 json.dump(res, fid)

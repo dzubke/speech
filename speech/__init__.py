@@ -1,2 +1,2 @@
-from speech.utils.io import save, load
+from speech.utils.io import save, load, load_pretrained
 from speech.utils.score import compute_per
