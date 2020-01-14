@@ -66,6 +66,8 @@ class CTC(model.Model):
 
     def infer(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
+        print(f"x size: {x.size()}")
+        print(f"y size: {y.size()}")
         probs = self.forward_impl(x, softmax=True)
         # convert the torch tensor into a numpy array
         probs = probs.data.cpu().numpy()
