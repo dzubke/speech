@@ -17,8 +17,6 @@
 
     "model" : {
         "class" : "Transducer",
-        "pickle_path" : "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/run_state_pickle/trans_run_state.pickle",
-        "from_pickle" : false,
         "dropout" : 0.5,
         "encoder" : {
             "conv" : [

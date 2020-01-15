@@ -17,8 +17,6 @@
 
     "model" : {
         "class" : "Seq2Seq",
-        "pickle_path" : "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/run_state_pickle/S2S_run_state.pickle",
-        "from_pickle" : false,
         "dropout" : 0.3,
         "encoder" : {
             "conv" : [
