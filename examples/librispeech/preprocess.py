@@ -15,9 +15,9 @@ from speech.utils import data_helpers
 from speech.utils import wave
 
 SETS = {
-    "train" : ["train-clean-100"],
-    "dev" : ["dev-clean"],
-    "test" : ["test-clean"]
+    "train" : ["train-other-500"],
+    "dev" : ["dev-other"],
+    "test" : ["test-other"]
     }
 
 def load_transcripts(path, use_phonemes=True):

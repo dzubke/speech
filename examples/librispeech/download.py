@@ -8,7 +8,8 @@ import tarfile
 import urllib.request
 
 EXT = ".tar.gz"
-FILES = ["raw-metadata", "train-clean-100", "dev-clean", "test-clean"]
+FILES = ["train-other-500", "dev-other", "test-other"]
+#FILES = ["raw-metadata","train-clean-100", "train-clean-360", "dev-clean", "test-clean"]
 BASE_URL = "http://www.openslr.org/resources/12/"
 
 def download_and_extract(in_file, out_dir):
