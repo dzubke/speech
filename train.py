@@ -106,10 +106,13 @@ def run(config):
                         preproc, batch_size)
 
     # Model
-    model_class = eval("models." + model_cfg["class"])
-    model = model_class(preproc.input_dim,
-                        preproc.vocab_size,
-                        model_cfg)
+    if model_cfg["load_model"]:
+        model, preproc = speech.load(model_cfg["model_path"], tag="best")
+    else:
+        model_class = eval("models." + model_cfg["class"])
+        model = model_class(preproc.input_dim,
+                            preproc.vocab_size,
+                            model_cfg)
     model.cuda() if use_cuda else model.cpu()
 
     # Optimizer
