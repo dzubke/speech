@@ -14,17 +14,11 @@ def eval_loop(model, ldr):
     for batch in tqdm.tqdm(ldr):
         #dustin: my modification because the iteratable batch was being exhausted when it was called
         temp_batch = list(batch)
-        #print(f"# examples in batch: {len(temp_batch)}")   
-        #print(f"batch : {len(temp_batch[0])}")   
-        #print(f"batch: {temp_batch}")
-        #print(f"numpy [0][0]: {type(temp_batch[0])}")   
-        # print(f"temp_bach: {temp_batch}")
         preds = model.infer(temp_batch)
         #preds_dist, prob_dist = model.infer_distribution(temp_batch, 5)
         all_preds.extend(preds)
         all_labels.extend(temp_batch[1])
         #all_preds_dist.extend(((preds_dist, temp_batch[1]),prob_dist))
-    # print(f"all labels: {all_labels}, all preds: {all_preds}")
     return list(zip(all_labels, all_preds)) #, all_preds_dist
 
 def run(model_path, dataset_json,
@@ -34,20 +28,16 @@ def run(model_path, dataset_json,
     use_cuda = torch.cuda.is_available()
 
     model, preproc = speech.load(model_path, tag=tag)
-    # print(f"preproc dean shape: {len(preproc.mean)}, preproc std shape: {len(preproc.std)}")
     ldr =  loader.make_loader(dataset_json,
             preproc, batch_size)
-    # print(f"ldr: {[i for i in ldr]}")
     model.cuda() if use_cuda else model.cpu()
     model.set_eval()
 
     results = eval_loop(model, ldr)
     print(f"number of examples: {len(results)}")
-    #print(f"results_dist: {results_dist}")
     #results_dist = [[(preproc.decode(pred[0]), preproc.decode(pred[1]), prob)] 
     #                for example_dist in results_dist
     #                for pred, prob in example_dist]
-    #print(f"results_dist: {results_dist}")
     results = [(preproc.decode(label), preproc.decode(pred))
                for label, pred in results]
     print(f"results: {results}")

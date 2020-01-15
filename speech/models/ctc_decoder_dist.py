@@ -1,4 +1,7 @@
 """
+Dustin: This file is identical to ctc_decoder, expect that it output the top X results, instead of only the top result.
+This code should be included in ctc_decoder, but I didn't want modify that code directly, so made a copy.
+
 This file is a modification of the file: ctc_decoder.py so that the top number of results from
 beam search are outputed rather than just the top result.
 
@@ -114,7 +117,6 @@ def decode_dist(probs, beam_size=10, blank=0, dist_size=5):
 
   best = beam[0]
   best_dist = beam[:dist_size]
-  print(f"ctc_decoder_dist best_dist size: {len(best_dist)}")
   probs = [-logsumexp(*dist[1]) for dist in best_dist]
   preds = [dist[0] for dist in best_dist]
   best_dist = preds, probs

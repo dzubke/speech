@@ -21,7 +21,7 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, max_samples=100, start_and_end=True, use_mfcc=False):
+    def __init__(self, data_json, max_samples=100, start_and_end=True):
         """
         Builds a preprocessor from a dataset.
         Arguments:
@@ -30,16 +30,17 @@ class Preprocessor():
             max_samples (int): The maximum number of examples to be used
                 in computing summary statistics.
             start_and_end (bool): Include start and end tokens in labels.
-            use_mfcc (bool): if true, mfcc processing will be used
+
+        Note:if using mfcc processing is desired, change method log_specgram_from_file to mfcc_from_file
+
         """
         data = read_data_json(data_json)
-        self.use_mfcc = False      #boolean if true, mfcc processing will be used
 
         # Compute data mean, std from sample
         audio_files = [d['audio'] for d in data]
         random.shuffle(audio_files)
         # the mean and std are of the log of the spectogram of the audio files
-        self.mean, self.std = compute_mean_std(audio_files[:max_samples], self.use_mfcc)
+        self.mean, self.std = compute_mean_std(audio_files[:max_samples])
         self._input_dim = self.mean.shape[0]
 
 
@@ -71,12 +72,7 @@ class Preprocessor():
         return text[s:e]
 
     def preprocess(self, wave_file, text):
-        #if use_mfcc is true, use mfcc values
-        if self.use_mfcc: 
-            inputs = mfcc_from_file(wave_file)
-        else: 
-            inputs = log_specgram_from_file(wave_file)
-            # print(f"log spec size: {inputs.shape}")
+        inputs = log_specgram_from_file(wave_file)
         inputs = (inputs - self.mean) / self.std
         targets = self.encode(text)
         return inputs, targets
@@ -89,14 +85,9 @@ class Preprocessor():
     def vocab_size(self):
         return len(self.int_to_char)
 
-def compute_mean_std(audio_files, use_mfcc: bool):
-    if use_mfcc:        # if use_mfcc true, use mfcc processing
-        samples = [mfcc_from_file(af)
-               for af in audio_files]
-    else:              # else, use log_specgram processing
-        samples = [log_specgram_from_file(af)
+def compute_mean_std(audio_files):
+    samples = [log_specgram_from_file(af)
                 for af in audio_files]
-    print(f"samples shape: {samples[0].shape}")
     samples = np.vstack(samples)
     mean = np.mean(samples, axis=0)
     std = np.std(samples, axis=0)
@@ -107,7 +98,6 @@ class AudioDataset(tud.Dataset):
     def __init__(self, data_json, preproc, batch_size):
 
         data = read_data_json(data_json)        #loads the data_json into a list
-        print(f"data[0]: {data[0]}")
         self.preproc = preproc                  # assign the preproc object
 
         # I'm not fully certain what is going on here
@@ -127,7 +117,6 @@ class AudioDataset(tud.Dataset):
         
         # unpack the data in the buckets into a list
         data = [d for b in buckets for d in b]
-        print(f"len of data: {len(data)}")
         self.data = data
 
     def __len__(self):
@@ -152,10 +141,8 @@ class BatchRandomSampler(tud.sampler.Sampler):
             raise ValueError("batch_size is greater than data length")
 
         it_end = len(data_source) - batch_size + 1
-        print(f"it_end: {it_end}")
         self.batches = [range(i, i + batch_size)
                 for i in range(0, it_end, batch_size)]
-        print(f"self.batches: {self.batches}")
         self.data_source = data_source
 
     def __iter__(self):
@@ -169,9 +156,7 @@ def make_loader(dataset_json, preproc,
                 batch_size, num_workers=4):
     dataset = AudioDataset(dataset_json, preproc,
                            batch_size)
-    #print(f"dataset: {[i for i in dataset]}")
     sampler = BatchRandomSampler(dataset, batch_size)
-    print(f"sampler: {[i for i in sampler]}")
     loader = tud.DataLoader(dataset,
                 batch_size=batch_size,
                 sampler=sampler,
@@ -192,8 +177,6 @@ def mfcc_from_file(audio_file: str):
         np.ndarray, the transposed log of the spectrogram as returned by mfcc
     """
     audio, sample_rate = wave.array_from_wave(audio_file)
-    print(f"audio_file: {audio_file}")
-    print(f"audio shape: {audio.shape}, sample rate {sample_rate}")
 
     if len(audio.shape)>1:     # if there are multiple channels, take the first channel
         audio = audio[:,0]
@@ -205,6 +188,8 @@ def create_mfcc(audio, sample_rate: int, esp=1e-10):
     If num_mfcc is set to 13 or less: Output consists of 12 MFCC and 1 energy
     if num_mfcc is set to 26 or less: ouput consists of 12 mfcc, 1 energy, as well as the first derivative of these
     if num_mfcc is set to 39 or less: ouput consists of above as well as the second derivative of these
+    
+    TODO (dustin): this fuction violates DRY principle. Clean it up. 
     """
 
     num_mfcc = 39   # the number of mfcc's in the output
@@ -232,7 +217,6 @@ def create_mfcc(audio, sample_rate: int, esp=1e-10):
 
                 out = np.concatenate((mfcc, derivative, derivative2, derivative3), axis=1)
 
-    print(f"mfcc shape: {out.shape}")
     return out.astype(np.float32)
 
 
@@ -251,12 +235,9 @@ def log_specgram_from_file(audio_file: str, channel: int=0, plot=False):
     """
     
     audio, sr = wave.array_from_wave(audio_file)
-    print(f"audio_file: {audio_file}")
-    print(f"audio shape: {audio.shape}, sample rate {sr}")
 
     if len(audio.shape)>1:     # there are multiple channels
         _, num_channels = audio.shape
-        print(f"are audio channels empty: channel 0: {sum(audio[:,0])==0}, channel 1: {sum(audio[:,1])==0}")
         assert channel <= num_channels, "channel argument greater than audio channels"
         audio = audio[:,channel]
    
@@ -266,14 +247,12 @@ def log_specgram(audio, sample_rate, window_size=20,
                  step_size=10, eps=1e-10, plot=False):
     nperseg = int(window_size * sample_rate / 1e3)
     noverlap = int(step_size * sample_rate / 1e3)
-    #print(f"nperseg: {nperseg}, noverlap: {noverlap}, sample_rate: {sample_rate}")
     f, t, spec = scipy.signal.spectrogram(audio,
                     fs=sample_rate,
                     window='hann',
                     nperseg=nperseg,
                     noverlap=noverlap,
                     detrend=False)
-    #print(f"log spectrogram shape: {spec.T.shape}, f.shape:{f.shape}, t.shape: {t.shape}")
     if plot==True:
         plot_spectrogram(f,t, spec)
     return np.log(spec.T.astype(np.float32) + eps)
@@ -297,9 +276,6 @@ def compare_log_spec_from_file(audio_file_1: str, audio_file_2: str, plot=False)
 
     nperseg_1 = int(window_size * sr_1 / 1e3)
     noverlap_1 = int(step_size * sr_1 / 1e3)
-
-    print(f"nperseg_1:{nperseg_1}, noverlap_1:{noverlap_1}")
-
     nperseg_2 = int(window_size * sr_2 / 1e3)
     noverlap_2 = int(step_size * sr_2 / 1e3)
 
@@ -325,8 +301,6 @@ def compare_log_spec_from_file(audio_file_1: str, audio_file_2: str, plot=False)
         plot_spectrogram(freq_diff, time_diff, spec_diff)
         #plot_spectrogram(freq_1, time_1, spec_2)
         #plot_spectrogram(freq_2, time_2, spec_2)
-
-    print(f"sum of spectrogram difference: {np.sum(spec_diff)}")
     
     return spec_diff
 

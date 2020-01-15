@@ -54,18 +54,12 @@ class Seq2Seq(model.Model):
         if self.is_cuda:
             x = x.cuda()
             y = y.cuda()
-        print(f"x size 1: {x.size()}, y size 1: {y.size()}")
         out, alis = self.forward_impl(x, y)
-        print(f"out size 1: {out.size()}, alis size 1: {alis.size()}")
         batch_size, _, out_dim = out.size()
         out = out.view((-1, out_dim))
-        print(f"out size 2: {out.size()}")
         y = y[:,1:].contiguous().view(-1)
-        print(f"y size 2: {y.size()}")
-        print(y.data.cpu().numpy())
         loss = nn.functional.cross_entropy(out, y,
                 size_average=False)
-        print(f"loss:{loss}")
         loss = loss / batch_size
         return loss 
 
