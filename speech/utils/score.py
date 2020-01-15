@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import editdistance
 
-def compute_per(results):
+def compute_cer(results):
     """
     Arguments:
         results (list): list of 2 elements tuples made of lists of the ground truth labels
