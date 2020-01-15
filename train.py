@@ -12,7 +12,6 @@ import torch.optim
 import tqdm
 import pickle
 import itertools
-
 import speech
 import speech.loader as loader
 import speech.models as models
@@ -44,8 +43,7 @@ def run_epoch(model, optimizer, train_ldr, it, avg_loss):
     end_t = time.time()
     tq = tqdm.tqdm(train_ldr)
     for batch in tq:
-        # print(batch)
-        temp_batch = list(batch)
+        temp_batch = list(batch)    # this was added as the batch object was being exhausted when it was called
         start_t = time.time()
         optimizer.zero_grad()
         loss = model.loss(temp_batch)
@@ -76,12 +74,6 @@ def eval_dev(model, ldr, preproc):
     model.set_eval()
 
     for batch in tqdm.tqdm(ldr):
-        # debugging print statements
-        #print(f"ldr len: {ldr.__len__()}, ldr contents: {[i for i in  itertools.islice(ldr,0,1)]}")
-        #print(f"# of elem in zip: {len([j for i in  itertools.islice(ldr,0,1) for j in i])}, len zip elem 1 aka # of arrays: {len([k for i in itertools.islice(ldr,0,1) for j in itertools.islice(i,0,1) for k in j])}, len of zip elem 2 aka # of phon lists: {len([k for i in itertools.islice(ldr,1) for j in itertools.islice(i,1,2) for k in j])}")
-        #print(f"shape of first 5 arrays: {[k.shape for i in itertools.islice(ldr,0,1) for j in itertools.islice(i,0,1) for k in itertools.islice(j,0,5)]}, # of phones in first 5 lists: {[len(k) for i in itertools.islice(ldr,1) for j in itertools.islice(i,1,2) for k in itertools.islice(j,0,5)]}")
-        #print(f"# of elem in zip: {len([j for i in  batch for j in i])}, len zip elem 1 aka # of arrays: {len([k for i in batch for j in itertools.islice(i,0,1) for k in j])}, len of zip elem 2 aka # of phon lists: {len([k for i in batch for j in itertools.islice(i,1,2) for k in j])}")
-        
         temp_batch = list(batch)
         preds = model.infer(temp_batch)
         loss = model.loss(temp_batch)
@@ -107,16 +99,14 @@ def run(config):
     # Loaders
     batch_size = opt_cfg["batch_size"]
     preproc = loader.Preprocessor(data_cfg["train_set"],
-                  start_and_end=data_cfg["start_and_end"], use_mfcc=data_cfg["use_mfcc"])
+                  start_and_end=data_cfg["start_and_end"])
     train_ldr = loader.make_loader(data_cfg["train_set"],
                         preproc, batch_size)
     dev_ldr = loader.make_loader(data_cfg["dev_set"],
                         preproc, batch_size)
 
     # Model
-    # dustin: I don't understand how the line below works. I can infer what it does but am not sure how it does it
     model_class = eval("models." + model_cfg["class"])
-    print(f"preproc.input_dim:{preproc.input_dim}, preproc.vocab_size: {preproc.vocab_size}")
     model = model_class(preproc.input_dim,
                         preproc.vocab_size,
                         model_cfg)
@@ -131,26 +121,8 @@ def run(config):
     best_so_far = float("inf")
     for e in range(opt_cfg["epochs"]):
         start = time.time()
-        # print([i for ex in train_ldr for i in ex])
 
-        # the if-statement pickles the run_state_object to be retreived if there are bugs in the 
-        # in any of the lines below run_epoch, so that you don't have to wait for run_epoch to complete
-        # before encountering the bugs
-        
-        if model_cfg["load_model"] and e==0: 
-            with open(model_cfg["it_loss_path"], 'rb') as f:
-                run_state = pickle.load(f)  # loads tuple of previous iteration and avg_loss: (it and avg_loss)
-                print(run_state)
-                with open(model_cfg["model_path"], 'rb') as model_f:
-                    model = torch.load(model_f)
-                    print("inside the load model")
-            print(run_state)
-
-        
-        else:
-            run_state = run_epoch(model, optimizer, train_ldr, *run_state)
-            with open(model_cfg["it_loss_path"],'wb') as model_fn:
-                pickle.dump(run_state, model_fn)
+        run_state = run_epoch(model, optimizer, train_ldr, *run_state)
 
         msg = "Epoch {} completed in {:.2f} (s)."
         print(msg.format(e, time.time() - start))
