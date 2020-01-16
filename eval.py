@@ -41,11 +41,11 @@ def run(model_path, dataset_json,
     results = [(preproc.decode(label), preproc.decode(pred))
                for label, pred in results]
     print(f"results: {results}")
-    per = speech.compute_per(results)
+    cer = speech.compute_cer(results)
 
 
 
-    print("PER for 48-phonemes {:.3f}".format(per))
+    print("PER {:.3f}".format(cer))
 
     if out_file is not None:
         with open(out_file, 'w') as fid:
