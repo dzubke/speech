@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.autograd as autograd
 
 import transducer.decoders as td
-import transducer.functions.transducer as transducer
+import transducer.transducer as transducer
 from . import model
 
 class Transducer(model.Model):
