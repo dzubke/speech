@@ -1,9 +1,9 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200114",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200115",
 
     "data" : {
-        "train_set" : "/home/dzubke/awni_speech/data/LibriSpeech/train-clean-100.json",
+        "train_set" : "/home/dzubke/awni_speech/data/LibriSpeech/train-clean-460.json",
         "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
         "start_and_end" : false
     },
