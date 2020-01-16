@@ -40,7 +40,6 @@ def run(model_path, dataset_json,
     #                for pred, prob in example_dist]
     results = [(preproc.decode(label), preproc.decode(pred))
                for label, pred in results]
-    print(f"results: {results}")
     cer = speech.compute_cer(results)
 
 
