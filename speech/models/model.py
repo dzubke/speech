@@ -32,13 +32,14 @@ class Model(nn.Module):
 
         convs = []
         in_c = 1
-        for out_c, h, w, s in conv_cfg:     
+        for out_c, h, w, s_h, s_w, p_h, p_w in conv_cfg:     
             conv = nn.Conv2d(in_channels=in_c, 
                              out_channels=out_c, 
                              kernel_size=(h, w),
-                             stride=(s, s), 
-                             padding=0)
-            convs.extend([conv, nn.ReLU()])
+                             stride=(s_h, s_w), 
+                             padding=(p_h, p_w))
+            batch_norm =  nn.BatchNorm2d(out_c)
+            convs.extend([conv, batch_norm, nn.ReLU()])
             if config["dropout"] != 0:
                 convs.append(nn.Dropout(p=config["dropout"]))
             in_c = out_c
@@ -50,7 +51,7 @@ class Model(nn.Module):
           "Convolutional ouptut frequency dimension is negative."
 
         rnn_cfg = encoder_cfg["rnn"]
-        self.rnn = nn.GRU(input_size=conv_out,
+        self.rnn = nn.LSTM(input_size=conv_out,
                           hidden_size=rnn_cfg["dim"],
                           num_layers=rnn_cfg["layers"],
                           batch_first=True, dropout=config["dropout"],
@@ -62,10 +63,10 @@ class Model(nn.Module):
     def conv_out_size(self, n, dim):
         for c in self.conv.children():
             if type(c) == nn.Conv2d:
-                # assuming a valid convolution meaning no padding
                 k = c.kernel_size[dim]
                 s = c.stride[dim]
-                n = (n - k + 1) / s
+                p = c.padding[dim]
+                n = (n - k + 1 + 2*p) / s
                 n = int(math.ceil(n))
         return n
 
