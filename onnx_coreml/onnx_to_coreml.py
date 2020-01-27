@@ -28,9 +28,9 @@ def converter_2(model_in, model_out):
     mlmodel.save(model_out)
 
 def main(model_in, model_out):
-    
     #converter_1(model_in, model_out)
     converter_2(model_in, model_out)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
