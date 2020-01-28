@@ -6,14 +6,19 @@ from onnx_coreml import convert
 import coremltools
 from get_paths import onnx_coreml_paths
 
-def converter_1(onnx_path, coreml_path, input_names, output_names):
+def converter_1(onnx_path, coreml_path):
+    print("mark 1")
     model_file = open(onnx_path, 'rb')
+    print("mark 2")
     model_proto = onnx_pb.ModelProto()
+    print("mark 3")
     model_proto.ParseFromString(model_file.read())
+    print("mark 4")
     coreml_model = convert(
-        model_proto#,  input_names=input_names, output_names=output_names, 
-       # minimum_ios_deployment_target = '13' 
+        model_proto, 
+        minimum_ios_deployment_target = '13' 
     )
+    print("mark 5")
     coreml_model.save(coreml_path)
 
 def converter_2(model_in, model_out):
@@ -35,13 +40,13 @@ def generate_input_output_names(model_name):
     elif model_name == 'resnet18':
         return ['input'], ['output']
     else: 
-        return ['inputs','labels'], ['outputs']
+        return ['inputs'], ['outputs']
 
 
 def main(model_name):
     onnx_path, coreml_path = onnx_coreml_paths(model_name)
-    input_names, output_names = generate_input_output_names(model_name)
-    converter_1(onnx_path, coreml_path, input_names, output_names)
+    #input_names, output_names = generate_input_output_names(model_name)
+    converter_1(onnx_path, coreml_path)#, input_names, output_names)
     #converter_2(onnx_path, coreml_path)
 
 

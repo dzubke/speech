@@ -15,8 +15,8 @@ def generate_test_input(model_format:str ,model_name:str, set_device=None ):
         elif model_name == "resnet18" or model_name == "alexnet":
             return eval("torch.randn(batch_size, 3, 224,224, requires_grad=True)"+device)
         else:
-            return [eval("torch.FloatTensor(batch_size, 200, 161)"+device),
-                eval("torch.IntTensor(batch_size, 41)"+device)]
+            return eval("torch.FloatTensor(batch_size, 200, 161)"+device)
+                #eval("torch.IntTensor(batch_size, 41)"+device)]
 
     elif model_format == "onnx":
         if model_name == "super_resolution":
