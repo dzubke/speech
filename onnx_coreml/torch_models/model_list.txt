@@ -1,7 +1,7 @@
-
-
-
-
- - earlier models are likely standard architecture. See ctc_config.json files. 
+t_model: same as 20200128_best_model but with batch_size=1 set in ctc_config.json earlier models are likely standard architecture. See ctc_config.json files. 
  - 20200127_best_model: 2 CNN, 4 LSTM (256 hidden units) trained for 1 epoch on train-clean-100.json
  - 20200128_best_model: 1 CNN, 1 GRU layer trained on dustin_test_data, some issues related to dropout mentioned during training
+- 20200128-v2_best_model: same as 20200128_best_model but with batch_size=1 set in ctc_config.json
+- 20200128-v3_best_model: removed self.bidirection if-statemetn
+
+
