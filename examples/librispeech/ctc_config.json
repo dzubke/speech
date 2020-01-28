@@ -1,10 +1,10 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200125",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200128",
 
     "data" : {
-        "train_set" : "/home/dzubke/awni_speech/data/LibriSpeech/train-clean-100.json",
-        "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
+        "train_set" : "/home/dzubke/awni_speech/data/dustin_test_data/20191202_clean/drz_test.json",
+        "dev_set" : "/home/dzubke/awni_speech/data/dustin_test_data/20191202_clean/drz_test.json",
         "start_and_end" : false
     },
 
@@ -20,13 +20,12 @@
         "dropout" : 0.4,
         "encoder" : {
             "conv" : [
-                [32, 5, 32, 2],
                 [32, 5, 32, 1]
              ],
             "rnn" : {
                 "dim" : 256,
                 "bidirectional" : false,
-                "layers" : 4
+                "layers" : 1
             }
         }
     }
