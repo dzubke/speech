@@ -115,6 +115,9 @@ onnx/examples
 
 # nohup.out files
 *.out
+<<<<<<< HEAD
 
 #alexnet is tooo big
 alexnet*
+=======
+>>>>>>> fb9fcbbba879ec25aed73ce520764b85e01f9d95
