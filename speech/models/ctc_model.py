@@ -22,8 +22,8 @@ class CTC(model.Model):
         self.fc = model.LinearND(self.encoder_dim, output_dim + 1)
 
     def forward(self, batch):
-        x, y, x_lens, y_lens = self.collate(*batch)
-        return self.forward_impl(x)
+       # x, y, x_lens, y_lens = self.collate(*batch)
+        return self.forward_impl(batch)
 
     def forward_impl(self, x, softmax=False):
         """conducts a forward pass through the CNN and RNN layers specified in the encoder
