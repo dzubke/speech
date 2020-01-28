@@ -8,13 +8,17 @@ import coremltools
 def torch_load(model_path, torch_device):
     return load(model_path, map_location=device(torch_device))
 
-def torch_onnx_export(torch_model, input_tensor, onnx_path, export_params=True, verbose=True, 
-                    opset_version=9, do_constant_folding=True, input_names = ['input'],
-                    output_names = ['output'], dynamic_axes = None):
-    """dynamic_axes example: 
-        {'input' : {0 : 'batch_size', 1: 'time_dim'},   
-        'output' : {0 : 'batch_size', 1: 'time_dim'}}
-        
+def torch_onnx_export(torch_model, input_tensor, onnx_path, 
+                    export_params=True,
+                    verbose=True, 
+                    opset_version=9, 
+                    do_constant_folding=False,
+                    input_names = ['input'],
+                    output_names = ['output'],
+                    keep_initializers_as_inputs=True, 
+                    dynamic_axes =  {'input' : {0 : 'batch_size', 1: 'time_dim'}, 'output' : {0 : 'batch_size', 1: 'time_dim'}}
+                    ):
+    """
     """
 
     onnx.export(torch_model,               # model being run
