@@ -62,7 +62,7 @@ class CTC(model.Model):
             for v in batch:
                 v.volatile = True
         return batch
-
+    
     def infer(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
         probs = self.forward_impl(x, softmax=True)

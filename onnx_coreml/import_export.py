@@ -1,9 +1,12 @@
+import sys
+
 from torch import load, onnx, device
 from onnx import onnx_pb
 from onnx_coreml import convert
 import coremltools
 
-
+from model_generator import TestNet
+import torch.nn as nn
 
 def torch_load(model_path, torch_device):
     return load(model_path, map_location=device(torch_device))
@@ -16,7 +19,7 @@ def torch_onnx_export(torch_model, input_tensor, onnx_path,
                     input_names = ['input'],
                     output_names = ['output'],
                     keep_initializers_as_inputs=True, 
-                    dynamic_axes =  {'input' : {0 : 'batch_size', 1: 'time_dim'}, 'output' : {0 : 'batch_size', 1: 'time_dim'}}
+                    dynamic_axes = {'input' : {0 : 'batch_size', 1: 'time_dim'}, 'output' : {0 : 'batch_size', 1: 'time_dim'}}
                     ):
     """
     """

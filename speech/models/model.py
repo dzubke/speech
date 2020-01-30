@@ -93,8 +93,8 @@ class Model(nn.Module):
         # Reshape x to be (batch, time, freq * channels)
         # for the RNN
         
-        #b, t, f, c = x.size()
-        x = x.view((x.size()[0], x.size()[1], -1))   
+        #b, t, f, c = x.data.size()
+        x = x.view((x.size()[0], x.size()[1], -1)) 
         
         x, h = self.rnn(x)
         
