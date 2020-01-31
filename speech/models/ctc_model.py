@@ -19,8 +19,7 @@ class CTC(model.Model):
         self.blank = output_dim
         self.fc = model.LinearND(self.encoder_dim, output_dim + 1)
 
-    def forward(self, batch):
-        x, y, x_lens, y_lens = self.collate(*batch)
+    def forward(self, x):
         return self.forward_impl(x)
 
     def forward_impl(self, x, softmax=False):
