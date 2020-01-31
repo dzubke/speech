@@ -51,7 +51,7 @@ class Model(nn.Module):
           "Convolutional ouptut frequency dimension is negative."
 
         rnn_cfg = encoder_cfg["rnn"]
-        self.rnn = nn.LSTM(input_size=conv_out,
+        self.rnn = nn.GRU(input_size=conv_out,
                           hidden_size=rnn_cfg["dim"],
                           num_layers=rnn_cfg["layers"],
                           batch_first=True, dropout=config["dropout"],
@@ -88,10 +88,10 @@ class Model(nn.Module):
         # (batch, channels, time, freq)
         x = torch.transpose(x, 1, 2).contiguous()
 
-        # Reshape x to be (batch, time, freq * channels)
+        # Reshape x to be (batch, time, channels  * freq)
         # for the RNN
-        b, t, f, c = x.size()
-        x = x.view((b, t, f * c))   
+        b, t, c, f= x.size()
+        x = x.view((b, t, c * f))   
 
         x, h = self.rnn(x)
 
