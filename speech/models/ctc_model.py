@@ -9,7 +9,7 @@ import torch.autograd as autograd
 import functions.ctc as ctc
 from . import model
 from .ctc_decoder import decode
-from .ctc_decoder_dist import decode_dis
+from .ctc_decoder_dist import decode_dist
 
 class CTC(model.Model):
     def __init__(self, freq_dim, output_dim, config):
@@ -20,7 +20,6 @@ class CTC(model.Model):
         self.fc = model.LinearND(self.encoder_dim, output_dim + 1)
 
     def forward(self, x):
-        #x, y, x_lens, y_lens = self.collate(*batch)
         return self.forward_impl(x)
 
     def forward_impl(self, x, softmax=False):
