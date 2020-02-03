@@ -14,12 +14,12 @@ def torch_load(model_path, torch_device):
 def torch_onnx_export(torch_model, input_tensor, onnx_path, 
                     export_params=True,
                     verbose=True, 
-                    opset_version=9, 
+                    opset_version=10, 
                     do_constant_folding=False,
                     input_names = ['input'],
                     output_names = ['output'],
-                    keep_initializers_as_inputs=True, 
-                    dynamic_axes = {'input' : {0 : 'batch_size', 1: 'time_dim'}, 'output' : {0 : 'batch_size', 1: 'time_dim'}}
+                    keep_initializers_as_inputs=None, 
+                    dynamic_axes = {'input' : {1: 'time_dim'}, 'output' : {1: 'time_dim'}}
                     ):
     """
     """
@@ -32,6 +32,7 @@ def torch_onnx_export(torch_model, input_tensor, onnx_path,
                       do_constant_folding=do_constant_folding,  # whether to execute constant folding for optimization
                       input_names = input_names,   # the model's input names
                       output_names = output_names, # the model's output names
+                      keep_initializers_as_inputs=keep_initializers_as_inputs,
                       dynamic_axes=dynamic_axes)    # variable lenght axes
 
 

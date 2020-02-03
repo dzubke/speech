@@ -33,7 +33,7 @@ layer_count=1
 #model = nn.Conv2d(1, 32, (5, 32), 1, 0)
 model = TestNet()
 model.eval()
-model_name = "20200129_1conv2d-1gru"
+model_name = "20200130_1conv2d-1gru"
 
 torch.save(model, './torch_models/'+model_name+'.pth')
 

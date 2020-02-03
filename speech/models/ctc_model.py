@@ -8,10 +8,15 @@ import torch.autograd as autograd
 
 #import functions.ctc as ctc #awni hannun's ctc bindings
 from warpctc_pytorch import CTCLoss  #sean naren's ctc bindings
-#from torch_baidu_ctc import CTCLoss   # joan puigcerver  ctc bindings
 from . import model
 from .ctc_decoder import decode
 from .ctc_decoder_dist import decode_dist
+
+"""
+two different ctc loss functions can be used for this model: awni hannun and sean naren's pytorch bindings
+to baidu's warp-ctc. To change them, change the commented out code in the import statements above
+ and in self.loss() below
+"""
 
 class CTC(model.Model):
     def __init__(self, freq_dim, output_dim, config):
@@ -43,10 +48,12 @@ class CTC(model.Model):
     def loss(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
         out = self.forward_impl(x)
-        loss_fn = CTCLoss(size_average=True)
-        #loss_fn = CTCLoss(average_frames=True, reduction="sum") #joan's ctc format
-        float_out = out.permute(1,0,2).float().requires_grad_(True) #permuation for sean and joan ctc
-        loss = loss_fn(float_out, y, x_lens, y_lens)
+        
+        #loss_fn = ctc.CTCLoss()         # awni's ctc loss call
+        loss_fn = CTCLoss(size_average=True)    # 1. naren's ctc loss call
+        out = out.permute(1,0,2).float().requires_grad_(True) # 2. naren ctc loss
+        
+        loss = loss_fn(out, y, x_lens, y_lens)
         return loss
 
     def collate(self, inputs, labels):

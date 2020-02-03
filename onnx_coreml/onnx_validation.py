@@ -12,7 +12,7 @@ from get_paths import pytorch_onnx_paths
 from get_test_input import generate_test_input
 from import_export import torch_load, torch_onnx_export
 
-
+from SimpleNet import SimpleNet
 
 
 def test_onnxruntime(model_name):
@@ -20,22 +20,26 @@ def test_onnxruntime(model_name):
     """    
     
     #input_tensor = torch.randn(5, 3, 10, requires_grad=True).cuda()
-    input_tensor = generate_test_input("pytorch", model_name)
-    
+    #input_tensor = generate_test_input("pytorch", model_name)
+    input_tensor, h0, c0 = generate_test_input("pytorch", model_name)    
+
     torch_path, onnx_path = pytorch_onnx_paths(model_name)
     
     torch_device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
     torch_model = torch_load(torch_path, torch_device)
     torch_model.eval()
-    torch_output = torch_model(input_tensor)    
-    
+    #torch_output = torch_model(input_tensor)
+    torch_output, (hn, cn) = torch_model(input_tensor, (h0, c0))    
+    print(f"torch_output: {torch_output}")   
+ 
     #torch_output = torch_export_inference(torch_path, onnx_path, input_tensor)
     
     onnx_runtime(input_tensor, onnx_path, torch_output)
 
 def torch_export_inference(torch_path: str, onnx_path:str, input_tensor):
-    """takes in a path to a pytorch model, loads the model, conducts inference on the input_tensor
+    """ DEPRICATED --> THIS FUNCTION ISN'T USED. I JUST HAVEN'T DELETED IT YOU. ITS HARD TO LET GO SOMETIMES...        
+        takes in a path to a pytorch model, loads the model, conducts inference on the input_tensor
         and exports the pytorch model as an onnx model. the method outputs the torch_ouput tensor that contains
         the inference
     """

@@ -32,12 +32,13 @@ class Model(nn.Module):
 
         convs = []
         in_c = 1
-        for out_c, h, w, s in conv_cfg:     
+        for out_c, h, w, s_h, s_w, p_h, p_w in conv_cfg:     
             conv = nn.Conv2d(in_channels=in_c, 
                              out_channels=out_c, 
                              kernel_size=(h, w),
-                             stride=(s, s), 
-                             padding=0)
+                             stride=(s_h, s_w), 
+                             padding=(p_h, p_w))
+            batch_norm =  nn.BatchNorm2d(out_c)
             convs.extend([conv, nn.ReLU()])
             if config["dropout"] != 0:
                 convs.append(nn.Dropout(p=config["dropout"]))
@@ -65,7 +66,8 @@ class Model(nn.Module):
                 # assuming a valid convolution meaning no padding
                 k = c.kernel_size[dim]
                 s = c.stride[dim]
-                n = (n - k + 1) / s
+                p = c.padding[dim]
+                n = (n - k + 1 + 2*p) / s
                 n = int(math.ceil(n))
         return n
 
@@ -75,7 +77,7 @@ class Model(nn.Module):
         """
         raise NotImplementedError
 
-    def encode(self, x):
+    def encode(self, x, h_prev):
         """this function processes the input data x through the CNN and RNN layers specified
             in the model encoder config.
 
@@ -93,16 +95,17 @@ class Model(nn.Module):
         # Reshape x to be (batch, time, freq * channels)
         # for the RNN
         
-        #b, t, f, c = x.data.size()
-        x = x.view((x.size()[0], x.size()[1], -1)) 
-        
-        x, h = self.rnn(x)
-        
-        #if self.rnn.bidirectional:
-        #    half = x.size()[-1] // 2
-        #    x = x[:, :, :half] + x[:, :, half:]
+        b, t, f, c = x.size()
+        x = x.view((b, t, f*c)) 
+        #x = x.view((x.data.size()[0], x.data.size()[1], -1)) 
 
-        return x
+        x, h = self.rnn(x, h_prev)
+        
+        if self.rnn.bidirectional:
+            half = x.size()[-1] // 2
+            x = x[:, :, :half] + x[:, :, half:]
+
+        return x, h
 
     def loss(self, x, y):
         """
