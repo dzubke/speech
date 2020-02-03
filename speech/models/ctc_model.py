@@ -39,7 +39,7 @@ class CTC(model.Model):
         """
         if self.is_cuda:
             x = x.cuda()
-        x = self.encode(x)      # propogates the data through the CNN and RNN encoder
+        x, h = self.encode(x)      # propogates the data through the CNN and RNN encoder
         x = self.fc(x)          # propogates the data through a fully-connected layer
         if softmax:
             return torch.nn.functional.softmax(x, dim=2)
