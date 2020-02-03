@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.autograd as autograd
 
 import transducer.decoders as td
-import transducer.functions.transducer as transducer
+import transducer.transducer as transducer
 from . import model
 
 class Transducer(model.Model):
@@ -47,7 +47,7 @@ class Transducer(model.Model):
         x, y, x_lens, y_lens = self.collate(*batch)
         y_mat = self.label_collate(batch[1])
         out = self.forward_impl(x, y_mat)
-        loss_fn = transducer.TransducerLoss()
+        loss_fn = transducer.Transducer().apply
         loss = loss_fn(out, y, x_lens, y_lens)
         return loss
 

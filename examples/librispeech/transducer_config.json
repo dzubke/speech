@@ -1,0 +1,37 @@
+{
+    "seed" : 2017,
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/trans_models/20200115",
+
+    "data" : {
+        "train_set" : "/home/dzubke/awni_speech/data/LibriSpeech/train-clean-100.json",
+        "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
+        "start_and_end" : false
+    },
+
+    "optimizer" : {
+        "batch_size" : 8,
+        "epochs" : 3,
+        "learning_rate" : 1e-3,
+        "momentum" : 0.0
+    },
+
+    "model" : {
+        "class" : "Transducer",
+        "dropout" : 0.5,
+        "encoder" : {
+            "conv" : [
+                [8, 5, 32, 2],
+                [8, 5, 32, 1]
+            ],
+            "rnn" : {
+                "dim" : 256,
+                "bidirectional" : true,
+                "layers" : 4
+            }
+        },
+        "decoder" : {
+            "embedding_dim" : 256,
+            "layers" : 1
+        }
+    }
+}

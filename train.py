@@ -47,10 +47,13 @@ def run_epoch(model, optimizer, train_ldr, it, avg_loss):
         start_t = time.time()
         optimizer.zero_grad()
         loss = model.loss(temp_batch)
+        #print(f"loss value 1: {loss.data[0]}")
         loss.backward()
 
         grad_norm = nn.utils.clip_grad_norm_(model.parameters(), 200)
-        loss = loss.data[0]
+        loss = loss.item()
+        #loss = loss.data[0]
+        #print(f"loss value 2: {loss}")
 
         optimizer.step()
         prev_end_t = end_t
@@ -77,7 +80,8 @@ def eval_dev(model, ldr, preproc):
         temp_batch = list(batch)
         preds = model.infer(temp_batch)
         loss = model.loss(temp_batch)
-        losses.append(loss.data[0])
+        losses.append(loss.item())
+        #losses.append(loss.data[0])
         all_preds.extend(preds)
         all_labels.extend(temp_batch[1])        #add the labels in the batch object
 

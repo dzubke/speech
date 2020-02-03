@@ -63,6 +63,7 @@ class Model(nn.Module):
     def conv_out_size(self, n, dim):
         for c in self.conv.children():
             if type(c) == nn.Conv2d:
+                # assuming a valid convolution meaning no padding
                 k = c.kernel_size[dim]
                 s = c.stride[dim]
                 p = c.padding[dim]
@@ -76,30 +77,35 @@ class Model(nn.Module):
         """
         raise NotImplementedError
 
-    def encode(self, x):
+    def encode(self, x, h_prev):
         """this function processes the input data x through the CNN and RNN layers specified
             in the model encoder config.
 
         """
+
         x = x.unsqueeze(1)      #
+
         x = self.conv(x)
 
         # At this point x should have shape
         # (batch, channels, time, freq)
+        
         x = torch.transpose(x, 1, 2).contiguous()
-
-        # Reshape x to be (batch, time, channels  * freq)
+        
+        # Reshape x to be (batch, time, freq * channels)
         # for the RNN
-        b, t, c, f= x.size()
-        x = x.view((b, t, c * f))   
+        
+        b, t, f, c = x.size()
+        x = x.view((b, t, f*c)) 
+        #x = x.view((x.data.size()[0], x.data.size()[1], -1)) 
 
-        x, h = self.rnn(x)
-
+        x, h = self.rnn(x, h_prev)
+        
         if self.rnn.bidirectional:
             half = x.size()[-1] // 2
             x = x[:, :, :half] + x[:, :, half:]
 
-        return x
+        return x, h
 
     def loss(self, x, y):
         """
