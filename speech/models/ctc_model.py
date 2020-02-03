@@ -6,10 +6,17 @@ import numpy as np
 import torch
 import torch.autograd as autograd
 
-import functions.ctc as ctc
+#import functions.ctc as ctc #awni hannun's ctc bindings
+from warpctc_pytorch import CTCLoss  #sean naren's ctc bindings
 from . import model
 from .ctc_decoder import decode
 from .ctc_decoder_dist import decode_dist
+
+"""
+two different ctc loss functions can be used for this model: awni hannun and sean naren's pytorch bindings
+to baidu's warp-ctc. To change them, change the commented out code in the import statements above
+ and in self.loss() below
+"""
 
 class CTC(model.Model):
     def __init__(self, freq_dim, output_dim, config):
@@ -19,8 +26,9 @@ class CTC(model.Model):
         self.blank = output_dim
         self.fc = model.LinearND(self.encoder_dim, output_dim + 1)
 
-    def forward(self, x):
-        return self.forward_impl(x)
+    def forward(self, batch):
+       # x, y, x_lens, y_lens = self.collate(*batch)
+        return self.forward_impl(batch)
 
     def forward_impl(self, x, softmax=False):
         """conducts a forward pass through the CNN and RNN layers specified in the encoder
@@ -40,7 +48,11 @@ class CTC(model.Model):
     def loss(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
         out = self.forward_impl(x)
-        loss_fn = ctc.CTCLoss()
+        
+        #loss_fn = ctc.CTCLoss()         # awni's ctc loss call
+        loss_fn = CTCLoss(size_average=True)    # 1. naren's ctc loss call
+        out = out.permute(1,0,2).float().requires_grad_(True) # 2. naren ctc loss
+        
         loss = loss_fn(out, y, x_lens, y_lens)
         return loss
 
@@ -57,7 +69,7 @@ class CTC(model.Model):
             for v in batch:
                 v.volatile = True
         return batch
-
+    
     def infer(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
         probs = self.forward_impl(x, softmax=True)
