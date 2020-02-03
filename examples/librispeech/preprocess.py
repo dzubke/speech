@@ -18,7 +18,9 @@ from speech.utils import data_helpers
 from speech.utils import wave
 
 SETS = {
-    "train" : ["train-clean-360"]
+    "train" : ["train-other-500"],
+    "dev" : ["dev-other"],
+    "test" : ["test-other"],
     }
 
 
