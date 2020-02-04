@@ -51,7 +51,7 @@ class Model(nn.Module):
           "Convolutional ouptut frequency dimension is negative."
 
         rnn_cfg = encoder_cfg["rnn"]
-        self.rnn = nn.GRU(input_size=conv_out,
+        self.rnn = nn.LSTM(input_size=conv_out,
                           hidden_size=rnn_cfg["dim"],
                           num_layers=rnn_cfg["layers"],
                           batch_first=True, dropout=config["dropout"],
@@ -77,7 +77,7 @@ class Model(nn.Module):
         """
         raise NotImplementedError
 
-    def encode(self, x, h_prev):
+    def encode(self, x, h_prev=None):
         """this function processes the input data x through the CNN and RNN layers specified
             in the model encoder config.
 
