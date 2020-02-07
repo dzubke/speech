@@ -1,0 +1,33 @@
+{
+    "seed" : 2017,
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200115",
+
+    "data" : {
+        "train_set" : "/home/dzubke/awni_speech/data/LibriSpeech/train-clean-100.json",
+        "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
+        "start_and_end" : false
+    },
+
+    "optimizer" : {
+        "batch_size" : 8,
+        "epochs" : 100,
+        "learning_rate" : 1e-3,
+        "momentum" : 0.0
+    },
+
+    "model" : {
+        "class" : "CTC",
+        "dropout" : 0.4,
+        "encoder" : {
+            "conv" : [
+                [32, 5, 32, 2],
+                [32, 5, 32, 1]
+             ],
+            "rnn" : {
+                "dim" : 256,
+                "bidirectional" : false,
+                "layers" : 4
+            }
+        }
+    }
+}

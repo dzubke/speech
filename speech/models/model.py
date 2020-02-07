@@ -51,11 +51,14 @@ class Model(nn.Module):
           "Convolutional ouptut frequency dimension is negative."
 
         rnn_cfg = encoder_cfg["rnn"]
-        self.rnn = nn.GRU(input_size=conv_out,
-                          hidden_size=rnn_cfg["dim"],
-                          num_layers=rnn_cfg["layers"],
-                          batch_first=True, dropout=config["dropout"],
-                          bidirectional=rnn_cfg["bidirectional"])
+        assert rnn_cfg["type"] == "GRU" or rnn_cfg["type"] == "LSTM", "RNN type in config not supported"
+
+        self.rnn = eval("nn."+rnn_cfg["type"])(
+                        input_size=conv_out,
+                        hidden_size=rnn_cfg["dim"],
+                        num_layers=rnn_cfg["layers"],
+                        batch_first=True, dropout=config["dropout"],
+                        bidirectional=rnn_cfg["bidirectional"])
         self._encoder_dim = rnn_cfg["dim"]
 
         self.volatile = False
@@ -77,14 +80,14 @@ class Model(nn.Module):
         """
         raise NotImplementedError
 
-    def encode(self, x, h_prev):
+    def encode(self, x, rnn_args):
         """this function processes the input data x through the CNN and RNN layers specified
             in the model encoder config.
 
         """
 
         x = x.unsqueeze(1)      #
-
+        
         x = self.conv(x)
 
         # At this point x should have shape
@@ -95,17 +98,17 @@ class Model(nn.Module):
         # Reshape x to be (batch, time, freq * channels)
         # for the RNN
         
-        b, t, f, c = x.size()
+        b, t, f, c = x.data.size()
         x = x.view((b, t, f*c)) 
         #x = x.view((x.data.size()[0], x.data.size()[1], -1)) 
 
-        x, h = self.rnn(x, h_prev)
+        x, rnn_args = self.rnn(x, rnn_args)
         
-        if self.rnn.bidirectional:
-            half = x.size()[-1] // 2
-            x = x[:, :, :half] + x[:, :, half:]
+        # if self.rnn.bidirectional:
+        #     half = x.size()[-1] // 2
+        #     x = x[:, :, :half] + x[:, :, half:]
 
-        return x, h
+        return x, rnn_args
 
     def loss(self, x, y):
         """
