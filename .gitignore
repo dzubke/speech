@@ -119,5 +119,13 @@ onnx/examples
 
 #alexnet is tooo big
 alexnet*
-=======
->>>>>>> fb9fcbbba879ec25aed73ce520764b85e01f9d95
+
+#large models
+examples/librispeech/models/ctc_models/20200203/*model
+
+examples/librispeech/models/ctc_models/20200203/20200204/*model
+examples/librispeech/models/ctc_models/20200203/20200205/*model
+examples/librispeech/models/ctc_models/20200203/20200206/*model
+examples/librispeech/models/ctc_models/20200203/20200207/*model
+examples/librispeech/models/ctc_models/20200203/20200207/*model
+examples/librispeech/models/ctc_models/20200203/events.out.tfevents.1580757074.phoneme-2
