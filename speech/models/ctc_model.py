@@ -7,7 +7,7 @@ import torch
 import torch.autograd as autograd
 
 #import functions.ctc as ctc #awni hannun's ctc bindings
-from warpctc_pytorch import CTCLoss  #sean naren's ctc bindings
+#from warpctc_pytorch import CTCLoss  #sean naren's ctc bindings
 from . import model
 from .ctc_decoder import decode
 from .ctc_decoder_dist import decode_dist
@@ -26,35 +26,29 @@ class CTC(model.Model):
         self.blank = output_dim
         self.fc = model.LinearND(self.encoder_dim, output_dim + 1)
 
-    def forward(self, batch):
+    def forward(self, x, rnn_args):
        # x, y, x_lens, y_lens = self.collate(*batch)
-        return self.forward_impl(batch)
+        return self.forward_impl(x, rnn_args)
 
-    def forward_impl(self, x, softmax=False):
-        """conducts a forward pass through the CNN and RNN layers specified in the encoder
-
-            Returns
-            --------
-            torch tensor of shape (batch x ?? x vocab_size)
-        """
+    def forward_impl(self, x, rnn_args, softmax=False):
         if self.is_cuda:
             x = x.cuda()
-        x = self.encode(x)      # propogates the data through the CNN and RNN encoder
-        x = self.fc(x)          # propogates the data through a fully-connected layer
-        if softmax:
-            return torch.nn.functional.softmax(x, dim=2)
-        return x
+        x, rnn_args = self.encode(x, rnn_args)    
+        x = self.fc(x)          
+        #if softmax:
+        x = torch.nn.functional.softmax(x, dim=2)
+        return x, rnn_args
 
     def loss(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
         out = self.forward_impl(x)
         
         #loss_fn = ctc.CTCLoss()         # awni's ctc loss call
-        loss_fn = CTCLoss(size_average=True)    # 1. naren's ctc loss call
-        out = out.permute(1,0,2).float().requires_grad_(True) # 2. naren ctc loss
+        #loss_fn = CTCLoss(size_average=True)    # 1. naren's ctc loss call
+        #out = out.permute(1,0,2).float().requires_grad_(True) # 2. naren ctc loss
         
-        loss = loss_fn(out, y, x_lens, y_lens)
-        return loss
+        #loss = loss_fn(out, y, x_lens, y_lens)
+        #return loss
 
     def collate(self, inputs, labels):
         max_t = max(i.shape[0] for i in inputs)

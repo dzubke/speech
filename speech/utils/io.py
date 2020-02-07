@@ -31,3 +31,9 @@ def load_pretrained(model_path):
 def save_dict(dct, path):
     with open(path, 'wb') as fid:
         pickle.dump(dct, fid)
+
+def export_state_dict(model_in_path, params_out_path):
+    model = torch.load(model_in_path, map_location=torch.device('cpu'))
+    pythtorch.save(model.state_dict(), params_out_path)
+
+
