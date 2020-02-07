@@ -5,8 +5,10 @@ import torch
 import torch.nn as nn
 import onnx
 from onnx import onnx_pb
+from onnx import helper, shape_inference
+
 import onnxruntime
-from onnx_coreml import convert
+import onnx_coreml
 import coremltools
 
 class SimpleNet(nn.Module):
@@ -41,17 +43,9 @@ class SimpleNet(nn.Module):
         x = torch.transpose(x, 1, 2).contiguous()
         print("shape after transpose: ", x.size()) # [1, 196, 32, 130]
         
-        # Flatten freq*channels to single feature dimension
-        # Note: CoreML conversion will break if we do `x.size()` here instead of `x.data.size()`. See:
-        # https://github.com/pytorch/pytorch/issues/11670#issuecomment-452697486
-        #b, t, f, c = x.data.size()
-        #x = x.view((b, t, f * c))
-        # x = flatten(x)
-        x = torch.split(x, 1, dim=2)
-        x = torch.cat(x, dim=3)
-        x = x.squeeze(2)
-
-
+        # x = flatten_orig(x)
+        # x = flatten_scripted(x)
+        x = flatten_dustin(x)
 
         print("shape after flattening: ", x.size()) # [1, 196, 4160]
 
@@ -61,46 +55,78 @@ class SimpleNet(nn.Module):
         x, h = self.gru(x)
 
         # Output: (batch, seq, hidden size) = (1, seq, 20)
-        print("x after gru: ", x.size()) # [1, 196, 20]
+        # print("x after gru: ", x.size()) # [1, 196, 20]
         return x
 
-# Testing the Reshape node (for GRU input) using ONNX scripting instead of tracing:
-# https://pytorch.org/docs/stable/onnx.html#tracing-vs-scripting
-@torch.jit.script
-def flatten(x):
+def flatten_orig(x):
+    # Flatten freq*channels to single feature dimension
+    # Note: CoreML conversion will break if we do `x.size()` here instead of `x.data.size()`. See:
+    # https://github.com/pytorch/pytorch/issues/11670#issuecomment-452697486
     b, t, f, c = x.size()
     x = x.view((b, t, f * c))
     return x
 
+# Testing the Reshape node (for GRU input) using ONNX scripting instead of tracing:
+# https://pytorch.org/docs/stable/onnx.html#tracing-vs-scripting
+#@torch.jit.script
+#def flatten_scripted(x):
+#    b, t, f, c = x.size()
+#    x = x.view((b, t, f * c))
+#    return x
+
+# Dustin replacement for flatten
+def flatten_dustin(x):
+    # Say the output of the conv layer is (1, 196, 32, 130). 
+    # Split tensor into 32 different tensors of shape (1, 196, 1, 130). 
+    x = torch.split(x, 1, dim=2)
+    # Concatenate into tensor of shape (1, 196, 1, 4160) (4160 = 32*130).
+    x = torch.cat(x, dim=3)
+    # Squeeze removes the single dimension in the middle to get (1, 196, 4160).
+    x = x.squeeze(2)
+    return x
+
 def main():
+    print(f"torch version: {torch.__version__}")
+    print(f"onnx version: {onnx.__version__}")
+    #print(f"onnx_coreml version: {onnx_coreml.__version__}")
+    print(f"onnxruntime version: {onnxruntime.__version__}")
+    #print(f"coremltools version: {coremltools.__version__}")
+    
     # Run Torch model once
     model = SimpleNet()
     model.eval()
-    
+
     # Export Torch to ONNX with dummy input
     dummy_input = torch.randn(1, 200, 161) # dummy input to model, shape (batch, time, freq)
     current_date = date.today()
 
-    torch.save(model, f"./torch_models/SimpleNet_{current_date}.pth")
-    onnx_filename = f"./onnx_models/SimpleNet_{current_date}.onnx"
-    torch.onnx.export(model, dummy_input, onnx_filename,
-                    export_params=True,
-                    verbose=True, 
-                    opset_version=9,
+    onnx_filename = f"SimpleNet_{current_date}.onnx"
+    print("before export")
+    torch.onnx.export(model, dummy_input, onnx_filename, export_params=True, verbose=True,
                     input_names=['input'],
                     output_names=['output'],
-                    dynamic_axes={'input': {0:'batch_size', 1: 'time_dim'}, 'output': {0:'batch_size', 1: 'time_dim'}}
+                    opset_version=9,
+                    strip_doc_string=False,
+                    dynamic_axes={'input': {0: 'batch', 1: 'time_dim'}, 'output': {0: 'batch', 1: 'time_dim'}}
                     )
-    
+    print("after export")
+
     # Load and check new ONNX model
     onnx_model = onnx.load(onnx_filename)
     onnx.checker.check_model(onnx_model)
     
     print("----- ONNX printable graph -----")
-    print(onnx_model.graph.input)
-    print(onnx_model.graph.output)
-    print(onnx.helper.printable_graph(onnx_model.graph))
+    #print(onnx_model.graph.value_info)
+    print("~~~")
+    #print(onnx_model.graph.input)
+    #print(onnx_model.graph.output)
+    #print(onnx.helper.printable_graph(onnx_model.graph))
     print("-------------------")
+
+    inferred_model = shape_inference.infer_shapes(onnx_model)
+    onnx.checker.check_model(inferred_model)
+    #print(inferred_model.graph.value_info)
+    print("~~~")
 
     # Testing ONNX output against Torch model
     test_input = torch.randn(1, 1000, 161) # different time_dim to test dynamic seq length
@@ -124,13 +150,24 @@ def main():
 
     # Export to CoreML
     print("Try to convert to CoreML...")
-    mlmodel_filename = f"./coreml_models/SimpleNet_{current_date}.mlmodel"
-    mlmodel = convert(model=onnx_model, minimum_ios_deployment_target='13')
+    mlmodel_filename = f"SimpleNet_{current_date}.mlmodel"
+    mlmodel = onnx_coreml.convert(model=onnx_model, minimum_ios_deployment_target='13')
     mlmodel.save(mlmodel_filename)
+    print(f"\nCoreML model saved to: {mlmodel_filename}\n")
+    
+    # Predict with CoreML
+    #mlmodel.visualize_spec()
+    print(f"model __repr__: {mlmodel}")
+    #mlmodel_data = to_numpy(test_input)
     mlmodel_data = {'data':to_numpy(test_input)}
-    predictions = mlmodel.predict(mlmodel_data)    
-    print(f"predictions: {predictions}")
+    predictions = mlmodel.predict(mlmodel_data)
+    print(f"mlmodel predictions: {predictions}")
+
+    #print(f"model.get_spec: {mlmodel.get_spec()}")
+    #print(f"model.visualize_spec: {mlmodel.visualize_spec(input_shape_dict={1:'batch', 200: 'time', 161:'freq'})}")
+
+
+
 
 if __name__ == "__main__":
     main()
-
