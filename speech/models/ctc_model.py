@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import torch.autograd as autograd
 
-#import functions.ctc as ctc #awni hannun's ctc bindings
+import functions.ctc as ctc #awni hannun's ctc bindings
 #from warpctc_pytorch import CTCLoss  #sean naren's ctc bindings
 from . import model
 from .ctc_decoder import decode
@@ -35,20 +35,20 @@ class CTC(model.Model):
             x = x.cuda()
         x, rnn_args = self.encode(x, rnn_args)    
         x = self.fc(x)          
-        #if softmax:
-        x = torch.nn.functional.softmax(x, dim=2)
+        if softmax:
+            return torch.nn.functional.softmax(x, dim=2), rnn_args
         return x, rnn_args
 
     def loss(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
         out = self.forward_impl(x)
         
-        #loss_fn = ctc.CTCLoss()         # awni's ctc loss call
+        loss_fn = ctc.CTCLoss()         # awni's ctc loss call
         #loss_fn = CTCLoss(size_average=True)    # 1. naren's ctc loss call
         #out = out.permute(1,0,2).float().requires_grad_(True) # 2. naren ctc loss
         
-        #loss = loss_fn(out, y, x_lens, y_lens)
-        #return loss
+        loss = loss_fn(out, y, x_lens, y_lens)
+        return loss
 
     def collate(self, inputs, labels):
         max_t = max(i.shape[0] for i in inputs)
