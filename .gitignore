@@ -128,3 +128,4 @@ examples/librispeech/models/ctc_models/20200203/20200205/*model
 examples/librispeech/models/ctc_models/20200203/20200206/*model
 examples/librispeech/models/ctc_models/20200203/20200207/*model
 examples/librispeech/models/ctc_models/20200203/20200207/*model
+examples/librispeech/models/ctc_models/20200203/events.out.tfevents.1580757074.phoneme-2
