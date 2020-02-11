@@ -26,11 +26,11 @@ class CTC(model.Model):
         self.blank = output_dim
         self.fc = model.LinearND(self.encoder_dim, output_dim + 1)
 
-    def forward(self, x, rnn_args):
+    def forward(self, x, rnn_args=None):
        # x, y, x_lens, y_lens = self.collate(*batch)
         return self.forward_impl(x, rnn_args)
 
-    def forward_impl(self, x, rnn_args, softmax=False):
+    def forward_impl(self, x, rnn_args=None, softmax=False):
         if self.is_cuda:
             x = x.cuda()
         x, rnn_args = self.encode(x, rnn_args)    
@@ -41,7 +41,7 @@ class CTC(model.Model):
 
     def loss(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
-        out = self.forward_impl(x)
+        out, rnn_args = self.forward_impl(x)
         
         loss_fn = ctc.CTCLoss()         # awni's ctc loss call
         #loss_fn = CTCLoss(size_average=True)    # 1. naren's ctc loss call
@@ -66,7 +66,7 @@ class CTC(model.Model):
     
     def infer(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
-        probs = self.forward_impl(x, softmax=True)
+        probs, rnn_args = self.forward_impl(x, softmax=True)
         # convert the torch tensor into a numpy array
         probs = probs.data.cpu().numpy()
         return [decode(p, beam_size=3, blank=self.blank)[0]
