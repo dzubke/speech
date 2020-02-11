@@ -18,12 +18,13 @@ import numpy as np
 #project libraries
 from speech.loader import log_specgram_from_file
 from speech.models.ctc_decoder import decode as ctc_decode
+import speech.models as models
 
 CONFIG_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/validation_scripts/ctc_config_20200121-0127.json'
-TRAINED_MODEL_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/torch_models/20200121-0127_best_model.pth'
+TRAINED_MODEL_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/torch_models/20200121-0127_best_model_pyt14.pth'
 STATE_DICT_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/validation_scripts/state_params_20200121-0127.pth'
-ONNX_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/validation_scripts/CTCNet_2020-02-05.onnx'
-COREML_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/validation_scripts/CTCNet_2020-02-05.mlmodel'
+ONNX_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/onnx_models/20200121-0127_best_model_pyt14.onnx'
+COREML_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/coreml_models/20200121-0127_best_model_pyt14.mlmodel'
 PREPROC_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/preproc/20200121-0127_best_preproc.pyc'
 
 np.random.seed(2020)
@@ -37,7 +38,7 @@ def main():
     #load models
     trained_model = torch.load(TRAINED_MODEL_FN, map_location=torch.device('cpu'))
 
-    CTCNet_model = CTC(161, 100, 40, model_cfg)
+    CTCNet_model = models.CTC(161,40, model_cfg)
     state_dict = torch.load(STATE_DICT_FN)
     CTCNet_model.load_state_dict(state_dict)
 
@@ -77,15 +78,15 @@ def main():
         print(f"\n~~~~~~~~~~~~~~~~~~{name}~~~~~~~~~~~~~~~~~~~~~~\n")
         test_x, test_h, test_c = data
 
-        trained_output = trained_model(torch.from_numpy(test_x), (torch.from_numpy(test_h), torch.from_numpy(test_c))) 
-        trained_probs, trained_h, trained_c = to_numpy(trained_output[0]), to_numpy(trained_output[1][0]), to_numpy(trained_output[1][1])
+        trained_output = trained_model(torch.from_numpy(test_x),torch.from_numpy(test_h), torch.from_numpy(test_c)) 
+        trained_probs, trained_h, trained_c = to_numpy(trained_output[0]), to_numpy(trained_output[1]), to_numpy(trained_output[2])
         trained_max_decoder = max_decode(trained_probs[0], blank=40)
         trained_ctc_decoder = ctc_decode(trained_probs[0], beam_size=50, blank=40)
-    
+        
         torch_output = CTCNet_model(torch.from_numpy(test_x), torch.from_numpy(test_h), torch.from_numpy(test_c)) 
         torch_probs, torch_h, torch_c = [to_numpy(tensor) for tensor in torch_output]
         #torch_output = [to_numpy(tensor) for tensor in torch_output]
-        
+       
         ort_session = onnxruntime.InferenceSession(ONNX_FN)
         ort_inputs = {
         ort_session.get_inputs()[0].name: test_x,
@@ -94,15 +95,17 @@ def main():
         ort_output = ort_session.run(None, ort_inputs)
         onnx_probs, onnx_h, onnx_c = [np.array(array) for array in ort_output]
         #onnx_output = [np.array(array) for array in ort_output]
+        print("onnxruntime prediction complete") 
 
-        coreml_input = {'input': test_x, 'h_prev': test_h, 'c_prev': test_c}
+        coreml_input = {'input': test_x, 'hidden_prev': test_h, 'cell_prev': test_c}
         coreml_output = coreml_model.predict(coreml_input, useCPUOnly=True)
         coreml_probs = np.array(coreml_output['output'])
         coreml_h = np.array(coreml_output['hidden'])
-        coreml_c = np.array(coreml_output['c'])
+        coreml_c = np.array(coreml_output['cell'])
         coreml_max_decoder = max_decode(coreml_probs[0], blank=40)
         coreml_ctc_decoder = ctc_decode(coreml_probs[0], beam_size=50,blank=40)
         #coreml_output = [coreml_probs, coreml_h, coreml_c]
+        print("coreml prediction completed")
 
         print("\n-----Coreml Output-----")
         print(f"output {np.shape(coreml_probs)}: \n{coreml_probs[0,100,:]}")
@@ -116,7 +119,7 @@ def main():
         # print(f"hidden {coreml_h.shape}: \n{coreml_h[0,0,0:20]}")
         # print(f"cell {coreml_c.shape}: \n{coreml_c[0,0,0:20]}")
         # print(f"max decode: {coreml_max_decoder}")
-        # print(f"ctc decode: {coreml_ctc_decoder}")
+        #        print(f"ctc decode: {coreml_ctc_decoder}")
 
         # Compare Trained and Coreml predictions
         np.testing.assert_allclose(coreml_probs, trained_probs, rtol=1e-03, atol=1e-05)
@@ -128,10 +131,10 @@ def main():
         print("\nTrained and Coreml probs, hidden, cell, decoder states match, all good!")
 
         # Compare Trained and Torch predictions
-        np.testing.assert_allclose(torch_probs, trained_probs, rtol=1e-03, atol=1e-05)
-        np.testing.assert_allclose(torch_h, trained_h, rtol=1e-03, atol=1e-05)
-        np.testing.assert_allclose(torch_c, trained_c, rtol=1e-03, atol=1e-05)
-        print("\nTorch and Trained probs, hidden, cell states match, all good!")  
+        #np.testing.assert_allclose(torch_probs, trained_probs, rtol=1e-03, atol=1e-05)
+        #np.testing.assert_allclose(torch_h, trained_h, rtol=1e-03, atol=1e-05)
+        #np.testing.assert_allclose(torch_c, trained_c, rtol=1e-03, atol=1e-05)
+        #print("\nTorch and Trained probs, hidden, cell states match, all good!")  
 
         # Compare Torch and ONNX predictions
         np.testing.assert_allclose(torch_probs, onnx_probs, rtol=1e-03, atol=1e-05)

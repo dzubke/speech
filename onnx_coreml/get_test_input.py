@@ -6,7 +6,7 @@ def generate_test_input(model_format:str ,model_name:str, set_device=None ):
     """outputs a test input based on the model format ("pytorch" or "onnx") and the model name
     """
     batch_size = 1
-    layer_count = 1
+    layer_count = 5 
     
     device = ".cuda()" if torch.cuda.is_available() and set_device!='cpu'  else ""
     
@@ -21,8 +21,10 @@ def generate_test_input(model_format:str ,model_name:str, set_device=None ):
                     eval("torch.randn(layer_count * 2, 3, 20)"+device) 
                     )
         else:
-            return eval("torch.FloatTensor(batch_size, 125, 161)"+device)
-                #eval("torch.IntTensor(batch_size, 41)"+device)]
+            return (eval("torch.randn(1,396, 161)"+device),
+                    eval("torch.randn(layer_count * 1, 1, 1024)"+device),
+                    eval("torch.randn(layer_count * 1, 1, 1024)"+device)
+                    )
 
     elif model_format == "onnx":
         if model_name == "super_resolution":
