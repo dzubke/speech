@@ -42,7 +42,7 @@ class Preprocessor():
         # the mean and std are of the log of the spectogram of the audio files
         self.mean, self.std = compute_mean_std(audio_files[:max_samples])
         self._input_dim = self.mean.shape[0]
-
+        print(f"preproc input_dim: {self._input_dim}")
 
         # Make char map
         chars = list(set(t for d in data for t in d['text']))
