@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import torch.autograd as autograd
 
-import functions.ctc as ctc #awni hannun's ctc bindings
+#import functions.ctc as ctc #awni hannun's ctc bindings
 #from warpctc_pytorch import CTCLoss  #sean naren's ctc bindings
 from . import model
 from .ctc_decoder import decode
@@ -26,29 +26,29 @@ class CTC(model.Model):
         self.blank = output_dim
         self.fc = model.LinearND(self.encoder_dim, output_dim + 1)
 
-    def forward(self, x, rnn_args):
+    def forward(self, x, h_prev, c_prev):
        # x, y, x_lens, y_lens = self.collate(*batch)
-        return self.forward_impl(x, rnn_args)
+        return self.forward_impl(x, h_prev, c_prev)
 
-    def forward_impl(self, x, rnn_args, softmax=False):
+    def forward_impl(self, x, h_prev, c_prev, softmax=True):
         if self.is_cuda:
             x = x.cuda()
-        x, rnn_args = self.encode(x, rnn_args)    
+        x, h, c = self.encode(x, h_prev, c_prev)     
         x = self.fc(x)          
         if softmax:
-            return torch.nn.functional.softmax(x, dim=2), rnn_args
-        return x, rnn_args
+            return torch.nn.functional.softmax(x, dim=2), h, c
+        return x, h, c
 
     def loss(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
         out = self.forward_impl(x)
         
-        loss_fn = ctc.CTCLoss()         # awni's ctc loss call
+        #loss_fn = ctc.CTCLoss()         # awni's ctc loss call
         #loss_fn = CTCLoss(size_average=True)    # 1. naren's ctc loss call
         #out = out.permute(1,0,2).float().requires_grad_(True) # 2. naren ctc loss
         
-        loss = loss_fn(out, y, x_lens, y_lens)
-        return loss
+        #loss = loss_fn(out, y, x_lens, y_lens)
+        #return loss
 
     def collate(self, inputs, labels):
         max_t = max(i.shape[0] for i in inputs)
@@ -64,13 +64,13 @@ class CTC(model.Model):
                 v.volatile = True
         return batch
     
-    def infer(self, batch):
+    def infer(self, batch, rnn_args=None):
         x, y, x_lens, y_lens = self.collate(*batch)
-        probs = self.forward_impl(x, softmax=True)
+        probs = self.forward_impl(x, rnn_args,softmax=True) 
         # convert the torch tensor into a numpy array
         probs = probs.data.cpu().numpy()
         return [decode(p, beam_size=3, blank=self.blank)[0]
-                    for p in probs]
+                    for p in probs], rnn_args
     
     def infer_distribution(self, batch, num_results):
         x, y, x_lens, y_lens = self.collate(*batch)
