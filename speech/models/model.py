@@ -80,7 +80,7 @@ class Model(nn.Module):
         """
         raise NotImplementedError
 
-    def encode(self, x, rnn_args):
+    def encode(self, x, h_prev, c_prev):
         """this function processes the input data x through the CNN and RNN layers specified
             in the model encoder config.
 
@@ -102,13 +102,13 @@ class Model(nn.Module):
         x = x.view((b, t, f*c)) 
         #x = x.view((x.data.size()[0], x.data.size()[1], -1)) 
 
-        x, rnn_args = self.rnn(x, rnn_args)
+        x, (h, c) = self.rnn(x, (h_prev, c_prev))
         
         # if self.rnn.bidirectional:
         #     half = x.size()[-1] // 2
         #     x = x[:, :, :half] + x[:, :, half:]
 
-        return x, rnn_args
+        return x, h, c
 
     def loss(self, x, y):
         """

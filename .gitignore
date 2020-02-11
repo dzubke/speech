@@ -129,3 +129,11 @@ examples/librispeech/models/ctc_models/20200203/20200206/*model
 examples/librispeech/models/ctc_models/20200203/20200207/*model
 examples/librispeech/models/ctc_models/20200203/20200207/*model
 examples/librispeech/models/ctc_models/20200203/events.out.tfevents.1580757074.phoneme-2
+onnx_coreml/torch_models/
+onnx_coreml/onnx_models/
+onnx_coreml/coreml_models/
+onnx_coreml/validation_scripts/*.onnx
+onnx_coreml/validation_scripts/*.mlmodel
+
+
+
