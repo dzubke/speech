@@ -21,9 +21,9 @@ def generate_test_input(model_format:str ,model_name:str, set_device=None ):
                     eval("torch.randn(layer_count * 2, 3, 20)"+device) 
                     )
         else:
-            return (eval("torch.randn(1,396, 161)"+device),
-                    eval("torch.randn(layer_count * 1, 1, 1024)"+device),
-                    eval("torch.randn(layer_count * 1, 1, 1024)"+device)
+            return (eval("torch.randn(1,396, 129)"+device),
+                    (eval("torch.randn(layer_count * 1, 1, 512)"+device),
+                    eval("torch.randn(layer_count * 1, 1, 512)"+device))
                     )
 
     elif model_format == "onnx":

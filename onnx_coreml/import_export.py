@@ -20,8 +20,6 @@ def torch_onnx_export(torch_model, input_tensor, onnx_path,
                     output_names = ['output', 'hidden', 'cell'],
                     dynamic_axes = None
                     ):
-    """
-    """
 
     torch.onnx.export(torch_model,               # model being run
                 input_tensor,              # model input (or a tuple for multiple inputs)
@@ -33,6 +31,8 @@ def torch_onnx_export(torch_model, input_tensor, onnx_path,
                 output_names = output_names, # the model's output names
                 #dynamic_axes=dynamic_axes)    # variable lenght axes
                 )
+
+
 def onnx_coreml_export(onnx_path, coreml_path):
     onnx_model = onnx.load(onnx_path)
     
@@ -42,29 +42,36 @@ def onnx_coreml_export(onnx_path, coreml_path):
     )
     coreml_model.save(coreml_path)
 
-def preproc_pickle(preproc_path_in, preproc_path_out):
+
+def preproc_to_dict(preproc_path_in, preproc_path_out=None, to_pickle=True):
     with open(preproc_path_in, 'rb') as fid:
         preproc = pickle.load(fid)
-        print(f"self.mean, self.std: {preproc.mean}, {preproc.std}")
-        preproc_dict = {'mean':preproc.mean,
-                        'std': preproc.std,
+        preproc_dict = {'mean':preproc.mean.tolist(),
+                        'std': preproc.std.tolist(),
                         "_input_dim": preproc._input_dim,
                         "start_and_end": preproc.start_and_end,
                         "int_to_char": preproc.int_to_char,
                         "char_to_int": preproc.char_to_int
                         }
 
-        with open(preproc_path_out, 'wb') as fid:
-            pickle.dump(preproc_dict, fid)
+        if to_pickle:
+            with open(preproc_path_out, 'wb') as fid:
+                pickle.dump(preproc_dict, fid)
+        else:
+            return preproc_dict
 
-    with open(preproc_path_out, 'rb') as fid:
-        preproc = pickle.load(fid)    
-        print(preproc)
+
+def preproc_to_json(preproc_path, json_path):
+    preproc_dict = preproc_to_dict(preproc_path, to_pickle=False)
+
+    with open(json_path, 'w') as fid:
+        json.dump(preproc_dict, fid)
 
 
-def export_state_dict(model_in_path, params_out_path):
-    model = torch.load(model_in_path, map_location=torch.device('cpu'))
-    torch.save(model.state_dict(), params_out_path)
+def export_state_dict(model_path, state_dict_path):
+    model = torch.load(model_path, map_location=torch.device('cpu'))
+    torch.save(model.state_dict(), state_dict_path)
+
 
 def export_torch_model():
     state_dict_path = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/validation_scripts/state_params_20200121-0127.pth' 
