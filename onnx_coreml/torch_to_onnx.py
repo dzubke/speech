@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 
 import torch
 
@@ -11,28 +12,32 @@ from import_export import torch_load, torch_onnx_export
 
 
 def onnx_export(model_name, use_state_dict):  
-    torch_path, onnx_path = pytorch_onnx_paths(model_name)
+    torch_path, config_path, onnx_path = pytorch_onnx_paths(model_name)
+
     torch_device = 'cpu'
     
     if use_state_dict=='True':
-        state_dict_path = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/validation_scripts/state_params_20200121-0127.pth'
-        config_path = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/validation_scripts/ctc_config_20200121-0127.json'
+        print(f'loaded state_dict from: {torch_path}')
+        
         with open(config_path, 'r') as fid:
             config = json.load(fid)
             model_cfg = config['model']
-        ctc_model = models.CTC(161, 40, model_cfg) 
-        state_dict = torch.load(state_dict_path)    
-        ctc_model.load_state_dict(state_dict)
+        
+        ctc_model = models.CTC(129, 40, model_cfg) 
+        state_dict_model = torch.load(torch_path, map_location=torch.device(torch_device))
+        ctc_model.load_state_dict(state_dict_model.state_dict())
     
     else: 
-        print(f'loaded model from: {torch_path}')
-        ctc_model = torch_load(torch_path, torch_device)
+        print(f'loaded entire model from: {torch_path}')
+        ctc_model = torch.load(torch_path, map_location=torch.device(torch_device))
+        torch.save(ctc_model, torch_path)
+        ctc_model = torch.load(torch_path, map_location=torch.device(torch_device))
+
         
     
     ctc_model.eval()    
     
     input_tensor = generate_test_input("pytorch", model_name, set_device=torch_device) 
-    print("before torch_onnx export")
     torch_onnx_export(ctc_model, input_tensor, onnx_path)
     print(f"Torch model sucessfully converted to Onnx at {onnx_path}")
 
