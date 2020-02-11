@@ -45,7 +45,7 @@ class Model(nn.Module):
             in_c = out_c
 
         self.conv = nn.Sequential(*convs)
-        conv_out = out_c * self.conv_out_size(input_dim, 1)
+        conv_out = out_c * self.conv_out_size(self.input_dim, 1)
 
         assert conv_out > 0, \
           "Convolutional ouptut frequency dimension is negative."

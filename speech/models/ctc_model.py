@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import torch.autograd as autograd
 
-import functions.ctc as ctc #awni hannun's ctc bindings
+#import functions.ctc as ctc #awni hannun's ctc bindings
 #from warpctc_pytorch import CTCLoss  #sean naren's ctc bindings
 from . import model
 from .ctc_decoder import decode
@@ -28,7 +28,7 @@ class CTC(model.Model):
 
     def forward(self, x, rnn_args=None):
        # x, y, x_lens, y_lens = self.collate(*batch)
-        return self.forward_impl(x, rnn_args)
+        return self.forward_impl(x, rnn_args,  softmax=True)
 
     def forward_impl(self, x, rnn_args=None, softmax=False):
         if self.is_cuda:
