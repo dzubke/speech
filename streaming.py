@@ -164,25 +164,27 @@ class StreamInfer():
             print("existing preprocess")
 
 
-    def start_infer(self, model, preproc):
+    def start_infer(self, model, preproc, rnn_args):
 
-        infer_thread = Thread(target=self.infer, args=(model, preproc))
+        infer_thread = Thread(target=self.infer, args=(model, preproc, rnn_args))
         infer_thread.start()
 
-    def infer(self, model, preproc):
+    def infer(self, model, preproc, rnn_args):
 
         # loading the model conducting inference and the preprocessing object preproc
         fake_label = [27]
+        print(f"rnn_args type: {type(rnn_args)}")
+
         try:
             while True:
                 norm_log_spec = self.model_q.get()
                 dummy_batch = ((norm_log_spec,), (fake_label,))  # model.infer expects 2-element tuple
-                preds = model.infer(dummy_batch)
+                preds, rnn_args = model.infer(dummy_batch, rnn_args)
                 preds = [preproc.decode(pred) for pred in preds]
                 self.predictions.extend(*preds)
-                pickel_once +=1
+                #pickle_once +=1
         except KeyboardInterrupt:
-            print("existing infer")
+            print("exiting infer")
 
     
     def check_queue_size(self):
@@ -215,11 +217,13 @@ def main(model_path: str):
     
     stream_infer.start_collection(audio_buffer_size)     # collects audio from the microphone into audio buffer and puts it on the preprocess queue
     
-    model, preproc = speech.load(model_path, tag='')
+    model, preproc = speech.load(model_path, tag='best')
 
     stream_infer.start_preprocess(preproc)      # continually gets audio buffers from preprocess_q, preprocesses it, and puts it on the model_q
 
-    stream_infer.start_infer(model, preproc)     # continually getss preprocessed objects from model_q and updates the predictions list with the predictions 
+    layer_count = 5
+    rnn_args = (torch.randn(layer_count * 1, 1, 512), torch.randn(layer_count * 1, 1, 512))
+    stream_infer.start_infer(model, preproc, rnn_args)     # continually getss preprocessed objects from model_q and updates the predictions list with the predictions 
 
 
 
