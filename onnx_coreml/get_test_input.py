@@ -2,8 +2,11 @@ import torch
 import numpy
 
 
-def generate_test_input(model_format:str ,model_name:str, set_device=None ):
+def generate_test_input(model_format:str ,model_name:str, time_dim: int, set_device=None ):
     """outputs a test input based on the model format ("pytorch" or "onnx") and the model name
+        
+        Arguments
+            time_dim: time_dimension into the model
     """
     batch_size = 1
     layer_count = 5 
@@ -21,7 +24,7 @@ def generate_test_input(model_format:str ,model_name:str, set_device=None ):
                     eval("torch.randn(layer_count * 2, 3, 20)"+device) 
                     )
         else:
-            return (eval("torch.randn(1,396, 129)"+device),
+            return (eval("torch.randn(1,time_dim, 257)"+device),
                     (eval("torch.randn(layer_count * 1, 1, 512)"+device),
                     eval("torch.randn(layer_count * 1, 1, 512)"+device))
                     )

@@ -12,6 +12,10 @@ from import_export import torch_load, torch_onnx_export
 
 
 def onnx_export(model_name, use_state_dict):  
+    
+    freq_dim = 257  #freq dimension out of log_spectrogram 
+    time_dim = 186   #time dimension out of log_spectrogram 
+    
     torch_path, config_path, onnx_path = pytorch_onnx_paths(model_name)
 
     torch_device = 'cpu'
@@ -23,7 +27,7 @@ def onnx_export(model_name, use_state_dict):
             config = json.load(fid)
             model_cfg = config['model']
         
-        ctc_model = models.CTC(129, 40, model_cfg) 
+        ctc_model = models.CTC(freq_dim, 40, model_cfg) 
         state_dict_model = torch.load(torch_path, map_location=torch.device(torch_device))
         ctc_model.load_state_dict(state_dict_model.state_dict())
     
@@ -37,7 +41,7 @@ def onnx_export(model_name, use_state_dict):
     
     ctc_model.eval()    
     
-    input_tensor = generate_test_input("pytorch", model_name, set_device=torch_device) 
+    input_tensor = generate_test_input("pytorch", model_name, time_dim=time_dim, set_device=torch_device) 
     torch_onnx_export(ctc_model, input_tensor, onnx_path)
     print(f"Torch model sucessfully converted to Onnx at {onnx_path}")
 

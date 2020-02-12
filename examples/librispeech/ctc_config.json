@@ -7,8 +7,14 @@
         "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-combo.json",
         "start_and_end" : false
     },
+    
+    "preproc": {
+        "preprocessor": "log_spec",
+        "window_size": 32,
+        "step_size": 16
+    },
 
-    "optimizer" : {
+    "optimizer": {
         "batch_size" : 8,
         "epochs" : 100,
         "learning_rate" : 1e-3,

@@ -4,6 +4,7 @@ import argparse
 import json
 import math
 import pickle
+import math
 
 # third-party libaries
 import torch
@@ -34,6 +35,9 @@ PREPROC_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/sr
 np.random.seed(2020)
 torch.manual_seed(2020)
 
+freq_dim = 257 #freq dimension out of log_spectrogram 
+time_dim = 186  #time dimension out of log_spectrogram 
+
 def main(model_name):
     
     TRAINED_MODEL_FN, ONNX_FN, COREML_FN, CONFIG_FN, PREPROC_FN, state_dict_path = validation_paths(model_name)
@@ -45,7 +49,7 @@ def main(model_name):
     #load models
     state_dict_model = torch.load(TRAINED_MODEL_FN, map_location=torch.device('cpu'))
 
-    trained_model = models.CTC(129,40, model_cfg)
+    trained_model = models.CTC(freq_dim,40, model_cfg)
     state_dict = state_dict_model.state_dict()
     torch.save(state_dict, state_dict_path)
     trained_model.load_state_dict(state_dict)
@@ -78,7 +82,7 @@ def main(model_name):
 
 
     #creating the test data
-    data_dct = gen_test_data(PREPROC_FN, time_dim=396, freq_dim =129)
+    data_dct = gen_test_data(PREPROC_FN, time_dim, freq_dim)
 
     #saving the preproc object as a dictionary
     preproc_json_path = PREPROC_FN[:-4]+".json"   #removes the .pyc extension and replaces with .pickle ext
@@ -120,8 +124,8 @@ def main(model_name):
         #coreml_output = [coreml_probs, coreml_h, coreml_c]
         print("coreml prediction completed")
 
-        time_step = 100
-        trained_probs_sample = trained_probs[0,time_step,:]
+        time_slice = math.floor(time_dim/2) - 1
+        trained_probs_sample = trained_probs[0,time_slice,:]
         trained_h_sample = trained_h[0,0,0:25]
         trained_c_sample = trained_c[0,0,0:25]
         trained_max_decoder_char = ints_to_phonemes(PREPROC_FN, trained_max_decoder)
@@ -134,16 +138,16 @@ def main(model_name):
         print(f"max decode: {trained_max_decoder_char}")
         print(f"ctc decode: {trained_ctc_decoder_char}")
 
-        output_dict = {"torch_probs_time=100":trained_probs_sample.tolist(), "torch_h_sample":trained_h_sample.tolist(), 
+        output_dict = {"torch_probs_time=50":trained_probs_sample.tolist(), "torch_h_sample":trained_h_sample.tolist(), 
                         "torch_c_sample": trained_c_sample.tolist(), "torch_max_decoder":trained_max_decoder_char, 
                         "torch_ctc_decoder_beam=50":trained_ctc_decoder_char}
 
         predictions_dict.update({name: output_dict})
 
         print("\n-----Coreml Output-----")
-        print(f"output {coreml_probs.shape}: \n{coreml_probs[0,100,:]}")
-        print(f"hidden {coreml_h.shape}: \n{coreml_h[0,0,0:20]}")
-        print(f"cell {coreml_c.shape}: \n{coreml_c[0,0,0:20]}")
+        print(f"output {coreml_probs.shape}: \n{coreml_probs[0,time_slice,:]}")
+        print(f"hidden {coreml_h.shape}: \n{coreml_h[0,0,0:25]}")
+        print(f"cell {coreml_c.shape}: \n{coreml_c[0,0,0:25]}")
         print(f"max decode: {coreml_max_decoder}")
         print(f"ctc decode: {coreml_ctc_decoder}")
 
@@ -180,7 +184,7 @@ def main(model_name):
         #np.testing.assert_allclose(torch_c, coreml_c, rtol=1e-03, atol=1e-05)
         #print("\nTorch and CoreML probs, hidden, cell states match, all good!")
     
-    dict_to_json(predictions_dict, "./preproc/"+model_name+"_output.json")
+    dict_to_json(predictions_dict, "./output/"+model_name+"_output.json")
 
 def dict_to_json(input_dict, json_path):
     
@@ -236,7 +240,7 @@ def load_audio(preproc_path, test_names, test_fns, base_path, test_h, test_c):
     for test_name, test_fn in zip(test_names, test_fns):
 
         audio_data = preprocess(preproc_path, log_specgram_from_file(base_path+test_fn))
-        audio_data = audio_data[:396,:]
+        audio_data = audio_data[:time_dim,:]
         audio_data = np.expand_dims(audio_data, 0)
         dct.update({test_name : [audio_data, test_h, test_c]})
     return dct

@@ -98,11 +98,12 @@ def run(config):
 
     opt_cfg = config["optimizer"]
     data_cfg = config["data"]
+    preproc_cfg = config["preproc"]
     model_cfg = config["model"]
 
     # Loaders
     batch_size = opt_cfg["batch_size"]
-    preproc = loader.Preprocessor(data_cfg["train_set"],
+    preproc = loader.Preprocessor(data_cfg["train_set"], preproc_cfg, 
                   start_and_end=data_cfg["start_and_end"])
     train_ldr = loader.make_loader(data_cfg["train_set"],
                         preproc, batch_size)
