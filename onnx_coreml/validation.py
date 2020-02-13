@@ -21,7 +21,7 @@ from speech.loader import log_specgram_from_file
 from speech.models.ctc_decoder import decode as ctc_decode
 import speech.models as models
 from get_paths import validation_paths
-from import_export import preproc_to_json, export_state_dict
+from import_export import preproc_to_dict, preproc_to_json, export_state_dict
 
 """
 CONFIG_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/validation_scripts/ctc_config_20200121-0127.json'
@@ -88,8 +88,14 @@ def main(model_name):
     preproc_json_path = PREPROC_FN[:-4]+".json"   #removes the .pyc extension and replaces with .pickle ext
     preproc_to_json(PREPROC_FN, preproc_json_path)
 
+    preproc_pickle_path = PREPROC_FN[:-4]+".pickle"
+    preproc_to_dict(PREPROC_FN, preproc_pickle_path, to_pickle=True)
+
+
     # make predictions
     predictions_dict= {}
+
+    stream_test_name = "Speak_5_out"
 
     for name, data in data_dct.items():
         print(f"\n~~~~~~~~~~~~~~~~~~{name}~~~~~~~~~~~~~~~~~~~~~~\n")
@@ -124,6 +130,16 @@ def main(model_name):
         #coreml_output = [coreml_probs, coreml_h, coreml_c]
         print("coreml prediction completed")
 
+        if name == stream_test_name:
+            stream_test_x = test_x
+            stream_test_h = test_h
+            stream_test_c = test_c
+            stream_test_probs = trained_probs
+            stream_test_h = trained_h
+            stream_test_c = trained_c
+            stream_test_max_decoder = trained_max_decoder
+            stream_test_ctc_decoder = trained_ctc_decoder
+
         time_slice = math.floor(time_dim/2) - 1
         trained_probs_sample = trained_probs[0,time_slice,:]
         trained_h_sample = trained_h[0,0,0:25]
@@ -138,7 +154,7 @@ def main(model_name):
         print(f"max decode: {trained_max_decoder_char}")
         print(f"ctc decode: {trained_ctc_decoder_char}")
 
-        output_dict = {"torch_probs_time=50":trained_probs_sample.tolist(), "torch_h_sample":trained_h_sample.tolist(), 
+        output_dict = {"torch_probs_(time_dim/2-1)":trained_probs_sample.tolist(), "torch_h_sample":trained_h_sample.tolist(), 
                         "torch_c_sample": trained_c_sample.tolist(), "torch_max_decoder":trained_max_decoder_char, 
                         "torch_ctc_decoder_beam=50":trained_ctc_decoder_char}
 
@@ -183,8 +199,41 @@ def main(model_name):
         #np.testing.assert_allclose(torch_h, coreml_h, rtol=1e-03, atol=1e-05)
         #np.testing.assert_allclose(torch_c, coreml_c, rtol=1e-03, atol=1e-05)
         #print("\nTorch and CoreML probs, hidden, cell states match, all good!")
+
+
     
     dict_to_json(predictions_dict, "./output/"+model_name+"_output.json")
+
+
+    print("------------- Streaming Validation --------------")
+
+    stream_step = 14
+    num_loops = math.floor(time_dim/stream_step)
+
+    stream_test_h = torch.from_numpy(stream_test_h)
+    stream_test_c = torch.from_numpy(stream_test_c)
+
+
+    for i in range(num_loops):
+
+        x_chunk = test_x[:, i*stream_step : (i+1)*stream_step, :]
+        probs_chunk, (stream_test_h, stream_test_c) = trained_model(torch.from_numpy(x_chunk), 
+                                    (stream_test_h,
+                                    stream_test_c )
+                                    )
+
+        probs_slice = stream_test_probs[:, int(i*stream_step/2) : int((i+1)*stream_step/2),:]
+        print(f"probs_3sec:{probs_slice.shape} {probs_slice}")
+
+        probs_chunk = to_numpy(probs_chunk)
+        print(f"probs_14f:{probs_chunk.shape} {probs_chunk}")
+
+        np.testing.assert_allclose(probs_slice, probs_chunk, rtol=1e-03, atol=1e-05)
+        
+        
+    
+
+
 
 def dict_to_json(input_dict, json_path):
     
@@ -228,7 +277,7 @@ def gen_test_data(preproc_path, time_dim, freq_dim):
                 "ST-R3SdlQCwoYQkost3snFxzXS5vam2-1574726165.wv"]
                           
     base_path = './audio_files/'
-    audio_dct = load_audio(preproc_path, test_names, test_fns, base_path, test_h_randn, test_c_randn)
+    audio_dct = load_audio(preproc_path, test_names, test_fns, base_path, test_h_zeros, test_c_zeros)
     test_dct = {'test_zeros': test_zeros, 'test_randn_seed-2020': test_randn}
     test_dct.update(audio_dct)
 

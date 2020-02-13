@@ -236,7 +236,7 @@ def create_mfcc(audio, sample_rate: int, window_size, step_size, esp=1e-10):
     return out.astype(np.float32)
 
 
-def log_specgram_from_file(audio_file: str, window_size=20, step_size=10, channel: int=0, plot=False):
+def log_specgram_from_file(audio_file: str, window_size=32, step_size=16, channel: int=0, plot=False):
     """Computes the log of the spectrogram from from a input audio file string
 
     Arguments
@@ -272,7 +272,6 @@ def log_specgram(audio, sample_rate, window_size=32,
     if plot==True:
         plot_spectrogram(f,t, spec)
     return np.log(spec.T.astype(np.float32) + eps)
-
 
 def compare_log_spec_from_file(audio_file_1: str, audio_file_2: str, plot=False):
     """This function takes in two audio paths and calculates the difference between the spectrograms 
