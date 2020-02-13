@@ -15,6 +15,7 @@ import onnxruntime
 import onnx_coreml
 import coremltools
 import numpy as np
+import editdistance
 
 #project libraries
 from speech.loader import log_specgram_from_file
@@ -36,9 +37,11 @@ np.random.seed(2020)
 torch.manual_seed(2020)
 
 freq_dim = 257 #freq dimension out of log_spectrogram 
-time_dim = 186  #time dimension out of log_spectrogram 
 
-def main(model_name):
+def main(model_name, num_frames):
+
+    time_dim = num_frames  #time dimension out of log_spectrogram 
+
     
     TRAINED_MODEL_FN, ONNX_FN, COREML_FN, CONFIG_FN, PREPROC_FN, state_dict_path = validation_paths(model_name)
     
@@ -105,7 +108,8 @@ def main(model_name):
         trained_probs, trained_h, trained_c = to_numpy(trained_output[0]), to_numpy(trained_output[1][0]), to_numpy(trained_output[1][1])
         trained_max_decoder = max_decode(trained_probs[0], blank=40)
         trained_ctc_decoder = ctc_decode(trained_probs[0], beam_size=50, blank=40)
-        
+
+
         #torch_output = CTCNet_model(torch.from_numpy(test_x), torch.from_numpy(test_h), torch.from_numpy(test_c)) 
         #torch_probs, torch_h, torch_c = [to_numpy(tensor) for tensor in torch_output]
         #torch_output = [to_numpy(tensor) for tensor in torch_output]
@@ -135,8 +139,8 @@ def main(model_name):
             stream_test_h = test_h
             stream_test_c = test_c
             stream_test_probs = trained_probs
-            stream_test_h = trained_h
-            stream_test_c = trained_c
+            stream_test_h_out = trained_h
+            stream_test_c_out = trained_c
             stream_test_max_decoder = trained_max_decoder
             stream_test_ctc_decoder = trained_ctc_decoder
 
@@ -205,31 +209,67 @@ def main(model_name):
     dict_to_json(predictions_dict, "./output/"+model_name+"_output.json")
 
 
-    print("------------- Streaming Validation --------------")
+    print("\n\n------------- Streaming Validation --------------")
 
-    stream_step = 14
-    num_loops = math.floor(time_dim/stream_step)
+    chunk_step = 5
+    chunk_loops = math.floor(time_dim/chunk_step)
+    dist_dict = {}
+    for i in range(1, chunk_loops):
+        print(f"outer loop: {i}")
+        stream_step = i*chunk_step
+        #print(f"stream step: {stream_step}")
+        #print(f"time dim: {time_dim}")
+        #conv_out = trained_model.conv_out_size(time_dim, dim=0)
+        #print(f"conv_out: {conv_out}")
 
-    stream_test_h = torch.from_numpy(stream_test_h)
-    stream_test_c = torch.from_numpy(stream_test_c)
+        num_loops = math.floor(time_dim/stream_step)
 
+        #np.testing.assert_allclose(stream_test_h, test_h, rtol=1e-05, atol=1e-05)
+        stream_test_h_in = stream_test_h_out = torch.from_numpy(stream_test_h)
+        stream_test_c_in = stream_test_c_out = torch.from_numpy(stream_test_c)
 
-    for i in range(num_loops):
-
-        x_chunk = test_x[:, i*stream_step : (i+1)*stream_step, :]
-        probs_chunk, (stream_test_h, stream_test_c) = trained_model(torch.from_numpy(x_chunk), 
-                                    (stream_test_h,
-                                    stream_test_c )
-                                    )
-
-        probs_slice = stream_test_probs[:, int(i*stream_step/2) : int((i+1)*stream_step/2),:]
-        print(f"probs_3sec:{probs_slice.shape} {probs_slice}")
-
-        probs_chunk = to_numpy(probs_chunk)
-        print(f"probs_14f:{probs_chunk.shape} {probs_chunk}")
-
-        np.testing.assert_allclose(probs_slice, probs_chunk, rtol=1e-03, atol=1e-05)
         
+        for i in range(num_loops+1):
+            print(f"inner loop: {i}")
+
+            if i != num_loops: 
+                x_chunk = stream_test_x[:, i*stream_step : (i+1)*stream_step, :]
+            else:
+                x_chunk = stream_test_x[:, num_loops*stream_step:, :]
+
+            np.testing.assert_allclose(to_numpy(stream_test_h_in), to_numpy(stream_test_h_out), rtol=1e-03, atol=1e-05)
+            np.testing.assert_allclose(to_numpy(stream_test_c_in), to_numpy(stream_test_c_out), rtol=1e-03, atol=1e-05)
+
+            print(f"x_chunk size: {x_chunk.shape}")
+            probs_chunk, (stream_test_h_out, stream_test_c_out) = trained_model(torch.from_numpy(x_chunk), 
+                                        (stream_test_h_in,
+                                        stream_test_c_in)
+                                        )
+            stream_test_h_in = stream_test_h_out
+            stream_test_c_in = stream_test_c_out
+
+            #probs_slice = stream_test_probs[:, int(i*stream_step/2) : int((i+1)*stream_step/2),:]
+            #print(f"probs_full:{probs_slice.shape} {probs_slice[0,0,:]}")
+
+            probs_chunk = to_numpy(probs_chunk)
+            #print(f"probs_chunk:{probs_chunk.shape} {probs_chunk[0,0,:]}")
+            
+            if i ==0:
+                probs_chunks = probs_chunk
+            else: 
+                probs_chunks = np.concatenate((probs_chunks, probs_chunk), axis=1)
+
+
+            #np.testing.assert_allclose(probs_slice, probs_chunk, rtol=1e-3, atol=1e-3)
+        
+        #print(f"probs_chunk size: {probs_chunks.shape}")
+        full_max_decoder = ints_to_phonemes(PREPROC_FN, stream_test_max_decoder)
+        chunked_max_decoder = ints_to_phonemes(PREPROC_FN,max_decode(np.squeeze(probs_chunks), blank=40))
+
+        dist_dict.update({stream_step: editdistance.eval(full_max_decoder, chunked_max_decoder)})
+    
+    print(dist_dict)
+
         
     
 
@@ -263,28 +303,32 @@ def gen_test_data(preproc_path, time_dim, freq_dim):
     test_c_randn = np.random.randn(5, 1, 512).astype(np.float32)
     test_randn = [test_x_randn, test_h_randn, test_c_randn]
 
-    test_names = ["DZ-5-drz-test-20191202", "DZ-5-plane-noise", "LibSp_777-126732-0003", "LibSp_84-121123-0001", 
+    test_names = ["Speak_5_out"]
+    
+    test_fns = ["ST-out.wav"]
+
+    unused_names = ["DZ-5-drz-test-20191202", "DZ-5-plane-noise", 
+                "LibSp_777-126732-0003", "LibSp_84-121123-0001", 
                 "Speak_1_4ysq5X0Mvxaq1ArAntCWC2YkWHc2-1574725037", 
                 "Speak_2_58cynYij95TbB9Nlz3TrKBbkg643-1574725017", 
                 "Speak_3_CcSEvcOEineimGwKOk1c8P2eU0q1-1574725123", 
                 "Speak_4_OVrsxD1n9Wbh0Hh6thej8FIBIOE2-1574725033", 
-                "Speak_5_out", "Speak_6_R3SdlQCwoYQkost3snFxzXS5vam2-1574726165"]
-    
-    test_fns = ["DZ-5-drz-test-20191202.wv", "DZ-5-plane-noise.wv", "LS-777-126732-0003.wav", 
+                "Speak_6_R3SdlQCwoYQkost3snFxzXS5vam2-1574726165"]
+
+    used_fns =["DZ-5-drz-test-20191202.wv", "DZ-5-plane-noise.wv", "LS-777-126732-0003.wav", 
                 "LS-84-121123-0001.wav", "ST-4ysq5X0Mvxaq1ArAntCWC2YkWHc2-1574725037.wv",
                 "ST-58cynYij95TbB9Nlz3TrKBbkg643-1574725017.wv", "ST-CcSEvcOEineimGwKOk1c8P2eU0q1-1574725123.wv", 
-                "ST-OVrsxD1n9Wbh0Hh6thej8FIBIOE2-1574725033.wv", "ST-out.wav", 
-                "ST-R3SdlQCwoYQkost3snFxzXS5vam2-1574726165.wv"]
+                "ST-OVrsxD1n9Wbh0Hh6thej8FIBIOE2-1574725033.wv", "ST-R3SdlQCwoYQkost3snFxzXS5vam2-1574726165.wv"]
                           
     base_path = './audio_files/'
-    audio_dct = load_audio(preproc_path, test_names, test_fns, base_path, test_h_zeros, test_c_zeros)
+    audio_dct = load_audio(preproc_path, test_names, test_fns, base_path, test_h_zeros, test_c_zeros, time_dim)
     test_dct = {'test_zeros': test_zeros, 'test_randn_seed-2020': test_randn}
     test_dct.update(audio_dct)
 
     return test_dct
 
 
-def load_audio(preproc_path, test_names, test_fns, base_path, test_h, test_c):
+def load_audio(preproc_path, test_names, test_fns, base_path, test_h, test_c, time_dim):
     dct = {}
     for test_name, test_fn in zip(test_names, test_fns):
 
@@ -421,7 +465,9 @@ if  __name__=="__main__":
     # commmand format: python validation.py <model_name>
     parser = argparse.ArgumentParser(description="validates the outputs of the models.")
     parser.add_argument("model_name", help="name of the model.")
+    parser.add_argument("--num_frames", help="number of input frames in time dimension hard-coded in onnx model")
+
     args = parser.parse_args()
 
-    main(args.model_name)
+    main(args.model_name, int(args.num_frames))
 

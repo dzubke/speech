@@ -134,6 +134,10 @@ onnx_coreml/onnx_models/
 onnx_coreml/coreml_models/
 onnx_coreml/validation_scripts/*.onnx
 onnx_coreml/validation_scripts/*.mlmodel
+onnx_coreml/output/
+onnx_coreml/config/
+onnx_coreml/preproc/
+onnx_coreml/zips/
 
 
 

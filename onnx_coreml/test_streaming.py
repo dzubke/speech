@@ -11,8 +11,8 @@ import pickle
 import speech.models as models
 
 
-# conducts inference on audio with just recording audio from a microphone without streaming.
-
+freq_dim = 257 #freq dimension out of log_spectrogram 
+time_dim = 186  #time dimension out of log_spectrogram
 state_dict_fn = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/torch_models/20200211-0212_w32-s16_3sec_state_dict.pth'
 
 def main():

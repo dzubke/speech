@@ -8,6 +8,12 @@
         "start_and_end" : false
     },
 
+    "preproc": {
+        "preprocessor": "log_spec",
+        "window_size": 32,
+        "step_size": 16
+    },
+
     "optimizer" : {
         "batch_size" : 8,
         "epochs" : 100,
