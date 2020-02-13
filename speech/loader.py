@@ -21,12 +21,16 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, max_samples=100, start_and_end=True):
+    def __init__(self, data_json, preproc_json, max_samples=100, start_and_end=True):
         """
         Builds a preprocessor from a dataset.
         Arguments:
             data_json (string): A file containing a json representation
                 of each example per line.
+            preproc_json: A json file defining the preprocessing with attributes
+                preprocessor: "log_spec" or "mfcc" to determine the type of preprocessing
+                window_size: the size of the window in the spectrogram transform
+                step_size: the size of the step in the spectrogram transform
             max_samples (int): The maximum number of examples to be used
                 in computing summary statistics.
             start_and_end (bool): Include start and end tokens in labels.
@@ -35,14 +39,14 @@ class Preprocessor():
 
         """
         data = read_data_json(data_json)
+        preproc_cfg = read_data_json(preproc_json)
 
         # Compute data mean, std from sample
         audio_files = [d['audio'] for d in data]
         random.shuffle(audio_files)
         # the mean and std are of the log of the spectogram of the audio files
-        self.mean, self.std = compute_mean_std(audio_files[:max_samples])
+        self.mean, self.std = compute_mean_std(audio_files[:max_samples], preproc_cfg)
         self._input_dim = self.mean.shape[0]
-
 
         # Make char map
         chars = list(set(t for d in data for t in d['text']))
@@ -72,7 +76,13 @@ class Preprocessor():
         return text[s:e]
 
     def preprocess(self, wave_file, text):
-        inputs = log_specgram_from_file(wave_file)
+        if preproc_cfg['preprocessor'] == "log_spec":
+            inputs = log_specgram_from_file(wave_file, preproc_cfg['window_size'], preproc_cfg['step_size'])
+        elif preproc_cfg['preprocessor'] == "mfcc":
+            inputs = mfcc_from_file(wave_file, preproc_cfg['window_size'], preproc_cfg['step_size'])
+        else: 
+            raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
+        
         inputs = (inputs - self.mean) / self.std
         targets = self.encode(text)
         return inputs, targets
@@ -85,9 +95,16 @@ class Preprocessor():
     def vocab_size(self):
         return len(self.int_to_char)
 
-def compute_mean_std(audio_files):
-    samples = [log_specgram_from_file(af)
-                for af in audio_files]
+def compute_mean_std(audio_files, preproc_cfg):
+    if preproc_cfg['preprocessor'] == "log_spec":
+        samples = [log_specgram_from_file(af, preproc_cfg['window_size'], preproc_cfg['step_size'])
+                    for af in audio_files]
+    elif preproc_cfg['preprocessor'] == "mfcc":
+        samples = [mfcc_from_file(af, preproc_cfg['window_size'], preproc_cfg['step_size'])
+                    for af in audio_files]
+    else: 
+        raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
+    
     samples = np.vstack(samples)
     mean = np.mean(samples, axis=0)
     std = np.std(samples, axis=0)
@@ -100,7 +117,6 @@ class AudioDataset(tud.Dataset):
         data = read_data_json(data_json)        #loads the data_json into a list
         self.preproc = preproc                  # assign the preproc object
 
-        # I'm not fully certain what is going on here
         bucket_diff = 4                         # number of different buckets
         max_len = max(len(x['text']) for x in data) # max number of phoneme labels in data
         num_buckets = max_len // bucket_diff        # the number of buckets
@@ -165,7 +181,7 @@ def make_loader(dataset_json, preproc,
                 drop_last=True)
     return loader
 
-def mfcc_from_file(audio_file: str):
+def mfcc_from_file(audio_file: str, window_size=20, step_size=10):
     """Computes the Mel Frequency Cepstral Coefficients (MFCC) from an audio file path by calling the mfcc method
 
     Arguments
@@ -181,9 +197,9 @@ def mfcc_from_file(audio_file: str):
     if len(audio.shape)>1:     # if there are multiple channels, take the first channel
         audio = audio[:,0]
    
-    return create_mfcc(audio, sample_rate)
+    return create_mfcc(audio, sample_rate, window_size, step_size)
 
-def create_mfcc(audio, sample_rate: int, esp=1e-10):
+def create_mfcc(audio, sample_rate: int, window_size, step_size, esp=1e-10):
     """Calculates the mfcc using python_speech_features and can return the mfcc's and its derivatives, if desired. 
     If num_mfcc is set to 13 or less: Output consists of 12 MFCC and 1 energy
     if num_mfcc is set to 26 or less: ouput consists of 12 mfcc, 1 energy, as well as the first derivative of these
@@ -193,7 +209,7 @@ def create_mfcc(audio, sample_rate: int, esp=1e-10):
     """
 
     num_mfcc = 39   # the number of mfcc's in the output
-    mfcc = python_speech_features.mfcc(audio, sample_rate, winlen=0.025, winstep=0.01, numcep=13, nfilt=26, preemph=0.97, appendEnergy=True)
+    mfcc = python_speech_features.mfcc(audio, sample_rate, winlen=window_size/1000, winstep=step_size/1000, numcep=13, nfilt=26, preemph=0.97, appendEnergy=True)
     out = mfcc
     
     # the if-statement waterfall appends the desired number of derivatives to the output value
@@ -220,7 +236,7 @@ def create_mfcc(audio, sample_rate: int, esp=1e-10):
     return out.astype(np.float32)
 
 
-def log_specgram_from_file(audio_file: str, channel: int=0, plot=False):
+def log_specgram_from_file(audio_file: str, window_size=32, step_size=16, channel: int=0, plot=False):
     """Computes the log of the spectrogram from from a input audio file string
 
     Arguments
@@ -241,10 +257,10 @@ def log_specgram_from_file(audio_file: str, channel: int=0, plot=False):
         assert channel <= num_channels, "channel argument greater than audio channels"
         audio = audio[:,channel]
    
-    return log_specgram(audio, sr, plot=plot)
+    return log_specgram(audio, sr, window_size, step_size, plot=plot)
 
-def log_specgram(audio, sample_rate, window_size=20,
-                 step_size=10, eps=1e-10, plot=False):
+def log_specgram(audio, sample_rate, window_size=32,
+                 step_size=16, eps=1e-10, plot=False):
     nperseg = int(window_size * sample_rate / 1e3)
     noverlap = int(step_size * sample_rate / 1e3)
     f, t, spec = scipy.signal.spectrogram(audio,
@@ -256,7 +272,6 @@ def log_specgram(audio, sample_rate, window_size=20,
     if plot==True:
         plot_spectrogram(f,t, spec)
     return np.log(spec.T.astype(np.float32) + eps)
-
 
 def compare_log_spec_from_file(audio_file_1: str, audio_file_2: str, plot=False):
     """This function takes in two audio paths and calculates the difference between the spectrograms 

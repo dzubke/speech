@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import torch.autograd as autograd
 
-import functions.ctc as ctc #awni hannun's ctc bindings
+#import functions.ctc as ctc #awni hannun's ctc bindings
 #from warpctc_pytorch import CTCLoss  #sean naren's ctc bindings
 from . import model
 from .ctc_decoder import decode
@@ -26,11 +26,11 @@ class CTC(model.Model):
         self.blank = output_dim
         self.fc = model.LinearND(self.encoder_dim, output_dim + 1)
 
-    def forward(self, x, rnn_args):
+    def forward(self, x, rnn_args=None):
        # x, y, x_lens, y_lens = self.collate(*batch)
-        return self.forward_impl(x, rnn_args)
+        return self.forward_impl(x, rnn_args,  softmax=True)
 
-    def forward_impl(self, x, rnn_args, softmax=False):
+    def forward_impl(self, x, rnn_args=None, softmax=False):
         if self.is_cuda:
             x = x.cuda()
         x, rnn_args = self.encode(x, rnn_args)    
@@ -41,7 +41,7 @@ class CTC(model.Model):
 
     def loss(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
-        out = self.forward_impl(x)
+        out, rnn_args = self.forward_impl(x)
         
         loss_fn = ctc.CTCLoss()         # awni's ctc loss call
         #loss_fn = CTCLoss(size_average=True)    # 1. naren's ctc loss call
@@ -64,13 +64,13 @@ class CTC(model.Model):
                 v.volatile = True
         return batch
     
-    def infer(self, batch):
+    def infer(self, batch, rnn_args=None):
         x, y, x_lens, y_lens = self.collate(*batch)
-        probs = self.forward_impl(x, softmax=True)
+        probs, rnn_args = self.forward_impl(x, rnn_args, softmax=True)
         # convert the torch tensor into a numpy array
         probs = probs.data.cpu().numpy()
         return [decode(p, beam_size=3, blank=self.blank)[0]
-                    for p in probs]
+                    for p in probs], rnn_args
     
     def infer_distribution(self, batch, num_results):
         x, y, x_lens, y_lens = self.collate(*batch)

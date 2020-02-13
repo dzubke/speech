@@ -132,3 +132,8 @@ examples/librispeech/models/ctc_models/20200203/20200210/*model
 examples/librispeech/models/ctc_models/20200203/20200211/*model
 examples/librispeech/models/ctc_models/20200203/20200212/*model
 examples/librispeech/models/ctc_models/20200203/20200213/*model
+onnx_coreml/torch_models/
+onnx_coreml/onnx_models/
+onnx_coreml/coreml_models/
+onnx_coreml/validation_scripts/*.onnx
+onnx_coreml/validation_scripts/*.mlmodel
