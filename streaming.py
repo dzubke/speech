@@ -22,22 +22,21 @@ This implementation of model streaming is similar to Mozilla's implementation at
 https://github.com/mozilla/DeepSpeech/blob/v0.5.1/native_client/deepspeech.cc#L62
 
    The streaming process uses three queues 
-   - audio_buffer, collects audio samples until there's enough data to
-     compute input features for a single window.
-   - mfcc_buffer, used to buffer input features until there's enough data for
-     a single timestep. Remember there's overlap in the features, each timestep
-     contains n_context past feature frames, the current feature frame, and
-     n_context future feature frames, for a total of 2*n_context + 1 feature
-     frames per timestep.
-   - batch_buffer, used to buffer timesteps until there's enough data to compute
-     a batch of n_steps.
-   Data flows through all three buffers as audio samples are fed via the public
-   API. When audio_buffer is full, features are computed from it and pushed to
-   mfcc_buffer. When mfcc_buffer is full, the timestep is copied to batch_buffer.
-   When batch_buffer is full, we do a single step through the acoustic model
-   and accumulate results in the DecoderState structure.
-   When finishStream() is called, we decode the accumulated logits and return
-   the corresponding transcription.
+   - mic_queue, the mic_record method collects audio samples from the microphone
+                and places them in the audio queue
+   - preprocess_queue, the objects in the audio queue are collected by the audio_collection method
+                into sets of 10 and put in the preprocess queue. Also, an overlap factor 
+                can be set that will add an additional number of mic_buffers into a single 
+                audio object to be put in the preprocess queue
+   - model_queue, the objects in the preprocess queue are then fed into the model by the infer method
+                 to calculate the probabilies of each phoneme label at each timestep. In the 
+                 model.infer() call, those probabilities are also fed into the decoder to output
+                 phoneme labels. 
+    The phoneme label predictions are then added to the predictions list which is printed to stdout.
+
+    This program is ended through a keyboard interrupt. The multi-threading relies on serveral infinite
+    loops that need to be interrupted to shut the program down. This isn't ideal, but is how this code is
+    written right now. 
 """
 
 
@@ -96,7 +95,7 @@ class StreamInfer():
         """This function collects the number of mic_buffers specified in audio_buffer_size into 
             a numpy array and puts it on the proprocess_q
         """
-        overlap = 5  # the amount of overlapping mic_buffers between each audio_buffer
+        overlap = 0  # the amount of overlapping mic_buffers between each audio_buffer
         tail_cache = np.array([], dtype=np.int16)
         head_cache = np.array([], dtype=np.int16)
 
