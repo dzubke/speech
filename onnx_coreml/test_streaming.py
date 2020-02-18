@@ -22,13 +22,6 @@ def main():
     trained_model.load_state_dict(state_dict)
 
 
-
-
-
-
-
-
-
 def predict_from_stream(model_path: str):
     """This function takes in a path to a pytorch model and prints predictions of the model from live streaming
         audio from a computer microphone.
