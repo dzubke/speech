@@ -21,7 +21,7 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, preproc_json, max_samples=100, start_and_end=True):
+    def __init__(self, data_json, max_samples=100, start_and_end=True): #preproc_json,
         """
         Builds a preprocessor from a dataset.
         Arguments:
@@ -39,13 +39,13 @@ class Preprocessor():
 
         """
         data = read_data_json(data_json)
-        preproc_cfg = read_data_json(preproc_json)
+        #preproc_cfg = read_data_json(preproc_json)
 
         # Compute data mean, std from sample
         audio_files = [d['audio'] for d in data]
         random.shuffle(audio_files)
         # the mean and std are of the log of the spectogram of the audio files
-        self.mean, self.std = compute_mean_std(audio_files[:max_samples], preproc_cfg)
+        self.mean, self.std = compute_mean_std(audio_files[:max_samples])#, preproc_cfg)
         self._input_dim = self.mean.shape[0]
 
         # Make char map
@@ -76,12 +76,12 @@ class Preprocessor():
         return text[s:e]
 
     def preprocess(self, wave_file, text):
-        if preproc_cfg['preprocessor'] == "log_spec":
-            inputs = log_specgram_from_file(wave_file, preproc_cfg['window_size'], preproc_cfg['step_size'])
-        elif preproc_cfg['preprocessor'] == "mfcc":
-            inputs = mfcc_from_file(wave_file, preproc_cfg['window_size'], preproc_cfg['step_size'])
-        else: 
-            raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
+        #if preproc_cfg['preprocessor'] == "log_spec":
+        inputs = log_specgram_from_file(wave_file)#, preproc_cfg['window_size'], preproc_cfg['step_size'])
+        #elif preproc_cfg['preprocessor'] == "mfcc":
+        #    inputs = mfcc_from_file(wave_file, preproc_cfg['window_size'], preproc_cfg['step_size'])
+        #else: 
+        #    raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
         
         inputs = (inputs - self.mean) / self.std
         targets = self.encode(text)
@@ -95,15 +95,15 @@ class Preprocessor():
     def vocab_size(self):
         return len(self.int_to_char)
 
-def compute_mean_std(audio_files, preproc_cfg):
-    if preproc_cfg['preprocessor'] == "log_spec":
-        samples = [log_specgram_from_file(af, preproc_cfg['window_size'], preproc_cfg['step_size'])
-                    for af in audio_files]
-    elif preproc_cfg['preprocessor'] == "mfcc":
-        samples = [mfcc_from_file(af, preproc_cfg['window_size'], preproc_cfg['step_size'])
-                    for af in audio_files]
-    else: 
-        raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
+def compute_mean_std(audio_files):#, preproc_cfg):
+    #if preproc_cfg['preprocessor'] == "log_spec":
+    samples = [log_specgram_from_file(af)
+                    for af in audio_files]  #, preproc_cfg['window_size'], preproc_cfg['step_size']
+    #elif preproc_cfg['preprocessor'] == "mfcc":
+    #    samples = [mfcc_from_file(af, preproc_cfg['window_size'], preproc_cfg['step_size'])
+    #                for af in audio_files]
+    #else: 
+    #    raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
     
     samples = np.vstack(samples)
     mean = np.mean(samples, axis=0)
@@ -236,7 +236,7 @@ def create_mfcc(audio, sample_rate: int, window_size, step_size, esp=1e-10):
     return out.astype(np.float32)
 
 
-def log_specgram_from_file(audio_file: str, window_size=32, step_size=16, channel: int=0, plot=False):
+def log_specgram_from_file(audio_file: str, window_size=20, step_size=10, channel: int=0, plot=False):
     """Computes the log of the spectrogram from from a input audio file string
 
     Arguments
