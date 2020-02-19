@@ -52,7 +52,7 @@ def main(model_name, num_frames):
     #load models
     state_dict_model = torch.load(TRAINED_MODEL_FN, map_location=torch.device('cpu'))
 
-    trained_model = models.CTC(freq_dim,40, model_cfg)
+    trained_model = CTC(freq_dim,40, model_cfg)
     state_dict = state_dict_model.state_dict()
     torch.save(state_dict, state_dict_path)
     trained_model.load_state_dict(state_dict)
@@ -70,35 +70,12 @@ def main(model_name, num_frames):
     inferred_model = shape_inference.infer_shapes(onnx_model)
     onnx.checker.check_model(inferred_model)
 
-    # print("---------trained model-------------")
-    # print(f"trained_model: {trained_model}")
-    # print("-------Trained State Dict------------")
-    # for k, v in trained_model.state_dict().items():
-    #     print(k, v.shape, v.dtype)
-
-    # print("---------CTCNet_model-------------")
-    # print(f"CTCNet_model: {CTCNet_model}")
-    # print("----------CTCNet state dict------------")
-    # for k, v in CTCNet_model.state_dict().items():
-    #     print(k, v.shape, v.dtype)
-    # print("-----------------------------")
-
-
     #creating the test data
     data_dct = gen_test_data(PREPROC_FN, time_dim, freq_dim)
-
-    #saving the preproc object as a dictionary
-    preproc_json_path = PREPROC_FN[:-4]+".json"   #removes the .pyc extension and replaces with .pickle ext
-    preproc_to_json(PREPROC_FN, preproc_json_path)
-
-    preproc_pickle_path = PREPROC_FN[:-4]+".pickle"
-    preproc_to_dict(PREPROC_FN, preproc_pickle_path, to_pickle=True)
-
 
     # make predictions
     predictions_dict= {}
 
-    stream_test_name = "Speak_5_out"
 
     for name, data in data_dct.items():
         print(f"\n~~~~~~~~~~~~~~~~~~{name}~~~~~~~~~~~~~~~~~~~~~~\n")
@@ -108,180 +85,97 @@ def main(model_name, num_frames):
         trained_probs, trained_h, trained_c = to_numpy(trained_output[0]), to_numpy(trained_output[1][0]), to_numpy(trained_output[1][1])
         trained_max_decoder = max_decode(trained_probs[0], blank=40)
         trained_ctc_decoder = ctc_decode(trained_probs[0], beam_size=50, blank=40)
-
-
-        #torch_output = CTCNet_model(torch.from_numpy(test_x), torch.from_numpy(test_h), torch.from_numpy(test_c)) 
-        #torch_probs, torch_h, torch_c = [to_numpy(tensor) for tensor in torch_output]
-        #torch_output = [to_numpy(tensor) for tensor in torch_output]
-       
-        ort_session = onnxruntime.InferenceSession(ONNX_FN)
-        ort_inputs = {
-        ort_session.get_inputs()[0].name: test_x,
-        ort_session.get_inputs()[1].name: test_h,
-        ort_session.get_inputs()[2].name: test_c}
-        ort_output = ort_session.run(None, ort_inputs)
-        onnx_probs, onnx_h, onnx_c = [np.array(array) for array in ort_output]
-        #onnx_output = [np.array(array) for array in ort_output]
-        print("onnxruntime prediction complete") 
-
-        coreml_input = {'input': test_x, 'hidden_prev': test_h, 'cell_prev': test_c}
-        coreml_output = coreml_model.predict(coreml_input, useCPUOnly=True)
-        coreml_probs = np.array(coreml_output['output'])
-        coreml_h = np.array(coreml_output['hidden'])
-        coreml_c = np.array(coreml_output['cell'])
-        coreml_max_decoder = max_decode(coreml_probs[0], blank=40)
-        coreml_ctc_decoder = ctc_decode(coreml_probs[0], beam_size=50,blank=40)
-        #coreml_output = [coreml_probs, coreml_h, coreml_c]
-        print("coreml prediction completed")
-
-        if name == stream_test_name:
-            stream_test_x = test_x
-            stream_test_h = test_h
-            stream_test_c = test_c
-            stream_test_probs = trained_probs
-            stream_test_h_out = trained_h
-            stream_test_c_out = trained_c
-            stream_test_max_decoder = trained_max_decoder
-            stream_test_ctc_decoder = trained_ctc_decoder
-
-        time_slice = math.floor(time_dim/2) - 1
-        trained_probs_sample = trained_probs[0,time_slice,:]
-        trained_h_sample = trained_h[0,0,0:25]
-        trained_c_sample = trained_c[0,0,0:25]
         trained_max_decoder_char = ints_to_phonemes(PREPROC_FN, trained_max_decoder)
         trained_ctc_decoder_char = ints_to_phonemes(PREPROC_FN, trained_ctc_decoder[0])
+        print("torch prediction complete") 
+        print(f"input size: {test_x.shape}")
 
-        print("\n-----Torch Output-----")
-        print(f"output {np.shape(trained_probs)}: \n{trained_probs_sample}")
-        print(f"hidden {np.shape(trained_h)}: \n{trained_h_sample}")
-        print(f"cell {np.shape(trained_c)}: \n{trained_c_sample}")
-        print(f"max decode: {trained_max_decoder_char}")
-        print(f"ctc decode: {trained_ctc_decoder_char}")
+        # ort_session = onnxruntime.InferenceSession(ONNX_FN)
+        # ort_inputs = {
+        # ort_session.get_inputs()[0].name: test_x,
+        # ort_session.get_inputs()[1].name: test_h,
+        # ort_session.get_inputs()[2].name: test_c}
+        # ort_output = ort_session.run(None, ort_inputs)
+        # onnx_probs, onnx_h, onnx_c = [np.array(array) for array in ort_output]
+        # print("onnxruntime prediction complete") 
 
-        output_dict = {"torch_probs_(time_dim/2-1)":trained_probs_sample.tolist(), "torch_h_sample":trained_h_sample.tolist(), 
-                        "torch_c_sample": trained_c_sample.tolist(), "torch_max_decoder":trained_max_decoder_char, 
-                        "torch_ctc_decoder_beam=50":trained_ctc_decoder_char}
+        # coreml_input = {'input': test_x, 'hidden_prev': test_h, 'cell_prev': test_c}
+        # coreml_output = coreml_model.predict(coreml_input, useCPUOnly=True)
+        # coreml_probs = np.array(coreml_output['output'])
+        # coreml_h = np.array(coreml_output['hidden'])
+        # coreml_c = np.array(coreml_output['cell'])
+        # coreml_max_decoder = max_decode(coreml_probs[0], blank=40)
+        # coreml_ctc_decoder = ctc_decode(coreml_probs[0], beam_size=50,blank=40)
+        # print("coreml prediction completed")
 
-        predictions_dict.update({name: output_dict})
-
-        print("\n-----Coreml Output-----")
-        print(f"output {coreml_probs.shape}: \n{coreml_probs[0,time_slice,:]}")
-        print(f"hidden {coreml_h.shape}: \n{coreml_h[0,0,0:25]}")
-        print(f"cell {coreml_c.shape}: \n{coreml_c[0,0,0:25]}")
-        print(f"max decode: {coreml_max_decoder}")
-        print(f"ctc decode: {coreml_ctc_decoder}")
-
-        # Compare Trained and Coreml predictions
-        np.testing.assert_allclose(coreml_probs, trained_probs, rtol=1e-03, atol=1e-05)
-        np.testing.assert_allclose(coreml_h, trained_h, rtol=1e-03, atol=1e-05)
-        np.testing.assert_allclose(coreml_c, trained_c, rtol=1e-03, atol=1e-05)
-        #assert(trained_max_decoder==coreml_max_decoder), "max decoder doesn't match"
-        #assert(trained_ctc_decoder[0]==coreml_ctc_decoder[0]), "ctc decoder labels don't match"
-        #np.testing.assert_almost_equal(trained_ctc_decoder[1], coreml_ctc_decoder[1], decimal=3)
-        print("\nTrained and Coreml probs, hidden, cell, decoder states match, all good!")
-
-        # Compare Trained and Torch predictions
-        #np.testing.assert_allclose(torch_probs, trained_probs, rtol=1e-03, atol=1e-05)
-        #np.testing.assert_allclose(torch_h, trained_h, rtol=1e-03, atol=1e-05)
-        #np.testing.assert_allclose(torch_c, trained_c, rtol=1e-03, atol=1e-05)
-        #print("\nTorch and Trained probs, hidden, cell states match, all good!")  
-
-        # Compare Torch and ONNX predictions
-        np.testing.assert_allclose(trained_probs, onnx_probs, rtol=1e-03, atol=1e-05)
-        np.testing.assert_allclose(trained_h, onnx_h, rtol=1e-03, atol=1e-05)
-        np.testing.assert_allclose(trained_c, onnx_c, rtol=1e-03, atol=1e-05)
-        print("\nTrained and ONNX probs, hidden, cell states match, all good!")  
-
-        # Compare ONNX and CoreML predictions
-        np.testing.assert_allclose(onnx_probs, coreml_probs, rtol=1e-03, atol=1e-05)
-        np.testing.assert_allclose(onnx_h, coreml_h, rtol=1e-03, atol=1e-05)
-        np.testing.assert_allclose(onnx_c, coreml_c, rtol=1e-03, atol=1e-05)
-        print("\nONNX and CoreML probs, hidden, cell states match, all good!")
-
-        # Compare Torch and CoreML predictions
-        #np.testing.assert_allclose(torch_probs, coreml_probs, rtol=1e-03, atol=1e-05)
-        #np.testing.assert_allclose(torch_h, coreml_h, rtol=1e-03, atol=1e-05)
-        #np.testing.assert_allclose(torch_c, coreml_c, rtol=1e-03, atol=1e-05)
-        #print("\nTorch and CoreML probs, hidden, cell states match, all good!")
-
-
+        # # Compare Trained and Coreml predictions
+        # np.testing.assert_allclose(coreml_probs, trained_probs, rtol=1e-03, atol=1e-05)
+        # np.testing.assert_allclose(coreml_h, trained_h, rtol=1e-03, atol=1e-05)
+        # np.testing.assert_allclose(coreml_c, trained_c, rtol=1e-03, atol=1e-05)
+        # #assert(trained_max_decoder==coreml_max_decoder), "max decoder doesn't match"
+        # #assert(trained_ctc_decoder[0]==coreml_ctc_decoder[0]), "ctc decoder labels don't match"
+        # #np.testing.assert_almost_equal(trained_ctc_decoder[1], coreml_ctc_decoder[1], decimal=3)
+        # print("\nTrained and Coreml probs, hidden, cell states match, all good!")
     
-    dict_to_json(predictions_dict, "./output/"+model_name+"_output.json")
+        print("\n\n------------- Streaming Validation --------------")
 
-    """
-    print("\n\n------------- Streaming Validation --------------")
+        stream_test_x = test_x
+        stream_test_probs = trained_probs
+        stream_test_h_out = trained_h
+        stream_test_c_out = trained_c
+        stream_test_max_decoder = trained_max_decoder
+        stream_test_ctc_decoder = trained_ctc_decoder
 
-    chunk_step = 5
-    chunk_loops = math.floor(time_dim/chunk_step)
-    dist_dict = {}
-    for i in range(1, chunk_loops):
-        print(f"outer loop: {i}")
-        stream_step = i*chunk_step
-        #print(f"stream step: {stream_step}")
-        #print(f"time dim: {time_dim}")
-        #conv_out = trained_model.conv_out_size(time_dim, dim=0)
-        #print(f"conv_out: {conv_out}")
+        context_size = 31
+        dist_dict = {}
 
-        num_loops = math.floor(time_dim/stream_step)
+        stream_test_h_in = stream_test_h_out = torch.from_numpy(test_h)
+        stream_test_c_in = stream_test_c_out = torch.from_numpy(test_c)
+        for i in range(217):
+            print(f"outer loop: {i}")
 
-        #np.testing.assert_allclose(stream_test_h, test_h, rtol=1e-05, atol=1e-05)
-        stream_test_h_in = stream_test_h_out = torch.from_numpy(stream_test_h)
-        stream_test_c_in = stream_test_c_out = torch.from_numpy(stream_test_c)
 
-        
-        for i in range(num_loops+1):
-            print(f"inner loop: {i}")
-
-            if i != num_loops: 
-                x_chunk = stream_test_x[:, i*stream_step : (i+1)*stream_step, :]
-            else:
-                x_chunk = stream_test_x[:, num_loops*stream_step:, :]
+            input_buffer = test_x[:, i:i+context_size, :]
 
             np.testing.assert_allclose(to_numpy(stream_test_h_in), to_numpy(stream_test_h_out), rtol=1e-03, atol=1e-05)
             np.testing.assert_allclose(to_numpy(stream_test_c_in), to_numpy(stream_test_c_out), rtol=1e-03, atol=1e-05)
 
-            print(f"x_chunk size: {x_chunk.shape}")
-            probs_chunk, (stream_test_h_out, stream_test_c_out) = trained_model(torch.from_numpy(x_chunk), 
+            print(f"input_buffer size: {input_buffer.shape}")
+            stream_probs, (stream_test_h_out, stream_test_c_out) = trained_model(torch.from_numpy(input_buffer), 
                                         (stream_test_h_in,
                                         stream_test_c_in)
                                         )
             stream_test_h_in = stream_test_h_out
             stream_test_c_in = stream_test_c_out
 
+            print(f"stream_probs: {stream_probs.shape} \n {stream_probs}")
+
+
             #probs_slice = stream_test_probs[:, int(i*stream_step/2) : int((i+1)*stream_step/2),:]
             #print(f"probs_full:{probs_slice.shape} {probs_slice[0,0,:]}")
 
-            probs_chunk = to_numpy(probs_chunk)
+            stream_probs = to_numpy(stream_probs)
             #print(f"probs_chunk:{probs_chunk.shape} {probs_chunk[0,0,:]}")
             
             if i ==0:
-                probs_chunks = probs_chunk
+                stream_output = stream_probs
             else: 
-                probs_chunks = np.concatenate((probs_chunks, probs_chunk), axis=1)
+                stream_output = np.concatenate((stream_output, stream_probs), axis=1)
 
 
-            #np.testing.assert_allclose(probs_slice, probs_chunk, rtol=1e-3, atol=1e-3)
-        
+        np.testing.assert_allclose(stream_output, trained_probs, rtol=1e-3, atol=1e-3)
+        print("the outputs are the same")
+
         #print(f"probs_chunk size: {probs_chunks.shape}")
-        full_max_decoder = ints_to_phonemes(PREPROC_FN, stream_test_max_decoder)
-        chunked_max_decoder = ints_to_phonemes(PREPROC_FN,max_decode(np.squeeze(probs_chunks), blank=40))
+        #full_max_decoder = ints_to_phonemes(PREPROC_FN, stream_test_max_decoder)
+        #chunked_max_decoder = ints_to_phonemes(PREPROC_FN,max_decode(np.squeeze(probs_chunks), blank=40))
 
-        dist_dict.update({stream_step: editdistance.eval(full_max_decoder, chunked_max_decoder)})
-    
-    print(dist_dict)
-    """
+        #dist_dict.update({stream_step: editdistance.eval(full_max_decoder, chunked_max_decoder)})
+        #print(dist_dict)
         
-    
 
 
-
-def dict_to_json(input_dict, json_path):
-    
-    with open(json_path, 'w') as fid:
-        json.dump(input_dict, fid)
-
-
-def preprocess(PREPROC_FN, inputs):
+def normalize(PREPROC_FN, inputs):
     with open(PREPROC_FN, 'rb') as fid:
         preproc = pickle.load(fid)
         return (inputs - preproc.mean) / preproc.std
@@ -303,18 +197,9 @@ def gen_test_data(preproc_path, time_dim, freq_dim):
     test_c_randn = np.random.randn(5, 1, 512).astype(np.float32)
     test_randn = [test_x_randn, test_h_randn, test_c_randn]
 
-    test_names = ["Speak_5_out", "DZ-5-drz-test-20191202", "DZ-5-plane-noise", 
-                "LibSp_777-126732-0003", "LibSp_84-121123-0001", 
-                "Speak_1_4ysq5X0Mvxaq1ArAntCWC2YkWHc2-1574725037", 
-                "Speak_2_58cynYij95TbB9Nlz3TrKBbkg643-1574725017", 
-                "Speak_3_CcSEvcOEineimGwKOk1c8P2eU0q1-1574725123", 
-                "Speak_4_OVrsxD1n9Wbh0Hh6thej8FIBIOE2-1574725033", 
-                "Speak_6_R3SdlQCwoYQkost3snFxzXS5vam2-1574726165"]
+    test_names = ["Speak_5_out"]
     
-    test_fns = ["ST-out.wav", "DZ-5-drz-test-20191202.wv", "DZ-5-plane-noise.wv", "LS-777-126732-0003.wav", 
-                "LS-84-121123-0001.wav", "ST-4ysq5X0Mvxaq1ArAntCWC2YkWHc2-1574725037.wv",
-                "ST-58cynYij95TbB9Nlz3TrKBbkg643-1574725017.wv", "ST-CcSEvcOEineimGwKOk1c8P2eU0q1-1574725123.wv", 
-                "ST-OVrsxD1n9Wbh0Hh6thej8FIBIOE2-1574725033.wv", "ST-R3SdlQCwoYQkost3snFxzXS5vam2-1574726165.wv"]
+    test_fns = ["ST-out.wav"]
 
     unused_names = ["DZ-5-drz-test-20191202", "DZ-5-plane-noise", 
                 "LibSp_777-126732-0003", "LibSp_84-121123-0001", 
@@ -331,7 +216,7 @@ def gen_test_data(preproc_path, time_dim, freq_dim):
                           
     base_path = './audio_files/'
     audio_dct = load_audio(preproc_path, test_names, test_fns, base_path, test_h_zeros, test_c_zeros, time_dim)
-    test_dct = {'test_zeros': test_zeros, 'test_randn_seed-2020': test_randn}
+    test_dct = {} #{'test_zeros': test_zeros, 'test_randn_seed-2020': test_randn}
     test_dct.update(audio_dct)
 
     return test_dct
@@ -341,19 +226,24 @@ def load_audio(preproc_path, test_names, test_fns, base_path, test_h, test_c, ti
     dct = {}
     for test_name, test_fn in zip(test_names, test_fns):
 
-        audio_data = preprocess(preproc_path, log_specgram_from_file(base_path+test_fn))
-        audio_data = audio_data[:time_dim,:]
+        audio_data = normalize(preproc_path, log_specgram_from_file(base_path+test_fn))
+        #audio_data = audio_data[:time_dim,:]       #concatenates the audio_data after time_dim
         audio_data = np.expand_dims(audio_data, 0)
         dct.update({test_name : [audio_data, test_h, test_c]})
     return dct
 
 
 class CTC(nn.Module):
-    def __init__(self, freq_dim, time_dim, output_dim, config):
+    def __init__(self, freq_dim, output_dim, config):
         super().__init__()
         
         encoder_cfg = config["encoder"]
-        conv_cfg = encoder_cfg["conv"]
+        dropout = 0.4
+        conv_cfg =  [
+			[32, 11, 41, 1, 2, 0, 20],
+			[32, 11, 21, 1, 2, 0, 10],
+			[96, 11, 21, 1, 1, 0, 10]
+             ]
 
         convs = []
         in_c = 1
@@ -365,8 +255,8 @@ class CTC(nn.Module):
                              padding=(p1, p2))
             batch_norm =  nn.BatchNorm2d(out_c)
             convs.extend([conv, batch_norm, nn.ReLU()])
-            if config["dropout"] != 0:
-                convs.append(nn.Dropout(p=config["dropout"]))
+            if dropout != 0:
+                convs.append(nn.Dropout(p=dropout))
             in_c = out_c
 
         self.conv = nn.Sequential(*convs)
@@ -375,17 +265,20 @@ class CTC(nn.Module):
         assert conv_out > 0, \
           "Convolutional output frequency dimension is negative."
 
-        #print(f"conv_out: {conv_out}")
-        rnn_cfg = encoder_cfg["rnn"]
+        rnn_cfg = {
+                "type": "LSTM",
+                "dim" : 512,
+                "bidirectional" : False,
+                "layers" : 5
+            }
 
         assert rnn_cfg["type"] == "GRU" or rnn_cfg["type"] == "LSTM", "RNN type in config not supported"
-
 
         self.rnn = eval("nn."+rnn_cfg["type"])(
                         input_size=conv_out,
                         hidden_size=rnn_cfg["dim"],
                         num_layers=rnn_cfg["layers"],
-                        batch_first=True, dropout=config["dropout"],
+                        batch_first=True, dropout=dropout,
                         bidirectional=rnn_cfg["bidirectional"])
 
         
@@ -395,7 +288,6 @@ class CTC(nn.Module):
 
 
         # include the blank token
-        #print(f"fc _encoder_dim {_encoder_dim}, output_dim {output_dim}")
         self.fc = LinearND(_encoder_dim, output_dim + 1)
 
     def conv_out_size(self, n, dim):
@@ -409,7 +301,7 @@ class CTC(nn.Module):
                 n = int(math.ceil(n))
         return n
 
-    def forward(self, x, h_prev, c_prev):
+    def forward(self, x, rnn_args):
 
         x = x.unsqueeze(1)
 
@@ -422,14 +314,14 @@ class CTC(nn.Module):
         x = x.view((b, t, f*c))
         
         # rnn
-        x, (h, c) = self.rnn(x, (h_prev, c_prev))
+        x, rnn_args = self.rnn(x, rnn_args)
 
         # fc
         x = self.fc(x)
 
         # softmax for final output
         x = torch.nn.functional.softmax(x, dim=2)
-        return x, h, c
+        return x, rnn_args
 
 
 class LinearND(nn.Module):
