@@ -236,7 +236,7 @@ def create_mfcc(audio, sample_rate: int, window_size, step_size, esp=1e-10):
     return out.astype(np.float32)
 
 
-def log_specgram_from_file(audio_file: str, window_size=20, step_size=10, channel: int=0, plot=False):
+def log_specgram_from_file(audio_file: str, window_size=32, step_size=16, channel: int=0, plot=False):
     """Computes the log of the spectrogram from from a input audio file string
 
     Arguments
@@ -259,8 +259,8 @@ def log_specgram_from_file(audio_file: str, window_size=20, step_size=10, channe
    
     return log_specgram(audio, sr, window_size, step_size, plot=plot)
 
-def log_specgram(audio, sample_rate, window_size=32,
-                 step_size=16, eps=1e-10, plot=False):
+def log_specgram(audio, sample_rate, window_size=20,
+                 step_size=10, eps=1e-10, plot=False):
     nperseg = int(window_size * sample_rate / 1e3)
     noverlap = int(step_size * sample_rate / 1e3)
     f, t, spec = scipy.signal.spectrogram(audio,
