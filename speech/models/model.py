@@ -85,7 +85,6 @@ class Model(nn.Module):
             in the model encoder config.
 
         """
-
         x = x.unsqueeze(1)      #
         
         x = self.conv(x)
