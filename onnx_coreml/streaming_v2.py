@@ -23,6 +23,10 @@ from speech.models.ctc_decoder import decode as ctc_decode
 import speech.models as models
 from get_paths import validation_paths
 from import_export import preproc_to_dict, preproc_to_json, export_state_dict
+from get_test_input import generate_test_input
+from import_export import torch_onnx_export, onnx_coreml_export
+
+
 
 """
 CONFIG_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/validation_scripts/ctc_config_20200121-0127.json'
@@ -57,9 +61,17 @@ def main(model_name, num_frames):
     torch.save(state_dict, state_dict_path)
     trained_model.load_state_dict(state_dict)
 
-    onnx_model = onnx.load(ONNX_FN)
+    #exporting and loading onnx model
+    #torch_device = 'cpu'
+    #input_tensor = generate_test_input("pytorch", model_name, time_dim=time_dim, set_device=torch_device) 
+    onnx_path = "./onnx_models/20200211-0219_w32-s16_nopad-onestride_31f_model.onnx"
+    #torch_onnx_export(trained_model, input_tensor, onnx_path)
+    onnx_model = onnx.load(onnx_path)
 
-    coreml_model = coremltools.models.MLModel(COREML_FN)
+    # exporting and loading coreml model
+    coreml_path = "./coreml_models/20200211-0219_w32-s16_nopad-onestride_31f_model.mlmodel"
+    #onnx_coreml_export(onnx_path, coreml_path)
+    coreml_model = coremltools.models.MLModel(coreml_path)
 
 
     # prepping and checking models
@@ -129,6 +141,11 @@ def main(model_name, num_frames):
         context_size = 31
         dist_dict = {}
 
+        #initializing the hidden and cell states for the coreml model
+        coreml_h_in = test_h
+        coreml_c_in = test_c
+
+        #initializing the hidden and cell states for the torch model
         stream_test_h_in = stream_test_h_out = torch.from_numpy(test_h)
         stream_test_c_in = stream_test_c_out = torch.from_numpy(test_c)
         for i in range(217):
@@ -148,6 +165,14 @@ def main(model_name, num_frames):
             stream_test_h_in = stream_test_h_out
             stream_test_c_in = stream_test_c_out
 
+            
+            coreml_input = {'input': input_buffer, 'hidden_prev': coreml_h_in, 'cell_prev': coreml_c_in}
+            coreml_output = coreml_model.predict(coreml_input, useCPUOnly=True)
+            coreml_stream_probs = np.array(coreml_output['output'])
+            coreml_h_in = np.array(coreml_output['hidden'])
+            coreml_c_in = np.array(coreml_output['cell'])
+
+
             print(f"stream_probs: {stream_probs.shape} \n {stream_probs}")
 
 
@@ -159,11 +184,14 @@ def main(model_name, num_frames):
             
             if i ==0:
                 stream_output = stream_probs
+                coreml_probs = coreml_stream_probs
             else: 
                 stream_output = np.concatenate((stream_output, stream_probs), axis=1)
-
+                coreml_probs = np.concatenate((coreml_probs, coreml_stream_probs), axis=1)
 
         np.testing.assert_allclose(stream_output, trained_probs, rtol=1e-3, atol=1e-3)
+        np.testing.assert_allclose(coreml_probs, trained_probs, rtol=1e-3, atol=1e-3)
+
         print("the outputs are the same")
 
         #print(f"probs_chunk size: {probs_chunks.shape}")
