@@ -144,7 +144,7 @@ def main(model_name, num_frames):
             stream_test_max_decoder = trained_max_decoder
             stream_test_ctc_decoder = trained_ctc_decoder
 
-        time_slice = math.floor(time_dim/2) - 1
+        time_slice = 0 #math.floor(time_dim/2) - 1
         trained_probs_sample = trained_probs[0,time_slice,:]
         trained_h_sample = trained_h[0,0,0:25]
         trained_c_sample = trained_c[0,0,0:25]
