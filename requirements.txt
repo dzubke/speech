@@ -6,6 +6,7 @@
 #SoundFile==0.10.2
 #tensorboard-logger==0.0.4
 #python_speech_features==0.6
+#librosa==0.7.2
 numpy==1.13.3
 cffi==1.11.2
 py==1.4.34

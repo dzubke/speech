@@ -87,8 +87,14 @@ class Model(nn.Module):
         """
         x = x.unsqueeze(1)      #
         
-        x = self.conv(x)
+        # padding will be added during training, but not when exporting the model
+        if config["export"] != "true":
+            # calculates the necessary padding based on half the filter size
+            # this calcuation does not generalize to all cases
+            pad = list(self.conv.children())[0].kernel_size[0]//2
+            x = nn.functional.pad(x, (0,0,pad,pad))    
 
+        x = self.conv(x)
         # At this point x should have shape
         # (batch, channels, time, freq)
         
