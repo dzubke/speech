@@ -89,7 +89,7 @@ class Preprocessor():
         inputs = apply_spec_augment(inputs)
 
         targets = self.encode(text)
-        
+
         return inputs, targets
 
     @property
@@ -376,7 +376,8 @@ def apply_spec_augment(inputs):
     policy_choice = np.random.randint(low=0, high=4)
     policy = policy_dict.get(policy_choice)
 
-    # the inputs need to be transposed and converted to torch to input to spec_augment
+    # the inputs need to be transposed and converted to torch tensor
+    # as spec_augment method expects tensor with freq x time dimensions
     inputs = torch.from_numpy(inputs.T)
 
     inputs = spec_augment.spec_augment(inputs, 
@@ -386,8 +387,9 @@ def apply_spec_augment(inputs):
                     frequency_mask_num=policy.get('frequency_mask_num'), 
                     time_mask_num=policy.get('time_mask_num'))
     
-    #convert the torch tensor back to numpy array
+    # convert the torch tensor back to numpy array and transpose back to time x freq
     inputs = inputs.detach().cpu().numpy() if inputs.requires_grad else inputs.cpu().numpy()
+    inputs = inputs.T
     assert type(inputs) == np.ndarray, "output is not numpy array"
 
     return inputs
