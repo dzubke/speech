@@ -39,7 +39,7 @@ import librosa.display
 import numpy as np
 import random
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from .sparse_image_warp import sparse_image_warp
 import torch
@@ -54,7 +54,7 @@ def time_warp(spec, W):
     spec_len = spec.shape[2]
 
     assert spec_len>2*W, "frequency dimension is not large enough for W parameter"
-    assert run_rows>0, "time dimension must be greater than zero"
+    assert num_rows>0, "time dimension must be greater than zero"
 
     y = num_rows // 2
     horizontal_line_at_ctr = spec[0][y]
