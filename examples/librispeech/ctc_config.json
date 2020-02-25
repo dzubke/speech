@@ -24,6 +24,7 @@
     "model" : {
         "class" : "CTC",
         "dropout" : 0.4,
+        "export": true,
         "encoder" : {
             "conv" : [
 			[32, 11, 41, 2, 2, 5, 20],
