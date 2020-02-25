@@ -83,6 +83,27 @@ class Preprocessor():
         #else: 
         #    raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
         
+        # spec_augment_policies = {
+        #     0:{
+        #         apply_augment: false
+        #     },
+        #     1: {
+        #         apply_augment:true, 
+        #         parameters: {W: 40, F: 50, m_F: 1, t: 50, p: 1.0, m_T: 1}
+        #     },
+        #     2: {
+        #     apply_augment:true, 
+        #     parameters: {W: 40, F: 50, m_F: 2, t: 50, p: 1.0, m_T: 2}
+        #     }
+        # }
+
+        # spec_aug_rand = np.random.uniform(low=0, high=3)
+
+        # if spec_aug_rand == 0: 
+        #     # don't apply spec_augment
+        # if spec_aug_rand > 0: 
+        #     # apply spec augment using the policy specified in spec_aug_rand
+        
         inputs = (inputs - self.mean) / self.std
         targets = self.encode(text)
         return inputs, targets

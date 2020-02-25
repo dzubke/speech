@@ -45,7 +45,12 @@ from .sparse_image_warp import sparse_image_warp
 import torch
 
 
-def time_warp(spec, W=5):
+def time_warp(spec, W):
+    
+    if W==0:
+        return spec
+
+    print(f"W is: {W}")
     num_rows = spec.shape[1]
     spec_len = spec.shape[2]
 
@@ -54,10 +59,13 @@ def time_warp(spec, W=5):
     # assert len(horizontal_line_at_ctr) == spec_len
 
     point_to_warp = horizontal_line_at_ctr[random.randrange(W, spec_len-W)]
+    print(f"point_to_warp: {point_to_warp}")
     # assert isinstance(point_to_warp, torch.Tensor)
 
     # Uniform distribution from (0,W) with chance to be up to W negative
     dist_to_warp = random.randrange(-W, W)
+    print(f"dist_to_warp: {dist_to_warp}")
+
     src_pts = torch.tensor([[[y, point_to_warp]]])
     dest_pts = torch.tensor([[[y, point_to_warp + dist_to_warp]]])
     warped_spectro, dense_flows = sparse_image_warp(spec, src_pts, dest_pts)
@@ -65,14 +73,14 @@ def time_warp(spec, W=5):
     return warped_spectro.squeeze(3)
 
 
-def spec_augment(mel_spectrogram, time_warping_para=40, frequency_masking_para=27,
-                 time_masking_para=70, frequency_mask_num=1, time_mask_num=1):
+def spec_augment(mel_spectrogram, time_warping_para=5, frequency_masking_para=50,
+                 time_masking_para=50, frequency_mask_num=1, time_mask_num=1):
     """Spec augmentation Calculation Function.
     'SpecAugment' have 3 steps for audio data augmentation.
     first step is time warping using Tensorflow's image_sparse_warp function.
     Second step is frequency masking, last step is time masking.
     # Arguments:
-      mel_spectrogram(numpy array): audio file path of you want to warping and masking.
+      spectrogram(torch tensor): audio file path of you want to warping and masking.
       time_warping_para(float): Augmentation parameter, "time warp parameter W".
         If none, default = 40.
       frequency_masking_para(float): Augmentation parameter, "frequency mask parameter F"
@@ -90,41 +98,54 @@ def spec_augment(mel_spectrogram, time_warping_para=40, frequency_masking_para=2
 
     v = mel_spectrogram.shape[1]
     tau = mel_spectrogram.shape[2]
+    print(f" nu is: {v}")
+    print(f"tau is: {tau}")
 
     # Step 1 : Time warping
-    warped_mel_spectrogram = time_warp(mel_spectrogram)
+    warped_mel_spectrogram = time_warp(mel_spectrogram, W=time_warping_para)
 
     # Step 2 : Frequency masking
     for i in range(frequency_mask_num):
         f = np.random.uniform(low=0.0, high=frequency_masking_para)
         f = int(f)
         if v - f < 0:
-            continue
+            break
         f0 = random.randint(0, v-f)
+        print(f"f is: {f} at: {f0}")
+
         warped_mel_spectrogram[:, f0:f0+f, :] = 0
 
     # Step 3 : Time masking
     for i in range(time_mask_num):
         t = np.random.uniform(low=0.0, high=time_masking_para)
         t = int(t)
+
         if tau - t < 0:
-            continue
+            break
         t0 = random.randint(0, tau-t)
+        print(f"t is: {t} at: {t0}")
+
         warped_mel_spectrogram[:, :, t0:t0+t] = 0
 
     return warped_mel_spectrogram.squeeze()
 
 
-def visualization_spectrogram(mel_spectrogram, title):
+def visualization_spectrogram(mel_spectrogram, title, ax=None):
     """visualizing result of SpecAugment
     # Arguments:
-      mel_spectrogram(ndarray): mel_spectrogram to visualize.
+      spectrogram(ndarray): mel_spectrogram to visualize.
       title(String): plot figure's title
     """
+    #mel_spectrogram = mel_spectrogram.unsqueeze(0)
     # Show mel-spectrogram using librosa's specshow.
-    plt.figure(figsize=(10, 4))
-    librosa.display.specshow(librosa.power_to_db(mel_spectrogram[0, :, :], ref=np.max), y_axis='mel', fmax=8000, x_axis='time')
+
+    #plt.figure(figsize=(10, 4))
+    librosa.display.specshow(
+            mel_spectrogram,
+            y_axis='log',x_axis='time', sr=32000, ax=ax
+            )
     # plt.colorbar(format='%+2.0f dB')
-    plt.title(title)
-    plt.tight_layout()
+    
+    plt.title(title) if ax==None else ax.set_title(title) 
+    #plt.tight_layout()
     plt.show()
