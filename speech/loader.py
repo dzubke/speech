@@ -21,7 +21,7 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, preproc_json, max_samples=100, start_and_end=True):
+    def __init__(self, data_json, preproc_cfg, max_samples=100, start_and_end=True):
         """
         Builds a preprocessor from a dataset.
         Arguments:
@@ -39,7 +39,6 @@ class Preprocessor():
 
         """
         data = read_data_json(data_json)
-        preproc_cfg = read_data_json(preproc_json)
 
         # Compute data mean, std from sample
         audio_files = [d['audio'] for d in data]
@@ -47,8 +46,12 @@ class Preprocessor():
         # the mean and std are of the log of the spectogram of the audio files
         self.mean, self.std = compute_mean_std(audio_files[:max_samples], preproc_cfg)
         self._input_dim = self.mean.shape[0]
+
         self.spec_augment = preproc_cfg['use_spec_augmment']
         self.preprocessor = preproc_cfg['preprocessor']
+        self.window_size = preproc_cfg['window_size']
+        self.step_size = preproc_cfg['step_size']
+
 
         # Make char map
         chars = list(set(t for d in data for t in d['text']))
@@ -80,9 +83,9 @@ class Preprocessor():
     def preprocess(self, wave_file, text):
         
         if self.preprocessor == "log_spec":
-            inputs = log_specgram_from_file(wave_file, preproc_cfg['window_size'], preproc_cfg['step_size'])
+            inputs = log_specgram_from_file(wave_file, self.window_size, self.step_size)
         elif self.preprocessor == "mfcc":
-           inputs = mfcc_from_file(wave_file, preproc_cfg['window_size'], preproc_cfg['step_size'])
+           inputs = mfcc_from_file(wave_file, self.window_size, self.step_size)
         else: 
            raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
         
@@ -105,10 +108,10 @@ class Preprocessor():
         return len(self.int_to_char)
 
 def compute_mean_std(audio_files, preproc_cfg):
-    if self.preprocessor == "log_spec":
-    samples = [log_specgram_from_file(af, preproc_cfg['window_size'], preproc_cfg['step_size'])
+    if preproc_cfg['preprocessor'] == "log_spec":
+        samples = [log_specgram_from_file(af, preproc_cfg['window_size'], preproc_cfg['step_size'])
                     for af in audio_files]  
-    elif self.preprocessor == "mfcc":
+    elif preproc_cfg['preprocessor'] == "mfcc":
         samples = [mfcc_from_file(af, preproc_cfg['window_size'], preproc_cfg['step_size'])
                    for af in audio_files]
     else: 
