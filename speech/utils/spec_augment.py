@@ -53,6 +53,9 @@ def time_warp(spec, W):
     num_rows = spec.shape[1]
     spec_len = spec.shape[2]
 
+    assert spec_len>2*W, "frequency dimension is not large enough for W parameter"
+    assert run_rows>0, "time dimension must be greater than zero"
+
     y = num_rows // 2
     horizontal_line_at_ctr = spec[0][y]
     # assert len(horizontal_line_at_ctr) == spec_len
@@ -110,7 +113,7 @@ def spec_augment(mel_spectrogram, time_warping_para=5, frequency_masking_para=50
         f = np.random.uniform(low=0.0, high=frequency_masking_para)
         f = int(f)
         if v - f < 0:
-            break
+            continue
         f0 = random.randint(0, v-f)
         #print(f"f is: {f} at: {f0}")
 
@@ -122,7 +125,7 @@ def spec_augment(mel_spectrogram, time_warping_para=5, frequency_masking_para=50
         t = int(t)
 
         if tau - t < 0:
-            break
+            continue
         t0 = random.randint(0, tau-t)
         #print(f"t is: {t} at: {t0}")
 
