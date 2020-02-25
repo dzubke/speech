@@ -9,7 +9,7 @@ import numpy as np
 
 # project libraries
 from speech.utils import spec_augment
-from speech.loader import log_specgram_from_file
+from speech.loader import log_specgram_from_file, apply_spec_augment
 from speech.utils import wave
 
   
@@ -38,7 +38,7 @@ def main():
     log_spec = np.log(spec.astype(np.float32))
     log_f = np.log(f.astype(np.float32))
 
-    fig, (ax1, ax2, ax3) = plt.subplots(3, figsize=(10, 20))
+    fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, figsize=(10, 20))
 
     # plot the spectrogram
 
@@ -67,7 +67,7 @@ def main():
                  'time_masking_para':50, 'frequency_mask_num':0, 'time_mask_num':0}, 
                 1: {"time_warping_para":5, "frequency_masking_para":60,
                  "time_masking_para":60, "frequency_mask_num":1, "time_mask_num":1},
-                2: {"time_warping_para":40, "frequency_masking_para":30,
+                2: {"time_warping_para":5, "frequency_masking_para":30,
                  "time_masking_para":30, "frequency_mask_num":2, "time_mask_num":2},
                 3: {"time_warping_para":5, "frequency_masking_para":20,
                  "time_masking_para":20, "frequency_mask_num":3, "time_mask_num":3},
@@ -79,9 +79,11 @@ def main():
                         time_masking_para=policy.get('time_masking_para'),
                         frequency_mask_num=policy.get('frequency_mask_num'), 
                         time_mask_num=policy.get('time_mask_num'))
-    spec_augment.visualization_spectrogram(aug_log_spec_T.numpy(), f"triple mask augment", ax=ax3) 
+    spec_augment.visualization_spectrogram(aug_log_spec_T.numpy(), f"double mask augment", ax=ax3) 
 
-
+    output = apply_spec_augment(log_spec)
+    spec_augment.visualization_spectrogram(output, f"apply_spec_augment", ax=ax4) 
+    plt.show()
 
 if __name__ == "__main__":
     main()

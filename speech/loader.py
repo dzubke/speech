@@ -12,7 +12,7 @@ import torch.utils.data as tud
 import matplotlib.pyplot as plt
 import python_speech_features
 
-from speech.utils import wave
+from speech.utils import wave, spec_augment
 
 
 
@@ -76,36 +76,20 @@ class Preprocessor():
         return text[s:e]
 
     def preprocess(self, wave_file, text):
-        #if preproc_cfg['preprocessor'] == "log_spec":
-        inputs = log_specgram_from_file(wave_file)#, preproc_cfg['window_size'], preproc_cfg['step_size'])
-        #elif preproc_cfg['preprocessor'] == "mfcc":
-        #    inputs = mfcc_from_file(wave_file, preproc_cfg['window_size'], preproc_cfg['step_size'])
-        #else: 
-        #    raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
         
-        # spec_augment_policies = {
-        #     0:{
-        #         apply_augment: false
-        #     },
-        #     1: {
-        #         apply_augment:true, 
-        #         parameters: {W: 40, F: 50, m_F: 1, t: 50, p: 1.0, m_T: 1}
-        #     },
-        #     2: {
-        #     apply_augment:true, 
-        #     parameters: {W: 40, F: 50, m_F: 2, t: 50, p: 1.0, m_T: 2}
-        #     }
-        # }
-
-        # spec_aug_rand = np.random.uniform(low=0, high=3)
-
-        # if spec_aug_rand == 0: 
-        #     # don't apply spec_augment
-        # if spec_aug_rand > 0: 
-        #     # apply spec augment using the policy specified in spec_aug_rand
+        if preproc_cfg['preprocessor'] == "log_spec":
+            inputs = log_specgram_from_file(wave_file)#, preproc_cfg['window_size'], preproc_cfg['step_size'])
+        elif preproc_cfg['preprocessor'] == "mfcc":
+           inputs = mfcc_from_file(wave_file, preproc_cfg['window_size'], preproc_cfg['step_size'])
+        else: 
+           raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
+        
         
         inputs = (inputs - self.mean) / self.std
+        inputs = apply_spec_augment(inputs)
+
         targets = self.encode(text)
+        
         return inputs, targets
 
     @property
@@ -117,14 +101,14 @@ class Preprocessor():
         return len(self.int_to_char)
 
 def compute_mean_std(audio_files):#, preproc_cfg):
-    #if preproc_cfg['preprocessor'] == "log_spec":
+    if preproc_cfg['preprocessor'] == "log_spec":
     samples = [log_specgram_from_file(af)
                     for af in audio_files]  #, preproc_cfg['window_size'], preproc_cfg['step_size']
-    #elif preproc_cfg['preprocessor'] == "mfcc":
-    #    samples = [mfcc_from_file(af, preproc_cfg['window_size'], preproc_cfg['step_size'])
-    #                for af in audio_files]
-    #else: 
-    #    raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
+    elif preproc_cfg['preprocessor'] == "mfcc":
+        samples = [mfcc_from_file(af, preproc_cfg['window_size'], preproc_cfg['step_size'])
+                   for af in audio_files]
+    else: 
+        raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
     
     samples = np.vstack(samples)
     mean = np.mean(samples, axis=0)
@@ -364,3 +348,46 @@ def plot_spectrogram(f, t, Sxx):
 def read_data_json(data_json):
     with open(data_json) as fid:
         return [json.loads(l) for l in fid]
+
+
+def apply_spec_augment(inputs):
+    """calls the spec_augment function on the normalized log_spec. A policy defined 
+        in the policy_dict will be chosen uniformly at random.
+    Arguments:
+        inputs (np.ndarray): normalized log_spec with dimensional order time x freq
+
+    Returns:
+        inputs (nd.ndarray): the modified log_spec array with order time x freq
+    """
+
+    assert type(inputs) == np.ndarray, "input is not numpy array"
+
+    policy_dict = {
+        0: {'time_warping_para':0, 'frequency_masking_para':50,
+            'time_masking_para':50, 'frequency_mask_num':0, 'time_mask_num':0}, 
+        1: {"time_warping_para":5, "frequency_masking_para":60,
+            "time_masking_para":60, "frequency_mask_num":1, "time_mask_num":1},
+        2: {"time_warping_para":5, "frequency_masking_para":30,
+            "time_masking_para":30, "frequency_mask_num":2, "time_mask_num":2},
+        3: {"time_warping_para":5, "frequency_masking_para":20,
+            "time_masking_para":20, "frequency_mask_num":3, "time_mask_num":3},
+            }
+    
+    policy_choice = np.random.randint(low=0, high=4)
+    policy = policy_dict.get(policy_choice)
+
+    # the inputs need to be transposed and converted to torch to input to spec_augment
+    inputs = torch.from_numpy(inputs.T)
+
+    inputs = spec_augment.spec_augment(inputs, 
+                    time_warping_para=policy.get('time_warping_para'), 
+                    frequency_masking_para=policy.get('frequency_masking_para'),
+                    time_masking_para=policy.get('time_masking_para'),
+                    frequency_mask_num=policy.get('frequency_mask_num'), 
+                    time_mask_num=policy.get('time_mask_num'))
+    
+    #convert the torch tensor back to numpy array
+    inputs = inputs.detach().cpu().numpy() if inputs.requires_grad else inputs.cpu().numpy()
+    assert type(inputs) == np.ndarray, "output is not numpy array"
+
+    return inputs
