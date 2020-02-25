@@ -50,7 +50,6 @@ def time_warp(spec, W):
     if W==0:
         return spec
 
-    print(f"W is: {W}")
     num_rows = spec.shape[1]
     spec_len = spec.shape[2]
 
@@ -59,12 +58,14 @@ def time_warp(spec, W):
     # assert len(horizontal_line_at_ctr) == spec_len
 
     point_to_warp = horizontal_line_at_ctr[random.randrange(W, spec_len-W)]
-    print(f"point_to_warp: {point_to_warp}")
     # assert isinstance(point_to_warp, torch.Tensor)
 
     # Uniform distribution from (0,W) with chance to be up to W negative
     dist_to_warp = random.randrange(-W, W)
-    print(f"dist_to_warp: {dist_to_warp}")
+    
+    #print(f"W is: {W}")
+    #print(f"point_to_warp: {point_to_warp}")
+    #print(f"dist_to_warp: {dist_to_warp}")
 
     src_pts = torch.tensor([[[y, point_to_warp]]])
     dest_pts = torch.tensor([[[y, point_to_warp + dist_to_warp]]])
@@ -98,8 +99,8 @@ def spec_augment(mel_spectrogram, time_warping_para=5, frequency_masking_para=50
 
     v = mel_spectrogram.shape[1]
     tau = mel_spectrogram.shape[2]
-    print(f" nu is: {v}")
-    print(f"tau is: {tau}")
+    #print(f" nu is: {v}")
+    #print(f"tau is: {tau}")
 
     # Step 1 : Time warping
     warped_mel_spectrogram = time_warp(mel_spectrogram, W=time_warping_para)
@@ -111,7 +112,7 @@ def spec_augment(mel_spectrogram, time_warping_para=5, frequency_masking_para=50
         if v - f < 0:
             break
         f0 = random.randint(0, v-f)
-        print(f"f is: {f} at: {f0}")
+        #print(f"f is: {f} at: {f0}")
 
         warped_mel_spectrogram[:, f0:f0+f, :] = 0
 
@@ -123,7 +124,7 @@ def spec_augment(mel_spectrogram, time_warping_para=5, frequency_masking_para=50
         if tau - t < 0:
             break
         t0 = random.randint(0, tau-t)
-        print(f"t is: {t} at: {t0}")
+        #print(f"t is: {t} at: {t0}")
 
         warped_mel_spectrogram[:, :, t0:t0+t] = 0
 
@@ -148,4 +149,4 @@ def visualization_spectrogram(mel_spectrogram, title, ax=None):
     
     plt.title(title) if ax==None else ax.set_title(title) 
     #plt.tight_layout()
-    plt.show()
+    #plt.show()
