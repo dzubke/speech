@@ -296,8 +296,8 @@ def dense_image_warp(image, flow):
 
     # The flow is defined on the image grid. Turn the flow into a list of query
     # points in the grid space.
-    grid_x, grid_y = torch.meshgrid(
-        [torch.arange(width), torch.arange(height)])
+    grid_x, grid_y = torch.meshgrid([
+        torch.arange(width), torch.arange(height)])
 
     stacked_grid = torch.stack((grid_y, grid_x), dim=2).float()
 

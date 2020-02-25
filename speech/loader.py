@@ -47,11 +47,10 @@ class Preprocessor():
         self.mean, self.std = compute_mean_std(audio_files[:max_samples], preproc_cfg)
         self._input_dim = self.mean.shape[0]
 
-        self.spec_augment = preproc_cfg['use_spec_augmment']
+        self.spec_augment = preproc_cfg['use_spec_augment']
         self.preprocessor = preproc_cfg['preprocessor']
         self.window_size = preproc_cfg['window_size']
         self.step_size = preproc_cfg['step_size']
-
 
         # Make char map
         chars = list(set(t for d in data for t in d['text']))
@@ -116,7 +115,7 @@ def compute_mean_std(audio_files, preproc_cfg):
                    for af in audio_files]
     else: 
         raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
-    
+     
     samples = np.vstack(samples)
     mean = np.mean(samples, axis=0)
     std = np.std(samples, axis=0)

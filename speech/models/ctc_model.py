@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import torch.autograd as autograd
 
-#import functions.ctc as ctc #awni hannun's ctc bindings
+import functions.ctc as ctc #awni hannun's ctc bindings
 #from warpctc_pytorch import CTCLoss  #sean naren's ctc bindings
 from . import model
 from .ctc_decoder import decode
