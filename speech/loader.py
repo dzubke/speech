@@ -21,7 +21,7 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, max_samples=100, start_and_end=True): #preproc_json,
+    def __init__(self, data_json, preproc_json, max_samples=100, start_and_end=True):
         """
         Builds a preprocessor from a dataset.
         Arguments:
@@ -39,14 +39,16 @@ class Preprocessor():
 
         """
         data = read_data_json(data_json)
-        #preproc_cfg = read_data_json(preproc_json)
+        preproc_cfg = read_data_json(preproc_json)
 
         # Compute data mean, std from sample
         audio_files = [d['audio'] for d in data]
         random.shuffle(audio_files)
         # the mean and std are of the log of the spectogram of the audio files
-        self.mean, self.std = compute_mean_std(audio_files[:max_samples])#, preproc_cfg)
+        self.mean, self.std = compute_mean_std(audio_files[:max_samples], preproc_cfg)
         self._input_dim = self.mean.shape[0]
+        self.spec_augment = preproc_cfg['use_spec_augmment']
+        self.preprocessor = preproc_cfg['preprocessor']
 
         # Make char map
         chars = list(set(t for d in data for t in d['text']))
@@ -77,16 +79,18 @@ class Preprocessor():
 
     def preprocess(self, wave_file, text):
         
-        if preproc_cfg['preprocessor'] == "log_spec":
-            inputs = log_specgram_from_file(wave_file)#, preproc_cfg['window_size'], preproc_cfg['step_size'])
-        elif preproc_cfg['preprocessor'] == "mfcc":
+        if self.preprocessor == "log_spec":
+            inputs = log_specgram_from_file(wave_file, preproc_cfg['window_size'], preproc_cfg['step_size'])
+        elif self.preprocessor == "mfcc":
            inputs = mfcc_from_file(wave_file, preproc_cfg['window_size'], preproc_cfg['step_size'])
         else: 
            raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
         
         
         inputs = (inputs - self.mean) / self.std
-        inputs = apply_spec_augment(inputs)
+
+        if self.spec_augment:
+            inputs = apply_spec_augment(inputs)
 
         targets = self.encode(text)
 
@@ -100,11 +104,11 @@ class Preprocessor():
     def vocab_size(self):
         return len(self.int_to_char)
 
-def compute_mean_std(audio_files):#, preproc_cfg):
-    if preproc_cfg['preprocessor'] == "log_spec":
-    samples = [log_specgram_from_file(af)
-                    for af in audio_files]  #, preproc_cfg['window_size'], preproc_cfg['step_size']
-    elif preproc_cfg['preprocessor'] == "mfcc":
+def compute_mean_std(audio_files, preproc_cfg):
+    if self.preprocessor == "log_spec":
+    samples = [log_specgram_from_file(af, preproc_cfg['window_size'], preproc_cfg['step_size'])
+                    for af in audio_files]  
+    elif self.preprocessor == "mfcc":
         samples = [mfcc_from_file(af, preproc_cfg['window_size'], preproc_cfg['step_size'])
                    for af in audio_files]
     else: 
@@ -355,7 +359,6 @@ def apply_spec_augment(inputs):
         in the policy_dict will be chosen uniformly at random.
     Arguments:
         inputs (np.ndarray): normalized log_spec with dimensional order time x freq
-
     Returns:
         inputs (nd.ndarray): the modified log_spec array with order time x freq
     """
@@ -363,8 +366,8 @@ def apply_spec_augment(inputs):
     assert type(inputs) == np.ndarray, "input is not numpy array"
 
     policy_dict = {
-        0: {'time_warping_para':0, 'frequency_masking_para':50,
-            'time_masking_para':50, 'frequency_mask_num':0, 'time_mask_num':0}, 
+        0: {'time_warping_para':0, 'frequency_masking_para':0,
+            'time_masking_para':0, 'frequency_mask_num':0, 'time_mask_num':0}, 
         1: {"time_warping_para":5, "frequency_masking_para":60,
             "time_masking_para":60, "frequency_mask_num":1, "time_mask_num":1},
         2: {"time_warping_para":5, "frequency_masking_para":30,

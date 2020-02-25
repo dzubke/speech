@@ -62,6 +62,7 @@ class Model(nn.Module):
         self._encoder_dim = rnn_cfg["dim"]
 
         self.volatile = False
+        self.export_model = config["export"]
 
     def conv_out_size(self, n, dim):
         for c in self.conv.children():
@@ -88,7 +89,7 @@ class Model(nn.Module):
         x = x.unsqueeze(1)      #
         
         # padding will be added during training, but not when exporting the model
-        if config["export"] != "true":
+        if not self.export_model:
             # calculates the necessary padding based on half the filter size
             # WARNING: this calcuation does not generalize to all cases
             pad = list(self.conv.children())[0].kernel_size[0]//2
