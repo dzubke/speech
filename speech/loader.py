@@ -47,10 +47,14 @@ class Preprocessor():
         self.mean, self.std = compute_mean_std(audio_files[:max_samples], preproc_cfg)
         self._input_dim = self.mean.shape[0]
 
+        # self.inject_noise = preproc_cfg['inject_noise']
+        # self.noise_prob = preproc_cfg['inject_noise']
+
         self.spec_augment = preproc_cfg['use_spec_augment']
         self.preprocessor = preproc_cfg['preprocessor']
         self.window_size = preproc_cfg['window_size']
         self.step_size = preproc_cfg['step_size']
+
 
         # Make char map
         chars = list(set(t for d in data for t in d['text']))
@@ -88,6 +92,10 @@ class Preprocessor():
         else: 
            raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
         
+        # if self.inject_noise:
+        #     add_noise = np.random.binomial(1, self.noise_prob)
+        #     if add_noise:
+        #         inputs = self.noiseInjector.inject_noise(inputs)
         
         inputs = (inputs - self.mean) / self.std
 
