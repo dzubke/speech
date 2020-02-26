@@ -43,17 +43,20 @@ class Preprocessor():
         # Compute data mean, std from sample
         audio_files = [d['audio'] for d in data]
         random.shuffle(audio_files)
-        # the mean and std are of the log of the spectogram of the audio files
-        self.mean, self.std = compute_mean_std(audio_files[:max_samples], preproc_cfg)
-        self._input_dim = self.mean.shape[0]
-
-        # self.inject_noise = preproc_cfg['inject_noise']
-        # self.noise_prob = preproc_cfg['inject_noise']
 
         self.spec_augment = preproc_cfg['use_spec_augment']
         self.preprocessor = preproc_cfg['preprocessor']
         self.window_size = preproc_cfg['window_size']
         self.step_size = preproc_cfg['step_size']
+
+        # self.inject_noise = preproc_cfg['inject_noise']
+        # self.noise_prob = preproc_cfg['inject_noise']
+
+        self.mean, self.std = compute_mean_std(audio_files[:max_samples], 
+                                                preprocessor = self.preprocessor,
+                                                window_size = self.window_size, 
+                                                step_size = self.step_size)
+        self._input_dim = self.mean.shape[0]
 
 
         # Make char map
@@ -114,12 +117,12 @@ class Preprocessor():
     def vocab_size(self):
         return len(self.int_to_char)
 
-def compute_mean_std(audio_files, preproc_cfg):
-    if preproc_cfg['preprocessor'] == "log_spec":
-        samples = [log_specgram_from_file(af, preproc_cfg['window_size'], preproc_cfg['step_size'])
+def compute_mean_std(audio_files, preprocessor, window_size, step_size):
+    if preprocessor == "log_spec":
+        samples = [log_specgram_from_file(af, window_size, step_size)
                     for af in audio_files]  
-    elif preproc_cfg['preprocessor'] == "mfcc":
-        samples = [mfcc_from_file(af, preproc_cfg['window_size'], preproc_cfg['step_size'])
+    elif preprocessor == "mfcc":
+        samples = [mfcc_from_file(af, window_size, step_size)
                    for af in audio_files]
     else: 
         raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")

@@ -78,7 +78,7 @@ def eval_dev(model, ldr, preproc):
 
     for batch in tqdm.tqdm(ldr):
         temp_batch = list(batch)
-        preds = model.infer(temp_batch)
+        preds, rnn_args = model.infer(temp_batch)
         loss = model.loss(temp_batch)
         losses.append(loss.item())
         #losses.append(loss.data[0])
