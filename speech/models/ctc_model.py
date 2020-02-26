@@ -64,17 +64,17 @@ class CTC(model.Model):
                 v.volatile = True
         return batch
     
-    def infer(self, batch, rnn_args=None):
+    def infer(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
-        probs, rnn_args = self.forward_impl(x, rnn_args, softmax=True)
+        probs, rnn_args = self.forward_impl(x, softmax=True)
         # convert the torch tensor into a numpy array
         probs = probs.data.cpu().numpy()
         return [decode(p, beam_size=3, blank=self.blank)[0]
-                    for p in probs], rnn_args
+                    for p in probs]
     
     def infer_distribution(self, batch, num_results):
         x, y, x_lens, y_lens = self.collate(*batch)
-        probs = self.forward_impl(x, softmax=True)
+        probs, rnn_args = self.forward_impl(x, softmax=True)
         probs = probs.data.cpu().numpy()
         return [decode_dist(p, beam_size=3, blank=self.blank)
                     for p in probs]
