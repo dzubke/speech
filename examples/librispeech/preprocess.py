@@ -13,43 +13,74 @@ from collections import defaultdict
 import pickle
 import string
 
-
 from speech.utils import data_helpers
 from speech.utils import wave
 
-SETS = {
+
+def main(output_directory, use_phonemes):
+    
+    SETS = {
     "train" : ["train-other-500"],
     "dev" : ["dev-other"],
     "test" : ["test-other"],
     }
+
+    path = os.path.join(output_directory, "LibriSpeech")   
+    print("Converting files from flac to wave...")
+    convert_to_wav(path)
     
+    for dataset, dirs in SETS.items():
+        for d in dirs:
+            print("Preprocessing {}".format(d))
+            prefix = os.path.join(path, d)
+            build_json(prefix, use_phonemes)
+
+
 def build_json(path, use_phonemes):
     transcripts = load_transcripts(path, use_phonemes)
     dirname = os.path.dirname(path)
     basename = os.path.basename(path) + os.path.extsep + "json"
     with open(os.path.join(dirname, basename), 'w') as fid:
-        for k, t in tqdm.tqdm(transcripts.items()):
-            wave_file = path_from_key(k, path, ext="wav")
+        for file_key, text in tqdm.tqdm(transcripts.items()):
+            wave_file = path_from_key(file_key, path, ext="wav")
             dur = wave.wav_duration(wave_file)
-            datum = {'text' : t,
+            datum = {'text' : text,
                      'duration' : dur,
                      'audio' : wave_file}
             json.dump(datum, fid)
             fid.write("\n")
 
+
 def load_transcripts(path, use_phonemes=True):
     pattern = os.path.join(path, "*/*/*.trans.txt")
     files = glob.glob(pattern)
     data = {}
+    if use_phonemes: 
+        word_phoneme_dict = lexicon_to_dict()
+        #save_lexicon_to_dict()
+
     for f in tqdm.tqdm(files):
         with open(f) as fid:
             lines = (l.strip().lower().split() for l in fid)
             if use_phonemes: 
-                lines = ((l[0], transcript_to_phonemes(l[1:])) for l in lines)
+                lines = (
+                    (l[0], phones for word in l[1:] 
+                                    for phones in word_phoneme_dict[word]) 
+                                        for l in lines)
             else: 
                 lines = ((l[0], " ".join(l[1:])) for l in lines)
             data.update(lines)
     return data
+
+
+def transcript_to_phonemes(words):
+    """converts the words in the transcript to phonemes using the word_to_phoneme dictionary mapping
+    """
+    phonemes = []
+    for word in words:
+        phonemes.extend(word_phoneme_dict[word])
+    return phonemes
+
 
 def path_from_key(key, prefix, ext):
     dirs = key.split("-")
@@ -57,13 +88,9 @@ def path_from_key(key, prefix, ext):
     path = os.path.join(prefix, *dirs)
     return path + os.path.extsep + ext
 
+
 def convert_to_wav(path):
     data_helpers.convert_full_set(path, "*/*/*/*.flac")
-
-def clean_text(text):
-    return text.strip().lower()
-
-
 
 
 def lexicon_to_dict():
@@ -86,18 +113,6 @@ def lexicon_to_dict():
                 lex_dict[word] = phones
 
     return lex_dict
-
-# creating a global instance of the word_phoneme dictionary
-word_phoneme_dict = lexicon_to_dict()
-
-def transcript_to_phonemes(words):
-    """converts the words in the transcript to phonemes using the word_to_phoneme dictionary mapping
-    """
-    phonemes = []
-    for word in words:
-        phonemes.extend(word_phoneme_dict[word])
-
-    return phonemes
 
 
 def check_phones():
@@ -128,7 +143,6 @@ def check_phones():
     print(f"phones in cmubut not timit: {cmu_phones.difference(timit_phones39)}")
 
 
-
 if __name__ == "__main__":
     ## format of command is >>python preprocess.py <path_to_dataset> --use_phonemes <True/False> 
     # where the optional --use_phonemes argument is whether the labels will be phonemes (True) or words (False)
@@ -142,13 +156,4 @@ if __name__ == "__main__":
         help="A boolean of whether the labels will be phonemes (True) or words (False)")
     args = parser.parse_args()
 
-    path = os.path.join(args.output_directory, "LibriSpeech")   
-
-    print("Converting files from flac to wave...")
-    convert_to_wav(path)
-    #save_lexicon_to_dict()
-    for dataset, dirs in SETS.items():
-        for d in dirs:
-            print("Preprocessing {}".format(d))
-            prefix = os.path.join(path, d)
-            build_json(prefix, args.use_phonemes)
+    main(args.output_directory, args.use_phonemes)
