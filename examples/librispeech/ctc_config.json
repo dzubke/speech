@@ -1,6 +1,6 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200225/",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200226/",
 
     "data" : {
         "train_set" : "/home/dzubke/awni_speech/data/LibriSpeech/train-other-960.json",
