@@ -14,7 +14,7 @@ def eval_loop(model, ldr):
     for batch in tqdm.tqdm(ldr):
         #dustin: my modification because the iteratable batch was being exhausted when it was called
         temp_batch = list(batch)
-        preds, rnn_args = model.infer(temp_batch)
+        preds = model.infer(temp_batch)
         #preds_dist, prob_dist = model.infer_distribution(temp_batch, 5)
         all_preds.extend(preds)
         all_labels.extend(temp_batch[1])
@@ -26,8 +26,8 @@ def run(model_path, dataset_json,
         out_file=None):
 
     use_cuda = torch.cuda.is_available()
-
     model, preproc = speech.load(model_path, tag=tag)
+    preproc.spec_augment = False
     ldr =  loader.make_loader(dataset_json,
             preproc, batch_size)
     model.cuda() if use_cuda else model.cpu()
