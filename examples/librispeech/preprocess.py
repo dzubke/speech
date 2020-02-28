@@ -22,9 +22,9 @@ PRONUNCIATION_LEXICON_PATH = "librispeech-lexicon.txt"
 def main(output_directory, use_phonemes):
     
     SETS = {
-    "train" : ["train-clean-360", "train-other-500"],
-    "dev" : ["dev-other"],
-    "test" : ["test-other"],
+    "train" : ["train-clean-100"],
+    "dev" : ["dev-clean"],
+    "test" : ["test-clean"],
     }
 
     path = os.path.join(output_directory, "LibriSpeech")   
@@ -40,7 +40,6 @@ def main(output_directory, use_phonemes):
 
 def build_json(path, use_phonemes):
     transcripts, unknown_words_set, unknown_words_dict = load_transcripts(path, use_phonemes)
-    print(f"unknown words dict: {len(unknown_words_dict)}")
     dirname = os.path.dirname(path)
     basename = os.path.basename(path) + os.path.extsep + "json"
     with open(os.path.join(dirname, basename), 'w') as fid:
@@ -68,11 +67,10 @@ def load_transcripts(path, use_phonemes=True):
     unknown_dict=dict()
     if use_phonemes: 
         word_phoneme_dict = data_helpers.lexicon_to_dict(PRONUNCIATION_LEXICON_PATH, corpus_name="librispeech")
-        print(f"type of word_phoneme_dict: {type(word_phoneme_dict)}")
     for f in tqdm.tqdm(files):
         with open(f) as fid:
             # load transcript of file
-            lines = (l.strip().lower().split() for l in fid) 
+            lines = [l.strip().lower().split() for l in fid]
             if use_phonemes: 
                 file_unk_list, file_unk_dict= check_unknown_words(lines, word_phoneme_dict)
                 lines = ((l[0], transcript_to_phonemes(l[1:], word_phoneme_dict) ) for l in lines)
