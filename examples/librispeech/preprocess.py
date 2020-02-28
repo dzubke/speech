@@ -16,18 +16,20 @@ import string
 from speech.utils import data_helpers
 from speech.utils import wave
 
+PRONUNCIATION_LEXICON_PATH = "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/librispeech/librispeech-lexicon.txt"
+
 
 def main(output_directory, use_phonemes):
     
     SETS = {
-    "train" : ["train-other-500"],
-    "dev" : ["dev-other"],
-    "test" : ["test-other"],
+    "train" : ["train-clean-100"],
+    "dev" : ["dev-clean"],
+    "test" : ["test-clean "],
     }
 
     path = os.path.join(output_directory, "LibriSpeech")   
     print("Converting files from flac to wave...")
-    convert_to_wav(path)
+    #convert_to_wav(path)
     
     for dataset, dirs in SETS.items():
         for d in dirs:
@@ -40,7 +42,6 @@ def build_json(path, use_phonemes):
     transcripts, unknown_words = load_transcripts(path, use_phonemes)
     dirname = os.path.dirname(path)
     basename = os.path.basename(path) + os.path.extsep + "json"
-    unk_words_fname = "libsp_"+os.path.basename(path)+"_unk_words.txt"
     with open(os.path.join(dirname, basename), 'w') as fid:
         for file_key, text in tqdm.tqdm(transcripts.items()):
             wave_file = path_from_key(file_key, path, ext="wav")
@@ -51,6 +52,7 @@ def build_json(path, use_phonemes):
             json.dump(datum, fid)
             fid.write("\n")
 
+    unk_words_fname = "libsp_"+basename+"_unk_words.txt"
     with open(unk_words_fname, 'w') as fid:
         for word in unknown_words:
             fid.write(word+'\n')
@@ -61,15 +63,14 @@ def load_transcripts(path, use_phonemes=True):
     data = {}
     unknown_words=set()
     if use_phonemes: 
-        word_phoneme_dict = lexicon_to_dict('librispeech')
-        #save_lexicon_to_dict()
-
+        word_phoneme_dict = data_helpers.lexicon_to_dict(PRONUNCIATION_LEXICON_PATH, corpus_name='librispeech')
+        print(f"type of word_phoneme_dict: {type(word_phoneme_dict)}")
     for f in tqdm.tqdm(files):
         with open(f) as fid:
             lines = (l.strip().lower().split() for l in fid)
             if use_phonemes: 
-                lines = ((l[0], transcript_to_phonemes(l[1:])) for l in lines)
-                unk_words = filter(lambda x: word_phoneme_dict[x] == "unk", [word for l in lines for word in l[1:]])
+                lines = ((l[0], transcript_to_phonemes(l[1:], word_phoneme_dict) ) for l in lines)
+                unk_words = filter(lambda x: word_phoneme_dict[x] == "unk", word for l in lines for word in l[1:])
             else: 
                 lines = ((l[0], " ".join(l[1:])) for l in lines)
             data.update(lines)
@@ -77,7 +78,7 @@ def load_transcripts(path, use_phonemes=True):
     return data, unknown_words
 
 
-def transcript_to_phonemes(words):
+def transcript_to_phonemes(words, word_phoneme_dict):
     """converts the words in the transcript to phonemes using the word_to_phoneme dictionary mapping
     """
     phonemes = []
@@ -94,9 +95,6 @@ def path_from_key(key, prefix, ext):
 
 def convert_to_wav(path):
     data_helpers.convert_full_set(path, "*/*/*/*.flac")
-
-
-
 
 
 if __name__ == "__main__":

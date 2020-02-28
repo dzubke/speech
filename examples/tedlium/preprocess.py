@@ -29,7 +29,8 @@ def lexicon_to_dict(ted_dir):
                 print(f"repated word: {word}")
             lex_dict[word] = phones 
     
-    lex_dict = {key: value for key, value in lex_dict.items() if not re.search("\(\d\)$", key)}
+    lex_dict = defaultdict(lambda: "unk", 
+                {key: value for key, value in lex_dict.items() if not re.search("\(\d\)$", key)})
 
     return lex_dict
 

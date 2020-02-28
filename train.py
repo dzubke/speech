@@ -75,6 +75,8 @@ def eval_dev(model, ldr, preproc):
     losses = []; all_preds = []; all_labels = []
 
     model.set_eval()
+    preproc.spec_augment=False
+    #preproc.turn_off_augmentation()    #need to implement will turn off spec_augment and noise_injection
 
     for batch in tqdm.tqdm(ldr):
         temp_batch = list(batch)
@@ -86,6 +88,9 @@ def eval_dev(model, ldr, preproc):
         all_labels.extend(temp_batch[1])        #add the labels in the batch object
 
     model.set_train()
+    preproc.spec_augment=False
+    #preproc.turn_off_augmentation()        
+
 
     loss = sum(losses) / len(losses)
     results = [(preproc.decode(l), preproc.decode(p))              # decodes back to phoneme labels
