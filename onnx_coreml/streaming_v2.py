@@ -156,7 +156,6 @@ def main(model_name, num_frames):
 
             np.testing.assert_allclose(to_numpy(stream_test_h_in), to_numpy(stream_test_h_out), rtol=1e-03, atol=1e-05)
             np.testing.assert_allclose(to_numpy(stream_test_c_in), to_numpy(stream_test_c_out), rtol=1e-03, atol=1e-05)
-
             print(f"input_buffer size: {input_buffer.shape}")
             stream_probs, (stream_test_h_out, stream_test_c_out) = trained_model(torch.from_numpy(input_buffer), 
                                         (stream_test_h_in,
