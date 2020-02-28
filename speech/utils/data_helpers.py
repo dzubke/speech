@@ -37,8 +37,9 @@ def lexicon_to_dict(lexicon_path, corpus_name):
             # librispeech: the if-statement will ignore the second pronunciation with the same word
             if lex_dict[word] == "unk":
                 lex_dict[word] = phones
-
-    return clean_dict(lex_dict, corpus_name)
+    lex_dict = clean_dict(lex_dict, corpus_name)
+    assert type(lex_dict)== defaultdict, "word_phoneme_dict is not defaultdict"
+    return lex_dict
 
 def clean_phonemes(phonemes, corpus_name):
 
