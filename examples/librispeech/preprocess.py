@@ -16,15 +16,15 @@ import string
 from speech.utils import data_helpers
 from speech.utils import wave
 
-PRONUNCIATION_LEXICON_PATH = "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/librispeech/librispeech-lexicon.txt"
+PRONUNCIATION_LEXICON_PATH = "librispeech-lexicon.txt"
 
 
 def main(output_directory, use_phonemes):
     
     SETS = {
-    "train" : ["train-clean-100"],
-    "dev" : ["dev-clean"],
-    "test" : ["test-clean"],
+    "train" : ["train-clean-360", "train-other-500"],
+    "dev" : ["dev-other"],
+    "test" : ["test-other"],
     }
 
     path = os.path.join(output_directory, "LibriSpeech")   
@@ -76,12 +76,12 @@ def load_transcripts(path, use_phonemes=True):
             if use_phonemes: 
                 file_unk_list, file_unk_dict= check_unknown_words(lines, word_phoneme_dict)
                 lines = ((l[0], transcript_to_phonemes(l[1:], word_phoneme_dict) ) for l in lines)
+                unknown_set.update(file_unk_list)
+                unknown_dict.update(file_unk_dict)
             else: 
                 lines = ((l[0], " ".join(l[1:])) for l in lines)
                 unk_words = []
             data.update(lines)
-            unknown_set.update(file_unk_list)
-            unknown_dict.update(file_unk_dict)
     return data, unknown_set, unknown_dict
 
 
