@@ -24,7 +24,7 @@ def main(output_directory, use_phonemes):
     SETS = {
     "train" : ["train-clean-100"],
     "dev" : ["dev-clean"],
-    "test" : ["test-clean "],
+    "test" : ["test-clean"],
     }
 
     path = os.path.join(output_directory, "LibriSpeech")   
@@ -39,7 +39,8 @@ def main(output_directory, use_phonemes):
 
 
 def build_json(path, use_phonemes):
-    transcripts, unknown_words = load_transcripts(path, use_phonemes)
+    transcripts, unknown_words_set, unknown_words_dict = load_transcripts(path, use_phonemes)
+    print(f"unknown words dict: {len(unknown_words_dict)}")
     dirname = os.path.dirname(path)
     basename = os.path.basename(path) + os.path.extsep + "json"
     with open(os.path.join(dirname, basename), 'w') as fid:
@@ -52,30 +53,49 @@ def build_json(path, use_phonemes):
             json.dump(datum, fid)
             fid.write("\n")
 
-    unk_words_fname = "libsp_"+basename+"_unk_words.txt"
-    with open(unk_words_fname, 'w') as fid:
-        for word in unknown_words:
-            fid.write(word+'\n')
+    process_unknown_words(path, unknown_words_set, unknown_words_dict)
+    
+
+def convert_to_wav(path):
+    data_helpers.convert_full_set(path, "*/*/*/*.flac")
+
 
 def load_transcripts(path, use_phonemes=True):
     pattern = os.path.join(path, "*/*/*.trans.txt")
     files = glob.glob(pattern)
     data = {}
-    unknown_words=set()
+    unknown_set=set()
+    unknown_dict=dict()
     if use_phonemes: 
-        word_phoneme_dict = data_helpers.lexicon_to_dict(PRONUNCIATION_LEXICON_PATH, corpus_name='librispeech')
+        word_phoneme_dict = data_helpers.lexicon_to_dict(PRONUNCIATION_LEXICON_PATH, corpus_name="librispeech")
         print(f"type of word_phoneme_dict: {type(word_phoneme_dict)}")
     for f in tqdm.tqdm(files):
         with open(f) as fid:
-            lines = (l.strip().lower().split() for l in fid)
+            # load transcript of file
+            lines = (l.strip().lower().split() for l in fid) 
             if use_phonemes: 
+                file_unk_list, file_unk_dict= check_unknown_words(lines, word_phoneme_dict)
                 lines = ((l[0], transcript_to_phonemes(l[1:], word_phoneme_dict) ) for l in lines)
-                unk_words = filter(lambda x: word_phoneme_dict[x] == "unk", word for l in lines for word in l[1:])
             else: 
                 lines = ((l[0], " ".join(l[1:])) for l in lines)
+                unk_words = []
             data.update(lines)
-            unknown_words.update(set(unk_words))
-    return data, unknown_words
+            unknown_set.update(file_unk_list)
+            unknown_dict.update(file_unk_dict)
+    return data, unknown_set, unknown_dict
+
+
+def check_unknown_words(lines, word_phoneme_dict):
+    unk_words_list = list()
+    unk_words_dict = dict()
+    for line in lines:
+        line_name = line[0] 
+        line_unk_list = [word for word in line[1:] if word_phoneme_dict[word] =="unk"]
+        if line_unk_list:       #if not empty
+            unk_words_list.extend(line_unk_list)
+            unk_words_dict.update({line_name: len(line_unk_list)})
+
+    return unk_words_list, unk_words_dict
 
 
 def transcript_to_phonemes(words, word_phoneme_dict):
@@ -93,8 +113,20 @@ def path_from_key(key, prefix, ext):
     return path + os.path.extsep + ext
 
 
-def convert_to_wav(path):
-    data_helpers.convert_full_set(path, "*/*/*/*.flac")
+def process_unknown_words(path, unknown_words_set, unknown_words_dict):
+    """saves a json object of the dictionary with relevant statistics on the unknown words in corpus
+    """
+
+    stats_dict=dict()
+    stats_dict.update({"unique_unknown_words": len(unknown_words_set)})
+    stats_dict.update({"count_unknown_words": sum(unknown_words_dict.values())})
+    stats_dict.update({"lines_unknown_words": len(unknown_words_dict)})
+    stats_dict.update({"unknown_words_set": list(unknown_words_set)})
+    stats_dict.update({"unknown_words_dict": unknown_words_dict})
+
+    stats_dict_fname = "libsp_"+os.path.basename(path)+"_unk-words-stats.json"
+    with open(stats_dict_fname, 'w') as fid:
+        json.dump(stats_dict, fid)
 
 
 if __name__ == "__main__":
