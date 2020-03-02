@@ -16,15 +16,14 @@ import string
 from speech.utils import data_helpers
 from speech.utils import wave
 
-PRONUNCIATION_LEXICON_PATH = "librispeech-lexicon.txt"
-
+UNK_WORD_TOKEN=list()
 
 def main(output_directory, use_phonemes):
-    
+    #"train-clean-100", "test-clean"
     SETS = {
-    "train" : ["train-clean-100"],
+    "train" : [],
     "dev" : ["dev-clean"],
-    "test" : ["test-clean"],
+    "test" : [],
     }
 
     path = os.path.join(output_directory, "LibriSpeech")   
@@ -39,7 +38,7 @@ def main(output_directory, use_phonemes):
 
 
 def build_json(path, use_phonemes):
-    transcripts, unknown_words_set, unknown_words_dict = load_transcripts(path, use_phonemes)
+    transcripts, unk_words_set, unk_words_dict, line_count, word_count = load_transcripts(path, use_phonemes)
     dirname = os.path.dirname(path)
     basename = os.path.basename(path) + os.path.extsep + "json"
     with open(os.path.join(dirname, basename), 'w') as fid:
@@ -52,7 +51,7 @@ def build_json(path, use_phonemes):
             json.dump(datum, fid)
             fid.write("\n")
 
-    process_unknown_words(path, unknown_words_set, unknown_words_dict)
+    process_unknown_words(path, unk_words_set, unk_words_dict, line_count, word_count)
     
 
 def convert_to_wav(path):
@@ -65,35 +64,43 @@ def load_transcripts(path, use_phonemes=True):
     data = {}
     unknown_set=set()
     unknown_dict=dict()
+    line_count, word_count= 0, 0
+
     if use_phonemes: 
-        word_phoneme_dict = data_helpers.lexicon_to_dict(PRONUNCIATION_LEXICON_PATH, corpus_name="librispeech")
+        LEXICON_PATH = "librispeech-lexicon.txt"
+        word_phoneme_dict = data_helpers.lexicon_to_dict(LEXICON_PATH, corpus_name="librispeech")
     for f in tqdm.tqdm(files):
         with open(f) as fid:
             # load transcript of file
             lines = [l.strip().lower().split() for l in fid]
             if use_phonemes: 
-                file_unk_list, file_unk_dict= check_unknown_words(lines, word_phoneme_dict)
-                lines = ((l[0], transcript_to_phonemes(l[1:], word_phoneme_dict) ) for l in lines)
+                file_unk_list, file_unk_dict, counts = check_unknown_words(lines, word_phoneme_dict)
+                lines = ((l[0], transcript_to_phonemes(l[1:], word_phoneme_dict)) for l in lines)
                 unknown_set.update(file_unk_list)
                 unknown_dict.update(file_unk_dict)
+                line_count+=counts[0]
+                word_count+=counts[1]
+
             else: 
                 lines = ((l[0], " ".join(l[1:])) for l in lines)
                 unk_words = []
             data.update(lines)
-    return data, unknown_set, unknown_dict
+    return data, unknown_set, unknown_dict, line_count, word_count
 
 
 def check_unknown_words(lines, word_phoneme_dict):
-    unk_words_list = list()
-    unk_words_dict = dict()
+    unk_words_list, unk_words_dict = list(), dict()
+    line_count, word_count = 0, 0
     for line in lines:
+        line_count += 1
+        word_count += len(line) - 1
         line_name = line[0] 
-        line_unk_list = [word for word in line[1:] if word_phoneme_dict[word] =="unk"]
+        line_unk_list = [word for word in line[1:] if word_phoneme_dict[word] ==UNK_WORD_TOKEN]
         if line_unk_list:       #if not empty
             unk_words_list.extend(line_unk_list)
             unk_words_dict.update({line_name: len(line_unk_list)})
 
-    return unk_words_list, unk_words_dict
+    return unk_words_list, unk_words_dict, (line_count, word_count)
 
 
 def transcript_to_phonemes(words, word_phoneme_dict):
@@ -111,14 +118,16 @@ def path_from_key(key, prefix, ext):
     return path + os.path.extsep + ext
 
 
-def process_unknown_words(path, unknown_words_set, unknown_words_dict):
+def process_unknown_words(path, unknown_words_set, unknown_words_dict, line_count, word_count):
     """saves a json object of the dictionary with relevant statistics on the unknown words in corpus
     """
 
     stats_dict=dict()
     stats_dict.update({"unique_unknown_words": len(unknown_words_set)})
     stats_dict.update({"count_unknown_words": sum(unknown_words_dict.values())})
+    stats_dict.update({"total_words": word_count})
     stats_dict.update({"lines_unknown_words": len(unknown_words_dict)})
+    stats_dict.update({"total_lines": line_count})
     stats_dict.update({"unknown_words_set": list(unknown_words_set)})
     stats_dict.update({"unknown_words_dict": unknown_words_dict})
 
@@ -126,6 +135,30 @@ def process_unknown_words(path, unknown_words_set, unknown_words_dict):
     with open(stats_dict_fname, 'w') as fid:
         json.dump(stats_dict, fid)
 
+
+def unique_unknown_words():
+
+
+    train_100_fn = 'libsp_train-clean-100_unk-words-stats.json'
+    train_360_fn = 'libsp_train-clean-360_unk-words-stats.json'
+    train_500_fn = 'libsp_train-other-500_unk-words-stats.json'
+    test_clean_fn = 'libsp_test-clean_unk-words-stats.json'
+    test_other_fn = 'libsp_test-other_unk-words-stats.json'
+    dev_clean_fn = 'libsp_dev-clean_unk-words-stats.json'
+    dev_other_fn = 'libsp_dev-other_unk-words-stats.json'
+
+    datasets_fn = [train_100_fn, train_360_fn, train_500_fn, test_clean_fn, test_other_fn, dev_clean_fn, dev_other_fn]
+    unknown_set = set()
+    for data_fn in datasets_fn: 
+        with open(data_fn, 'r') as fid: 
+            unk_words_dict = json.load(fid)
+            unknown_set.update(unk_words_dict['unknown_words_set'])
+    
+    with open("all_unk_words.txt", 'w') as fid:
+        json.dump(list(unknown_set), fid)
+
+
+    print(f"number of unknown words: {len(unknown_set)}")
 
 if __name__ == "__main__":
     ## format of command is >>python preprocess.py <path_to_dataset> --use_phonemes <True/False> 
