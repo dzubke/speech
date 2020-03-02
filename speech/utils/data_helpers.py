@@ -11,7 +11,7 @@ import re
 
 from speech.utils import convert
 
-UNK_WORD_TOKEN = None
+UNK_WORD_TOKEN = list()
 
 def convert_full_set(path, pattern, new_ext="wav", **kwargs):
     pattern = os.path.join(path, pattern)
@@ -44,16 +44,16 @@ def lexicon_to_dict(lexicon_path, corpus_name):
     return lex_dict
 
 
-def check_unknown_words(lines, word_phoneme_dict):
+def check_unknown_words(filename, text, word_phoneme_dict):
     unk_words_list, unk_words_dict = list(), dict()
     line_count, word_count = 0, 0
-    for line in lines:
-        line_count += 1
-        word_count += len(line) - 1
-        line_unk_list = [word for word in line if word_phoneme_dict[word] ==UNK_WORD_TOKEN]
-        if line_unk_list:       #if not empty
-            unk_words_list.extend(line_unk_list)
-            unk_words_dict.update({line_name: len(line_unk_list)})
+    text = text.split()
+    line_count += 1
+    word_count += len(text) - 1
+    line_unk_list = [word for word in text if word_phoneme_dict[word]==UNK_WORD_TOKEN]
+    if line_unk_list:       #if not empty
+        unk_words_list.extend(line_unk_list)
+        unk_words_dict.update({filename: len(line_unk_list)})
 
     return unk_words_list, unk_words_dict, (line_count, word_count)
 
