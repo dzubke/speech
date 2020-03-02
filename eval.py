@@ -27,7 +27,10 @@ def run(model_path, dataset_json,
 
     use_cuda = torch.cuda.is_available()
     model, preproc = speech.load(model_path, tag=tag)
+    print(f"initial spec_augment status: {preproc.spec_augment}")
     preproc.spec_augment = False
+    print(f"eval spec_augment status: {preproc.spec_augment}")
+    #preproc.turn_off_augmentation()
     ldr =  loader.make_loader(dataset_json,
             preproc, batch_size)
     model.cuda() if use_cuda else model.cpu()

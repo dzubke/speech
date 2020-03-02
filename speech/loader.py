@@ -109,6 +109,15 @@ class Preprocessor():
 
         return inputs, targets
 
+    def turn_off_augmentation():
+        self.spec_augment = False
+        #self.inject_noise = False
+
+    def turn_on_augmentation():
+        self.spec_augment = True
+        #self.inject_noise = True
+
+
     @property
     def input_dim(self):
         return self._input_dim
