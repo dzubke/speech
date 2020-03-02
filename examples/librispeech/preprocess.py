@@ -21,8 +21,8 @@ def main(output_directory, use_phonemes):
     # "train-clean-100", "train-clean-360", "train-other-500", "dev-clean", "dev-other", "test-clean", "dev-other"  
     SETS = {
     "train" : [],
-    "dev" : ["dev-other"],
-    "test" : ["test-other"],
+    "dev" : ["dev-clean"],
+    "test" : [],
     }
 
     path = os.path.join(output_directory, "LibriSpeech")   
@@ -45,7 +45,7 @@ def build_json(path, use_phonemes):
     line_count, word_count= 0, 0
 
     if use_phonemes: 
-        LEXICON_PATH = "librispeech-lexicon.txt"
+        LEXICON_PATH = "librispeech-lexicon_extended.txt"
         word_phoneme_dict = data_helpers.lexicon_to_dict(LEXICON_PATH, corpus_name="librispeech")
     with open(os.path.join(dirname, basename), 'w') as fid:
         for file_key, text in tqdm.tqdm(transcripts.items()):
@@ -53,7 +53,7 @@ def build_json(path, use_phonemes):
             dur = wave.wav_duration(wave_file)
 
             if use_phonemes: 
-                unk_words_list, unk_words_dict, counts = data_helpers.check_unknown_words(text, word_phoneme_dict)
+                unk_words_list, unk_words_dict, counts = data_helpers.check_unknown_words(file_key, text, word_phoneme_dict)
                 if counts[1] > 0: 
                     unknown_set.update(unk_words_list)
                     unknown_dict.update(unk_words_dict)
@@ -68,7 +68,7 @@ def build_json(path, use_phonemes):
             json.dump(datum, fid)
             fid.write("\n")
 
-    process_unknown_words(path, unk_words_set, unk_words_dict, line_count, word_count)
+    process_unknown_words(path, unknown_set, unknown_dict, line_count, word_count)
     
 
 def convert_to_wav(path):
