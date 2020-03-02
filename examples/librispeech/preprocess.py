@@ -137,7 +137,9 @@ def process_unknown_words(path, unknown_words_set, unknown_words_dict, line_coun
 
 
 def unique_unknown_words():
-
+    """
+        Creates a set of the total number of unknown words across the 7 segments of the librispeech dataset
+    """
 
     train_100_fn = 'libsp_train-clean-100_unk-words-stats.json'
     train_360_fn = 'libsp_train-clean-360_unk-words-stats.json'
@@ -153,10 +155,12 @@ def unique_unknown_words():
         with open(data_fn, 'r') as fid: 
             unk_words_dict = json.load(fid)
             unknown_set.update(unk_words_dict['unknown_words_set'])
-    
-    with open("all_unk_words.txt", 'w') as fid:
-        json.dump(list(unknown_set), fid)
+            print(len(unk_words_dict['unknown_words_set']))
 
+    unknown_set = list(filter(lambda x: len(x)<30, unknown_set))
+    
+    with open("libsp_all_unk_words.txt", 'w') as fid:
+        fid.write('\n'.join(unknown_set))
 
     print(f"number of unknown words: {len(unknown_set)}")
 
