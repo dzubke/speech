@@ -16,7 +16,6 @@ import string
 from speech.utils import data_helpers
 from speech.utils import wave
 
-UNK_WORD_TOKEN=list()
 
 def main(output_directory, use_phonemes):
     # "train-clean-100", "train-clean-360", "train-other-500", "dev-clean", "dev-other", "test-clean", "dev-other"  
@@ -38,13 +37,31 @@ def main(output_directory, use_phonemes):
 
 
 def build_json(path, use_phonemes):
-    transcripts, unk_words_set, unk_words_dict, line_count, word_count = load_transcripts(path, use_phonemes)
+    transcripts = load_transcripts(path) #, unk_words_set, unk_words_dict, line_count, word_count
     dirname = os.path.dirname(path)
     basename = os.path.basename(path) + os.path.extsep + "json"
+    unknown_set=set()
+    unknown_dict=dict()
+    line_count, word_count= 0, 0
+
+    if use_phonemes: 
+        LEXICON_PATH = "librispeech-lexicon.txt"
+        word_phoneme_dict = data_helpers.lexicon_to_dict(LEXICON_PATH, corpus_name="librispeech")
     with open(os.path.join(dirname, basename), 'w') as fid:
         for file_key, text in tqdm.tqdm(transcripts.items()):
             wave_file = path_from_key(file_key, path, ext="wav")
             dur = wave.wav_duration(wave_file)
+
+            if use_phonemes: 
+                unk_words_list, unk_words_dict, counts = data_helpers.check_unknown_words(text, word_phoneme_dict)
+                if counts[1] > 0: 
+                    unknown_set.update(unk_words_list)
+                    unknown_dict.update(unk_words_dict)
+                    line_count+=counts[0]
+                    word_count+=counts[1]
+                    continue
+                text = transcript_to_phonemes(text, word_phoneme_dict)
+                    
             datum = {'text' : text,
                      'duration' : dur,
                      'audio' : wave_file}
@@ -58,49 +75,35 @@ def convert_to_wav(path):
     data_helpers.convert_full_set(path, "*/*/*/*.flac")
 
 
-def load_transcripts(path, use_phonemes=True):
+def load_transcripts(path):
     pattern = os.path.join(path, "*/*/*.trans.txt")
     files = glob.glob(pattern)
     data = {}
-    unknown_set=set()
-    unknown_dict=dict()
-    line_count, word_count= 0, 0
+    # unknown_set=set()
+    # unknown_dict=dict()
+    # line_count, word_count= 0, 0
 
-    if use_phonemes: 
-        LEXICON_PATH = "librispeech-lexicon.txt"
-        word_phoneme_dict = data_helpers.lexicon_to_dict(LEXICON_PATH, corpus_name="librispeech")
+    # if use_phonemes: 
+    #     LEXICON_PATH = "librispeech-lexicon.txt"
+    #     word_phoneme_dict = data_helpers.lexicon_to_dict(LEXICON_PATH, corpus_name="librispeech")
     for f in tqdm.tqdm(files):
         with open(f) as fid:
             # load transcript of file
             lines = [l.strip().lower().split() for l in fid]
-            if use_phonemes: 
-                file_unk_list, file_unk_dict, counts = check_unknown_words(lines, word_phoneme_dict)
-                lines = ((l[0], transcript_to_phonemes(l[1:], word_phoneme_dict)) for l in lines)
-                unknown_set.update(file_unk_list)
-                unknown_dict.update(file_unk_dict)
-                line_count+=counts[0]
-                word_count+=counts[1]
+            # if use_phonemes: 
+            #     file_unk_list, file_unk_dict, counts = check_unknown_words(lines, word_phoneme_dict)
+            #     lines = ((l[0], l[1:], word_phoneme_dict)) for l in lines)
+            #     unknown_set.update(file_unk_list)
+            #     unknown_dict.update(file_unk_dict)
+            #     line_count+=counts[0]
+            #     word_count+=counts[1]
 
-            else: 
-                lines = ((l[0], " ".join(l[1:])) for l in lines)
-                unk_words = []
+            # else: 
+            lines = ((l[0], " ".join(l[1:])) for l in lines)
+                # unk_words = []
             data.update(lines)
-    return data, unknown_set, unknown_dict, line_count, word_count
+    return data #, unknown_set, unknown_dict, line_count, word_count
 
-
-def check_unknown_words(lines, word_phoneme_dict):
-    unk_words_list, unk_words_dict = list(), dict()
-    line_count, word_count = 0, 0
-    for line in lines:
-        line_count += 1
-        word_count += len(line) - 1
-        line_name = line[0] 
-        line_unk_list = [word for word in line[1:] if word_phoneme_dict[word] ==UNK_WORD_TOKEN]
-        if line_unk_list:       #if not empty
-            unk_words_list.extend(line_unk_list)
-            unk_words_dict.update({line_name: len(line_unk_list)})
-
-    return unk_words_list, unk_words_dict, (line_count, word_count)
 
 
 def transcript_to_phonemes(words, word_phoneme_dict):
