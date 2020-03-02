@@ -11,7 +11,7 @@ import re
 
 from speech.utils import convert
 
-UNK_WORD_TOKEN = list()
+UNK_WORD_TOKEN = None
 
 def convert_full_set(path, pattern, new_ext="wav", **kwargs):
     pattern = os.path.join(path, pattern)
