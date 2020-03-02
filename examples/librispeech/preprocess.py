@@ -19,11 +19,11 @@ from speech.utils import wave
 UNK_WORD_TOKEN=list()
 
 def main(output_directory, use_phonemes):
-    #"train-clean-100", "test-clean"
+    # "train-clean-100", "train-clean-360", "train-other-500", "dev-clean", "dev-other", "test-clean", "dev-other"  
     SETS = {
     "train" : [],
-    "dev" : ["dev-clean"],
-    "test" : [],
+    "dev" : ["dev-other"],
+    "test" : ["test-other"],
     }
 
     path = os.path.join(output_directory, "LibriSpeech")   
