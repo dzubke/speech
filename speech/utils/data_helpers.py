@@ -42,7 +42,7 @@ def lexicon_to_dict(lexicon_path, corpus_name):
                 lex_dict[word] = phones
     lex_dict = clean_dict(lex_dict, corpus_name)
     assert type(lex_dict)== defaultdict, "word_phoneme_dict is not defaultdict"
-    return lex_dict
+    return lex_dilct
 
 
 def clean_phonemes(phonemes, corpus_name):
@@ -99,6 +99,6 @@ def process_unknown_words(path, unknown_words_set, unknown_words_dict, line_coun
     if not os.path.exists(stats_dir):
         os.makedirs(stats_dir)
 
-    stats_dict_fname = os.path.join(stats_dir,"libsp_"+os.path.basename(path)+"_unk-words-stats.json")
+    stats_dict_fname = os.path.join(stats_dir, os.path.basename(path)+"_unk-words-stats.json")
     with open(stats_dict_fname, 'w') as fid:
         json.dump(stats_dict, fid)
