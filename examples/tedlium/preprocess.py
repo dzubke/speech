@@ -4,7 +4,7 @@ import re
 import argparse
 import subprocess
 import io
-from collections import defaultdict
+import json
 
 
 # third-party libraries
@@ -16,6 +16,8 @@ from tqdm import tqdm
 
 #project libraries
 from speech.utils import data_helpers
+from speech.utils import wave
+
 
 def main(target_dir, tar_path, sample_rate, min_duration, max_duration, use_phonemes):
     target_dl_dir = target_dir
@@ -43,8 +45,8 @@ def main(target_dir, tar_path, sample_rate, min_duration, max_duration, use_phon
     test_ted_dir = os.path.join(target_unpacked_dir, "legacy", "test")
 
     prepare_dir(train_ted_dir, use_phonemes)
-    prepare_dir(val_ted_dir,  use_phonemes)
-    prepare_dir(test_ted_dir,  use_phonemes)
+    #prepare_dir(val_ted_dir,  use_phonemes)
+    #dprepare_dir(test_ted_dir,  use_phonemes)
     #print('Creating manifests...')
 
     #create_manifest(train_ted_dir, 'ted_train_manifest.csv', min_duration, max_duration)
@@ -63,26 +65,48 @@ def prepare_dir(ted_dir, use_phonemes):
         os.makedirs(txt_dir)
     counter = 0
     entries = os.listdir(os.path.join(ted_dir, "sph"))
-    for sph_file in tqdm(entries, total=len(entries)):
-        speaker_name = sph_file.split('.sph')[0]
+    
+    unknown_set, unknown_dict = set(), dict()
+    line_count, word_count= 0, 0
+    with open(os.path.join(ted_dir, "data.json"), 'w') as fid:
+        for sph_file in tqdm(entries, total=len(entries)):
+            speaker_name = sph_file.split('.sph')[0]
 
-        sph_file_full = os.path.join(ted_dir, "sph", sph_file)
-        stm_file_full = os.path.join(ted_dir, "stm", "{}.stm".format(speaker_name))
+            sph_file_full = os.path.join(ted_dir, "sph", sph_file)
+            stm_file_full = os.path.join(ted_dir, "stm", "{}.stm".format(speaker_name))
 
-        assert os.path.exists(sph_file_full) and os.path.exists(stm_file_full)
-        if use_phonemes:
-            LEXICON_PATH = "TEDLIUM.152k.dic"
-            word_phoneme_dict = data_helpers.lexicon_to_dict(LEXICON_PATH, corpus_name="tedlium")
-        all_utterances = get_utterances_from_stm(stm_file_full)
+            assert os.path.exists(sph_file_full) and os.path.exists(stm_file_full)
+            if use_phonemes:
+                LEXICON_PATH = "TEDLIUM.152k.dic"
+                word_phoneme_dict = data_helpers.lexicon_to_dict(LEXICON_PATH, corpus_name="tedlium")
+            all_utterances = get_utterances_from_stm(stm_file_full)
 
-        all_utterances = filter(filter_short_utterances, all_utterances)
-        for utterance_id, utterance in enumerate(all_utterances):
-            target_wav_file = os.path.join(wav_dir, "{}_{}.wav".format(utterance["filename"], str(utterance_id)))
-            target_txt_file = os.path.join(txt_dir, "{}_{}.txt".format(utterance["filename"], str(utterance_id)))
-            cut_utterance(sph_file_full, target_wav_file, utterance["start_time"], utterance["end_time"])
-            with io.FileIO(target_txt_file, "w") as f:
-                f.write(_preprocess_transcript(utterance["transcript"], use_phonemes, word_phoneme_dict))
-        counter += 1
+            all_utterances = filter(filter_short_utterances, all_utterances)
+            for utterance_id, utterance in enumerate(all_utterances):
+                target_fn = "{}_{}.wav".format(utterance["filename"], str(utterance_id))
+                target_wav_file = os.path.join(wav_dir, target_fn+".wav")
+                target_txt_file = os.path.join(txt_dir, target_fn+".txt")
+                cut_utterance(sph_file_full, target_wav_file, utterance["start_time"], utterance["end_time"])
+                
+                if use_phonemes: #checks for unknown characters, records information, and continues to next utterance
+                    unk_words_list, unk_words_dict, counts = data_helpers.check_unknown_words(target_fn, utterance["transcript"], word_phoneme_dict)
+                    line_count+=counts[0]
+                    word_count+=counts[1]
+                    if len(unk_words_list) > 0: 
+                        unknown_set.update(unk_words_list)
+                        unknown_dict.update(unk_words_dict)
+                        continue
+                dur = wave.wav_duration(target_wav_file)
+                text = _preprocess_transcript(utterance["transcript"], use_phonemes, word_phoneme_dict)
+                datum = {'text' : text,
+                        'duration' : dur,
+                        'audio' : target_wav_file}
+                
+                json.dump(datum, fid)
+                fid.write("\n")
+            counter += 1
+    
+    data_helpers.process_unknown_words(ted_dir, unknown_set, unknown_dict, line_count, word_count)
 
 
 def get_utterances_from_stm(stm_file):
@@ -121,42 +145,28 @@ def cut_utterance(src_sph_file, target_wav_file, start_time, end_time, sample_ra
 
 
 def _preprocess_transcript(phrase, use_phonemes, word_phoneme_dict):
+    """
+        transform the input phrase. if use_phonemes is true, the words in phrase
+        are transformed into phoneme labels specified in word_phoneme_dict
+        Arguments:
+            phrase (list): list of words
+            use_phonemes (bool): if True, transform phrase into phonemes
+            word_phoneme_dict (dict): dictionary mapping words to phonemes
+    """
     phrase = phrase.strip()
     if use_phonemes:
+        if type(phrase) == str:
+            phrase = phrase.split() #converting string of space-separated words to list of words
+        elif type(phrase) == list: 
+            pass
+        else: 
+            raise(TypeError("input text is not string or list type"))
         phonemes = []
         for word in phrase:
-            print(word_phoneme_dict[word])
             phonemes.extend(word_phoneme_dict[word])
-        print(phonemes)
         phrase = phonemes
     
     return phrase
-
-
-
-
-# def lexicon_to_dict(ted_dir):
-#     """
-#     """
-#     lexicon_path = os.path.join(ted_dir, "TEDLIUM.152k.dic")
-    
-#     lex_dict = defaultdict(lambda: "unk")
-#     with open(lexicon_path, 'r') as fid:
-#         lexicon = (l.strip().lower().split() for l in fid)
-#         for line in lexicon: 
-#             word = line[0]
-#             phones = line[1:]
-#             # remove the accent digit from the phone, string.digits = '0123456789'
-#             # phones = list(map(lambda x: x.rstrip(string.digits), phones))
-#             # the if-statement will ignore the second pronunciation (phone list)
-#             if lex_dict[word] != "unk":
-#                 print(f"repated word: {word}")
-#             lex_dict[word] = phones 
-    
-#     lex_dict = defaultdict(lambda: "unk", 
-#                 {key: value for key, value in lex_dict.items() if not re.search("\(\d\)$", key)})
-
-#     return lex_dict
 
 
 
@@ -169,7 +179,7 @@ if __name__ == "__main__":
     parser.add_argument('--sample-rate', default=16000, type=int, help='Sample rate')
     parser.add_argument('--min-duration', default=1, type=int,
                         help='Prunes training samples shorter than the min duration (given in seconds, default 1)')
-    parser.add_argument('--max-duration', default=15, type=int,
+    parser.add_argument('--max-duration', default=20, type=int,
                         help='Prunes training samples longer than the max duration (given in seconds, default 15)')
     parser.add_argument('--use_phonemes', default=True, type=bool,
                         help='Determines whether output phoneme labels.')
