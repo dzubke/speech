@@ -54,14 +54,16 @@ def build_json(path, use_phonemes):
 
             if use_phonemes: 
                 unk_words_list, unk_words_dict, counts = data_helpers.check_unknown_words(file_key, text, word_phoneme_dict)
-                if counts[1] > 0: 
+                if len(unk_words_list) > 0: 
+                    print(unk_words_list)
                     unknown_set.update(unk_words_list)
                     unknown_dict.update(unk_words_dict)
                     line_count+=counts[0]
                     word_count+=counts[1]
                     continue
+                text = text.split()
                 text = transcript_to_phonemes(text, word_phoneme_dict)
-                    
+    
             datum = {'text' : text,
                      'duration' : dur,
                      'audio' : wave_file}
@@ -134,7 +136,7 @@ def process_unknown_words(path, unknown_words_set, unknown_words_dict, line_coun
     stats_dict.update({"unknown_words_set": list(unknown_words_set)})
     stats_dict.update({"unknown_words_dict": unknown_words_dict})
 
-    stats_dict_fname = "libsp_"+os.path.basename(path)+"_unk-words-stats.json"
+    stats_dict_fname = os.path.join("unk_word_stats","libsp_"+os.path.basename(path)+"_unk-words-stats.json")
     with open(stats_dict_fname, 'w') as fid:
         json.dump(stats_dict, fid)
 
@@ -144,13 +146,13 @@ def unique_unknown_words():
         Creates a set of the total number of unknown words across the 7 segments of the librispeech dataset
     """
 
-    train_100_fn = 'libsp_train-clean-100_unk-words-stats.json'
-    train_360_fn = 'libsp_train-clean-360_unk-words-stats.json'
-    train_500_fn = 'libsp_train-other-500_unk-words-stats.json'
-    test_clean_fn = 'libsp_test-clean_unk-words-stats.json'
-    test_other_fn = 'libsp_test-other_unk-words-stats.json'
-    dev_clean_fn = 'libsp_dev-clean_unk-words-stats.json'
-    dev_other_fn = 'libsp_dev-other_unk-words-stats.json'
+    train_100_fn = './unk_word_stats/libsp_train-clean-100_unk-words-stats.json'
+    train_360_fn = './unk_word_stats/libsp_train-clean-360_unk-words-stats.json'
+    train_500_fn = './unk_word_stats/libsp_train-other-500_unk-words-stats.json'
+    test_clean_fn = './unk_word_stats/libsp_test-clean_unk-words-stats.json'
+    test_other_fn = './unk_word_stats/libsp_test-other_unk-words-stats.json'
+    dev_clean_fn = './unk_word_stats/libsp_dev-clean_unk-words-stats.json'
+    dev_other_fn = './unk_word_stats/libsp_dev-other_unk-words-stats.json'
 
     datasets_fn = [train_100_fn, train_360_fn, train_500_fn, test_clean_fn, test_other_fn, dev_clean_fn, dev_other_fn]
     unknown_set = set()
@@ -162,7 +164,7 @@ def unique_unknown_words():
 
     unknown_set = list(filter(lambda x: len(x)<30, unknown_set))
     
-    with open("libsp_all_unk_words.txt", 'w') as fid:
+    with open("./unk_word_stats/libsp_all_unk_words.txt", 'w') as fid:
         fid.write('\n'.join(unknown_set))
 
     print(f"number of unknown words: {len(unknown_set)}")
