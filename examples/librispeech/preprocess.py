@@ -20,9 +20,9 @@ from speech.utils import wave
 def main(output_directory, use_phonemes):
     # "train-clean-100", "train-clean-360", "train-other-500", "dev-clean", "dev-other", "test-clean", "dev-other"  
     SETS = {
-    "train" : [],
-    "dev" : [],
-    "test" : ["test-clean"],
+    "train" : ["train-clean-100", "train-clean-360", "train-other-500"],
+    "dev" : ["dev-clean", "dev-other"],
+    "test" : ["test-clean", "test-other"],
     }
 
     path = os.path.join(output_directory, "LibriSpeech")   
