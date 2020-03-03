@@ -40,8 +40,7 @@ def build_json(path, use_phonemes):
     transcripts = load_transcripts(path) #, unk_words_set, unk_words_dict, line_count, word_count
     dirname = os.path.dirname(path)
     basename = os.path.basename(path) + os.path.extsep + "json"
-    unknown_set=set()
-    unknown_dict=dict()
+    unknown_set, unknown_dict = set(), dict()
     line_count, word_count= 0, 0
 
     if use_phonemes: 
@@ -54,14 +53,14 @@ def build_json(path, use_phonemes):
 
             if use_phonemes: 
                 unk_words_list, unk_words_dict, counts = data_helpers.check_unknown_words(file_key, text, word_phoneme_dict)
+                line_count+=counts[0]
+                word_count+=counts[1]
                 if len(unk_words_list) > 0: 
                     print(unk_words_list)
                     unknown_set.update(unk_words_list)
                     unknown_dict.update(unk_words_dict)
-                    line_count+=counts[0]
-                    word_count+=counts[1]
                     continue
-                text = text.split()
+                text = text.split()     #converting string of space-separated words to list of words
                 text = transcript_to_phonemes(text, word_phoneme_dict)
     
             datum = {'text' : text,
@@ -70,7 +69,7 @@ def build_json(path, use_phonemes):
             json.dump(datum, fid)
             fid.write("\n")
 
-    process_unknown_words(path, unknown_set, unknown_dict, line_count, word_count)
+    data_helpers.process_unknown_words(path, unknown_set, unknown_dict, line_count, word_count)
     
 
 def convert_to_wav(path):
@@ -121,24 +120,6 @@ def path_from_key(key, prefix, ext):
     dirs[-1] = key
     path = os.path.join(prefix, *dirs)
     return path + os.path.extsep + ext
-
-
-def process_unknown_words(path, unknown_words_set, unknown_words_dict, line_count, word_count):
-    """saves a json object of the dictionary with relevant statistics on the unknown words in corpus
-    """
-
-    stats_dict=dict()
-    stats_dict.update({"unique_unknown_words": len(unknown_words_set)})
-    stats_dict.update({"count_unknown_words": sum(unknown_words_dict.values())})
-    stats_dict.update({"total_words": word_count})
-    stats_dict.update({"lines_unknown_words": len(unknown_words_dict)})
-    stats_dict.update({"total_lines": line_count})
-    stats_dict.update({"unknown_words_set": list(unknown_words_set)})
-    stats_dict.update({"unknown_words_dict": unknown_words_dict})
-
-    stats_dict_fname = os.path.join("unk_word_stats","libsp_"+os.path.basename(path)+"_unk-words-stats.json")
-    with open(stats_dict_fname, 'w') as fid:
-        json.dump(stats_dict, fid)
 
 
 def unique_unknown_words():
