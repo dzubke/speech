@@ -24,7 +24,8 @@ def convert_full_set(path, pattern, new_ext="wav", **kwargs):
 
 
 def lexicon_to_dict(lexicon_path, corpus_name):
-    """This function reads the librispeech-lexicon.txt file which is a mapping of words in the
+    """
+        This function reads the librispeech-lexicon.txt file which is a mapping of words in the
         librispeech corpus to phoneme labels and represents the file as a dictionary.
         The digit accents are removed from the file name. 
         Note: the librispeech-lexicon.txt file needs to be in the same directory as this file.
@@ -42,7 +43,7 @@ def lexicon_to_dict(lexicon_path, corpus_name):
                 lex_dict[word] = phones
     lex_dict = clean_dict(lex_dict, corpus_name)
     assert type(lex_dict)== defaultdict, "word_phoneme_dict is not defaultdict"
-    return lex_dilct
+    return lex_dict
 
 
 def clean_phonemes(phonemes, corpus_name):
@@ -83,7 +84,8 @@ def check_unknown_words(filename, text, word_phoneme_dict):
 
 
 def process_unknown_words(path, unknown_words_set, unknown_words_dict, line_count, word_count):
-    """saves a json object of the dictionary with relevant statistics on the unknown words in corpus
+    """
+        saves a json object of the dictionary with relevant statistics on the unknown words in corpus
     """
 
     stats_dict=dict()
@@ -102,3 +104,39 @@ def process_unknown_words(path, unknown_words_set, unknown_words_dict, line_coun
     stats_dict_fname = os.path.join(stats_dir, os.path.basename(path)+"_unk-words-stats.json")
     with open(stats_dict_fname, 'w') as fid:
         json.dump(stats_dict, fid)
+
+
+def unique_unknown_words(dataset_dir):
+    """
+        Creates a set of the total number of unknown words across all segments in a dataset assuming a
+        unk-words-stats.json file from process_unknown_words() has been created for each part of the dataset. 
+
+        Arguments:
+            dataset_dir (str): pathname of dir continaing "unknown_word_stats" dir with unk-words-stats.json files
+    """
+
+    pattern = os.path.join(datset_dir, unk_word_stats, "*")
+    dataset_list = glob.glob(pattern)
+    if len(dataset_list) == 0: 
+        train_100_fn = './unk_word_stats/libsp_train-clean-100_unk-words-stats.json'
+        train_360_fn = './unk_word_stats/libsp_train-clean-360_unk-words-stats.json'
+        train_500_fn = './unk_word_stats/libsp_train-other-500_unk-words-stats.json'
+        test_clean_fn = './unk_word_stats/libsp_test-clean_unk-words-stats.json'
+        test_other_fn = './unk_word_stats/libsp_test-other_unk-words-stats.json'
+        dev_clean_fn = './unk_word_stats/libsp_dev-clean_unk-words-stats.json'
+        dev_other_fn = './unk_word_stats/libsp_dev-other_unk-words-stats.json'
+        datasets_list = [train_100_fn, train_360_fn, train_500_fn, test_clean_fn, test_other_fn, dev_clean_fn, dev_other_fn]
+    
+    unknown_set = set()
+    for data_fn in datasets_list: 
+        with open(data_fn, 'r') as fid: 
+            unk_words_dict = json.load(fid)
+            unknown_set.update(unk_words_dict['unknown_words_set'])
+            print(len(unk_words_dict['unknown_words_set']))
+
+    unknown_set = list(filter(lambda x: len(x)<30, unknown_set))
+    
+    with open("./unk_word_stats/all_unk_words.txt", 'w') as fid:
+        fid.write('\n'.join(unknown_set))
+
+    print(f"number of unknown words: {len(unknown_set)}")
