@@ -1,38 +1,59 @@
 # standard libraries
 import json
 import os
+import argparse
 
 # project libraries
 from speech.utils import data_helpers
 
 def main(corpus1_lex_fn:str, corpus2_lex_fn:str):
     """
-        performs a variety of methods comparing the lexicon pronounciation dictionaries of corpus1 and corpus2
+        performs a variety of methods comparing the lexicon pronounciation
+         dictionaries of corpus1 and corpus2
         
         Arguments:
-            corpus1_lex_fn (str): the pathname to the pronunciation lexicon for corpus 1
-            corpus2_lex_fn (str): the pathname to the pronunciation lexicon for corpus 2
+            corpus1_lex_fn (str): the pathname to the pronunciation
+             lexicon for corpus 1
+            corpus2_lex_fn (str): the pathname to the pronunciation
+             lexicon for corpus 2
     """
 
-    corpus1_name = os.path.basename(corpus1_lex_fn)
-    corpus2_name = os.path.basename(corpus2_lex_fn)
+
+    corpus1_name = process_name(corpus1_lex_fn)
+    corpus2_name = process_name(corpus2_lex_fn)
     
     lex1_dict = data_helpers.lexicon_to_dict(corpus1_lex_fn, corpus1_name)
     lex2_dict = data_helpers.lexicon_to_dict(corpus2_lex_fn, corpus2_name)
 
-    compare_phones(lex1_dict, lex2_dict)
+    compare_phones(lex1_dict, corpus1_name, lex2_dict, corpus2_name)
 
-
-def compare_phones(corpus1_lex:str, corpus2_lex:str):
+def process_name(corpus_lex_fn:str):
     """
-        compares the phonemes in lexicons of corpus1 and corpus2 and creates
+        extracts the corpus name from the lexicon dict filename
+    """
+    corpus_name = os.path.basename(corpus_lex_fn)
+    if '-' in corpus_name: 
+        #for librispeech-lexicon.txt
+        corpus_name = corpus_name.split(sep='-')[0]
+    else:
+        #for TEDLIUM.152k.dic
+        corpus_name = corpus_name.split(sep='.')[0].lower()
+    return corpus_name
+
+
+def compare_phones(corpus1_lex:str, corpus1_name:str,  corpus2_lex:str, corpus2_name:str):
+    """
+        compares the phonemes in lexicons of corpus1 and corpus2 and
+         creates
     """
 
-    corpus1_phones = export_phones(corpus1_lex, export=False)
-    corpus2_phones = export_phones(corpus2_lex, export=False)
-    intersection = {corpus2_phones.intersection(corpus1_phones)}
-    print(f"phonemes in corpus 1 but not corpus 2: {corpus1_phones.difference(corpus2_phones)} ")
-    print(f"phonemes in corpus 2 but not corpus 1: {corpus2_phones.difference(corpus1_phones)} ")
+    corpus1_phones, corpus1_words = export_phones(corpus1_lex, export=False)
+    corpus2_phones, corpus2_words = export_phones(corpus2_lex, export=False)
+    intersection = corpus2_phones.intersection(corpus1_phones)
+    print(f"phonemes in {corpus1_name} but not in {corpus2_name}: \
+        {corpus1_phones.difference(corpus2_phones)} ")
+    print(f"phonemes in {corpus2_name} but not in {corpus1_name}: \
+        {corpus2_phones.difference(corpus1_phones)} ")
     print(f"phonemes in common: number: {len(intersection)}, phonemes: {intersection}")
 
 
@@ -98,16 +119,14 @@ def check_phones():
 
 
 if __name__ == "__main__":
-    ## format of command is >>python preprocess.py <path_to_dataset> --use_phonemes <True/False> 
-    # where the optional --use_phonemes argument is whether the labels will be phonemes (True) or words (False)
     parser = argparse.ArgumentParser(
             description="Preprocess librispeech dataset.")
 
-    parser.add_argument("output_directory",
-        help="The dataset is saved in <output_directory>/LibriSpeech.")
+    parser.add_argument("corpus1_lex_fn",
+        help="The path to the lexicon pronuciation dictionary for corpus 1.")
 
-    parser.add_argument("--use_phonemes",
-        help="A boolean of whether the labels will be phonemes (True) or words (False)")
+    parser.add_argument("corpus2_lex_fn",
+        help="The path to the lexicon pronuciation dictionary for corpus 2")
     args = parser.parse_args()
 
-    main(args.output_directory, args.use_phonemes)
+    main(args.corpus1_lex_fn, args.corpus2_lex_fn)

@@ -44,6 +44,7 @@ class Preprocessor():
         audio_files = [d['audio'] for d in data]
         random.shuffle(audio_files)
 
+        self.spec_augment_cfg = preproc_cfg['use_spec_augment']
         self.spec_augment = preproc_cfg['use_spec_augment']
         self.preprocessor = preproc_cfg['preprocessor']
         self.window_size = preproc_cfg['window_size']
@@ -109,13 +110,23 @@ class Preprocessor():
 
         return inputs, targets
 
-    def turn_off_augmentation():
-        self.spec_augment = False
-        #self.inject_noise = False
+    def set_eval():
+        """
+            turns off the data augmentation for evaluation
+        """
+        if self.spec_augment_cfg:
+            self.spec_augment = False
+        #if self.inject_noise_cfg:
+            #self.inject_noise = False
 
-    def turn_on_augmentation():
-        self.spec_augment = True
-        #self.inject_noise = True
+    def set_train():
+        """
+            turns on data augmentation for training
+        """
+        if self.spec_augment_cfg:
+            self.spec_augment = True
+        #if self.inject_noise_cfg:
+            #self.inject_noise = True
 
 
     @property
