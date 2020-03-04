@@ -115,7 +115,7 @@ def unique_unknown_words(dataset_dir):
             dataset_dir (str): pathname of dir continaing "unknown_word_stats" dir with unk-words-stats.json files
     """
 
-    pattern = os.path.join(datset_dir, unk_word_stats, "*")
+    pattern = os.path.join(dataset_dir, "unk_word_stats", "*unk-words-stats.json")
     dataset_list = glob.glob(pattern)
     if len(dataset_list) == 0: 
         train_100_fn = './unk_word_stats/libsp_train-clean-100_unk-words-stats.json'
@@ -125,18 +125,31 @@ def unique_unknown_words(dataset_dir):
         test_other_fn = './unk_word_stats/libsp_test-other_unk-words-stats.json'
         dev_clean_fn = './unk_word_stats/libsp_dev-clean_unk-words-stats.json'
         dev_other_fn = './unk_word_stats/libsp_dev-other_unk-words-stats.json'
-        datasets_list = [train_100_fn, train_360_fn, train_500_fn, test_clean_fn, test_other_fn, dev_clean_fn, dev_other_fn]
+        dataset_list = [train_100_fn, train_360_fn, train_500_fn, test_clean_fn, test_other_fn, dev_clean_fn, dev_other_fn]
     
     unknown_set = set()
-    for data_fn in datasets_list: 
+    for data_fn in dataset_list: 
         with open(data_fn, 'r') as fid: 
             unk_words_dict = json.load(fid)
             unknown_set.update(unk_words_dict['unknown_words_set'])
             print(len(unk_words_dict['unknown_words_set']))
 
-    unknown_set = list(filter(lambda x: len(x)<30, unknown_set))
-    
-    with open("./unk_word_stats/all_unk_words.txt", 'w') as fid:
-        fid.write('\n'.join(unknown_set))
 
-    print(f"number of unknown words: {len(unknown_set)}")
+    unknown_set = filter_set(unknown_set)
+    unknown_list = list(unknown_set)
+    
+    write_path = os.path.join(dataset_dir, "unk_word_stats","all_unk_words.txt")
+    with open(write_path, 'w') as fid:
+        fid.write('\n'.join(unknown_list))
+
+    print(f"number of unknown words: {len(unknown_list)}")
+
+
+def filter_set(unknown_set:set):
+    """
+        filters the set based on the length and presence of digits.
+    """
+    unk_filter = filter(lambda x: len(x)<30, unknown_set)
+    search_pattern = r'[0-9!#$%&()*+,\-./:;<=>?@\[\\\]^_{|}~]'
+    unknown_set = set(filter(lambda x: not re.search(search_pattern, x), unk_filter))
+    return unknown_set
