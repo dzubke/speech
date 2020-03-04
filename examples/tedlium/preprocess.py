@@ -6,9 +6,8 @@ import subprocess
 import io
 import json
 
-
 # third-party libraries
-import wget
+#import wget
 import tarfile
 import unicodedata
 #from utils import create_manifest
@@ -45,8 +44,8 @@ def main(target_dir, tar_path, sample_rate, min_duration, max_duration, use_phon
     test_ted_dir = os.path.join(target_unpacked_dir, "legacy", "test")
 
     prepare_dir(train_ted_dir, use_phonemes)
-    #prepare_dir(val_ted_dir,  use_phonemes)
-    #dprepare_dir(test_ted_dir,  use_phonemes)
+    prepare_dir(val_ted_dir,  use_phonemes)
+    prepare_dir(test_ted_dir,  use_phonemes)
     #print('Creating manifests...')
 
     #create_manifest(train_ted_dir, 'ted_train_manifest.csv', min_duration, max_duration)

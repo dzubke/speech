@@ -42,7 +42,7 @@ def lexicon_to_dict(lexicon_path, corpus_name):
                 lex_dict[word] = phones
     lex_dict = clean_dict(lex_dict, corpus_name)
     assert type(lex_dict)== defaultdict, "word_phoneme_dict is not defaultdict"
-    return lex_dilct
+    return lex_dict
 
 
 def clean_phonemes(phonemes, corpus_name):
