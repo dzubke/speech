@@ -12,7 +12,8 @@
         "preprocessor": "log_spec",
         "window_size": 32,
         "step_size": 16,
-        "use_spec_augment": true
+        "use_spec_augment": true,
+        "use_noise_injection": false
     },
 
     "optimizer": {
@@ -26,6 +27,8 @@
         "class" : "CTC",
         "dropout" : 0.4,
         "export": false,
+        "load_pretrained": true,
+        "pretrained_path": "examples/librispeech/models/ctc_models/20200226/20200304/best_model", 
         "encoder" : {
             "conv" : [
 			[32, 11, 41, 1, 2, 0, 20],
