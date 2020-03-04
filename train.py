@@ -124,6 +124,11 @@ def run(config):
     model = model_class(preproc.input_dim,
                         preproc.vocab_size,
                         model_cfg)
+    if model_cfg["load_pretrained"]:
+        state_dict_model = torch.load(model_cfg["pretrained_path"], map_location=torch.device('cpu'))
+        state_dict = state_dict_model.state_dict()
+        model.load_state_dict(state_dict)
+        print("state_dict succesfully")
     model.cuda() if use_cuda else model.cpu()
 
     # Optimizer
