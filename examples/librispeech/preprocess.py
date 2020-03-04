@@ -18,11 +18,11 @@ from speech.utils import wave
 
 
 def main(output_directory, use_phonemes):
-    # "train-clean-100", "train-clean-360", "train-other-500", "dev-clean", "dev-other", "test-clean", "dev-other"  
+    # "train-clean-100", "train-clean-360", "train-other-500", "dev-clean", "dev-other", "test-clean", "test-other"  
     SETS = {
-    "train" : [],
-    "dev" : ["dev-clean"],
-    "test" : [],
+    "train" : ["train-clean-100", "train-clean-360", "train-other-500"],
+    "dev" : ["dev-clean", "dev-other"],
+    "test" : ["test-clean", "test-other"]
     }
 
     path = os.path.join(output_directory, "LibriSpeech")   
@@ -68,7 +68,7 @@ def build_json(path, use_phonemes):
                      'audio' : wave_file}
             json.dump(datum, fid)
             fid.write("\n")
-
+    print(f"saving unk-word-stats here: {path}")
     data_helpers.process_unknown_words(path, unknown_set, unknown_dict, line_count, word_count)
     
 
