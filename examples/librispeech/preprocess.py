@@ -122,33 +122,7 @@ def path_from_key(key, prefix, ext):
     return path + os.path.extsep + ext
 
 
-def unique_unknown_words():
-    """
-        Creates a set of the total number of unknown words across the 7 segments of the librispeech dataset
-    """
 
-    train_100_fn = './unk_word_stats/libsp_train-clean-100_unk-words-stats.json'
-    train_360_fn = './unk_word_stats/libsp_train-clean-360_unk-words-stats.json'
-    train_500_fn = './unk_word_stats/libsp_train-other-500_unk-words-stats.json'
-    test_clean_fn = './unk_word_stats/libsp_test-clean_unk-words-stats.json'
-    test_other_fn = './unk_word_stats/libsp_test-other_unk-words-stats.json'
-    dev_clean_fn = './unk_word_stats/libsp_dev-clean_unk-words-stats.json'
-    dev_other_fn = './unk_word_stats/libsp_dev-other_unk-words-stats.json'
-
-    datasets_fn = [train_100_fn, train_360_fn, train_500_fn, test_clean_fn, test_other_fn, dev_clean_fn, dev_other_fn]
-    unknown_set = set()
-    for data_fn in datasets_fn: 
-        with open(data_fn, 'r') as fid: 
-            unk_words_dict = json.load(fid)
-            unknown_set.update(unk_words_dict['unknown_words_set'])
-            print(len(unk_words_dict['unknown_words_set']))
-
-    unknown_set = list(filter(lambda x: len(x)<30, unknown_set))
-    
-    with open("./unk_word_stats/libsp_all_unk_words.txt", 'w') as fid:
-        fid.write('\n'.join(unknown_set))
-
-    print(f"number of unknown words: {len(unknown_set)}")
 
 if __name__ == "__main__":
     ## format of command is >>python preprocess.py <path_to_dataset> --use_phonemes <True/False> 
