@@ -142,7 +142,7 @@ def unique_unknown_words(dataset_dir):
     with open(write_path, 'w') as fid:
         fid.write('\n'.join(unknown_list))
 
-    print(f"number of unknown words: {len(unknown_list)}")
+    print(f"number of filtered unknown words: {len(unknown_list)}")
 
 
 def filter_set(unknown_set:set):
