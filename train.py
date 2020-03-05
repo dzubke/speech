@@ -139,6 +139,7 @@ def run(config):
     run_state = (0, 0)
     best_so_far = float("inf")
     for e in range(opt_cfg["epochs"]):
+        print(f"model print: {model}")
         start = time.time()
 
         run_state = run_epoch(model, optimizer, train_ldr, *run_state)
