@@ -124,8 +124,10 @@ def run(config):
     model = model_class(preproc.input_dim,
                         preproc.vocab_size,
                         model_cfg)
-    if model_cfg["load_trained"]:
-        model = load_from_trained(model, model_cfg)
+    if model_cfg["load_pretrained"]:
+        state_dict_model = torch.load(model_cfg["pretrained_path"], map_location=torch.device('cpu'))
+        state_dict = state_dict_model.state_dict()
+        model.load_state_dict(state_dict)
         print("state_dict succesfully")
     model.cuda() if use_cuda else model.cpu()
 
@@ -137,7 +139,6 @@ def run(config):
     run_state = (0, 0)
     best_so_far = float("inf")
     for e in range(opt_cfg["epochs"]):
-        print(f"model print: {model}")
         start = time.time()
 
         run_state = run_epoch(model, optimizer, train_ldr, *run_state)
@@ -158,41 +159,6 @@ def run(config):
             best_so_far = dev_cer
             speech.save(model, preproc,
                     config["save_path"], tag="best")
-
-
-def load_from_trained(model, model_cfg):
-    """
-        loads the model with pretrained weights from the model in
-        model_cfg["trained_path"]
-        Arguments:
-            model (torch model)
-            model_cfg (dict)
-    """
-
-    trained_model = torch.load(model_cfg["trained_path"], map_location=torch.device('cpu'))
-    trained_state_dict = trained_model.state_dict()
-    trained_state_dict = filter_state_dict(trained_state_dict, remove_layers=model_cfg["remove_layers"])
-    model_state_dict = model.state_dict()
-    model_state_dict.update(trained_state_dict)
-    model.load_state_dict(model_state_dict)
-    return model
-
-
-def filter_state_dict(state_dict, remove_layers=[]):
-    """
-        filters the inputted state_dict by removing the layers specified
-        in remove_layers
-        Arguments:
-            state_dict (OrderedDict): state_dict of pytorch model
-            remove_layers (list(str)): list of layers to remove 
-    """
-
-    state_dict = OrderedDict(
-        {key:value for key,value in state_dict.items() 
-        if key not in remove_layers}
-        )
-    return state_dict
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
