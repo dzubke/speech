@@ -6,6 +6,7 @@ import argparse
 import json
 import random
 import time
+from collections import OrderedDict
 import torch
 import torch.nn as nn
 import torch.optim
@@ -75,10 +76,7 @@ def eval_dev(model, ldr, preproc):
     losses = []; all_preds = []; all_labels = []
 
     model.set_eval()
-    print(f"spec_aug before set_eval: {preproc.spec_augment}")
     preproc.set_eval()
-    print(f"spec_aug after set_eval: {preproc.spec_augment}")
-
 
     for batch in tqdm.tqdm(ldr):
         temp_batch = list(batch)
@@ -90,11 +88,7 @@ def eval_dev(model, ldr, preproc):
         all_labels.extend(temp_batch[1])        #add the labels in the batch object
 
     model.set_train()
-    print(f"spec_aug before set_train: {preproc.spec_augment}")
     preproc.set_train()        
-    print(f"spec_aug after set_train: {preproc.spec_augment}")
-
-
 
     loss = sum(losses) / len(losses)
     results = [(preproc.decode(l), preproc.decode(p))              # decodes back to phoneme labels
@@ -126,7 +120,7 @@ def run(config):
                         model_cfg)
     if model_cfg["load_trained"]:
         model = load_from_trained(model, model_cfg)
-        print("state_dict succesfully")
+        print("succesfully loaded from trained model")
     model.cuda() if use_cuda else model.cpu()
 
     # Optimizer
