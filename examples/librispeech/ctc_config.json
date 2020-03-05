@@ -1,6 +1,6 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200304/",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200226/",
 
     "data" : {
         "train_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
@@ -27,8 +27,9 @@
         "class" : "CTC",
         "dropout" : 0.4,
         "convert_model": false,
-        "load_pretrained": false,
-        "pretrained_path": "examples/librispeech/models/ctc_models/20200226/20200304/best_model", 
+        "load_trained": true,
+        "trained_path": "examples/librispeech/models/ctc_models/20200226/20200304/best_model", 
+        "remove_layers": ["fc.fc.weight","fc.fc.bias"],
         "encoder" : {
             "conv" : [
 			[32, 11, 41, 1, 2, 0, 20],
