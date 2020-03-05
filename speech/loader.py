@@ -110,7 +110,7 @@ class Preprocessor():
 
         return inputs, targets
 
-    def set_eval():
+    def set_eval(self):
         """
             turns off the data augmentation for evaluation
         """
@@ -119,7 +119,7 @@ class Preprocessor():
         #if self.inject_noise_cfg:
             #self.inject_noise = False
 
-    def set_train():
+    def set_train(self):
         """
             turns on data augmentation for training
         """
