@@ -1,10 +1,10 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200226/",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200305/",
 
     "data" : {
-        "train_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
-        "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/test-clean.json",
+        "train_set" : "/home/dzubke/awni_speech/data/libsp_tedlium/train-libsp-tedlium.json",
+        "dev_set" : "/home/dzubke/awni_speech/data/libsp_tedlium/dev-libsp-tedlium.json",
         "start_and_end" : false
     },
     
