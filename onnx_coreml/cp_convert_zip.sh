@@ -5,6 +5,8 @@ cp $1/best_model ./torch_models/$2_model.pth
 cp $1/best_preproc.pyc ./preproc/$2_preproc.pyc
 cp $1/ctc_config.json ./config/$2_config.json
 
+sed -i '' 's/"convert_model": false,/"convert_model": true,/g' ./config/$2_config.json
+
 python torch_to_onnx.py $2 --num_frames $3 --use_state_dict True 
 python onnx_to_coreml.py $2
 python validation.py $2 --num_frames $3

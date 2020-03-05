@@ -18,7 +18,7 @@ from speech.utils import data_helpers
 from speech.utils import wave
 
 
-def main(target_dir, tar_path, sample_rate, min_duration, max_duration, use_phonemes):
+def main(target_dir, tar_path, sample_rate, min_duration, max_duration, use_phonemes, no_segment):
     target_dl_dir = target_dir
     if not os.path.exists(target_dl_dir):
         os.makedirs(target_dl_dir)
@@ -43,9 +43,9 @@ def main(target_dir, tar_path, sample_rate, min_duration, max_duration, use_phon
     val_ted_dir = os.path.join(target_unpacked_dir, "legacy", "dev")
     test_ted_dir = os.path.join(target_unpacked_dir, "legacy", "test")
 
-    prepare_dir(train_ted_dir, use_phonemes)
-    prepare_dir(val_ted_dir,  use_phonemes)
-    prepare_dir(test_ted_dir,  use_phonemes)
+    prepare_dir(train_ted_dir, use_phonemes, no_segment)
+    prepare_dir(val_ted_dir,  use_phonemes, no_segment)
+    prepare_dir(test_ted_dir,  use_phonemes, no_segment)
     #print('Creating manifests...')
 
     #create_manifest(train_ted_dir, 'ted_train_manifest.csv', min_duration, max_duration)
@@ -53,7 +53,15 @@ def main(target_dir, tar_path, sample_rate, min_duration, max_duration, use_phon
     #create_manifest(test_ted_dir, 'ted_test_manifest.csv')
 
 
-def prepare_dir(ted_dir, use_phonemes):
+def prepare_dir(ted_dir, use_phonemes, no_segment):
+    """
+        processed the audio and labels
+        Arguments:
+            ted_dir (str): path to the directory with the dataset
+            use_phonemes (bool): if true, phoneme labels will be used
+            segment_audio (bool): if true, the original audio will be segmented
+    """
+
     converted_dir = os.path.join(ted_dir, "converted")
     # directories to store converted wav files and their transcriptions
     wav_dir = os.path.join(converted_dir, "wav")
@@ -76,7 +84,7 @@ def prepare_dir(ted_dir, use_phonemes):
 
             assert os.path.exists(sph_file_full) and os.path.exists(stm_file_full)
             if use_phonemes:
-                LEXICON_PATH = "TEDLIUM.152k.dic"
+                LEXICON_PATH = "TEDLIUM.162k.dic"
                 word_phoneme_dict = data_helpers.lexicon_to_dict(LEXICON_PATH, corpus_name="tedlium")
             all_utterances = get_utterances_from_stm(stm_file_full)
 
@@ -85,9 +93,12 @@ def prepare_dir(ted_dir, use_phonemes):
                 target_fn = "{}_{}.wav".format(utterance["filename"], str(utterance_id))
                 target_wav_file = os.path.join(wav_dir, target_fn+".wav")
                 target_txt_file = os.path.join(txt_dir, target_fn+".txt")
-                cut_utterance(sph_file_full, target_wav_file, utterance["start_time"], utterance["end_time"])
+                if not no_segment:
+                    cut_utterance(sph_file_full, target_wav_file, 
+                        utterance["start_time"], utterance["end_time"])
                 
-                if use_phonemes: #checks for unknown characters, records information, and continues to next utterance
+                if use_phonemes: 
+                #checks for unknown characters, records information, and continues to next utterance
                     unk_words_list, unk_words_dict, counts = data_helpers.check_unknown_words(target_fn, utterance["transcript"], word_phoneme_dict)
                     line_count+=counts[0]
                     word_count+=counts[1]
@@ -179,11 +190,13 @@ if __name__ == "__main__":
     parser.add_argument('--min-duration', default=1, type=int,
                         help='Prunes training samples shorter than the min duration (given in seconds, default 1)')
     parser.add_argument('--max-duration', default=20, type=int,
-                        help='Prunes training samples longer than the max duration (given in seconds, default 15)')
-    parser.add_argument('--use_phonemes', default=True, type=bool,
+                        help='Prunes training samples longer than the max duration (given in seconds, default 20)')
+    parser.add_argument('--use_phonemes', default=False, type=bool,
                         help='Determines whether output phoneme labels.')
+    parser.add_argument('--no_segment', default=False, type=bool,
+                        help='if true, original audio files will not be segmented')
     args = parser.parse_args()
 
     TED_LIUM_V2_DL_URL = "http://www.openslr.org/resources/19/TEDLIUM_release2.tar.gz"
 
-    main(args.target_dir, args.tar_path, args.sample_rate, args.min_duration, args.max_duration, args.use_phonemes)
+    main(args.target_dir, args.tar_path, args.sample_rate, args.min_duration, args.max_duration, args.use_phonemes, args.no_segment)
