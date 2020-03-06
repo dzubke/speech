@@ -57,7 +57,7 @@ def compare_phones(corpus1_lex:str, corpus1_name:str,  corpus2_lex:str, corpus2_
     print(f"phonemes in common: number: {len(intersection)}, phonemes: {intersection}")
 
 
-def export_phones(lex_dict:dict, export:bool==False):
+def export_phones(lex_dict:dict, export:bool=False):
     """
         exports all words and phones in lex_dict into two separate txt files
 
