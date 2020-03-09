@@ -2,9 +2,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+# standard libraries
 import json
 import numpy as np
 import random
+
+# third-party libraries
 import scipy.signal
 import torch
 import torch.autograd as autograd
@@ -12,7 +15,9 @@ import torch.utils.data as tud
 import matplotlib.pyplot as plt
 import python_speech_features
 
+# project libraries
 from speech.utils import wave, spec_augment
+from speech.utils.noise_injector import inject_noise
 
 
 
@@ -44,14 +49,17 @@ class Preprocessor():
         audio_files = [d['audio'] for d in data]
         random.shuffle(audio_files)
 
-        self.spec_augment_cfg = preproc_cfg['use_spec_augment']
-        self.spec_augment = preproc_cfg['use_spec_augment']
+
         self.preprocessor = preproc_cfg['preprocessor']
         self.window_size = preproc_cfg['window_size']
         self.step_size = preproc_cfg['step_size']
-
-        # self.inject_noise = preproc_cfg['inject_noise']
-        # self.noise_prob = preproc_cfg['inject_noise']
+        self.SPEC_AUGMENT_STATIC = preproc_cfg['use_spec_augment']
+        self.spec_augment = preproc_cfg['use_spec_augment']
+        self.INJECT_NOISE_STATIC = preproc_cfg['inject_noise']
+        self.inject_noise = preproc_cfg['inject_noise']
+        self.noise_dir = preproc_cfg['noise_directory']
+        self.noise_prob = preproc_cfg['noise_prob']
+        self.noise_levels = preproc_cfg['noise_levels']
 
         self.mean, self.std = compute_mean_std(audio_files[:max_samples], 
                                                 preprocessor = self.preprocessor,
@@ -89,17 +97,19 @@ class Preprocessor():
 
     def preprocess(self, wave_file, text):
         
+        audio_data, samp_rate = wave.array_from_wave(wave_file)
+        
+        if self.inject_noise:
+            add_noise = np.random.binomial(1, self.noise_prob)
+            if add_noise:
+                audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, self.noise_levels) 
+
         if self.preprocessor == "log_spec":
-            inputs = log_specgram_from_file(wave_file, self.window_size, self.step_size)
+            inputs = log_specgram_from_data(audio_data, samp_rate, self.window_size, self.step_size)
         elif self.preprocessor == "mfcc":
-           inputs = mfcc_from_file(wave_file, self.window_size, self.step_size)
+           inputs = mfcc_from_data(audio_data, samp_rate, self.window_size, self.step_size)
         else: 
            raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
-        
-        # if self.inject_noise:
-        #     add_noise = np.random.binomial(1, self.noise_prob)
-        #     if add_noise:
-        #         inputs = self.noiseInjector.inject_noise(inputs)
         
         inputs = (inputs - self.mean) / self.std
 
@@ -110,23 +120,25 @@ class Preprocessor():
 
         return inputs, targets
 
+s
     def set_eval(self):
         """
             turns off the data augmentation for evaluation
         """
-        if self.spec_augment_cfg:
+        if self.SPEC_AUGMENT_STATIC:
             self.spec_augment = False
-        #if self.inject_noise_cfg:
-            #self.inject_noise = False
+        if self.INJECT_NOISE_STATIC:
+            self.inject_noise = False
+
 
     def set_train(self):
         """
             turns on data augmentation for training
         """
-        if self.spec_augment_cfg:
+        if self.SPEC_AUGMENT_STATIC:
             self.spec_augment = True
-        #if self.inject_noise_cfg:
-            #self.inject_noise = True
+        if self.INJECT_NOISE_STATIC:
+            self.inject_noise = True
 
 
     @property
@@ -138,12 +150,16 @@ class Preprocessor():
         return len(self.int_to_char)
 
 def compute_mean_std(audio_files, preprocessor, window_size, step_size):
+    samples = []
     if preprocessor == "log_spec":
-        samples = [log_specgram_from_file(af, window_size, step_size)
-                    for af in audio_files]  
+        for audio_file in audio_files: 
+            data, samp_rate = array_from_wave(audio_file)
+            samples.append(log_specgram_from_data(data, samp_rate, window_size, step_size))
+                    
     elif preprocessor == "mfcc":
-        samples = [mfcc_from_file(af, window_size, step_size)
-                   for af in audio_files]
+        for audio_file in audio_files: 
+            data, samp_rate = array_from_wave(audio_file)
+            samples.append(mfcc_from_data(data, samp_rate, window_size, step_size))
     else: 
         raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
      
@@ -223,7 +239,7 @@ def make_loader(dataset_json, preproc,
                 drop_last=True)
     return loader
 
-def mfcc_from_file(audio_file: str, window_size=20, step_size=10):
+def mfcc_from_data(audio: np.ndarray, samp_rate:int, window_size=20, step_size=10):
     """Computes the Mel Frequency Cepstral Coefficients (MFCC) from an audio file path by calling the mfcc method
 
     Arguments
@@ -234,12 +250,14 @@ def mfcc_from_file(audio_file: str, window_size=20, step_size=10):
     -------
         np.ndarray, the transposed log of the spectrogram as returned by mfcc
     """
-    audio, sample_rate = wave.array_from_wave(audio_file)
 
-    if len(audio.shape)>1:     # if there are multiple channels, take the first channel
-        audio = audio[:,0]
+    if len(audio.shape)>1:     # there are multiple channels
+        if audio.shape[1] == 1:
+            audio = audio.squeeze()
+        else:
+            audio = audio.mean(axis=1)  # multiple channels, average
    
-    return create_mfcc(audio, sample_rate, window_size, step_size)
+    return create_mfcc(audio, samp_rate, window_size, step_size)
 
 def create_mfcc(audio, sample_rate: int, window_size, step_size, esp=1e-10):
     """Calculates the mfcc using python_speech_features and can return the mfcc's and its derivatives, if desired. 
@@ -278,28 +296,22 @@ def create_mfcc(audio, sample_rate: int, window_size, step_size, esp=1e-10):
     return out.astype(np.float32)
 
 
-def log_specgram_from_file(audio_file: str, window_size=32, step_size=16, channel: int=0, plot=False):
+def log_specgram_from_data(audio: np.ndarray, samp_rate:int, window_size=32, step_size=16, plot=False):
     """Computes the log of the spectrogram from from a input audio file string
 
-    Arguments
-    ----------
-        audio_file: str, the filename of the audio file
-        channel: int, zero-indexed optional keyword argument specifying the channel to use
-        plot: bool, if true a plot of the spectrogram will be generated
+    Arguments:
+        audio_data (np.ndarray)
 
-    Returns
-    -------
+    Returns:
         np.ndarray, the transposed log of the spectrogram as returned by log_specgram
     """
     
-    audio, sr = wave.array_from_wave(audio_file)
-
     if len(audio.shape)>1:     # there are multiple channels
-        _, num_channels = audio.shape
-        assert channel <= num_channels, "channel argument greater than audio channels"
-        audio = audio[:,channel]
-   
-    return log_specgram(audio, sr, window_size, step_size, plot=plot)
+        if audio.shape[1] == 1:
+            audio = audio.squeeze()
+        else:
+            audio = audio.mean(axis=1)  # multiple channels, average
+    return log_specgram(audio, samp_rate, window_size, step_size, plot=plot)
 
 def log_specgram(audio, sample_rate, window_size=20,
                  step_size=10, eps=1e-10, plot=False):
@@ -314,6 +326,7 @@ def log_specgram(audio, sample_rate, window_size=20,
     if plot==True:
         plot_spectrogram(f,t, spec)
     return np.log(spec.T.astype(np.float32) + eps)
+
 
 def compare_log_spec_from_file(audio_file_1: str, audio_file_2: str, plot=False):
     """This function takes in two audio paths and calculates the difference between the spectrograms 
