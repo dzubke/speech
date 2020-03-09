@@ -52,7 +52,7 @@ def main(model_name, num_frames):
     #load models
     state_dict_model = torch.load(TRAINED_MODEL_FN, map_location=torch.device('cpu'))
 
-    trained_model = models.CTC(freq_dim,40, model_cfg)
+    trained_model = models.CTC(freq_dim, 39, model_cfg)
     state_dict = state_dict_model.state_dict()
     torch.save(state_dict, state_dict_path)
     trained_model.load_state_dict(state_dict)
@@ -99,6 +99,7 @@ def main(model_name, num_frames):
     predictions_dict= {}
 
     stream_test_name = "Speak_5_out"
+    BLANK_INDEX=39
 
     for name, data in data_dct.items():
         print(f"\n~~~~~~~~~~~~~~~~~~{name}~~~~~~~~~~~~~~~~~~~~~~\n")
@@ -106,8 +107,8 @@ def main(model_name, num_frames):
 
         trained_output = trained_model(torch.from_numpy(test_x),(torch.from_numpy(test_h), torch.from_numpy(test_c))) 
         trained_probs, trained_h, trained_c = to_numpy(trained_output[0]), to_numpy(trained_output[1][0]), to_numpy(trained_output[1][1])
-        trained_max_decoder = max_decode(trained_probs[0], blank=40)
-        trained_ctc_decoder = ctc_decode(trained_probs[0], beam_size=50, blank=40)
+        trained_max_decoder = max_decode(trained_probs[0], blank=BLANK_INDEX)
+        trained_ctc_decoder = ctc_decode(trained_probs[0], beam_size=50, blank=BLANK_INDEX)
 
 
         #torch_output = CTCNet_model(torch.from_numpy(test_x), torch.from_numpy(test_h), torch.from_numpy(test_c)) 
@@ -129,8 +130,8 @@ def main(model_name, num_frames):
         coreml_probs = np.array(coreml_output['output'])
         coreml_h = np.array(coreml_output['hidden'])
         coreml_c = np.array(coreml_output['cell'])
-        coreml_max_decoder = max_decode(coreml_probs[0], blank=40)
-        coreml_ctc_decoder = ctc_decode(coreml_probs[0], beam_size=50,blank=40)
+        coreml_max_decoder = max_decode(coreml_probs[0], blank=BLANK_INDEX)
+        coreml_ctc_decoder = ctc_decode(coreml_probs[0], beam_size=50,blank=BLANK_INDEX)
         #coreml_output = [coreml_probs, coreml_h, coreml_c]
         print("coreml prediction completed")
 
