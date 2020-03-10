@@ -120,7 +120,7 @@ def run(config):
                         model_cfg)
     if model_cfg["load_trained"]:
         model = load_from_trained(model, model_cfg)
-        print("succesfully loaded from trained model")
+        print("Succesfully loaded weights from trained model")
     model.cuda() if use_cuda else model.cpu()
 
     # Optimizer

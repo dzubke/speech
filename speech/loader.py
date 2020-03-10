@@ -120,7 +120,7 @@ class Preprocessor():
 
         return inputs, targets
 
-s
+
     def set_eval(self):
         """
             turns off the data augmentation for evaluation
@@ -153,12 +153,12 @@ def compute_mean_std(audio_files, preprocessor, window_size, step_size):
     samples = []
     if preprocessor == "log_spec":
         for audio_file in audio_files: 
-            data, samp_rate = array_from_wave(audio_file)
+            data, samp_rate = wave.array_from_wave(audio_file)
             samples.append(log_specgram_from_data(data, samp_rate, window_size, step_size))
                     
     elif preprocessor == "mfcc":
         for audio_file in audio_files: 
-            data, samp_rate = array_from_wave(audio_file)
+            data, samp_rate = wave.array_from_wave(audio_file)
             samples.append(mfcc_from_data(data, samp_rate, window_size, step_size))
     else: 
         raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
