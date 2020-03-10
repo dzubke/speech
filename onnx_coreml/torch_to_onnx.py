@@ -27,7 +27,7 @@ def onnx_export(model_name, num_frames, use_state_dict):
             config = json.load(fid)
             model_cfg = config['model']
         
-        ctc_model = models.CTC(freq_dim, 40, model_cfg) 
+        ctc_model = models.CTC(freq_dim, 39, model_cfg) 
         state_dict_model = torch.load(torch_path, map_location=torch.device(torch_device))
         ctc_model.load_state_dict(state_dict_model.state_dict())
     

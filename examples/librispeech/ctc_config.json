@@ -13,7 +13,10 @@
         "window_size": 32,
         "step_size": 16,
         "use_spec_augment": true,
-        "use_noise_injection": false
+        "inject_noise": false,
+        "noise_directory": "",
+        "noise_prob": 0.4,
+        "noise_levels": [0,0.5] 
     },
 
     "optimizer": {
