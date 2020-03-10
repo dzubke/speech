@@ -22,7 +22,7 @@ def inject_noise_sample(data, sample_rate, noise_path, noise_level):
     noise_start = np.random.rand() * (noise_len - data_len)
     noise_end = noise_start + data_len
     noise_dst = audio_with_sox(noise_path, sample_rate, noise_start, noise_end)
-    noise_dist = noise_dist.astype('float64')
+    noise_dst = noise_dst.astype('float64')
     data = data.astype('float64')
     assert len(data) == len(noise_dst)
     noise_energy = np.sqrt(noise_dst.dot(noise_dst) / noise_dst.size)
