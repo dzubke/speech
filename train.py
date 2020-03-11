@@ -44,7 +44,7 @@ def run_epoch(model, optimizer, train_ldr, it, avg_loss):
     end_t = time.time()
     tq = tqdm.tqdm(train_ldr)
     for batch in tq:
-        temp_batch = list(batch)    # this was added as the batch object was being exhausted when it was called
+        temp_batch = list(batch)    # this was added as the batch generator was being exhausted when it was called
         start_t = time.time()
         optimizer.zero_grad()
         loss = model.loss(temp_batch)
