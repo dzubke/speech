@@ -3,6 +3,8 @@ from __future__ import division
 from __future__ import print_function
 
 import argparse
+from datetime import date
+import logging
 import json
 import random
 import time
@@ -20,7 +22,13 @@ import speech.models as models
 # TODO, (awni) why does putting this above crash..
 import tensorboard_logger as tb
 
-def run_epoch(model, optimizer, train_ldr, it, avg_loss):
+
+
+
+
+
+
+def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
     r"""This performs a forwards and backward pass through the NN
 
     Arguements
@@ -44,7 +52,7 @@ def run_epoch(model, optimizer, train_ldr, it, avg_loss):
     end_t = time.time()
     tq = tqdm.tqdm(train_ldr)
     for batch in tq:
-        temp_batch = list(batch)    # this was added as the batch object was being exhausted when it was called
+        temp_batch = list(batch)    # this was added as the batch generator was being exhausted when it was called
         start_t = time.time()
         optimizer.zero_grad()
         loss = model.loss(temp_batch)
@@ -68,6 +76,13 @@ def run_epoch(model, optimizer, train_ldr, it, avg_loss):
         tq.set_postfix(iter=it, loss=loss,
                 avg_loss=avg_loss, grad_norm=grad_norm,
                 model_time=model_t, data_time=data_t)
+
+        logger.info(f"iter={it}, loss={round(loss,3)}, grad_norm={round(grad_norm,3)}")
+        inputs, labels, input_lens, label_lens = model.collate(*temp_batch)
+
+        if check_nan(model):
+            logger.info(f"labels: {[labels]}, label_lens: {label_lens} state_dict: {model.state_dict()}")
+
         it += 1
 
     return it, avg_loss
@@ -120,7 +135,7 @@ def run(config):
                         model_cfg)
     if model_cfg["load_trained"]:
         model = load_from_trained(model, model_cfg)
-        print("succesfully loaded from trained model")
+        print("Succesfully loaded weights from trained model")
     model.cuda() if use_cuda else model.cpu()
 
     # Optimizer
@@ -128,12 +143,23 @@ def run(config):
                     lr=opt_cfg["learning_rate"],
                     momentum=opt_cfg["momentum"])
 
+
+    # create logger
+    logger = logging.getLogger("training_log")
+    logger.setLevel(logging.DEBUG)
+    # create file handler which logs even debug messages
+    fh = logging.FileHandler("training_"+str(date.today())+".log")
+    fh.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
     run_state = (0, 0)
     best_so_far = float("inf")
     for e in range(opt_cfg["epochs"]):
         start = time.time()
 
-        run_state = run_epoch(model, optimizer, train_ldr, *run_state)
+        run_state = run_epoch(model, optimizer, train_ldr, logger, *run_state)
 
         msg = "Epoch {} completed in {:.2f} (s)."
         print(msg.format(e, time.time() - start))
@@ -143,6 +169,7 @@ def run(config):
         # Log for tensorboard
         tb.log_value("dev_loss", dev_loss, e)
         tb.log_value("dev_cer", dev_cer, e)
+
 
         speech.save(model, preproc, config["save_path"])
 
@@ -185,6 +212,19 @@ def filter_state_dict(state_dict, remove_layers=[]):
         if key not in remove_layers}
         )
     return state_dict
+
+def check_nan(model):
+    """
+        checks an iterator of training inputs if any of them have nan values
+    """
+    for param in model.parameters():
+        if (param!=param).any():
+            return True
+    
+    return False
+        
+
+
 
 
 if __name__ == "__main__":
