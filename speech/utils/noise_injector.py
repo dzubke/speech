@@ -17,18 +17,24 @@ def inject_noise(data, data_samp_rate, noise_dir, noise_levels=(0, 0.5)):
 
 
 def inject_noise_sample(data, sample_rate, noise_path, noise_level):
-    noise_len = wav_duration(noise_path)
+    noise_len = wav_duration(noise_path)        
+    #print(f"noise_len (s): {noise_len}")
     data_len = len(data) / sample_rate
-    noise_start = np.random.rand() * (noise_len - data_len)
-    noise_end = noise_start + data_len
-    noise_dst = audio_with_sox(noise_path, sample_rate, noise_start, noise_end)
-    noise_dist = noise_dist.astype('float64')
-    data = data.astype('float64')
-    assert len(data) == len(noise_dst)
-    noise_energy = np.sqrt(noise_dst.dot(noise_dst) / noise_dst.size)
-    data_energy = np.sqrt(np.abs(data.dot(data)) / data.size)
-    data += noise_level * noise_dst * data_energy / noise_energy
-    return data.astype('int16')
+    #print(f"data_len (s): {data_len}")
+    if data_len > noise_len:
+        return data
+    else:
+        noise_start = np.random.rand() * (noise_len - data_len) 
+        noise_end = noise_start + data_len
+        #print(f"noise duration: {noise_end - noise_start}, start: {noise_start}, end: {noise_end}")
+        noise_dst = audio_with_sox(noise_path, sample_rate, noise_start, noise_end)
+        noise_dst = noise_dst.astype('float64')
+        data = data.astype('float64')
+        assert len(data) == len(noise_dst), f"data len: {data.size}, noise len: {noise_dst.size}, noise_path: {noise_path}"
+        noise_energy = np.sqrt(noise_dst.dot(noise_dst) / noise_dst.size)
+        data_energy = np.sqrt(np.abs(data.dot(data)) / data.size)
+        data += noise_level * noise_dst * data_energy / noise_energy
+        return data.astype('int16')
 
 
 def audio_with_sox(path, sample_rate, start_time, end_time):
