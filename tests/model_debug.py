@@ -70,7 +70,7 @@ def test_model(test_label):
 
 def load_audio(audio_path, preproc):
     
-    audio_data, samp_rate = wave.array_from_wave(AUDIO_PATH)
+    audio_data, samp_rate = wave.array_from_wave(audio_path)
     inputs = loader.log_specgram_from_data(audio_data, samp_rate, 
                 window_size=32, step_size=16)
     inputs = (inputs - preproc.mean) / preproc.std
@@ -92,4 +92,4 @@ def alter_logspec(log_spec, alter):
 
 
 if __name__ == "__main__":
-    main()
+     main()
