@@ -2,6 +2,9 @@
 import json
 import argparse
 
+# third-party libraries
+import tqdm
+
 # project libraries
 from tests import model_debug
 from speech.utils.io import load
@@ -16,15 +19,17 @@ def main(json_path, preproc_path):
             json_path (str): path to data json
             preproc_path (str): path to dir with preproc object, don't include preproc.pyc in path
     """
-
+    
+    print(f"checking: {json_path} with preproc: {preproc_path}")
     with open(json_path) as fid:
         data_json = [json.loads(l) for l in fid]
 
     _, preproc = load(preproc_path)
-
+    
 
     json_has_nan = False
-    for sample in data_json:
+    tq = tqdm.tqdm(data_json)
+    for sample in tq:
         samp_path = sample["audio"]
         inputs, sample_rate = model_debug.load_audio(samp_path, preproc)
 
