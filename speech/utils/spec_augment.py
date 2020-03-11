@@ -86,11 +86,11 @@ def spec_augment(mel_spectrogram, time_warping_para=5, frequency_masking_para=50
     # Arguments:
       spectrogram(torch tensor): audio file path of you want to warping and masking.
       time_warping_para(float): Augmentation parameter, "time warp parameter W".
-        If none, default = 40.
+        If none, default = 4.
       frequency_masking_para(float): Augmentation parameter, "frequency mask parameter F"
-        If none, default = 27.
+        If none, default = 50.
       time_masking_para(float): Augmentation parameter, "time mask parameter T"
-        If none, default = 70.
+        If none, default = 50.
       frequency_mask_num(float): number of frequency masking lines, "m_F".
         If none, default = 1.
       time_mask_num(float): number of time masking lines, "m_T".
