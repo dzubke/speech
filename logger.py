@@ -15,9 +15,6 @@ def main():
 
     second_func(logger)
 
-def second_func(logger):
-    logger.info('creating an instance of auxiliary_module.Auxiliary')
-    logger.info('testing')
 
 
 

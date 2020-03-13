@@ -128,14 +128,12 @@ class Model(nn.Module):
         Set the model to evaluation mode.
         """
         self.eval()
-        self.volatile = True
 
     def set_train(self):
         """
         Set the model to training mode.
         """
         self.train()
-        self.volatile = False
 
     def infer(self, x):
         """

@@ -66,4 +66,4 @@ def same_size(data:np.ndarray, noise_dst:np.ndarray) -> np.ndarray:
     elif data.size > noise_dst.size:
         size_diff = data.size - noise_dst.size
         zero_diff = np.zeros((size_diff))
-        return np.concatenate((noise_dst.size, zero_diff), axis=0)
+        return np.concatenate((noise_dst, zero_diff), axis=0)
