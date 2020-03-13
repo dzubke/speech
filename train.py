@@ -93,14 +93,15 @@ def eval_dev(model, ldr, preproc):
     model.set_eval()
     preproc.set_eval()
 
-    for batch in tqdm.tqdm(ldr):
-        temp_batch = list(batch)
-        preds = model.infer(temp_batch)
-        loss = model.loss(temp_batch)
-        losses.append(loss.item())
-        #losses.append(loss.data[0])
-        all_preds.extend(preds)
-        all_labels.extend(temp_batch[1])        #add the labels in the batch object
+    with torch.no_grad():
+        for batch in tqdm.tqdm(ldr):
+            temp_batch = list(batch)
+            preds = model.infer(temp_batch)
+            loss = model.loss(temp_batch)
+            losses.append(loss.item())
+            #losses.append(loss.data[0])
+            all_preds.extend(preds)
+            all_labels.extend(temp_batch[1])        #add the labels in the batch object
 
     model.set_train()
     preproc.set_train()        

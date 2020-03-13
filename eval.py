@@ -11,6 +11,7 @@ import speech.loader as loader
 
 def eval_loop(model, ldr):
     all_preds = []; all_labels = []; all_preds_dist=[]
+
     for batch in tqdm.tqdm(ldr):
         #dustin: my modification because the iteratable batch was being exhausted when it was called
         temp_batch = list(batch)
@@ -36,7 +37,8 @@ def run(model_path, dataset_json,
     print(f"spec_augment after set_eval: {preproc.spec_augment}")
 
 
-    results = eval_loop(model, ldr)
+    with torch.no_grad():
+        results = eval_loop(model, ldr)
     print(f"number of examples: {len(results)}")
     #results_dist = [[(preproc.decode(pred[0]), preproc.decode(pred[1]), prob)] 
     #                for example_dist in results_dist
