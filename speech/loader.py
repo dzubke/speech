@@ -2,9 +2,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+# standard libraries
 import json
 import numpy as np
 import random
+
+# third-party libraries
 import scipy.signal
 import torch
 import torch.autograd as autograd
@@ -12,7 +15,9 @@ import torch.utils.data as tud
 import matplotlib.pyplot as plt
 import python_speech_features
 
-from speech.utils import wave
+# project libraries
+from speech.utils import wave, spec_augment
+from speech.utils.noise_injector import inject_noise
 
 
 
@@ -21,12 +26,16 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, max_samples=100, start_and_end=True):
+    def __init__(self, data_json, preproc_cfg, max_samples=100, start_and_end=True):
         """
         Builds a preprocessor from a dataset.
         Arguments:
             data_json (string): A file containing a json representation
                 of each example per line.
+            preproc_json: A json file defining the preprocessing with attributes
+                preprocessor: "log_spec" or "mfcc" to determine the type of preprocessing
+                window_size: the size of the window in the spectrogram transform
+                step_size: the size of the step in the spectrogram transform
             max_samples (int): The maximum number of examples to be used
                 in computing summary statistics.
             start_and_end (bool): Include start and end tokens in labels.
@@ -39,8 +48,23 @@ class Preprocessor():
         # Compute data mean, std from sample
         audio_files = [d['audio'] for d in data]
         random.shuffle(audio_files)
-        # the mean and std are of the log of the spectogram of the audio files
-        self.mean, self.std = compute_mean_std(audio_files[:max_samples])
+
+
+        self.preprocessor = preproc_cfg['preprocessor']
+        self.window_size = preproc_cfg['window_size']
+        self.step_size = preproc_cfg['step_size']
+        self.SPEC_AUGMENT_STATIC = preproc_cfg['use_spec_augment']
+        self.spec_augment = preproc_cfg['use_spec_augment']
+        self.INJECT_NOISE_STATIC = preproc_cfg['inject_noise']
+        self.inject_noise = preproc_cfg['inject_noise']
+        self.noise_dir = preproc_cfg['noise_directory']
+        self.noise_prob = preproc_cfg['noise_prob']
+        self.noise_levels = preproc_cfg['noise_levels']
+
+        self.mean, self.std = compute_mean_std(audio_files[:max_samples], 
+                                                preprocessor = self.preprocessor,
+                                                window_size = self.window_size, 
+                                                step_size = self.step_size)
         self._input_dim = self.mean.shape[0]
 
 
@@ -72,10 +96,50 @@ class Preprocessor():
         return text[s:e]
 
     def preprocess(self, wave_file, text):
-        inputs = log_specgram_from_file(wave_file)
+        
+        audio_data, samp_rate = wave.array_from_wave(wave_file)
+        
+        if self.inject_noise:
+            add_noise = np.random.binomial(1, self.noise_prob)
+            if add_noise:
+                audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, self.noise_levels) 
+
+        if self.preprocessor == "log_spec":
+            inputs = log_specgram_from_data(audio_data, samp_rate, self.window_size, self.step_size)
+        elif self.preprocessor == "mfcc":
+           inputs = mfcc_from_data(audio_data, samp_rate, self.window_size, self.step_size)
+        else: 
+           raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
+        
         inputs = (inputs - self.mean) / self.std
+
+        if self.spec_augment:
+            inputs = apply_spec_augment(inputs)
+
         targets = self.encode(text)
+
         return inputs, targets
+
+
+    def set_eval(self):
+        """
+            turns off the data augmentation for evaluation
+        """
+        if self.SPEC_AUGMENT_STATIC:
+            self.spec_augment = False
+        if self.INJECT_NOISE_STATIC:
+            self.inject_noise = False
+
+
+    def set_train(self):
+        """
+            turns on data augmentation for training
+        """
+        if self.SPEC_AUGMENT_STATIC:
+            self.spec_augment = True
+        if self.INJECT_NOISE_STATIC:
+            self.inject_noise = True
+
 
     @property
     def input_dim(self):
@@ -85,9 +149,20 @@ class Preprocessor():
     def vocab_size(self):
         return len(self.int_to_char)
 
-def compute_mean_std(audio_files):
-    samples = [log_specgram_from_file(af)
-                for af in audio_files]
+def compute_mean_std(audio_files, preprocessor, window_size, step_size):
+    samples = []
+    if preprocessor == "log_spec":
+        for audio_file in audio_files: 
+            data, samp_rate = wave.array_from_wave(audio_file)
+            samples.append(log_specgram_from_data(data, samp_rate, window_size, step_size))
+                    
+    elif preprocessor == "mfcc":
+        for audio_file in audio_files: 
+            data, samp_rate = wave.array_from_wave(audio_file)
+            samples.append(mfcc_from_data(data, samp_rate, window_size, step_size))
+    else: 
+        raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
+     
     samples = np.vstack(samples)
     mean = np.mean(samples, axis=0)
     std = np.std(samples, axis=0)
@@ -100,7 +175,6 @@ class AudioDataset(tud.Dataset):
         data = read_data_json(data_json)        #loads the data_json into a list
         self.preproc = preproc                  # assign the preproc object
 
-        # I'm not fully certain what is going on here
         bucket_diff = 4                         # number of different buckets
         max_len = max(len(x['text']) for x in data) # max number of phoneme labels in data
         num_buckets = max_len // bucket_diff        # the number of buckets
@@ -165,7 +239,7 @@ def make_loader(dataset_json, preproc,
                 drop_last=True)
     return loader
 
-def mfcc_from_file(audio_file: str):
+def mfcc_from_data(audio: np.ndarray, samp_rate:int, window_size=20, step_size=10):
     """Computes the Mel Frequency Cepstral Coefficients (MFCC) from an audio file path by calling the mfcc method
 
     Arguments
@@ -176,14 +250,16 @@ def mfcc_from_file(audio_file: str):
     -------
         np.ndarray, the transposed log of the spectrogram as returned by mfcc
     """
-    audio, sample_rate = wave.array_from_wave(audio_file)
 
-    if len(audio.shape)>1:     # if there are multiple channels, take the first channel
-        audio = audio[:,0]
+    if len(audio.shape)>1:     # there are multiple channels
+        if audio.shape[1] == 1:
+            audio = audio.squeeze()
+        else:
+            audio = audio.mean(axis=1)  # multiple channels, average
    
-    return create_mfcc(audio, sample_rate)
+    return create_mfcc(audio, samp_rate, window_size, step_size)
 
-def create_mfcc(audio, sample_rate: int, esp=1e-10):
+def create_mfcc(audio, sample_rate: int, window_size, step_size, esp=1e-10):
     """Calculates the mfcc using python_speech_features and can return the mfcc's and its derivatives, if desired. 
     If num_mfcc is set to 13 or less: Output consists of 12 MFCC and 1 energy
     if num_mfcc is set to 26 or less: ouput consists of 12 mfcc, 1 energy, as well as the first derivative of these
@@ -193,7 +269,7 @@ def create_mfcc(audio, sample_rate: int, esp=1e-10):
     """
 
     num_mfcc = 39   # the number of mfcc's in the output
-    mfcc = python_speech_features.mfcc(audio, sample_rate, winlen=0.025, winstep=0.01, numcep=13, nfilt=26, preemph=0.97, appendEnergy=True)
+    mfcc = python_speech_features.mfcc(audio, sample_rate, winlen=window_size/1000, winstep=step_size/1000, numcep=13, nfilt=26, preemph=0.97, appendEnergy=True)
     out = mfcc
     
     # the if-statement waterfall appends the desired number of derivatives to the output value
@@ -220,28 +296,22 @@ def create_mfcc(audio, sample_rate: int, esp=1e-10):
     return out.astype(np.float32)
 
 
-def log_specgram_from_file(audio_file: str, channel: int=0, plot=False):
+def log_specgram_from_data(audio: np.ndarray, samp_rate:int, window_size=32, step_size=16, plot=False):
     """Computes the log of the spectrogram from from a input audio file string
 
-    Arguments
-    ----------
-        audio_file: str, the filename of the audio file
-        channel: int, zero-indexed optional keyword argument specifying the channel to use
-        plot: bool, if true a plot of the spectrogram will be generated
+    Arguments:
+        audio_data (np.ndarray)
 
-    Returns
-    -------
+    Returns:
         np.ndarray, the transposed log of the spectrogram as returned by log_specgram
     """
     
-    audio, sr = wave.array_from_wave(audio_file)
-
     if len(audio.shape)>1:     # there are multiple channels
-        _, num_channels = audio.shape
-        assert channel <= num_channels, "channel argument greater than audio channels"
-        audio = audio[:,channel]
-   
-    return log_specgram(audio, sr, plot=plot)
+        if audio.shape[1] == 1:
+            audio = audio.squeeze()
+        else:
+            audio = audio.mean(axis=1)  # multiple channels, average
+    return log_specgram(audio, samp_rate, window_size, step_size, plot=plot)
 
 def log_specgram(audio, sample_rate, window_size=20,
                  step_size=10, eps=1e-10, plot=False):
@@ -328,3 +398,47 @@ def plot_spectrogram(f, t, Sxx):
 def read_data_json(data_json):
     with open(data_json) as fid:
         return [json.loads(l) for l in fid]
+
+
+def apply_spec_augment(inputs):
+    """calls the spec_augment function on the normalized log_spec. A policy defined 
+        in the policy_dict will be chosen uniformly at random.
+    Arguments:
+        inputs (np.ndarray): normalized log_spec with dimensional order time x freq
+    Returns:
+        inputs (nd.ndarray): the modified log_spec array with order time x freq
+    """
+
+    assert type(inputs) == np.ndarray, "input is not numpy array"
+
+    policy_dict = {
+        0: {'time_warping_para':0, 'frequency_masking_para':0,
+            'time_masking_para':0, 'frequency_mask_num':0, 'time_mask_num':0}, 
+        1: {"time_warping_para":5, "frequency_masking_para":60,
+            "time_masking_para":60, "frequency_mask_num":1, "time_mask_num":1},
+        2: {"time_warping_para":5, "frequency_masking_para":30,
+            "time_masking_para":30, "frequency_mask_num":2, "time_mask_num":2},
+        3: {"time_warping_para":5, "frequency_masking_para":20,
+            "time_masking_para":20, "frequency_mask_num":3, "time_mask_num":3},
+            }
+    
+    policy_choice = np.random.randint(low=0, high=4)
+    policy = policy_dict.get(policy_choice)
+
+    # the inputs need to be transposed and converted to torch tensor
+    # as spec_augment method expects tensor with freq x time dimensions
+    inputs = torch.from_numpy(inputs.T)
+
+    inputs = spec_augment.spec_augment(inputs, 
+                    time_warping_para=policy.get('time_warping_para'), 
+                    frequency_masking_para=policy.get('frequency_masking_para'),
+                    time_masking_para=policy.get('time_masking_para'),
+                    frequency_mask_num=policy.get('frequency_mask_num'), 
+                    time_mask_num=policy.get('time_mask_num'))
+    
+    # convert the torch tensor back to numpy array and transpose back to time x freq
+    inputs = inputs.detach().cpu().numpy() if inputs.requires_grad else inputs.cpu().numpy()
+    inputs = inputs.T
+    assert type(inputs) == np.ndarray, "output is not numpy array"
+
+    return inputs

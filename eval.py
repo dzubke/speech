@@ -11,14 +11,14 @@ import speech.loader as loader
 
 def eval_loop(model, ldr):
     all_preds = []; all_labels = []; all_preds_dist=[]
-    for batch in tqdm.tqdm(ldr):
-        #dustin: my modification because the iteratable batch was being exhausted when it was called
-        temp_batch = list(batch)
-        preds = model.infer(temp_batch)
-        #preds_dist, prob_dist = model.infer_distribution(temp_batch, 5)
-        all_preds.extend(preds)
-        all_labels.extend(temp_batch[1])
-        #all_preds_dist.extend(((preds_dist, temp_batch[1]),prob_dist))
+    with torch.no_grad():
+        for batch in tqdm.tqdm(ldr):
+            temp_batch = list(batch)
+            preds = model.infer(temp_batch)
+            #preds_dist, prob_dist = model.infer_distribution(temp_batch, 5)
+            all_preds.extend(preds)
+            all_labels.extend(temp_batch[1])
+            #all_preds_dist.extend(((preds_dist, temp_batch[1]),prob_dist))
     return list(zip(all_labels, all_preds)) #, all_preds_dist
 
 def run(model_path, dataset_json,
@@ -26,12 +26,15 @@ def run(model_path, dataset_json,
         out_file=None):
 
     use_cuda = torch.cuda.is_available()
-
     model, preproc = speech.load(model_path, tag=tag)
     ldr =  loader.make_loader(dataset_json,
             preproc, batch_size)
     model.cuda() if use_cuda else model.cpu()
     model.set_eval()
+    print(f"spec_augment before set_eval: {preproc.spec_augment}")
+    preproc.set_eval()
+    print(f"spec_augment after set_eval: {preproc.spec_augment}")
+
 
     results = eval_loop(model, ldr)
     print(f"number of examples: {len(results)}")
