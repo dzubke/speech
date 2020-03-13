@@ -45,7 +45,7 @@ class Model(nn.Module):
             in_c = out_c
 
         self.conv = nn.Sequential(*convs)
-        conv_out = out_c * self.conv_out_size(input_dim, 1)
+        conv_out = out_c * self.conv_out_size(self.input_dim, 1)
 
         assert conv_out > 0, \
           "Convolutional ouptut frequency dimension is negative."
@@ -62,6 +62,7 @@ class Model(nn.Module):
         self._encoder_dim = rnn_cfg["dim"]
 
         self.volatile = False
+        self.convert_model = config["convert_model"]
 
     def conv_out_size(self, n, dim):
         for c in self.conv.children():
@@ -80,16 +81,22 @@ class Model(nn.Module):
         """
         raise NotImplementedError
 
-    def encode(self, x, rnn_args):
+    def encode(self, x, rnn_args=None):
         """this function processes the input data x through the CNN and RNN layers specified
             in the model encoder config.
 
         """
-
         x = x.unsqueeze(1)      #
         
-        x = self.conv(x)
+        # padding will be added during training, but not when converting the model to onnx and coreml
+        if not self.convert_model:
+            # calculates the necessary padding based on half the filter size
+            # WARNING: this calcuation does not generalize to all cases
+            pad = list(self.conv.children())[0].kernel_size[0]//2
+            x = nn.functional.pad(x, (0,0,pad,pad))
+            
 
+        x = self.conv(x)
         # At this point x should have shape
         # (batch, channels, time, freq)
         
@@ -121,14 +128,12 @@ class Model(nn.Module):
         Set the model to evaluation mode.
         """
         self.eval()
-        self.volatile = True
 
     def set_train(self):
         """
         Set the model to training mode.
         """
         self.train()
-        self.volatile = False
 
     def infer(self, x):
         """
