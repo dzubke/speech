@@ -1,10 +1,10 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200313/",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200314/",
 
     "data" : {
-        "train_set" : "/home/dzubke/awni_speech/data/libsp_tedlium/train-libsp-tedlium.json",
-        "dev_set" : "/home/dzubke/awni_speech/data/libsp_tedlium/dev-libsp-tedlium.json",
+        "train_set" : "/home/dzubke/awni_speech/data/LibriSpeech/train-other-960.json",
+        "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-combo.json",
         "start_and_end" : false
     },
     
@@ -13,8 +13,8 @@
         "window_size": 32,
         "step_size": 16,
         "use_spec_augment": false,
-        "inject_noise": false,
-        "noise_directory": "/home/dzubke/awni_speech/data/background_noise/",
+        "inject_noise": true,
+        "noise_directory": "/home/dzubke/awni_speech/data/background_noise/extended_16kHz",
         "noise_prob": 0.5,
         "noise_levels": [0,0.8] 
     },
