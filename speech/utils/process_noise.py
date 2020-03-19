@@ -21,6 +21,10 @@ def main(audio_dir:str, use_extend:str, use_resample:str) -> None:
     if use_extend:
         target_duration = 60 # seconds
         extend_audio(audio_dir, target_duration)
+    
+    if use_resample:
+        target_samp_rate = 16000
+        resample(audio_dir, target_samp_rate)
 
 
 def extend_audio(audio_dir:str, target_duration:int) -> None: 
@@ -58,6 +62,40 @@ def extend_audio(audio_dir:str, target_duration:int) -> None:
         ext_audio_path = os.path.join(extended_dir, extended_name)
 
         write(ext_audio_path, samp_rate, output_data)
+
+
+def resample(audio_dir:str, target_samp_rate:int)->None:
+    """
+    resamples all of the audio files in audio_dir to the target sample rate
+    Arguments
+        audio_dir (str): the audio directory whose files will be resampled
+        target_samp_rate(int): the sample rate the files will be resampled to
+    """
+
+    assert os.path.exists(audio_dir) == True, "audio directory does not exist"
+    out_dir = os.path.join(audio_dir, "extended_16kHz")
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
+
+    pattern = os.path.join(audio_dir, "*.wav")
+    audio_files = glob.glob(pattern)
+    
+    for audio_fn in audio_files: 
+        filename = os.path.basename(audio_fn)
+        out_path = os.path.join(out_dir, filename)
+        sox_params = "sox \"{}\" -r {} -c 1 -b 16 {}".format(audio_fn, target_samp_rate, out_path)
+        os.system(sox_params)
+
+def resample_with_sox(path, sample_rate):
+    """
+    resample the recording with sox 
+    """
+    sox_params = "sox \"{}\" -r {} -c 1 -b 16 -e si {} trim {} ={} >/dev/null 2>&1".format(path, sample_rate,
+                                                                                            tar_filename, start_time,
+                                                                                            end_time)
+    os.system(sox_params)
+    noise_data, samp_rate = array_from_wave(tar_filename)
+    return noise_data
 
 
 if __name__ == "__main__":
