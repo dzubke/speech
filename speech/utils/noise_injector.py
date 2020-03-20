@@ -9,8 +9,13 @@ import numpy as np
 from speech.utils.wave import wav_duration, array_from_wave
 
 def inject_noise(data, data_samp_rate, noise_dir, noise_levels=(0, 0.5)):
+    """
+    injects noise from files in noise_dir into the input data. These
+    methods require the noise files in noise_dir be resampled to 16kHz
+    with process_noise.py in speech.utils.
+    """
     pattern = os.path.join(noise_dir, "*.wav")
-    noise_files = glob.glob(pattern)
+    noise_files = glob.glob(pattern)    
     noise_path = np.random.choice(noise_files)
     noise_level = np.random.uniform(*noise_levels)
     return inject_noise_sample(data, data_samp_rate, noise_path, noise_level)

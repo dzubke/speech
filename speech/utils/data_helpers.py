@@ -25,10 +25,10 @@ def convert_full_set(path, pattern, new_ext="wav", **kwargs):
 
 def lexicon_to_dict(lexicon_path, corpus_name):
     """
-        This function reads the librispeech-lexicon.txt file which is a mapping of words in the
-        librispeech corpus to phoneme labels and represents the file as a dictionary.
-        The digit accents are removed from the file name. 
-        Note: the librispeech-lexicon.txt file needs to be in the same directory as this file.
+    This function reads the librispeech-lexicon.txt file which is a mapping of words in the
+    librispeech corpus to phoneme labels and represents the file as a dictionary.
+    The digit accents are removed from the file name. 
+    Note: the librispeech-lexicon.txt file needs to be in the same directory as this file.
     """
     
     lex_dict = defaultdict(lambda: UNK_WORD_TOKEN)
@@ -85,7 +85,7 @@ def check_unknown_words(filename, text, word_phoneme_dict):
 
 def process_unknown_words(path, unknown_words_set, unknown_words_dict, line_count, word_count):
     """
-        saves a json object of the dictionary with relevant statistics on the unknown words in corpus
+    saves a json object of the dictionary with relevant statistics on the unknown words in corpus
     """
 
     stats_dict=dict()
@@ -108,11 +108,11 @@ def process_unknown_words(path, unknown_words_set, unknown_words_dict, line_coun
 
 def unique_unknown_words(dataset_dir):
     """
-        Creates a set of the total number of unknown words across all segments in a dataset assuming a
-        unk-words-stats.json file from process_unknown_words() has been created for each part of the dataset. 
+    Creates a set of the total number of unknown words across all segments in a dataset assuming a
+    unk-words-stats.json file from process_unknown_words() has been created for each part of the dataset. 
 
-        Arguments:
-            dataset_dir (str): pathname of dir continaing "unknown_word_stats" dir with unk-words-stats.json files
+    Arguments:
+        dataset_dir (str): pathname of dir continaing "unknown_word_stats" dir with unk-words-stats.json files
     """
 
     pattern = os.path.join(dataset_dir, "unk_word_stats", "*unk-words-stats.json")
@@ -147,7 +147,7 @@ def unique_unknown_words(dataset_dir):
 
 def filter_set(unknown_set:set):
     """
-        filters the set based on the length and presence of digits.
+    filters the set based on the length and presence of digits.
     """
     unk_filter = filter(lambda x: len(x)<30, unknown_set)
     search_pattern = r'[0-9!#$%&()*+,\-./:;<=>?@\[\\\]^_{|}~]'
