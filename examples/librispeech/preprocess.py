@@ -13,30 +13,107 @@ from collections import defaultdict
 import pickle
 import string
 
-
 from speech.utils import data_helpers
 from speech.utils import wave
 
-SETS = {
-    "train" : ["train-other-500"],
-    "dev" : ["dev-other"],
-    "test" : ["test-other"],
+
+def main(output_directory, use_phonemes):
+    # "train-clean-100", "train-clean-360", "train-other-500", "dev-clean", "dev-other", "test-clean", "test-other"  
+    SETS = {
+    "train" : ["train-clean-100", "train-clean-360", "train-other-500"],
+    "dev" : ["dev-clean", "dev-other"],
+    "test" : ["test-clean", "test-other"]
     }
 
+    path = os.path.join(output_directory, "LibriSpeech")   
+    print("Converting files from flac to wave...")
+    #convert_to_wav(path)
+    
+    for dataset, dirs in SETS.items():
+        for d in dirs:
+            print("Preprocessing {}".format(d))
+            prefix = os.path.join(path, d)
+            build_json(prefix, use_phonemes)
 
-def load_transcripts(path, use_phonemes=True):
+
+def build_json(path, use_phonemes):
+    transcripts = load_transcripts(path) #, unk_words_set, unk_words_dict, line_count, word_count
+    dirname = os.path.dirname(path)
+    basename = os.path.basename(path) + os.path.extsep + "json"
+    unknown_set, unknown_dict = set(), dict()
+    line_count, word_count= 0, 0
+
+    if use_phonemes: 
+        LEXICON_PATH = "librispeech-lexicon_extended.txt"
+        word_phoneme_dict = data_helpers.lexicon_to_dict(LEXICON_PATH, corpus_name="librispeech")
+    with open(os.path.join(dirname, basename), 'w') as fid:
+        for file_key, text in tqdm.tqdm(transcripts.items()):
+            wave_file = path_from_key(file_key, path, ext="wav")
+            dur = wave.wav_duration(wave_file)
+
+            if use_phonemes: 
+                unk_words_list, unk_words_dict, counts = data_helpers.check_unknown_words(file_key, text, word_phoneme_dict)
+                line_count+=counts[0]
+                word_count+=counts[1]
+                if len(unk_words_list) > 0: 
+                    print(unk_words_list)
+                    unknown_set.update(unk_words_list)
+                    unknown_dict.update(unk_words_dict)
+                    continue
+                text = text.split()     #converting string of space-separated words to list of words
+                text = transcript_to_phonemes(text, word_phoneme_dict)
+    
+            datum = {'text' : text,
+                     'duration' : dur,
+                     'audio' : wave_file}
+            json.dump(datum, fid)
+            fid.write("\n")
+    print(f"saving unk-word-stats here: {path}")
+    data_helpers.process_unknown_words(path, unknown_set, unknown_dict, line_count, word_count)
+    
+
+def convert_to_wav(path):
+    data_helpers.convert_full_set(path, "*/*/*/*.flac")
+
+
+def load_transcripts(path):
     pattern = os.path.join(path, "*/*/*.trans.txt")
     files = glob.glob(pattern)
     data = {}
+    # unknown_set=set()
+    # unknown_dict=dict()
+    # line_count, word_count= 0, 0
+
+    # if use_phonemes: 
+    #     LEXICON_PATH = "librispeech-lexicon.txt"
+    #     word_phoneme_dict = data_helpers.lexicon_to_dict(LEXICON_PATH, corpus_name="librispeech")
     for f in tqdm.tqdm(files):
         with open(f) as fid:
-            lines = (l.strip().lower().split() for l in fid)
-            if use_phonemes: 
-                lines = ((l[0], transcript_to_phonemes(l[1:])) for l in lines)
-            else: 
-                lines = ((l[0], " ".join(l[1:])) for l in lines)
+            # load transcript of file
+            lines = [l.strip().lower().split() for l in fid]
+            # if use_phonemes: 
+            #     file_unk_list, file_unk_dict, counts = check_unknown_words(lines, word_phoneme_dict)
+            #     lines = ((l[0], l[1:], word_phoneme_dict)) for l in lines)
+            #     unknown_set.update(file_unk_list)
+            #     unknown_dict.update(file_unk_dict)
+            #     line_count+=counts[0]
+            #     word_count+=counts[1]
+
+            # else: 
+            lines = ((l[0], " ".join(l[1:])) for l in lines)
+                # unk_words = []
             data.update(lines)
-    return data
+    return data #, unknown_set, unknown_dict, line_count, word_count
+
+
+
+def transcript_to_phonemes(words, word_phoneme_dict):
+    """converts the words in the transcript to phonemes using the word_to_phoneme dictionary mapping
+    """
+    phonemes = []
+    for word in words:
+        phonemes.extend(word_phoneme_dict[word])
+    return phonemes
 
 def path_from_key(key, prefix, ext):
     dirs = key.split("-")
@@ -44,88 +121,6 @@ def path_from_key(key, prefix, ext):
     path = os.path.join(prefix, *dirs)
     return path + os.path.extsep + ext
 
-def convert_to_wav(path):
-    data_helpers.convert_full_set(path, "*/*/*/*.flac")
-
-def clean_text(text):
-    return text.strip().lower()
-
-def build_json(path, use_phonemes):
-    transcripts = load_transcripts(path, use_phonemes)
-    dirname = os.path.dirname(path)
-    basename = os.path.basename(path) + os.path.extsep + "json"
-    with open(os.path.join(dirname, basename), 'w') as fid:
-        for k, t in tqdm.tqdm(transcripts.items()):
-            wave_file = path_from_key(k, path, ext="wav")
-            dur = wave.wav_duration(wave_file)
-            datum = {'text' : t,
-                     'duration' : dur,
-                     'audio' : wave_file}
-            json.dump(datum, fid)
-            fid.write("\n")
-
-
-def lexicon_to_dict():
-    """This function reads the librispeech-lexicon.txt file which is a mapping of words in the
-        librispeech corpus to phoneme labels and represents the file as a dictionary.
-        The digit accents are removed from the file name. 
-        Note: the librispeech-lexicon.txt file needs to be in the same directory as this file.
-    """
-    
-    lex_dict = defaultdict(lambda: "unk")
-    with open("librispeech-lexicon.txt", 'r') as fid:
-        lexicon = (l.strip().lower().split() for l in fid)
-        for line in lexicon: 
-            word = line[0]
-            phones = line[1:]
-
-            # remove the accent digit from the phone, string.digits = '0123456789'
-            striped_phones = []
-            for phone in phones:
-                striped_phones.append(phone.rstrip(string.digits))
-            lex_dict[word] = striped_phones
-
-    return lex_dict
-
-# creating a global instance of the word_to_phoneme dictionary
-word_to_phoneme = lexicon_to_dict()
-
-def transcript_to_phonemes(words):
-    """converts the words in the transcript to phonemes using the word_to_phoneme dictionary mapping
-    """
-    phonemes = []
-    for word in words:
-        phonemes.extend(word_to_phoneme[word])
-
-    return phonemes
-
-
-def check_phones():
-    """This function compares the phonemes in the librispeech corpus with the phoneme labels in the 39-phonemes
-    in the timit dataset outlined here: 
-    https://www.semanticscholar.org/paper/Speaker-independent-phone-recognition-using-hidden-Lee-Hon/3034afcd45fc190ed71982828b77f6e4154bdc5c
-    
-    Discrepencies in the CMU-39 and timit-39 phoneme sets and the librispeech phonemes: 
-     - included in CMU-39 but not timit-39:  ao, zh, 
-     - included timit-39 but not CMU-39: dx, sil
-    """
-    # standard 39 phones in the timit used by awni dictionary
-    timit_phones39 = set(['ae', 'ah', 'aa', 'aw', 'er', 'ay', 'b', 'ch', 'd', 'dh', 'dx', 'eh', 'l', 'm', 'n', 'ng', 'ey', 'f', 'g', 'hh', 'ih', 'iy', 'jh', 'k', 'l', 'ow', 'oy', 'p', 'r', 's', 'sh', 't', 'th', 'uh', 'uw', 'v', 'w', 'y', 'z', 'sil'])
-    cmu_phones = set(['aa', 'ae', 'ah', 'ao', 'aw', 'ay',  'b', 'ch', 'd', 'dh', 'eh', 'er', 'ey', 'f', 'g', 'hh', 'ih', 'iy', 'jh', 'k', 'l', 'm', 'n', 'ng', 'ow', 'oy', 'p', 'r', 's', 'sh', 't', 'th', 'uh', 'uw', 'v', 'w', 'y', 'z', 'zh'])
-    print(f"length of timit_dict: {len(timit_phones39)}")
-    librispeech_phones = set()
-    
-    # greating a set of the librispeech phones by looping over every phone list in the word_to_phoneme mapping
-    for phones in word_to_phoneme.values():
-        # looping over every phone in the word pronunciation
-        for phone in phones:
-            if phone not in librispeech_phones:
-                librispeech_phones.add(phone)
-
-    print(f"phones in librispeech but not cmu: {librispeech_phones.difference(cmu_phones)}")
-    print(f"phones in cmu but not librispeech: {cmu_phones.difference(librispeech_phones)}")
-    print(f"phones in timit but not cmu: {timit_phones39.difference(cmu_phones)}")
-    print(f"phones in cmubut not timit: {cmu_phones.difference(timit_phones39)}")
 
 
 
@@ -142,13 +137,4 @@ if __name__ == "__main__":
         help="A boolean of whether the labels will be phonemes (True) or words (False)")
     args = parser.parse_args()
 
-    path = os.path.join(args.output_directory, "LibriSpeech")   
-
-    print("Converting files from flac to wave...")
-    convert_to_wav(path)
-    #save_lexicon_to_dict()
-    for dataset, dirs in SETS.items():
-        for d in dirs:
-            print("Preprocessing {}".format(d))
-            prefix = os.path.join(path, d)
-            build_json(prefix, args.use_phonemes)
+    main(args.output_directory, args.use_phonemes)
