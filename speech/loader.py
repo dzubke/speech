@@ -149,6 +149,22 @@ class Preprocessor():
     def vocab_size(self):
         return len(self.int_to_char)
 
+    def __str__(self):
+        try: 
+            attribute_names = ["preprocessor", "window_size", "step_size", "SPEC_AUGMENT_STATIC", "spec_augment",
+            "INJECT_NOISE_STATIC", "inject_noise", "noise_dir", "noise_prob", "noise_levels", "_input_dim", 
+            "start_and_end", "int_to_char", "char_to_int"]
+            string="Showing up-to-date attributes"
+            for name in attribute_names:
+                string += name +": " + str(eval("self."+name))+"\n"
+            return string
+        except AttributeError:
+            attribute_names = ["_input_dim", "start_and_end", "int_to_char", "char_to_int"]
+            string="Showing limited attributes as not all new attributes are supported\n"
+            for name in attribute_names:
+                string += name +": " + str(eval("self."+name))+"\n"
+            return string
+
 def compute_mean_std(audio_files, preprocessor, window_size, step_size):
     samples = []
     if preprocessor == "log_spec":
@@ -296,13 +312,17 @@ def create_mfcc(audio, sample_rate: int, window_size, step_size, esp=1e-10):
     return out.astype(np.float32)
 
 
-def log_specgram_from_data(audio: np.ndarray, samp_rate:int, window_size=32, step_size=16, plot=False):
-    """Computes the log of the spectrogram from from a input audio file string
+def log_specgram_from_file(audio_path:str, window_size=32, step_size=16):
+    
+    audio_data, samp_rate = wave.array_from_wave(audio_path)
+    return log_specgram_from_data(audio_data, samp_rate, window_size=window_size, step_size=step_size)
 
+def log_specgram_from_data(audio: np.ndarray, samp_rate:int, window_size=32, step_size=16, plot=False):
+    """
+    Computes the log of the spectrogram from from a input audio file string
     Arguments:
         audio_data (np.ndarray)
-
-    Returns:
+    `Returns:
         np.ndarray, the transposed log of the spectrogram as returned by log_specgram
     """
     
