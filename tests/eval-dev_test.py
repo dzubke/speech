@@ -11,7 +11,7 @@ import speech
 import speech.loader as loader
 
 
-def main(model_path:str, json_path:str):
+def main(model_path:str, json_path:str, use_cuda:bool):
     """
     runs the eval_dev loop in train continually while saving
     relevant date to a log file
@@ -55,7 +55,7 @@ def eval_dev(model, ldr, preproc, logger):
             temp_batch = list(batch)
             logger.info(f"temp_batch created as list")
             preds = model.infer(temp_batch)
-            logger.info(f"model.infer called with {preds}")
+            logger.info(f"model.infer called with {len(preds[0])}")
             loss = model.loss(temp_batch)
             logger.info(f"loss calculated as: {loss.item()}")
             losses.append(loss.item())
@@ -85,10 +85,11 @@ if __name__=="__main__":
 
     parser = argparse.ArgumentParser(
             description="Testing the eval_dev loop")
+
     parser.add_argument("--model-path", type=str,
         help="path to the directory with the model and preproc object.")
     parser.add_argument("--json-path", type=str,
         help="Path to the data json file eval_dev will be called upon.")
     args = parser.parse_args()
 
-    main(args.model_path, args.json_path)
+    main(args.model_path, args.json_path, args.use_cuda)
