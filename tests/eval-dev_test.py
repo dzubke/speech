@@ -101,8 +101,6 @@ if __name__=="__main__":
         help="sets the model to use cuda in inference")
     parser.add_argument("--use-augmentation", action='store_true', default=False,
         help="if true, data augmentation is used during eval loop.")
-    parser.add_argument("--model-path", type=str,
-        help="path to the directory with the model and preproc object.")
     parser.add_argument("--json-path", type=str,
         help="Path to the data json file eval_dev will be called upon.")
     parser.add_argument("--log-name", type=str,
