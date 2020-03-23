@@ -23,7 +23,7 @@ def main(model_path:str, json_path:str, use_cuda:bool, log_name:str, use_augment
     # create file handler which logs even debug messages
     fh = logging.FileHandler(log_name+".log")
     fh.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(asctime)s-%(levelname)s-%(message)s', "%Y-%m-%d %H:%M:%S")
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
     fh.setFormatter(formatter)
     logger.addHandler(fh)
 
@@ -101,6 +101,8 @@ if __name__=="__main__":
         help="sets the model to use cuda in inference")
     parser.add_argument("--use-augmentation", action='store_true', default=False,
         help="if true, data augmentation is used during eval loop.")
+    parser.add_argument("--model-path", type=str,
+        help="path to the directory with the model and preproc object.")
     parser.add_argument("--json-path", type=str,
         help="Path to the data json file eval_dev will be called upon.")
     parser.add_argument("--log-name", type=str,
