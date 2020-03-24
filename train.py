@@ -22,12 +22,6 @@ import speech.models as models
 # TODO, (awni) why does putting this above crash..
 import tensorboard_logger as tb
 
-
-
-
-
-
-
 def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
     r"""This performs a forwards and backward pass through the NN
 
