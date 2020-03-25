@@ -46,7 +46,7 @@ import torch
 
 
 def time_warp(spec, W, logger):
-    
+    use_log = (logger is not None)
     if W==0:
         return spec
 
@@ -66,9 +66,9 @@ def time_warp(spec, W, logger):
     # Uniform distribution from (0,W) with chance to be up to W negative
     dist_to_warp = random.randrange(-W, W)
     
-    logger.info(f"spec_aug: W is: {W}")
-    logger.info(f"spec_aug: point_to_warp: {point_to_warp}")
-    logger.info(f"spec_aug: dist_to_warp: {dist_to_warp}")
+    if use_log: logger.info(f"spec_aug: W is: {W}")
+    if use_log: logger.info(f"spec_aug: point_to_warp: {point_to_warp}")
+    if use_log: logger.info(f"spec_aug: dist_to_warp: {dist_to_warp}")
 
     src_pts = torch.tensor([[[y, point_to_warp]]])
     dest_pts = torch.tensor([[[y, point_to_warp + dist_to_warp]]])
@@ -98,16 +98,18 @@ def spec_augment(mel_spectrogram, time_warping_para=5, frequency_masking_para=50
     # Returns
       mel_spectrogram(numpy array): warped and masked mel spectrogram.
     """
+    use_log = (logger is not None)
+    
     mel_spectrogram = mel_spectrogram.unsqueeze(0)
 
     v = mel_spectrogram.shape[1]
     tau = mel_spectrogram.shape[2]
-    logger.info(f"spec_aug: nu is: {v}")
-    logger.info(f"tau is: {tau}")
+    if use_log: logger.info(f"spec_aug: nu is: {v}")
+    if use_log: logger.info(f"tau is: {tau}")
 
     # Step 1 : Time warping
     warped_mel_spectrogram = time_warp(mel_spectrogram, W=time_warping_para, logger=logger)
-    logger.info(f"finished time_warp")
+    if use_log: logger.info(f"finished time_warp")
 
     # Step 2 : Frequency masking
     for i in range(frequency_mask_num):
@@ -116,7 +118,7 @@ def spec_augment(mel_spectrogram, time_warping_para=5, frequency_masking_para=50
         if v - f < 0:
             continue
         f0 = random.randint(0, v-f)
-        logger.info(f"spec_aug: f is: {f} at: {f0}")
+        if use_log: logger.info(f"spec_aug: f is: {f} at: {f0}")
 
         warped_mel_spectrogram[:, f0:f0+f, :] = 0
     # Step 3 : Time masking
@@ -127,7 +129,7 @@ def spec_augment(mel_spectrogram, time_warping_para=5, frequency_masking_para=50
         if tau - t < 0:
             continue
         t0 = random.randint(0, tau-t)
-        logger.info(f"spec_aug: t is: {t} at: {t0}")
+        if use_log: logger.info(f"spec_aug: t is: {t} at: {t0}")
 
         warped_mel_spectrogram[:, :, t0:t0+t] = 0
 

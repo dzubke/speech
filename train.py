@@ -78,7 +78,7 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         inputs, labels, input_lens, label_lens = model.collate(*temp_batch)
 
         if check_nan(model):
-            lif use_log: logger.error(f"labels: {[labels]}, label_lens: {label_lens} state_dict: {model.state_dict()}")
+            if use_log: logger.error(f"labels: {[labels]}, label_lens: {label_lens} state_dict: {model.state_dict()}")
 
         it += 1
 
@@ -171,6 +171,11 @@ def run(config, use_log, log_path):
                     momentum=opt_cfg["momentum"])
 
     if use_log: logger.info(f"====== Model, loaders, optimimzer created =======")
+    if use_log: logger.info(f"model: {model}")
+    if use_log: logger.info(f"preproc: {preproc}")
+    if use_log: logger.info(f"optimizer: {optimizer}")
+
+
 
     run_state = (0, 0)
     best_so_far = float("inf")
