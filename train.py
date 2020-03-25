@@ -23,7 +23,7 @@ import speech.models as models
 # TODO, (awni) why does putting this above crash..
 import tensorboard_logger as tb
 
-def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss, logger):
+def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss, use_log, logger):
     """
     Performs a forwards and backward pass through the model
     """
@@ -34,109 +34,112 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss, logger):
     end_t = time.time()
     tq = tqdm.tqdm(train_ldr)
     for batch in tq:
-        logger.info(f"====== Inside run_epoch =======")
+        if use_log: logger.info(f"====== Inside run_epoch =======")
 
         temp_batch = list(batch)    # this was added as the batch generator was being exhausted when it was called
         start_t = time.time()
         optimizer.zero_grad()
-        logger.info(f" Optimizer zero_grad")
+        if use_log: logger.info(f" Optimizer zero_grad")
 
         loss = model.loss(temp_batch)
         logger.info(f" Loss calculated")
 
         #print(f"loss value 1: {loss.data[0]}")
         loss.backward()
-        logger.info(f" Backward run ")
+        if use_log: logger.info(f" Backward run ")
 
 
         grad_norm = nn.utils.clip_grad_norm_(model.parameters(), 200)
-        logger.info(f" Grad_norm clipped ")
+        if use_log: logger.info(f" Grad_norm clipped ")
 
         loss = loss.item()
-        logger.info(f" loss reassigned ")
+        if use_log: logger.info(f" loss reassigned ")
 
         #loss = loss.data[0]
 
         optimizer.step()
-        logger.info(f" Grad_norm clipped ")
+        if use_log: logger.info(f" Grad_norm clipped ")
 
         prev_end_t = end_t
         end_t = time.time()
         model_t += end_t - start_t
         data_t += start_t - prev_end_t
-        logger.info(f" time calculated ")
+        if use_log: logger.info(f" time calculated ")
 
 
         exp_w = 0.99
         avg_loss = exp_w * avg_loss + (1 - exp_w) * loss
-        logger.info(f"Avg loss: {loss}")
+        if use_log: logger.info(f"Avg loss: {loss}")
         tb.log_value('train_loss', loss, it)
         tq.set_postfix(iter=it, loss=loss,
                 avg_loss=avg_loss, grad_norm=grad_norm,
                 model_time=model_t, data_time=data_t)
-        logger.info(f"loss is nan: {math.isnan(loss)}")
-        logger.info(f"iter={it}, loss={round(loss,3)}, grad_norm={round(grad_norm,3)}")
+        if use_log: logger.info(f"loss is nan: {math.isnan(loss)}")
+        if use_log: logger.info(f"iter={it}, loss={round(loss,3)}, grad_norm={round(grad_norm,3)}")
         inputs, labels, input_lens, label_lens = model.collate(*temp_batch)
 
         if check_nan(model):
-            logger.error(f"labels: {[labels]}, label_lens: {label_lens} state_dict: {model.state_dict()}")
+            lif use_log: logger.error(f"labels: {[labels]}, label_lens: {label_lens} state_dict: {model.state_dict()}")
 
         it += 1
 
     return it, avg_loss
 
-def eval_dev(model, ldr, preproc, logger):
+def eval_dev(model, ldr, preproc, use_log, logger):
     losses = []; all_preds = []; all_labels = []
 
     model.set_eval()
     preproc.set_eval()
-    logger.info(f" set_eval ")
+    if use_log: logger.info(f" set_eval ")
 
 
     with torch.no_grad():
         for batch in tqdm.tqdm(ldr):
             temp_batch = list(batch)
-            logger.info(f"batch converted")
+            if use_log: logger.info(f"batch converted")
             preds = model.infer(temp_batch)
-            logger.info(f"infer call")
+            if use_log: logger.info(f"infer call")
             loss = model.loss(temp_batch)
-            logger.info(f"loss calculated as: {loss.item():0.3f}")
-            logger.info(f"loss is nan: {math.isnan(loss.item())}")
+            if use_log: logger.info(f"loss calculated as: {loss.item():0.3f}")
+            if use_log: logger.info(f"loss is nan: {math.isnan(loss.item())}")
             losses.append(loss.item())
-            logger.info(f"loss appended")
+            if use_log: logger.info(f"loss appended")
             #losses.append(loss.data[0])
             all_preds.extend(preds)
-            logger.info(f"preds: {preds}")
+            if use_log: logger.info(f"preds: {preds}")
             all_labels.extend(temp_batch[1])        #add the labels in the batch object
-            logger.info(f"labels: {temp_batch[1]}")
+            if use_log: logger.info(f"labels: {temp_batch[1]}")
 
     model.set_train()
     preproc.set_train()        
-    logger.info(f"set_train")
+    if use_log: logger.info(f"set_train")
 
     loss = sum(losses) / len(losses)
-    logger.info(f"Avg loss: {loss}")
+    if use_log: logger.info(f"Avg loss: {loss}")
 
     results = [(preproc.decode(l), preproc.decode(p))              # decodes back to phoneme labels
                for l, p in zip(all_labels, all_preds)]
-    logger.info(f"results {results}")
+    if use_log: logger.info(f"results {results}")
     cer = speech.compute_cer(results)
     print("Dev: Loss {:.3f}, CER {:.3f}".format(loss, cer))
-    logger.info(f"CER: {cer}")
+    if use_log: logger.info(f"CER: {cer}")
 
     return loss, cer
 
-def run(config, log_path):
+def run(config, use_log, log_path):
 
-    # create logger
-    logger = logging.getLogger("train_log")
-    logger.setLevel(logging.DEBUG)
-    # create file handler which logs even debug messages
-    fh = logging.FileHandler(log_path+".log")
-    fh.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
-    fh.setFormatter(formatter)
-    logger.addHandler(fh)
+    if use_log: 
+        # create logger
+        logger = logging.getLogger("train_log")
+        logger.setLevel(logging.DEBUG)
+        # create file handler which logs even debug messages
+        fh = logging.FileHandler(log_path+".log")
+        fh.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
+        fh.setFormatter(formatter)
+        logger.addHandler(fh)
+    else:
+        logger = None
 
     opt_cfg = config["optimizer"]
     data_cfg = config["data"]
@@ -167,7 +170,7 @@ def run(config, log_path):
                     lr=opt_cfg["learning_rate"],
                     momentum=opt_cfg["momentum"])
 
-    logger.info(f"====== Model, loaders, optimimzer created =======")
+    if use_log: logger.info(f"====== Model, loaders, optimimzer created =======")
 
     run_state = (0, 0)
     best_so_far = float("inf")
@@ -175,15 +178,15 @@ def run(config, log_path):
         start = time.time()
         
         run_state = run_epoch(model, optimizer, train_ldr, logger, *run_state)
-        logger.info(f"====== Run_state finished =======")
+        if use_log: logger.info(f"====== Run_state finished =======") else 
 
         msg = "Epoch {} completed in {:.2f} (s)."
         print(msg.format(e, time.time() - start))
-        logger.info(msg.format(e, time.time() - start))
+        if use_log: logger.info(msg.format(e, time.time() - start))
 
 
         dev_loss, dev_cer = eval_dev(model, dev_ldr, preproc, logger)
-        logger.info(f"====== eval_dev finished =======")
+        if use_log: logger.info(f"====== eval_dev finished =======")
 
         # Log for tensorboard
         tb.log_value("dev_loss", dev_loss, e)
@@ -191,7 +194,7 @@ def run(config, log_path):
 
 
         speech.save(model, preproc, config["save_path"])
-        logger.info(f"====== model saved =======")
+        if use_log: logger.info(f"====== model saved =======")
 
         # Save the best model on the dev set
         if dev_cer < best_so_far:
@@ -242,10 +245,6 @@ def check_nan(model):
             return True
     
     return False
-        
-
-
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -255,7 +254,9 @@ if __name__ == "__main__":
         help="A json file with the training configuration.")
     parser.add_argument("--deterministic", default=False,
         action="store_true",
-        help="Run in deterministic mode (no cudnn). Only works on GPU."
+        help="Run in deterministic mode (no cudnn). Only works on GPU.")
+    parser.add_argument("--use-log", default=False, action="store_true",
+        help="Use a logger to store the calling of commands.")
     parser.add_argument("--log-path", type=str, default='train-log',
         help="Path to save log file.")
     args = parser.parse_args()
@@ -272,4 +273,4 @@ if __name__ == "__main__":
 
     if use_cuda and args.deterministic:
         torch.backends.cudnn.enabled = False
-    run(config, args.log_path)
+    run(config, args.use_log, args.log_path)
