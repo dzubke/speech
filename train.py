@@ -23,7 +23,7 @@ import speech.models as models
 # TODO, (awni) why does putting this above crash..
 import tensorboard_logger as tb
 
-def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss, logger):
+def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
     """
     Performs a forwards and backward pass through the model
     """
@@ -145,8 +145,8 @@ def run(config, log_path):
 
     # Loaders
     batch_size = opt_cfg["batch_size"]
-    preproc = loader.Preprocessor(data_cfg["train_set"], preproc_cfg, 
-                  start_and_end=data_cfg["start_and_end"], logger)
+    preproc = loader.Preprocessor(data_cfg["train_set"], preproc_cfg, logger, 
+                  start_and_end=data_cfg["start_and_end"])
     train_ldr = loader.make_loader(data_cfg["train_set"],
                         preproc, batch_size)
     dev_ldr = loader.make_loader(data_cfg["dev_set"],
@@ -255,7 +255,7 @@ if __name__ == "__main__":
         help="A json file with the training configuration.")
     parser.add_argument("--deterministic", default=False,
         action="store_true",
-        help="Run in deterministic mode (no cudnn). Only works on GPU."
+        help="Run in deterministic mode (no cudnn). Only works on GPU.")
     parser.add_argument("--log-path", type=str, default='train-log',
         help="Path to save log file.")
     args = parser.parse_args()
