@@ -23,13 +23,12 @@ import speech.models as models
 # TODO, (awni) why does putting this above crash..
 import tensorboard_logger as tb
 
-def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss, use_log, logger):
+
+def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
     """
     Performs a forwards and backward pass through the model
     """
-
-
-
+    use_log = (logger is not None)
     model_t = 0.0; data_t = 0.0
     end_t = time.time()
     tq = tqdm.tqdm(train_ldr)
@@ -85,11 +84,12 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss, use_log, logger
 
     return it, avg_loss
 
-def eval_dev(model, ldr, preproc, use_log, logger):
+def eval_dev(model, ldr, preproc,  logger):
     losses = []; all_preds = []; all_labels = []
-
+        
     model.set_eval()
     preproc.set_eval()
+    use_log = (logger is not None)
     if use_log: logger.info(f" set_eval ")
 
 
@@ -148,8 +148,8 @@ def run(config, use_log, log_path):
 
     # Loaders
     batch_size = opt_cfg["batch_size"]
-    preproc = loader.Preprocessor(data_cfg["train_set"], preproc_cfg, 
-                  start_and_end=data_cfg["start_and_end"], logger)
+    preproc = loader.Preprocessor(data_cfg["train_set"], preproc_cfg, logger, 
+                  start_and_end=data_cfg["start_and_end"])
     train_ldr = loader.make_loader(data_cfg["train_set"],
                         preproc, batch_size)
     dev_ldr = loader.make_loader(data_cfg["dev_set"],
