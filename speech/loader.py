@@ -120,7 +120,7 @@ class Preprocessor():
         self.logger.info(f"preproc: normalized")
 
         if self.spec_augment:
-            inputs = apply_spec_augment(inputs, self.logger)
+            inputs = apply_spec_augment(inputs)
             self.logger.info(f"preproc: spec_aug applied")
 
 
@@ -430,10 +430,10 @@ def read_data_json(data_json):
         return [json.loads(l) for l in fid]
 
 
-def apply_spec_augment(inputs, logger):
+def apply_spec_augment(inputs):
     """calls the spec_augment function on the normalized log_spec. A policy defined 
         in the policy_dict will be chosen uniformly at random.
-    Arguments:
+    Arguments:git a
         inputs (np.ndarray): normalized log_spec with dimensional order time x freq
     Returns:
         inputs (nd.ndarray): the modified log_spec array with order time x freq
@@ -453,12 +453,10 @@ def apply_spec_augment(inputs, logger):
             }
     
     policy_choice = np.random.randint(low=0, high=4)
-    logger.info(f"app spec_aug: policy: {policy_choice}")
     policy = policy_dict.get(policy_choice)
 
     # the inputs need to be transposed and converted to torch tensor
     # as spec_augment method expects tensor with freq x time dimensions
-    logger.info(f"app s_a: input shape: {inputs.shape}")
     inputs = torch.from_numpy(inputs.T)
 
     inputs = spec_augment.spec_augment(inputs, 
@@ -466,7 +464,7 @@ def apply_spec_augment(inputs, logger):
                     frequency_masking_para=policy.get('frequency_masking_para'),
                     time_masking_para=policy.get('time_masking_para'),
                     frequency_mask_num=policy.get('frequency_mask_num'), 
-                    time_mask_num=policy.get('time_mask_num'), logger=logger)
+                    time_mask_num=policy.get('time_mask_num'))
     
     # convert the torch tensor back to numpy array and transpose back to time x freq
     inputs = inputs.detach().cpu().numpy() if inputs.requires_grad else inputs.cpu().numpy()
