@@ -26,7 +26,7 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, preproc_cfg, max_samples=100, start_and_end=True, logger):
+    def __init__(self, data_json, preproc_cfg, logger, max_samples=100, start_and_end=True):
         """
         Builds a preprocessor from a dataset.
         Arguments:
@@ -433,7 +433,7 @@ def read_data_json(data_json):
 def apply_spec_augment(inputs):
     """calls the spec_augment function on the normalized log_spec. A policy defined 
         in the policy_dict will be chosen uniformly at random.
-    Arguments:
+    Arguments:git a
         inputs (np.ndarray): normalized log_spec with dimensional order time x freq
     Returns:
         inputs (nd.ndarray): the modified log_spec array with order time x freq

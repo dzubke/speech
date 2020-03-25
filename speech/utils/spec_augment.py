@@ -45,7 +45,7 @@ from .sparse_image_warp import sparse_image_warp
 import torch
 
 
-def time_warp(spec, W):
+def time_warp(spec, W, logger):
     
     if W==0:
         return spec
@@ -66,9 +66,9 @@ def time_warp(spec, W):
     # Uniform distribution from (0,W) with chance to be up to W negative
     dist_to_warp = random.randrange(-W, W)
     
-    #print(f"W is: {W}")
-    #print(f"point_to_warp: {point_to_warp}")
-    #print(f"dist_to_warp: {dist_to_warp}")
+    logger.info(f"spec_aug: W is: {W}")
+    logger.info(f"spec_aug: point_to_warp: {point_to_warp}")
+    logger.info(f"spec_aug: dist_to_warp: {dist_to_warp}")
 
     src_pts = torch.tensor([[[y, point_to_warp]]])
     dest_pts = torch.tensor([[[y, point_to_warp + dist_to_warp]]])
@@ -78,7 +78,7 @@ def time_warp(spec, W):
 
 
 def spec_augment(mel_spectrogram, time_warping_para=5, frequency_masking_para=50,
-                 time_masking_para=50, frequency_mask_num=1, time_mask_num=1):
+                 time_masking_para=50, frequency_mask_num=1, time_mask_num=1, logger=None):
     """Spec augmentation Calculation Function.
     'SpecAugment' have 3 steps for audio data augmentation.
     first step is time warping using Tensorflow's image_sparse_warp function.
@@ -102,11 +102,12 @@ def spec_augment(mel_spectrogram, time_warping_para=5, frequency_masking_para=50
 
     v = mel_spectrogram.shape[1]
     tau = mel_spectrogram.shape[2]
-    #print(f" nu is: {v}")
-    #print(f"tau is: {tau}")
+    logger.info(f"spec_aug: nu is: {v}")
+    logger.info(f"tau is: {tau}")
 
     # Step 1 : Time warping
-    warped_mel_spectrogram = time_warp(mel_spectrogram, W=time_warping_para)
+    warped_mel_spectrogram = time_warp(mel_spectrogram, W=time_warping_para, logger=logger)
+    logger.info(f"finished time_warp")
 
     # Step 2 : Frequency masking
     for i in range(frequency_mask_num):
@@ -115,10 +116,9 @@ def spec_augment(mel_spectrogram, time_warping_para=5, frequency_masking_para=50
         if v - f < 0:
             continue
         f0 = random.randint(0, v-f)
-        #print(f"f is: {f} at: {f0}")
+        logger.info(f"spec_aug: f is: {f} at: {f0}")
 
         warped_mel_spectrogram[:, f0:f0+f, :] = 0
-
     # Step 3 : Time masking
     for i in range(time_mask_num):
         t = np.random.uniform(low=0.0, high=time_masking_para)
@@ -127,7 +127,7 @@ def spec_augment(mel_spectrogram, time_warping_para=5, frequency_masking_para=50
         if tau - t < 0:
             continue
         t0 = random.randint(0, tau-t)
-        #print(f"t is: {t} at: {t0}")
+        logger.info(f"spec_aug: t is: {t} at: {t0}")
 
         warped_mel_spectrogram[:, :, t0:t0+t] = 0
 
