@@ -184,6 +184,7 @@ def run(config, use_log, log_path):
         
         run_state = run_epoch(model, optimizer, train_ldr, logger, *run_state)
         if use_log: logger.info(f"====== Run_state finished =======") 
+        if use_log: logger.info(f"preproc type: {type(preproc)}")
 
         msg = "Epoch {} completed in {:.2f} (s)."
         print(msg.format(e, time.time() - start))
@@ -197,7 +198,7 @@ def run(config, use_log, log_path):
         tb.log_value("dev_loss", dev_loss, e)
         tb.log_value("dev_cer", dev_cer, e)
 
-
+        if use_log: preproc.logger = None
         speech.save(model, preproc, config["save_path"])
         if use_log: logger.info(f"====== model saved =======")
 
@@ -206,7 +207,8 @@ def run(config, use_log, log_path):
             best_so_far = dev_cer
             speech.save(model, preproc,
                     config["save_path"], tag="best")
-
+        if use_log: preproc.logger = logger
+               
 
 def load_from_trained(model, model_cfg):
     """
