@@ -100,17 +100,17 @@ class Preprocessor():
     def preprocess(self, wave_file, text):
         
         audio_data, samp_rate = wave.array_from_wave(wave_file)
-        if use_log: self.logger.info(f"preprc: audio_data read: {wave_file}")
+        if self.use_log: self.logger.info(f"preprc: audio_data read: {wave_file}")
         
         if self.inject_noise:
             add_noise = np.random.binomial(1, self.noise_prob)
             if add_noise:
                 audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, self.noise_levels) 
-            if use_log: self.logger.info(f"preproc: noise injected")
+            if self.use_log: self.logger.info(f"preproc: noise injected")
 
         if self.preprocessor == "log_spec":
             inputs = log_specgram_from_data(audio_data, samp_rate, self.window_size, self.step_size)
-            if use_log: self.logger.info(f"preproc: log_spec calculated")
+            if self.use_log: self.logger.info(f"preproc: log_spec calculated")
 
         elif self.preprocessor == "mfcc":
            inputs = mfcc_from_data(audio_data, samp_rate, self.window_size, self.step_size)
@@ -118,15 +118,15 @@ class Preprocessor():
            raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
         
         inputs = (inputs - self.mean) / self.std
-        if use_log: self.logger.info(f"preproc: normalized")
+        if self.use_log: self.logger.info(f"preproc: normalized")
 
         if self.spec_augment:
-            inputs = apply_spec_augment(inputs)
-            if use_log: self.logger.info(f"preproc: spec_aug applied")
+            inputs = apply_spec_augment(inputs, self.logger)
+            if self.use_log: self.logger.info(f"preproc: spec_aug applied")
 
 
         targets = self.encode(text)
-        if use_log: self.logger.info(f"preproc: text encoded")
+        if self.use_log: self.logger.info(f"preproc: text encoded")
 
 
         return inputs, targets

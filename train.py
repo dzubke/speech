@@ -41,7 +41,7 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         if use_log: logger.info(f" Optimizer zero_grad")
 
         loss = model.loss(temp_batch)
-        logger.info(f" Loss calculated")
+        if use_log: logger.info(f" Loss calculated")
 
         #print(f"loss value 1: {loss.data[0]}")
         loss.backward()
@@ -183,7 +183,7 @@ def run(config, use_log, log_path):
         start = time.time()
         
         run_state = run_epoch(model, optimizer, train_ldr, logger, *run_state)
-        if use_log: logger.info(f"====== Run_state finished =======") else 
+        if use_log: logger.info(f"====== Run_state finished =======") 
 
         msg = "Epoch {} completed in {:.2f} (s)."
         print(msg.format(e, time.time() - start))
