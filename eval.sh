@@ -10,4 +10,4 @@ python eval.py ./examples/librispeech/models/ctc_models/$1/$2 ~/awni_speech/data
 echo -e "\nEvaluating the Dustin Noisy Testset"
 python eval.py ./examples/librispeech/models/ctc_models/$1/$2 ~/awni_speech/data/dustin_test_data/20191118_plane/simple/drz_test.json --save ./predictions/$1-$2_1118-simple_predictions.json
 echo -e "\nEvaluating Libsp Tedlium Testset"
-python eval.py ./examples/librispeech/models/ctc_models/$1/$2 ~/awni_speech/data/libsp_tedlium/test-libsp-tedlium.json --save ./predictions/$1-$2_test-libsp-tedlium_predictions.json
+python eval.py ./examples/librispeech/models/ctc_models/$1/$2 ~/awni_speech/data/libsp-tedlium/test-libsp-tedlium.json --save ./predictions/$1-$2_test-libsp-tedlium_predictions.json
