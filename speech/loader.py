@@ -26,7 +26,7 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, preproc_cfg, max_samples=100, start_and_end=True):
+    def __init__(self, data_json, preproc_cfg, logger, max_samples=100, start_and_end=True):
         """
         Builds a preprocessor from a dataset.
         Arguments:
@@ -66,6 +66,8 @@ class Preprocessor():
                                                 window_size = self.window_size, 
                                                 step_size = self.step_size)
         self._input_dim = self.mean.shape[0]
+        self.use_log = (logger is not None)
+        self.logger = logger
 
 
         # Make char map
@@ -98,25 +100,34 @@ class Preprocessor():
     def preprocess(self, wave_file, text):
         
         audio_data, samp_rate = wave.array_from_wave(wave_file)
+        if self.use_log: self.logger.info(f"preprc: audio_data read: {wave_file}")
         
         if self.inject_noise:
             add_noise = np.random.binomial(1, self.noise_prob)
             if add_noise:
                 audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, self.noise_levels) 
+            if self.use_log: self.logger.info(f"preproc: noise injected")
 
         if self.preprocessor == "log_spec":
             inputs = log_specgram_from_data(audio_data, samp_rate, self.window_size, self.step_size)
+            if self.use_log: self.logger.info(f"preproc: log_spec calculated")
+
         elif self.preprocessor == "mfcc":
            inputs = mfcc_from_data(audio_data, samp_rate, self.window_size, self.step_size)
         else: 
            raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
         
         inputs = (inputs - self.mean) / self.std
+        if self.use_log: self.logger.info(f"preproc: normalized")
 
         if self.spec_augment:
-            inputs = apply_spec_augment(inputs)
+            inputs = apply_spec_augment(inputs, self.logger)
+            if self.use_log: self.logger.info(f"preproc: spec_aug applied")
+
 
         targets = self.encode(text)
+        if self.use_log: self.logger.info(f"preproc: text encoded")
+
 
         return inputs, targets
 
@@ -148,6 +159,22 @@ class Preprocessor():
     @property
     def vocab_size(self):
         return len(self.int_to_char)
+
+    def __str__(self):
+        try: 
+            attribute_names = ["preprocessor", "window_size", "step_size", "SPEC_AUGMENT_STATIC", "spec_augment",
+            "INJECT_NOISE_STATIC", "inject_noise", "noise_dir", "noise_prob", "noise_levels", "_input_dim", 
+            "start_and_end", "int_to_char", "char_to_int"]
+            string="Showing up-to-date attributes"
+            for name in attribute_names:
+                string += name +": " + str(eval("self."+name))+"\n"
+            return string
+        except AttributeError:
+            attribute_names = ["_input_dim", "start_and_end", "int_to_char", "char_to_int"]
+            string="Showing limited attributes as not all new attributes are supported\n"
+            for name in attribute_names:
+                string += name +": " + str(eval("self."+name))+"\n"
+            return string
 
 def compute_mean_std(audio_files, preprocessor, window_size, step_size):
     samples = []
@@ -296,13 +323,17 @@ def create_mfcc(audio, sample_rate: int, window_size, step_size, esp=1e-10):
     return out.astype(np.float32)
 
 
-def log_specgram_from_data(audio: np.ndarray, samp_rate:int, window_size=32, step_size=16, plot=False):
-    """Computes the log of the spectrogram from from a input audio file string
+def log_specgram_from_file(audio_path:str, window_size=32, step_size=16):
+    
+    audio_data, samp_rate = wave.array_from_wave(audio_path)
+    return log_specgram_from_data(audio_data, samp_rate, window_size=window_size, step_size=step_size)
 
+def log_specgram_from_data(audio: np.ndarray, samp_rate:int, window_size=32, step_size=16, plot=False):
+    """
+    Computes the log of the spectrogram from from a input audio file string
     Arguments:
         audio_data (np.ndarray)
-
-    Returns:
+    `Returns:
         np.ndarray, the transposed log of the spectrogram as returned by log_specgram
     """
     
@@ -400,15 +431,16 @@ def read_data_json(data_json):
         return [json.loads(l) for l in fid]
 
 
-def apply_spec_augment(inputs):
+def apply_spec_augment(inputs, logger):
     """calls the spec_augment function on the normalized log_spec. A policy defined 
         in the policy_dict will be chosen uniformly at random.
-    Arguments:
+    Arguments:git a
         inputs (np.ndarray): normalized log_spec with dimensional order time x freq
     Returns:
         inputs (nd.ndarray): the modified log_spec array with order time x freq
     """
 
+    use_log = (logger is not None)
     assert type(inputs) == np.ndarray, "input is not numpy array"
 
     policy_dict = {
@@ -423,10 +455,14 @@ def apply_spec_augment(inputs):
             }
     
     policy_choice = np.random.randint(low=0, high=4)
+    if use_log: logger.info(f"app spec_aug: policy: {policy_choice}")
+
     policy = policy_dict.get(policy_choice)
 
     # the inputs need to be transposed and converted to torch tensor
     # as spec_augment method expects tensor with freq x time dimensions
+    if use_log: logger.info(f"app s_a: input shape: {inputs.shape}")
+
     inputs = torch.from_numpy(inputs.T)
 
     inputs = spec_augment.spec_augment(inputs, 
@@ -434,7 +470,7 @@ def apply_spec_augment(inputs):
                     frequency_masking_para=policy.get('frequency_masking_para'),
                     time_masking_para=policy.get('time_masking_para'),
                     frequency_mask_num=policy.get('frequency_mask_num'), 
-                    time_mask_num=policy.get('time_mask_num'))
+                    time_mask_num=policy.get('time_mask_num'), logger=logger)
     
     # convert the torch tensor back to numpy array and transpose back to time x freq
     inputs = inputs.detach().cpu().numpy() if inputs.requires_grad else inputs.cpu().numpy()
