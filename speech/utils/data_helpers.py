@@ -29,7 +29,7 @@ def lexicon_to_dict(lexicon_path:str, corpus_name:str)->dict:
     librispeech corpus to phoneme labels and represents the file as a dictionary.
     The digit accents are removed from the file name. 
     """
-    corpus_names = ["librispeech", "tedlium", "cmudict", "common-voice"]
+    corpus_names = ["librispeech", "tedlium", "cmudict", "commonvoice", "voxforge"]
     if corpus_name not in corpus_names:
         raise ValueError("corpus_name not accepted")
     
@@ -37,8 +37,7 @@ def lexicon_to_dict(lexicon_path:str, corpus_name:str)->dict:
     with open(lexicon_path, 'r', encoding="ISO-8859-1") as fid:
         lexicon = (l.strip().lower().split() for l in fid)
         for line in lexicon: 
-            word = line[0]
-            phones = line[1:]
+            word, phones = word_phone_split(line, corpus_name)
             phones = clean_phonemes(phones, corpus_name)
             # librispeech: the if-statement will ignore the second pronunciation with the same word
             if lex_dict[word] == UNK_WORD_TOKEN:
@@ -46,6 +45,17 @@ def lexicon_to_dict(lexicon_path:str, corpus_name:str)->dict:
     lex_dict = clean_dict(lex_dict, corpus_name)
     assert type(lex_dict)== defaultdict, "word_phoneme_dict is not defaultdict"
     return lex_dict
+
+def word_phone_split(line:list, corpus_name=str):
+    """
+    Splits the input list line into the word and phone entry.
+    voxforge has a middle column that is not used
+    """
+    if corpus_name == "voxforge":
+        word, phones = line[0], line[2:]
+    else:
+        word, phones = line[0], line[1:]
+    return word, phones
 
 
 def clean_phonemes(phonemes, corpus_name):
@@ -57,113 +67,12 @@ def clean_phonemes(phonemes, corpus_name):
 
 
 def clean_dict(lex_dict, corpus_name):
-    
-    if corpus_name == "tedlium" or corpus_name =="cmudict":
+    corpus_num_duplicates = ["tedlium", "cmudict", "voxforge"]
+    if corpus_name in corpus_num_duplicates:
         return defaultdict(lambda: UNK_WORD_TOKEN, 
                 {key: value for key, value in lex_dict.items() if not re.search("\(\d\)$", key)})
     else: 
         return lex_dict
-
-
-class UnknownWords():
-
-    def __init__(self):
-        self.word_set:set = set()
-        self.filename_dict:dict = dict()
-        self.line_count:int = 0
-        self.word_count:int = 0
-        self.has_unknown= False
-
-
-    def check_transcript(self, filename:str, text, word_phoneme_dict:dict):
-
-        if type(text) == str:
-            text = text.split()
-        elif type(text) == list: 
-            pass
-        else: 
-            raise(TypeError("input text is not string or list type"))
-   
-        self.line_count += 1
-        self.word_count += len(text) - 1
-        line_unk = [word for word in text if word_phoneme_dict[word]==UNK_WORD_TOKEN]
-        #if line_unk is empty, has_unk is False
-        self.has_unknown = bool(line_unk)
-        if self.has_unknown:
-            self.word_set.update(line_unk)
-            self.filename_dict.update({filename: len(line_unk)})
-
-    def process_save(self, save_path:str):
-        """
-        saves a json object of the dictionary with relevant statistics on the unknown words in corpus
-        """
-
-        stats_dict=dict()
-        stats_dict.update({"unique_unknown_words": len(self.word_set)})
-        stats_dict.update({"count_unknown_words": sum(self.filename_dict.values())})
-        stats_dict.update({"total_words": self.word_count})
-        stats_dict.update({"lines_unknown_words": len(self.filename_dict)})
-        stats_dict.update({"total_lines": self.line_count})
-        stats_dict.update({"unknown_words_set": list(self.word_set)})
-        stats_dict.update({"unknown_words_dict": self.filename_dict})
-        
-        stats_dir = "unk_word_stats"
-        if not os.path.exists(stats_dir):
-            os.makedirs(stats_dir)
-
-        stats_dict_fname = os.path.join(stats_dir, os.path.basename(save_path)+"_unk-words-stats.json")
-        with open(stats_dict_fname, 'w') as fid:
-            json.dump(stats_dict, fid)
-
-
-def unique_unknown_words(dataset_dir):
-    """
-    Creates a set of the total number of unknown words across all segments in a dataset assuming a
-    unk-words-stats.json file from process_unknown_words() has been created for each part of the dataset. 
-
-    Arguments:
-        dataset_dir (str): pathname of dir continaing "unknown_word_stats" dir with unk-words-stats.json files
-    """
-
-    pattern = os.path.join(dataset_dir, "unk_word_stats", "*unk-words-stats.json")
-    dataset_list = glob.glob(pattern)
-    if len(dataset_list) == 0: 
-        train_100_fn = './unk_word_stats/libsp_train-clean-100_unk-words-stats.json'
-        train_360_fn = './unk_word_stats/libsp_train-clean-360_unk-words-stats.json'
-        train_500_fn = './unk_word_stats/libsp_train-other-500_unk-words-stats.json'
-        test_clean_fn = './unk_word_stats/libsp_test-clean_unk-words-stats.json'
-        test_other_fn = './unk_word_stats/libsp_test-other_unk-words-stats.json'
-        dev_clean_fn = './unk_word_stats/libsp_dev-clean_unk-words-stats.json'
-        dev_other_fn = './unk_word_stats/libsp_dev-other_unk-words-stats.json'
-        dataset_list = [train_100_fn, train_360_fn, train_500_fn, test_clean_fn, test_other_fn, dev_clean_fn, dev_other_fn]
-    
-    unknown_set = set()
-    for data_fn in dataset_list: 
-        with open(data_fn, 'r') as fid: 
-            unk_words_dict = json.load(fid)
-            unknown_set.update(unk_words_dict['unknown_words_set'])
-            print(len(unk_words_dict['unknown_words_set']))
-
-
-    unknown_set = filter_set(unknown_set)
-    unknown_list = list(unknown_set)
-    
-    write_path = os.path.join(dataset_dir, "unk_word_stats","all_unk_words.txt")
-    with open(write_path, 'w') as fid:
-        fid.write('\n'.join(unknown_list))
-
-    print(f"number of filtered unknown words: {len(unknown_list)}")
-
-
-def filter_set(unknown_set:set):
-    """
-    filters the set based on the length and presence of digits.
-    """
-    unk_filter = filter(lambda x: len(x)<30, unknown_set)
-    search_pattern = r'[0-9!#$%&()*+,\-./:;<=>?@\[\\\]^_{|}~]'
-    unknown_set = set(filter(lambda x: not re.search(search_pattern, x), unk_filter))
-    return unknown_set
-
 
 def combine_lexicons(lex1_dict:dict, lex2_dict:dict)->(dict, dict):
     """
