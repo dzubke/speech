@@ -19,10 +19,7 @@ SETS = {
 }
 
 def main(cv_dir:str, lexicon_path:str, min_dur:float, max_dur:float, convert_wav:bool)->None:
-    
-    if convert_wav:
-        print("Converting files from mp3 to wave...")
-        data_helpers.convert_full_set(cv_dir, "*/*.mp3")
+
     
     if lexicon_path !='':
         cv_dict = data_helpers.lexicon_to_dict(lexicon_path, corpus_name="common-voice")
@@ -106,7 +103,7 @@ def process_text(transcript:str, cv_dict:dict, unknown_words, audio_name:str)->l
     punct_noapost = '!"#$%&()*+,-./:;<=>?@[\]^_`{|}~'
     for p in punct_noapost:
         if p in transcript:
-            raise ValueError(f"unwanted punctuation: {p} in transcript")
+           raise ValueError(f"unwanted punctuation: {p} in transcript")
     #assert any([p in transcript for p in punct_noapost]), "unwanted punctuation in transcript"
     transcript = transcript.split()
     # if there is a pronunciation dict, convert to phonemes
@@ -121,7 +118,7 @@ def process_text(transcript:str, cv_dict:dict, unknown_words, audio_name:str)->l
             phonemes.extend(cv_dict.get(word, list()))
         return phonemes
     else:
-        return transcript
+        return transcript 
 
 
 
