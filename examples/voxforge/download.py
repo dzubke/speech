@@ -41,7 +41,7 @@ def extract_samples(save_dir:str):
         with tarfile.open(tar_file) as tf:
             tf.extractall(path=sample_dir)
         os.remove(tar_file)
-        
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
