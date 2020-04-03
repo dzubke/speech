@@ -4,6 +4,7 @@ import argparse
 import os
 import tarfile
 import urllib.request
+import glob
 # third party libraries
 import tqdm
 
@@ -19,8 +20,18 @@ def main(output_dir:str):
 
 def download_extract(output_dir:str):
     save_dir = os.path.join(output_dir,"voxforge")
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
     download_dict = {"data": DATA_URL, "lexicon": LEX_URL}
     for name, url in download_dict.items():
+        if name == "data":
+            if os.path.exists(os.path.join(save_dir, "archive")):
+                print("Skipping data download")
+                continue
+        elif name == "lexicon":
+            if os.path.exists(os.path.join(save_dir, "VoxForge")):
+                print("Skipping lexicon download")
+                continue
         save_path = os.path.join(save_dir, name+EXT)
         print(f"Downloading: {name}...")
         urllib.request.urlretrieve(url, filename=save_path)
@@ -37,7 +48,7 @@ def extract_samples(save_dir:str):
     tar_path = os.path.join(sample_dir, pattern)
     tar_files = glob.glob(tar_path)
     print("Extracting and removing sample files...")
-    for tar_file in tqdm(tar_files):
+    for tar_file in tqdm.tqdm(tar_files):
         with tarfile.open(tar_file) as tf:
             tf.extractall(path=sample_dir)
         os.remove(tar_file)
@@ -47,7 +58,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
             description="Download voxforge dataset.")
 
-    parser.add_argument("--output_dir",
+    parser.add_argument("--output-dir",
         help="The dataset is saved in <output_dir>/voxforge.")
     args = parser.parse_args()
 
