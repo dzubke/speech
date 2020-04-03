@@ -85,6 +85,30 @@ class TatoebaDownloader(Downloader):
         self.data_dirname = "audio"
 
 
+      def download_extract(self):
+        """
+        Standards method to download and extract zip file
+        """
+        save_dir = os.path.join(self.output_dir,"commmon-voice")
+        if not os.path.exists(save_dir):
+            os.mkdir(save_dir)
+        for name, url in download_dict.items():
+            if name == "data":
+                if os.path.exists(os.path.join(save_dir, self.data_dirname)):
+                    print("Skipping data download")
+                    continue
+            save_path = os.path.join(save_dir, name + ".tar.gz")
+            print(f"Downloading: {name}...")
+            urllib.request.urlretrieve(url, filename=save_path)
+            print(f"Extracting: {name}...")
+            raise NotImplementedError("Zip can't yet be extracted with tarfile code")
+            with tarfile.open(save_path) as tf:
+                tf.extractall(path=save_dir)
+            os.remove(save_path)
+            print(f"Processed: {name}")
+        return save_dir
+
+
 class CommonvoiceDownloader(Downloader):
 
     def __init__(self, output_dir, dataset_name):
