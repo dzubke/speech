@@ -13,19 +13,20 @@ class Downloader(object):
     def __init__(self, output_dir, dataset_name):
         self.output_dir = output_dir
         self.dataset_name = dataset_name.lower()
+        self.download_dict = dict()
 
     def download_dataset(self):
-        save_dir = download_extract(self.output_dir)
-        extract_samples(save_dir)
+        save_dir = self.download_extract()
+        self.extract_samples(save_dir)
 
-      def download_extract(self):
+    def download_extract(self):
         """
         Standards method to download and extract zip file
         """
-        save_dir = os.path.join(self.output_dir,"commmon-voice")
+        save_dir = os.path.join(self.output_dir, self.dataset_name)
         if not os.path.exists(save_dir):
             os.mkdir(save_dir)
-        for name, url in download_dict.items():
+        for name, url in self.download_dict.items():
             if name == "data":
                 if os.path.exists(os.path.join(save_dir, self.data_dirname)):
                     print("Skipping data download")
@@ -40,7 +41,7 @@ class Downloader(object):
             print(f"Processed: {name}")
         return save_dir
     
-    def extract_samples(self):
+    def extract_samples(self, save_dir:str):
         """
         Most datasets won't need to extract samples
         """
@@ -49,7 +50,7 @@ class Downloader(object):
 
 class VoxforgeDownloader(Downloader):
 
-    def __init__(self, output_dir):
+    def __init__(self, output_dir, dataset_name):
         super(VoxforgeDownloader, self).__init__(output_dir, dataset_name)
         self.download_dict = {
             "data": "https://s3.us-east-2.amazonaws.com/common-voice-data-download/voxforge_corpus_v1.0.0.tar.gz",
@@ -65,7 +66,7 @@ class VoxforgeDownloader(Downloader):
         unzips themm.
         """
         pattern = "*.tgz"
-        sample_dir = os.path.join(save_dir,"archive")
+        sample_dir = os.path.join(save_dir, self.data_dirname)
         tar_path = os.path.join(sample_dir, pattern)
         tar_files = glob.glob(tar_path)
         print("Extracting and removing sample files...")
@@ -76,8 +77,8 @@ class VoxforgeDownloader(Downloader):
 
 class TatoebaDownloader(Downloader):
 
-    def __init__(self, output_dir):
-        super(VoxforgeDownloader, self).__init__(output_dir, dataset_name)
+    def __init__(self, output_dir, dataset_name):
+        super(TatoebaDownloader, self).__init__(output_dir, dataset_name)
         self.download_dict = { 
             "data": "https://downloads.tatoeba.org/audio/tatoeba_audio_eng.zip"
         }
@@ -86,7 +87,7 @@ class TatoebaDownloader(Downloader):
 
 class CommonvoiceDownloader(Downloader):
 
-    def __init__(self, output_dir):
+    def __init__(self, output_dir, dataset_name):
         super(CommonvoiceDownloader, self).__init__(output_dir, dataset_name)
         self.download_dict = {
             "data":"https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-4-2019-12-10/en.tar.gz"
@@ -105,6 +106,6 @@ if __name__ == "__main__":
         help="Name of dataset with a capitalized first letter.")
     args = parser.parse_args()
 
-    downloader = eval(args.dataset_name+"Downloader")
-    downloaer = downloader(args.output_dir, args.dataset_name)
-    downloadder.download_dataset()
+    downloader = eval(args.dataset_name+"Downloader")(args.output_dir, args.dataset_name)
+    print(f"type: {type(downloader)}")
+    downloader.download_dataset()
