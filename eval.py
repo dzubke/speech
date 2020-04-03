@@ -33,6 +33,7 @@ def run(model_path, dataset_json,
     model.set_eval()
     print(f"spec_augment before set_eval: {preproc.spec_augment}")
     preproc.set_eval()
+    preproc.use_log = False
     print(f"spec_augment after set_eval: {preproc.spec_augment}")
 
 

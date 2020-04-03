@@ -60,7 +60,7 @@ def build_json(path, use_phonemes):
                     unknown_set.update(unk_words_list)
                     unknown_dict.update(unk_words_dict)
                     continue
-                text = text.split()     #converting string of space-separated words to list of words
+                text = text.split()     #convert space-separated string to list of strings
                 text = transcript_to_phonemes(text, word_phoneme_dict)
     
             datum = {'text' : text,
@@ -80,32 +80,13 @@ def load_transcripts(path):
     pattern = os.path.join(path, "*/*/*.trans.txt")
     files = glob.glob(pattern)
     data = {}
-    # unknown_set=set()
-    # unknown_dict=dict()
-    # line_count, word_count= 0, 0
-
-    # if use_phonemes: 
-    #     LEXICON_PATH = "librispeech-lexicon.txt"
-    #     word_phoneme_dict = data_helpers.lexicon_to_dict(LEXICON_PATH, corpus_name="librispeech")
     for f in tqdm.tqdm(files):
         with open(f) as fid:
-            # load transcript of file
             lines = [l.strip().lower().split() for l in fid]
-            # if use_phonemes: 
-            #     file_unk_list, file_unk_dict, counts = check_unknown_words(lines, word_phoneme_dict)
-            #     lines = ((l[0], l[1:], word_phoneme_dict)) for l in lines)
-            #     unknown_set.update(file_unk_list)
-            #     unknown_dict.update(file_unk_dict)
-            #     line_count+=counts[0]
-            #     word_count+=counts[1]
-
-            # else: 
             lines = ((l[0], " ".join(l[1:])) for l in lines)
-                # unk_words = []
             data.update(lines)
-    return data #, unknown_set, unknown_dict, line_count, word_count
-
-
+    return data
+    
 
 def transcript_to_phonemes(words, word_phoneme_dict):
     """converts the words in the transcript to phonemes using the word_to_phoneme dictionary mapping
