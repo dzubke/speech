@@ -10,40 +10,25 @@ import tqdm
 
 class Downloader(object):
 
-    def __init__(self, output_dir):
+    def __init__(self, output_dir, dataset_name):
         self.output_dir = output_dir
+        self.dataset_name = dataset_name.lower()
 
     def download_dataset(self):
         save_dir = download_extract(self.output_dir)
         extract_samples(save_dir)
 
-    def download_extract(self):
-        raise NotImplementedError
-    
-    def extract_samples(self):
-        raise NotImplementedError
-    
-
-class VoxforgeDownloader(Downloader):
-
-    def __init__(self, output_dir):
-        super(VoxforgeDownloader, self).__init__(output_dir)
-        self.data_url = "https://s3.us-east-2.amazonaws.com/common-voice-data-download/voxforge_corpus_v1.0.0.tar.gz"
-        self.lex_url = "http://www.repository.voxforge1.org/downloads/SpeechCorpus/Trunk/Lexicon/VoxForge.tgz"
-
-    def download_extract(self):
-        save_dir = os.path.join(self.output_dir,"voxforge")
+      def download_extract(self):
+        """
+        Standards method to download and extract zip file
+        """
+        save_dir = os.path.join(self.output_dir,"commmon-voice")
         if not os.path.exists(save_dir):
             os.mkdir(save_dir)
-        download_dict = {"data": self.data_url, "lexicon": self.lex_url}
         for name, url in download_dict.items():
             if name == "data":
-                if os.path.exists(os.path.join(save_dir, "archive")):
+                if os.path.exists(os.path.join(save_dir, self.data_dirname)):
                     print("Skipping data download")
-                    continue
-            elif name == "lexicon":
-                if os.path.exists(os.path.join(save_dir, "VoxForge")):
-                    print("Skipping lexicon download")
                     continue
             save_path = os.path.join(save_dir, name + ".tar.gz")
             print(f"Downloading: {name}...")
@@ -54,6 +39,24 @@ class VoxforgeDownloader(Downloader):
             os.remove(save_path)
             print(f"Processed: {name}")
         return save_dir
+    
+    def extract_samples(self):
+        """
+        Most datasets won't need to extract samples
+        """
+        pass
+    
+
+class VoxforgeDownloader(Downloader):
+
+    def __init__(self, output_dir):
+        super(VoxforgeDownloader, self).__init__(output_dir, dataset_name)
+        self.download_dict = {
+            "data": "https://s3.us-east-2.amazonaws.com/common-voice-data-download/voxforge_corpus_v1.0.0.tar.gz",
+            "lexicon": "http://www.repository.voxforge1.org/downloads/SpeechCorpus/Trunk/Lexicon/VoxForge.tgz"
+        }
+        self.data_dirname = "archive"
+
 
     def extract_samples(save_dir:str):
         """
@@ -71,48 +74,26 @@ class VoxforgeDownloader(Downloader):
                 tf.extractall(path=sample_dir)
             os.remove(tar_file)
 
-class TataobaDownloader(Downloader):
+class TatoebaDownloader(Downloader):
 
     def __init__(self, output_dir):
-        super(VoxforgeDownloader, self).__init__(output_dir)
-        self.data_url = "https://downloads.tatoeba.org/audio/tatoeba_audio_eng.zip"
+        super(VoxforgeDownloader, self).__init__(output_dir, dataset_name)
+        self.download_dict = { 
+            "data": "https://downloads.tatoeba.org/audio/tatoeba_audio_eng.zip"
+        }
+        self.data_dirname = "audio"
 
 
 class CommonvoiceDownloader(Downloader):
 
     def __init__(self, output_dir):
-        super(CommonvoiceDownloader, self).__init__(output_dir)
-        self.data_url = "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-4-2019-12-10/en.tar.gz"
-        self.data_dirname = "en"
-
-    def download_extract(self):
-        """
-        Only downloading the dataset
-        """
-        save_dir = os.path.join(self.output_dir,"commmon-voice")
-        if not os.path.exists(save_dir):
-            os.mkdir(save_dir)
-        download_dict = {"data": self.data_url}
-        for name, url in download_dict.items():
-            if name == "data":
-                if os.path.exists(os.path.join(save_dir, self.data_dirname)):
-                    print("Skipping data download")
-                    continue
-            save_path = os.path.join(save_dir, name + ".tar.gz")
-            print(f"Downloading: {name}...")
-            urllib.request.urlretrieve(url, filename=save_path)
-            print(f"Extracting: {name}...")
-            with tarfile.open(save_path) as tf:
-                tf.extractall(path=save_dir)
-            os.remove(save_path)
-            print(f"Processed: {name}")
-        return save_dir
+        super(CommonvoiceDownloader, self).__init__(output_dir, dataset_name)
+        self.download_dict = {
+            "data":"https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-4-2019-12-10/en.tar.gz"
+        }
+        self.data_dirname = "clips"
     
-    def extract_samples(save_dir:str):
-        """
-        Don't need to unzip samples
-        """
-        pass
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -125,5 +106,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     downloader = eval(args.dataset_name+"Downloader")
-    downloaer = downloader(args.output_dir)
+    downloaer = downloader(args.output_dir, args.dataset_name)
     downloadder.download_dataset()
