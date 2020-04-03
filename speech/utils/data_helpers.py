@@ -29,7 +29,7 @@ def lexicon_to_dict(lexicon_path:str, corpus_name:str)->dict:
     librispeech corpus to phoneme labels and represents the file as a dictionary.
     The digit accents are removed from the file name. 
     """
-    corpus_names = ["librispeech", "tedlium", "cmudict", "commonvoice", "voxforge"]
+    corpus_names = ["librispeech", "tedlium", "cmudict", "commonvoice", "voxforge", "tatoeba"]
     if corpus_name not in corpus_names:
         raise ValueError("corpus_name not accepted")
     
@@ -83,7 +83,7 @@ def combine_lexicons(lex1_dict:dict, lex2_dict:dict)->(dict, dict):
         lex1_dict - dict[str:list(str)]: dict representation of the first lexicon
         lex2_dict - dict[str:list(str)]: dict representation of the second lexicon
     Returns:
-        combo_dict - dict[str:list(str)]
+        combo_dict - dict[str:list(str]
     """
 
     word_set = set(list(lex1_dict.keys()) + list(lex2_dict.keys()))
