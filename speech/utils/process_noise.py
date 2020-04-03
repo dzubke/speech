@@ -9,13 +9,13 @@ import numpy as np
 
 # project libraries
 from speech.utils.wave import array_from_wave, wav_duration
+from speech.utils import convert
 
 
-def main(audio_dir:str, use_extend:str, use_resample:str) -> None: 
+def main(audio_dir:str, use_extend:bool, use_resample:bool) -> None: 
     """
         processes the background audio files mainly by duplicating audio files
         that are less than 60 seconds in length
-
     """
 
     if use_extend:
@@ -73,18 +73,23 @@ def resample(audio_dir:str, target_samp_rate:int)->None:
     """
 
     assert os.path.exists(audio_dir) == True, "audio directory does not exist"
-    out_dir = os.path.join(audio_dir, "extended_16kHz")
+    out_dir = os.path.join(audio_dir, "resampled")
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
 
-    pattern = os.path.join(audio_dir, "*.wav")
-    audio_files = glob.glob(pattern)
+    extensions = ["*.wav", "*.mp3", "*.aiff", "*.flac"]
+    audio_files = list()
+    for ext in extensions:
+        pattern = os.path.join(audio_dir, ext)
+        audio_files.extend(glob.glob(pattern))
     
     for audio_fn in audio_files: 
-        filename = os.path.basename(audio_fn)
-        out_path = os.path.join(out_dir, filename)
-        sox_params = "sox \"{}\" -r {} -c 1 -b 16 {}".format(audio_fn, target_samp_rate, out_path)
-        os.system(sox_params)
+        filename = os.path.splitext(os.path.basename(audio_fn))[0]
+        wav_file = filename + os.path.extsep + "wav"
+        out_path = os.path.join(out_dir, wav_file)
+        convert.to_wave(audio_fn, out_path)
+        # sox_params = "sox \"{}\" -r {} -c 1 -b 16 {}".format(audio_fn, target_samp_rate, out_path)
+        # os.system(sox_params)
 
 def resample_with_sox(path, sample_rate):
     """
@@ -100,9 +105,11 @@ def resample_with_sox(path, sample_rate):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("audio_dir", help="Directory that contains the background audio files.")
-    parser.add_argument("--extend", action='store_true',
+    parser.add_argument("--audio-dir", help="Directory that contains the background audio files.")
+    parser.add_argument("--extend", action='store_true', default=False,
         help="Boolean flag that if present will call the extend_audio method ")
+    parser.add_argument("--resample", action='store_true', default=False,
+        help="Boolean flag that if present will call the resample method ")
     args = parser.parse_args()
 
-    main(args.audio_dir, args.extend)
+    main(args.audio_dir, args.extend, args.resample)
