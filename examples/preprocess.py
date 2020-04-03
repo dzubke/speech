@@ -27,6 +27,12 @@ class Preprocessor(object):
         self.max_duration = max_duration
 
     def process_datasets(self):
+        """
+        This function is usually written to iterate through the datasets in dataset_dict
+        and call collect_audio_transcrtips which stores the audio_path and string transcripts
+        ini the self.audio_trans object. Then, self.write_json writes the audio and transcripts
+        to a file.
+        """
         raise NotImplementedError
 
     def collect_audio_transcripts(self):
@@ -216,7 +222,43 @@ class VoxforgePreprocessor(Preprocessor):
             print(f"dir: {sample_dir} and name: {audio_name} not found")
         return audio_path
         
+class TatoebaPreprocessor(Preprocessor):
+    def __init__(self, dataset_dir, dataset_name, lexicon_path,
+                        force_convert, min_duration, max_duration):
+        super(TatoebaPreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
+            force_convert, min_duration, max_duration)
+        self.dataset_dict = {"all":"sentences_with_audio.csv"}
 
+    def process_datasets(self):
+        for set_name, label_fn in self.dataset_dict.items():
+            label_path = os.path.join(self.dataset_dir, label_fn)
+            self.collect_audio_transcripts(label_path)
+            root, ext = os.path.splitext(label_path)
+            json_path = root + os.path.extsep + "json"
+            self.write_json(json_path)
+        unique_unknown_words(self.dataset_dir)
+    
+
+    def collect_audio_trancripts(label_path:str)
+        # open the file and select only entries with desired accents
+        speakers = ["CK", "Deliaan", "Pencil", "Susuan1430"]
+        print(f"Filtering files by speakers: {speakers}")
+        dir_path = os.path.dirname(label_path)
+        with open(label_path) as fid: 
+            reader = csv.reader(fid, delimiter='\t')
+            # first line in reader is the header which equals:
+            # ['id', 'username', 'text']
+            is_header = True
+            for line in reader:
+                if is_header:
+                    is_header=False
+                    continue
+                else: 
+                    # filter by accent
+                    if line[1] in speakers:
+                        audio_path = os.path.join(dir_path, "audio", line[1], line[0]+".mp3")
+                        transcript = line[2:]
+                        self.audio_trans.append((audio_path, transcript))
 
 class UnknownWords():
 
