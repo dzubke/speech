@@ -1,10 +1,10 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200331/",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200403/cv/",
 
     "data" : {
-        "train_set" : "/home/dzubke/awni_speech/data/libsp-tedlium/train-libsp-tedlium.json",
-        "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-combo.json",
+        "train_set" : "/home/dzubke/awni_speech/data/common-voice/train.json",
+        "dev_set" : "/home/dzubke/awni_speech/data/common-voice/dev.json",
         "start_and_end" : false
     },
     
@@ -31,7 +31,7 @@
         "dropout" : 0.4,
         "convert_model": false,
         "load_trained": true,
-        "trained_path": "examples/librispeech/models/ctc_models/20200326/ph-3/20200331-1/best_model", 
+        "trained_path": "examples/librispeech/models/ctc_models//20200331/20200403/best_model", 
         "remove_layers": [],
         "encoder" : {
             "conv" : [
