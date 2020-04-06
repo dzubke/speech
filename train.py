@@ -95,6 +95,7 @@ def eval_dev(model, ldr, preproc,  logger):
 
     with torch.no_grad():
         for batch in tqdm.tqdm(ldr):
+            if use_log: logger.info(f"=====Inside batch loop=====")
             temp_batch = list(batch)
             if use_log: logger.info(f"batch converted")
             preds = model.infer(temp_batch)
@@ -190,6 +191,10 @@ def run(config, use_log, log_path):
         print(msg.format(e, time.time() - start))
         if use_log: logger.info(msg.format(e, time.time() - start))
 
+        if use_log: preproc.logger = None
+        speech.save(model, preproc, config["save_path"])
+        if use_log: logger.info(f"====== model saved =======")
+        if use_log: preproc.logger = logger
 
         dev_loss, dev_cer = eval_dev(model, dev_ldr, preproc, logger)
         if use_log: logger.info(f"====== eval_dev finished =======")
@@ -197,11 +202,8 @@ def run(config, use_log, log_path):
         # Log for tensorboard
         tb.log_value("dev_loss", dev_loss, e)
         tb.log_value("dev_cer", dev_cer, e)
-
-        if use_log: preproc.logger = None
-        speech.save(model, preproc, config["save_path"])
-        if use_log: logger.info(f"====== model saved =======")
-
+           
+        if use_log: preproc.logger = None 
         # Save the best model on the dev set
         if dev_cer < best_so_far:
             best_so_far = dev_cer

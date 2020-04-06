@@ -8,36 +8,48 @@ import numpy as np
 # project libraries
 from speech.utils.wave import wav_duration, array_from_wave
 
-def inject_noise(data, data_samp_rate, noise_dir, noise_levels=(0, 0.5)):
+def inject_noise(data, data_samp_rate, noise_dir, logger, noise_levels=(0, 0.5)):
     """
     injects noise from files in noise_dir into the input data. These
     methods require the noise files in noise_dir be resampled to 16kHz
     with process_noise.py in speech.utils.
     """
+    use_log = (logger is not None)
     pattern = os.path.join(noise_dir, "*.wav")
     noise_files = glob.glob(pattern)    
     noise_path = np.random.choice(noise_files)
+    if use_log: logger.info(f"noise_inj: noise_path: {noise_path}")
     noise_level = np.random.uniform(*noise_levels)
-    return inject_noise_sample(data, data_samp_rate, noise_path, noise_level)
+    if use_log: logger.info(f"noise_inj: noise_level: {noise_level}")
+    return inject_noise_sample(data, data_samp_rate, noise_path, noise_level, logger)
 
 
-def inject_noise_sample(data, sample_rate, noise_path, noise_level):
-    noise_len = wav_duration(noise_path)        
-    #print(f"noise_len (s): {noise_len}, noise_len type: {type(noise_len)}")
+def inject_noise_sample(data, sample_rate:int, noise_path:str, noise_level:float, logger):
+    """
+    Takes in a numpy array (data) and adds a section of the audio in noise_path
+    to the numpy array in proprotion on the value in noise_level
+    """
+    use_log = (logger is not None)
+    noise_len = wav_duration(noise_path)
+    if use_log: logger.info(f"noise_inj: noise_len: {noise_len}")
     data_len = len(data) / sample_rate
-    #print(f"data_len (s): {data_len}, data_len type: {type(data_len)}")
-    if data_len > noise_len:
+    if use_log: logger.info(f"noise_inj: data_len: {data_len}")
+    if data_len > noise_len: # if the noise_file len is too small, skip it
         return data
     else:
         noise_start = np.random.rand() * (noise_len - data_len) 
+        if use_log: logger.info(f"noise_inj: noise_start: {noise_start}")
         noise_end = noise_start + data_len
-        #print(f"noise duration: {noise_end - noise_start}, start: {noise_start}, end: {noise_end}")
-        #print(f"noise_start type: {type(noise_start)}, noise_end type: {type(noise_end)}")
+        if use_log: logger.info(f"noise_inj: noise_end: {noise_end}")
         noise_dst = audio_with_sox(noise_path, sample_rate, noise_start, noise_end)
         noise_dst = same_size(data, noise_dst)
+        # convert to float to avoid value integer overflow in .dot() operation
         noise_dst = noise_dst.astype('float64')
         data = data.astype('float64')
-        assert len(data) == len(noise_dst), f"data len: {data.size}, noise len: {noise_dst.size}, noise_path: {noise_path}"
+        if len(data)  != len(noise_dst):
+                if use_log: logger.warning(f"noise_inj: data len: {len(data)}, noise len: {len(noise_dst)}")
+                if use_log: logger.warning(f"noise_inj: data size: {data.size}, noise size: {noise_dst.size}") 
+                if use_log: logger.warning(f"noise_inj: noise_path: {noise_path}")
         noise_energy = np.sqrt(noise_dst.dot(noise_dst) / noise_dst.size)
         data_energy = np.sqrt(np.abs(data.dot(data)) / data.size)
         data += noise_level * noise_dst * data_energy / noise_energy
