@@ -245,8 +245,9 @@ class TatoebaPreprocessor(Preprocessor):
 
     def collect_audio_transcripts(self, label_path:str):
         # open the file and select only entries with desired accents
-        speakers = ["CK", "Deliaan", "Pencil", "Susuan1430"]
+        speakers = ["CK", "Delian", "pencil", "Susan1430"]  # these speakers have north american accents
         print(f"Filtering files by speakers: {speakers}")
+        error_files = {"CK": {"min":6122903, "max": 6123834}} # files in this range are often corrupted
         dir_path = os.path.dirname(label_path)
         with open(label_path) as fid: 
             reader = csv.reader(fid, delimiter='\t')
@@ -260,6 +261,10 @@ class TatoebaPreprocessor(Preprocessor):
                 else: 
                     # filter by accent
                     if line[1] in speakers:
+                        if line[1] in error_files:
+                            if error_files["CK"]["min"] <= int(line[0]) <= error_files["CK"]["max"]:
+                                print(f"skipping {(line[1], line[0])}")
+                                continue
                         audio_path = os.path.join(dir_path, "audio", line[1], line[0]+".mp3")
                         transcript = " ".join(line[2:])
                         self.audio_trans.append((audio_path, transcript))
