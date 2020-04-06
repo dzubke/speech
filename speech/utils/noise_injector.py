@@ -46,10 +46,7 @@ def inject_noise_sample(data, sample_rate:int, noise_path:str, noise_level:float
         # convert to float to avoid value integer overflow in .dot() operation
         noise_dst = noise_dst.astype('float64')
         data = data.astype('float64')
-        if len(data)  != len(noise_dst):
-                if use_log: logger.warning(f"noise_inj: data len: {len(data)}, noise len: {len(noise_dst)}")
-                if use_log: logger.warning(f"noise_inj: data size: {data.size}, noise size: {noise_dst.size}") 
-                if use_log: logger.warning(f"noise_inj: noise_path: {noise_path}")
+        assert len(data) == len(noise_dst), f"data len: {len(data)}, noise len: {len(noise_dst)}, data size: {data.size}, noise size: {noise_dst.size}, noise_path: {noise_path}"
         noise_energy = np.sqrt(noise_dst.dot(noise_dst) / noise_dst.size)
         data_energy = np.sqrt(np.abs(data.dot(data)) / data.size)
         data += noise_level * noise_dst * data_energy / noise_energy
@@ -71,8 +68,7 @@ def audio_with_sox(path, sample_rate, start_time, end_time):
 
 def same_size(data:np.ndarray, noise_dst:np.ndarray) -> np.ndarray:
     """
-        this function adjusts the size of noise_dist if it is smaller or bigger
-        than the size of data
+    this function adjusts the size of noise_dist if it is smaller or bigger than the size of data
     """
 
     if data.size == noise_dst.size:
