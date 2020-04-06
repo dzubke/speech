@@ -85,7 +85,10 @@ class Preprocessor(object):
         # allows for alphanumeric characters, space, and apostrophe
         accepted_char = '[^A-Za-z0-9 \']+'
         # filters out unaccepted characters, lowers the case, & splits into list
-        transcript = re.sub(accepted_char, '', transcript).lower()
+        try:
+            transcript = re.sub(accepted_char, '', transcript).lower()
+        except TypeError:
+            print(f"Type Error with: {transcript}")
         # check that all punctuation (minus apostrophe) has been removed 
         punct_noapost = '!"#$%&()*+,-./:;<=>?@[\]^_`{|}~'
         for p in punct_noapost:
@@ -230,6 +233,7 @@ class TatoebaPreprocessor(Preprocessor):
         self.dataset_dict = {"all":"sentences_with_audio.csv"}
 
     def process_datasets(self):
+        print("In Tatoeba process_datasets")
         for set_name, label_fn in self.dataset_dict.items():
             label_path = os.path.join(self.dataset_dir, label_fn)
             self.collect_audio_transcripts(label_path)
@@ -239,7 +243,7 @@ class TatoebaPreprocessor(Preprocessor):
         unique_unknown_words(self.dataset_dir)
     
 
-    def collect_audio_trancripts(label_path:str)
+    def collect_audio_transcripts(self, label_path:str):
         # open the file and select only entries with desired accents
         speakers = ["CK", "Deliaan", "Pencil", "Susuan1430"]
         print(f"Filtering files by speakers: {speakers}")
@@ -260,7 +264,7 @@ class TatoebaPreprocessor(Preprocessor):
                             print(f"skipping {(line[1], line[0])}")
                             continue
                         audio_path = os.path.join(dir_path, "audio", line[1], line[0]+".mp3")
-                        transcript = line[2:]
+                        transcript = " ".join(line[2:])
                         self.audio_trans.append((audio_path, transcript))
 
 class UnknownWords():
