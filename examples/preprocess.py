@@ -256,6 +256,9 @@ class TatoebaPreprocessor(Preprocessor):
                 else: 
                     # filter by accent
                     if line[1] in speakers:
+                        if (line[1], line[0]) in error_files:
+                            print(f"skipping {(line[1], line[0])}")
+                            continue
                         audio_path = os.path.join(dir_path, "audio", line[1], line[0]+".mp3")
                         transcript = line[2:]
                         self.audio_trans.append((audio_path, transcript))
@@ -301,7 +304,6 @@ class UnknownWords():
         stats_dir = os.path.join(dir_path, "unk_word_stats")
         if not os.path.exists(stats_dir):
             os.makedirs(stats_dir)
-
         stats_dict_fn = os.path.join(stats_dir, base+"_unk-words-stats.json")
         with open(stats_dict_fn, 'w') as fid:
             json.dump(stats_dict, fid)
