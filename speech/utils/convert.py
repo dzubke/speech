@@ -3,6 +3,8 @@ from __future__ import division
 from __future__ import print_function
 
 import subprocess
+import wave
+import os
 
 FFMPEG = "ffmpeg"
 AVCONV = "avconv"
@@ -40,9 +42,31 @@ def to_wave(audio_file, wave_file, use_avconv=USE_AVCONV):
     Convert audio file to wave format.
     """
     prog = AVCONV if use_avconv else FFMPEG
-    args = [prog, "-y", "-i", audio_file, "-ar", "16000","-f", "wav", wave_file]
+    args = [prog, "-y", "-i", audio_file, "-ac", "1", "-ar", "16000","-f", "wav", wave_file]
     subprocess.check_output(args, stderr=subprocess.STDOUT)
+
+def convert_2channels(audio_file:str):
+    """
+    if the input audio file has two channels, the file will be converted
+    to a version with a single channel
+    """
+    cmd = subprocess.check_output(["soxi", audio_file])  
+    num_chan = parse_soxi_out(cmd)
+    if num_chan>1: 
+        os.rename(audio_file, "/tmp/convert_2channels_audio.wav")
+        to_wave("/tmp/convert_2channels_audio.wav", audio_file)
+
+def parse_soxi_out(cmd:bytes):
+    """
+    this gross parser takes the bytes from the soxi output, decodes to utf-8, 
+    splits by the newline "\n", takes the second element of the array which is
+    the number of channels, splits by the semi-colon ':' takes the second element
+    which is the string of the num channels and converts to int.
+    """
+    return int(cmd.decode("utf-8").strip().split("\n")[1].split(':')[1].strip())
 
 if __name__ == "__main__":
     print("Use avconv", USE_AVCONV)
+
+
 
