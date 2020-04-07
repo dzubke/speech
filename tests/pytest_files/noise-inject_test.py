@@ -8,10 +8,9 @@ def test_file1_method1():
 	x=5
 	y=6
 	assert x+1 == y,"test failed"
-	assert x == y,"test failed"
 
 
-def test_dataset():
+def check_tests_dataset():
 	audio_dir = "/Users/dustin/CS/consulting/firstlayerai/data/LibriSpeech/train-clean-100/"
 	pattern = "*/*/*.wav"
 	audio_pattern = os.path.join(audio_dir, pattern)
@@ -33,7 +32,6 @@ def check_length(audio_path:str, noise_path:str):
 	audio_noise = noise_injector.inject_noise_sample(audio_data, samp_rate, noise_path, noise_level=0.5)
 
 
-# def test_single_sample():
-# 	audio_path = ""
-# 	noise_path = ""
-# 	check_length(audio_path, noise_path)
+def test_single_sample():
+	audio_path = "/Users/dustin/CS/consulting/firstlayerai/data/LibriSpeech/dev-clean/422/122949/422-122949-0001.wav"
+	check_all_noise(audio_path)
