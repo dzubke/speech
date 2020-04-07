@@ -193,6 +193,9 @@ class VoxforgePreprocessor(Preprocessor):
                     audio_path = self.find_audio_path(sample_dir, audio_name)
                     if audio_path is None:
                         continue
+                    # audio_path is corrupted and is skipped
+                    elif data_helpers.skip_file(audio_path):
+                        continue
                     transcript = line[1:]
                     # transcript should be a string
                     transcript = " ".join(transcript)
@@ -261,10 +264,11 @@ class TatoebaPreprocessor(Preprocessor):
                 else: 
                     # filter by accent
                     if line[1] in speakers:
-                        if line[1] in error_files:
-                            if error_files["CK"]["min"] <= int(line[0]) <= error_files["CK"]["max"]:
-                                print(f"skipping {(line[1], line[0])}")
-                                continue
+                        audio_path = os.path.join(dir_path, "audio", line[1], line[0]+".mp3")
+                        transcript = " ".join(line[2:])
+                        if data_helpers.skip_file(audio_path):
+                            print(f"skipping {audio_path}")
+                            continue
                         self.audio_trans.append((audio_path, transcript))
 
 class UnknownWords():
