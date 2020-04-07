@@ -105,7 +105,7 @@ class Preprocessor():
         if self.inject_noise:
             add_noise = np.random.binomial(1, self.noise_prob)
             if add_noise:
-                audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, self.noise_levels) 
+                audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, self.logger, self.noise_levels) 
             if self.use_log: self.logger.info(f"preproc: noise injected")
 
         if self.preprocessor == "log_spec":
