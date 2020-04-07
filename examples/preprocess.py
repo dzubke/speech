@@ -186,12 +186,15 @@ class VoxforgePreprocessor(Preprocessor):
             with open(text_path, 'r') as fid:
                 for line in fid:
                     line = line.strip().split()
+                    # if an empty entry, skip it
                     if len(line)==0:
-                        # if an empty entry, skip it
                         continue 
                     audio_name = self.parse_audio_name(line[0])
                     audio_path = self.find_audio_path(sample_dir, audio_name)
                     if audio_path is None:
+                        continue
+                    # audio_path is corrupted and is skipped
+                    elif data_helpers.skip_files(audio_path):
                         continue
                     transcript = line[1:]
                     # transcript should be a string
