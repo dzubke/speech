@@ -186,12 +186,19 @@ class VoxforgePreprocessor(Preprocessor):
             with open(text_path, 'r') as fid:
                 for line in fid:
                     line = line.strip().split()
+                    # if an empty entry, skip it
                     if len(line)==0:
-                        # if an empty entry, skip it
                         continue 
                     audio_name = self.parse_audio_name(line[0])
                     audio_path = self.find_audio_path(sample_dir, audio_name)
                     if audio_path is None:
+                        continue
+                    # audio_path is corrupted and is skipped
+<<<<<<< HEAD
+                    elif data_helpers.skip_files(audio_path):
+=======
+                    elif data_helpers.skip_file(audio_path):
+>>>>>>> 8ed5159bbf16556c2f86abbdbd9661570d303ebd
                         continue
                     transcript = line[1:]
                     # transcript should be a string
@@ -245,8 +252,9 @@ class TatoebaPreprocessor(Preprocessor):
 
     def collect_audio_transcripts(self, label_path:str):
         # open the file and select only entries with desired accents
-        speakers = ["CK", "Deliaan", "Pencil", "Susuan1430"]
+        speakers = ["CK", "Delian", "pencil", "Susan1430"]  # these speakers have north american accents
         print(f"Filtering files by speakers: {speakers}")
+        error_files = {"CK": {"min":6122903, "max": 6123834}} # files in this range are often corrupted
         dir_path = os.path.dirname(label_path)
         with open(label_path) as fid: 
             reader = csv.reader(fid, delimiter='\t')
@@ -262,6 +270,9 @@ class TatoebaPreprocessor(Preprocessor):
                     if line[1] in speakers:
                         audio_path = os.path.join(dir_path, "audio", line[1], line[0]+".mp3")
                         transcript = " ".join(line[2:])
+                        if data_helpers.skip_file(audio_path):
+                            print(f"skipping {audio_path}")
+                            continue
                         self.audio_trans.append((audio_path, transcript))
 
 class UnknownWords():
@@ -305,7 +316,6 @@ class UnknownWords():
         stats_dir = os.path.join(dir_path, "unk_word_stats")
         if not os.path.exists(stats_dir):
             os.makedirs(stats_dir)
-
         stats_dict_fn = os.path.join(stats_dir, base+"_unk-words-stats.json")
         with open(stats_dict_fn, 'w') as fid:
             json.dump(stats_dict, fid)
