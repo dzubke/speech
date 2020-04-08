@@ -115,14 +115,12 @@ onnx/examples
 
 # nohup.out files
 *.out
-<<<<<<< HEAD
 
 #alexnet is tooo big
 alexnet*
 
 #large models
 examples/librispeech/models/ctc_models/20200203/*model
-
 examples/librispeech/models/ctc_models/20200203/20200204/*model
 examples/librispeech/models/ctc_models/20200203/20200205/*model
 examples/librispeech/models/ctc_models/20200203/20200206/*model
@@ -131,8 +129,6 @@ examples/librispeech/models/ctc_models/20200203/20200207/*model
 examples/librispeech/models/ctc_models/20200203/20200210/*model
 examples/librispeech/models/ctc_models/20200203/20200211/*model
 examples/librispeech/models/ctc_models/20200203/20200212/*model
-<<<<<<< HEAD
-=======
 examples/librispeech/models/ctc_models/20200203/20200213/*model
 examples/librispeech/models/ctc_models/20200203/20200218/*model
 onnx_coreml/torch_models/
@@ -144,4 +140,3 @@ onnx_coreml/output/
 onnx_coreml/config/
 onnx_coreml/preproc/
 onnx_coreml/zips/
->>>>>>> 0344bb109e8af1e223ba3e2f153f82dd62e798ff
