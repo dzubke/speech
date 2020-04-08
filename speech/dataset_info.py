@@ -34,7 +34,7 @@ class CommonvoiceDataset(Dataset):
         self.corpus_name = "common-voice"
         self.dataset_name = "common-voice"
         self.audio_dir = "/home/dzubke/awni_speech/data/common-voice/clips/"
-        self.pattern = "*.wav"
+        self.pattern = "*.wv"
 
 class TedliumDataset(Dataset):
     def __init__(self):
