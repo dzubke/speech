@@ -28,14 +28,14 @@ def test_datasets():
             "pattern":"*/*.wv"}
     }
         
-    dataset_name = "train-other-500"
+    dataset_name = "tatoeba"
     dataset = dataset_dir[dataset_name]
     audio_pattern = os.path.join(dataset["path"], dataset["pattern"])
     audio_files = glob.glob(audio_pattern)
     noise_path = "/home/dzubke/awni_speech/data/background_noise/388338__uminari__short-walk-thru-a-noisy-street-in-a-mexico-city.wav"
     for audio_file in audio_files:
         #check_all_noise(audio_file)
-        if data_helpers.skip_file("librispeech", audio_file):
+        if data_helpers.skip_file(dataset_name, audio_file):
             print(f"skipping: {audio_file}")
             continue            
         try:
