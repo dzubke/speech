@@ -194,11 +194,7 @@ class VoxforgePreprocessor(Preprocessor):
                     if audio_path is None:
                         continue
                     # audio_path is corrupted and is skipped
-<<<<<<< HEAD
-                    elif data_helpers.skip_files(audio_path):
-=======
                     elif data_helpers.skip_file(audio_path):
->>>>>>> 8ed5159bbf16556c2f86abbdbd9661570d303ebd
                         continue
                     transcript = line[1:]
                     # transcript should be a string
