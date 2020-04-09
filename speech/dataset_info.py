@@ -1,5 +1,4 @@
 class Dataset():
-    
     def __init__(self, corpus_name:str, dataset_name:str, audio_dir:str, pattern:str):
         self.corpus_name = corpus_name
         self.dataset_name = dataset_name
