@@ -8,7 +8,7 @@ from speech.utils import wave, spec_augment, noise_injector, data_helpers
 from speech import dataset_info
 
 def test_datasets():
-    dataset_name = "Voxforge"
+    dataset_name = "Commonvoice"
     dataset_namme = dataset_name.capitalize()
     # initializing the dataset object specified by dataset_name
     dataset = eval("dataset_info."+dataset_name+"Dataset")()   

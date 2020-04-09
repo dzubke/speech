@@ -13,8 +13,6 @@ def reprocess(dataset_name:str):
     """
     Dataset name should be a key in the dataset_dir.
     """
-    # ensuring the dataset_name is capitalized
-    dataset_name = dataset_name.capitalize()
     # initializing the dataset object specified by dataset_name
     dataset = eval("dataset_info."+dataset_name+"Dataset")()
     audio_pattern = os.path.join(dataset.audio_dir, dataset.pattern)
@@ -32,7 +30,7 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser(
             description="reprocesses the datasets mainly to convert everything to single channel audio.")
     parser.add_argument("--dataset-name", type=str,
-        help="dataset name. Options: Librispeech100, Librispeech360, Librispeech500, Commonvoice, Tedlium, Voxforge, Tatoeba")
+        help="dataset name. Sample options: Libsp100, Commonvoice, Tedlium. See dataset_info.py for full options")
     args = parser.parse_args()
 
     reprocess(args.dataset_name)
