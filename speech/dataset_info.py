@@ -1,3 +1,6 @@
+# stanard library
+import os
+
 class Dataset():
     def __init__(self, corpus_name:str, dataset_name:str, audio_dir:str, pattern:str):
         self.corpus_name = corpus_name
@@ -5,28 +8,61 @@ class Dataset():
         self.audio_dir = audio_dir
         self.pattern = pattern
 
-
-class Librispeech100Dataset(Dataset):
+class AllDatasets():
+    def __init__(self):
+        self.dataset_list = [Librispeech100Dataset(), Librispeech360Dataset(), Librispeech500Dataset(),
+                            LibrispeechTestCleanDataset(), LibrispeechTestOtherDataset(), LibrispeechDevCleanDataset(),
+                            LibrispeechDevOtherDataset(), TedliumDataset(), CommonvoiceDataset(), VoxforgeDataset(),
+                            TatoebaDataset()]
+                            
+class LibrispeechDataset(Dataset):
     def __init__(self):
         self.corpus_name = "librispeech"
+        self.pattern = "*/*/*.wav"
+        self.base_dir = "/home/dzubke/awni_speech/data/LibriSpeech/"
+
+class Librispeech100Dataset(LibrispeechDataset):
+    def __init__(self):
+        super(Librispeech100Dataset, self).__init__()
         self.dataset_name = "train-clean-100"
-        self.audio_dir = "/home/dzubke/awni_speech/data/LibriSpeech/train-clean-100/"
-        self.pattern = "*/*/*.wav"
+        self.audio_dir = os.path.join(self.base_dir, self.dataset_name)
 
-
-class Librispeech360Dataset(Dataset):
+class Librispeech360Dataset(LibrispeechDataset):
     def __init__(self):
-        self.corpus_name = "librispeech"
+        super(Librispeech360Dataset, self).__init__()
         self.dataset_name = "train-clean-360"
-        self.audio_dir = "/home/dzubke/awni_speech/data/LibriSpeech/train-clean-360/"
-        self.pattern = "*/*/*.wav"
+        self.audio_dir = os.path.join(self.base_dir, self.dataset_name)
 
-class Librispeech500Dataset(Dataset):
+class Librispeech500Dataset(LibrispeechDataset):
     def __init__(self):
-        self.corpus_name = "librispeech"
+        super(Librispeech500Dataset, self).__init__()
         self.dataset_name = "train-other-500"
-        self.audio_dir = "/home/dzubke/awni_speech/data/LibriSpeech/train-clean-500/"
-        self.pattern = "*/*/*.wav"
+        self.audio_dir = os.path.join(self.base_dir, self.dataset_name)
+
+class LibrispeechTestCleanDataset(LibrispeechDataset):
+    def __init__(self):
+        super(LibrispeechTestCleanDataset, self).__init__()
+        self.dataset_name = "test-clean"
+        self.audio_dir = os.path.join(self.base_dir, self.dataset_name)
+
+class LibrispeechTestOtherDataset(LibrispeechDataset):
+    def __init__(self):
+        super(LibrispeechTestOtherDataset, self).__init__()
+        self.dataset_name = "test-other"
+        self.audio_dir = os.path.join(self.base_dir, self.dataset_name)
+
+class LibrispeechDevCleanDataset(LibrispeechDataset):
+    def __init__(self):
+        super(LibrispeechDevCleanDataset, self).__init__()
+        self.dataset_name = "dev-clean"
+        self.audio_dir = os.path.join(self.base_dir, self.dataset_name)
+
+class LibrispeechDevOtherDataset(LibrispeechDataset):
+    def __init__(self):
+        super(LibrispeechDevOtherDataset, self).__init__()
+        self.dataset_name = "dev-other"
+        self.audio_dir = os.path.join(self.base_dir, self.dataset_name)
+
 
 class CommonvoiceDataset(Dataset):
     def __init__(self):
