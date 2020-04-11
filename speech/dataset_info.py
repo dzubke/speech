@@ -112,3 +112,10 @@ class TatoebaDataset(Dataset):
         self.dataset_name = "tatoeba"
         self.audio_dir = "/home/dzubke/awni_speech/data/tatoeba/tatoeba_audio_eng/audio/"
         self.pattern = "*/*.wv"
+
+
+class NoiseDataset(Dataset):
+    def __init__(self):
+        self.corpus_name = "noise"
+        self.audio_dir = "/home/dzubke/awni_speech/data/background_noise"
+        self.pattern = "*.wav"
