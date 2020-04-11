@@ -1,3 +1,6 @@
+# stanard library
+import os
+
 class Dataset():
     def __init__(self, corpus_name:str, dataset_name:str, audio_dir:str, pattern:str):
         self.corpus_name = corpus_name
@@ -5,52 +8,60 @@ class Dataset():
         self.audio_dir = audio_dir
         self.pattern = pattern
 
+class AllDatasets():
+    def __init__(self):
+        self.dataset_list = [Librispeech100Dataset(), Librispeech360Dataset(), Librispeech500Dataset(),
+                            LibrispeechTestCleanDataset(), LibrispeechTestOtherDataset(), LibrispeechDevCleanDataset(),
+                            LibrispeechDevOtherDataset(), TedliumDataset(), CommonvoiceDataset(), VoxforgeDataset(),
+                            TatoebaDataset()]
+                            
 class LibrispeechDataset(Dataset):
     def __init__(self):
         self.corpus_name = "librispeech"
-        self.pattern = "*/*/*.wav"        
+        self.pattern = "*/*/*.wav"
+        self.base_dir = "/home/dzubke/awni_speech/data/LibriSpeech/"
 
-class Libsp100Dataset(LibrispeechDataset):
+class Librispeech100Dataset(LibrispeechDataset):
     def __init__(self):
-        super(Libsp100Dataset, self).__init__()
+        super(Librispeech100Dataset, self).__init__()
         self.dataset_name = "train-clean-100"
-        self.audio_dir = "/home/dzubke/awni_speech/data/LibriSpeech/train-clean-100/"
+        self.audio_dir = os.path.join(self.base_dir, self.dataset_name)
 
-class Libsp360Dataset(LibrispeechDataset):
+class Librispeech360Dataset(LibrispeechDataset):
     def __init__(self):
-        super(Libsp360Dataset, self).__init__()
+        super(Librispeech360Dataset, self).__init__()
         self.dataset_name = "train-clean-360"
-        self.audio_dir = "/home/dzubke/awni_speech/data/LibriSpeech/train-clean-360/"
+        self.audio_dir = os.path.join(self.base_dir, self.dataset_name)
 
-class Libsp500Dataset(LibrispeechDataset):
+class Librispeech500Dataset(LibrispeechDataset):
     def __init__(self):
-        super(Libsp500Dataset, self).__init__()
+        super(Librispeech500Dataset, self).__init__()
         self.dataset_name = "train-other-500"
-        self.audio_dir = "/home/dzubke/awni_speech/data/LibriSpeech/train-clean-500/"
+        self.audio_dir = os.path.join(self.base_dir, self.dataset_name)
 
-class LibspTestCleanDataset(LibrispeechDataset):
+class LibrispeechTestCleanDataset(LibrispeechDataset):
     def __init__(self):
-        super(LibspTestCleanDataset, self).__init__()
+        super(LibrispeechTestCleanDataset, self).__init__()
         self.dataset_name = "test-clean"
-        self.audio_dir = "/home/dzubke/awni_speech/data/LibriSpeech/test-clean/"
+        self.audio_dir = os.path.join(self.base_dir, self.dataset_name)
 
-class LibspTestOtherDataset(LibrispeechDataset):
+class LibrispeechTestOtherDataset(LibrispeechDataset):
     def __init__(self):
-        super(LibspTestOtherDataset, self).__init__()
+        super(LibrispeechTestOtherDataset, self).__init__()
         self.dataset_name = "test-other"
-        self.audio_dir = "/home/dzubke/awni_speech/data/LibriSpeech/test-other/"
+        self.audio_dir = os.path.join(self.base_dir, self.dataset_name)
 
-class LibspDevCleanDataset(LibrispeechDataset):
+class LibrispeechDevCleanDataset(LibrispeechDataset):
     def __init__(self):
-        super(LibspDevCleanDataset, self).__init__()
+        super(LibrispeechDevCleanDataset, self).__init__()
         self.dataset_name = "dev-clean"
-        self.audio_dir = "/home/dzubke/awni_speech/data/LibriSpeech/dev-clean/"
+        self.audio_dir = os.path.join(self.base_dir, self.dataset_name)
 
-class LibspDevOtherDataset(LibrispeechDataset):
+class LibrispeechDevOtherDataset(LibrispeechDataset):
     def __init__(self):
-        super(LibspDevOtherDataset, self).__init__()
+        super(LibrispeechDevOtherDataset, self).__init__()
         self.dataset_name = "dev-other"
-        self.audio_dir = "/home/dzubke/awni_speech/data/LibriSpeech/dev-other/"
+        self.audio_dir = os.path.join(self.base_dir, self.dataset_name)
 
 class CommonvoiceDataset(Dataset):
     def __init__(self):
