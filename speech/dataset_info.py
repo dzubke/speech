@@ -71,7 +71,6 @@ class LibrispeechDevOtherDataset(LibrispeechDataset):
         self.dataset_name = "dev-other"
         self.audio_dir = os.path.join(self.base_dir, self.dataset_name)
 
-
 class CommonvoiceDataset(Dataset):
     def __init__(self):
         self.corpus_name = "common-voice"
@@ -84,6 +83,20 @@ class TedliumDataset(Dataset):
         self.corpus_name = "tedlium"
         self.dataset_name = "tedlium"
         self.audio_dir = "/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/data/converted/wav/"
+        self.pattern = "*.wav"
+
+class TedliumDevDataset(Dataset):
+    def __init__(self):
+        self.corpus_name = "tedlium"
+        self.dataset_name = "tedlium-dev"
+        self.audio_dir = "/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/dev/converted/wav/"
+        self.pattern = "*.wav"
+
+class TedliumTestDataset(Dataset):
+    def __init__(self):
+        self.corpus_name = "tedlium"
+        self.dataset_name = "tedlium-test"
+        self.audio_dir = "/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/test/converted/wav/"
         self.pattern = "*.wav"
 
 class VoxforgeDataset(Dataset):

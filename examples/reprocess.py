@@ -26,8 +26,6 @@ def reprocess_one(dataset_name:str):
     """
     Dataset names should be consistent with class names in speech/dataset_info.py
     """
-    # ensuring the dataset_name is capitalized
-    dataset_name = dataset_name.capitalize()
     # initializing the dataset object specified by dataset_name
     dataset = eval("dataset_info."+dataset_name+"Dataset")()
     print(f"Processing {dataset.dataset_name}...")
