@@ -1,5 +1,7 @@
 # stanard library
 import os
+# project library
+from speech.utils import data_helpers
 
 class Dataset():
     def __init__(self, corpus_name:str, dataset_name:str, audio_dir:str, pattern:str):
@@ -7,6 +9,12 @@ class Dataset():
         self.dataset_name = dataset_name
         self.audio_dir = audio_dir
         self.pattern = pattern
+
+    def get_audio_files(self):
+        """
+        returns a list of the audio files in the dataset based on the pattern attribute
+        """
+        return data_helpers.get_files(self.audio_dir, self.pattern)
 
 class AllDatasets():
     def __init__(self):
