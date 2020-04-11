@@ -446,11 +446,11 @@ def apply_spec_augment(inputs, logger):
     policy_dict = {
         0: {'time_warping_para':0, 'frequency_masking_para':0,
             'time_masking_para':0, 'frequency_mask_num':0, 'time_mask_num':0}, 
-        1: {"time_warping_para":5, "frequency_masking_para":60,
+        1: {"time_warping_para":20, "frequency_masking_para":60,
             "time_masking_para":60, "frequency_mask_num":1, "time_mask_num":1},
-        2: {"time_warping_para":5, "frequency_masking_para":30,
+        2: {"time_warping_para":20, "frequency_masking_para":30,
             "time_masking_para":30, "frequency_mask_num":2, "time_mask_num":2},
-        3: {"time_warping_para":5, "frequency_masking_para":20,
+        3: {"time_warping_para":20, "frequency_masking_para":20,
             "time_masking_para":20, "frequency_mask_num":3, "time_mask_num":3},
             }
     
