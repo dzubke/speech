@@ -174,3 +174,10 @@ def skip_file(dataset_name:str, audio_path:str)->bool:
             if file_name in voxforge_errors.values():
                 skip=True
     return skip
+
+
+def get_files(root_dir:str, pattern:str):
+    """
+    returns a list of the files in the root_dir that match the pattern
+    """
+    return glob.glob(os.path.join(root_dir, pattern))

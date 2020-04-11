@@ -16,9 +16,7 @@ def reprocess_all():
     process_list = list()
     for dataset in all_datasets.dataset_list:
         print(f"Collecting {dataset.dataset_name}...")
-        audio_pattern = os.path.join(dataset.audio_dir, dataset.pattern)
-        audio_files = glob.glob(audio_pattern)
-        process_list.append((audio_files, dataset.corpus_name))
+        process_list.append((dataset.get_audio_files(), dataset.corpus_name))
         print(f"Finished collecting {dataset.dataset_name}")
     
     with Pool(num_datasets) as p:
@@ -32,10 +30,8 @@ def reprocess_one(dataset_name:str):
     dataset_name = dataset_name.capitalize()
     # initializing the dataset object specified by dataset_name
     dataset = eval("dataset_info."+dataset_name+"Dataset")()
-    audio_pattern = os.path.join(dataset.audio_dir, dataset.pattern)
-    audio_files = glob.glob(audio_pattern)
     print(f"Processing {dataset.dataset_name}...")
-    convert_glob(audio_files, dataset.corpus_name)
+    convert_glob((dataset.get_audio_files(), dataset.corpus_name)
     print(f"Finished processing {dataset.dataset_name}")
 
 
