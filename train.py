@@ -79,7 +79,7 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
 
         if check_nan(model):
             if use_log: logger.error(f"labels: {[labels]}, label_lens: {label_lens} state_dict: {model.state_dict()}")
-
+            if use_log: log_conv_grads(model, logger)
         it += 1
 
     return it, avg_loss
@@ -252,8 +252,19 @@ def check_nan(model):
     for param in model.parameters():
         if (param!=param).any():
             return True
-    
     return False
+
+def log_conv_grads(model, logger):
+    """
+    records the gradient values for the weight values in model into
+    the logger
+    """
+    # layers with weights
+    weight_layer_types = [torch.nn.modules.conv.Conv2d, torch.nn.modules.batchnorm.BatchNorm2d]
+    # only iterating through conv layers in first elemment of model children
+    for layer in [*model.children()][0]:
+        if type(layer) in weight_layer_types:
+            logger.error(f"grad: {layer}: {layer.weight.grad}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
