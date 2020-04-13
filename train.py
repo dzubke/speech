@@ -73,7 +73,7 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         tq.set_postfix(iter=it, loss=loss,
                 avg_loss=avg_loss, grad_norm=grad_norm,
                 model_time=model_t, data_time=data_t)
-        if use_log: logger.info(f"loss is nan: {math.isnan(loss)}")
+        if use_log: logger.info(f"loss is inf: {loss == float("inf")}")
         if use_log: logger.info(f"iter={it}, loss={round(loss,3)}, grad_norm={round(grad_norm,3)}")
         inputs, labels, input_lens, label_lens = model.collate(*temp_batch)
 
@@ -169,7 +169,11 @@ def run(config, use_log, log_path):
     # Optimizer
     optimizer = torch.optim.SGD(model.parameters(),
                     lr=opt_cfg["learning_rate"],
-                    momentum=opt_cfg["momentum"])
+                    momentum=opt_cfg["momentum"],
+                    dampening=opt_cfg["dampening"])
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 
+        step_size=opt_cfg["sched_step"], 
+        gamma=opt_cfg["sched_gamma"])
 
     if use_log: logger.info(f"====== Model, loaders, optimimzer created =======")
     if use_log: logger.info(f"model: {model}")
@@ -182,6 +186,9 @@ def run(config, use_log, log_path):
     best_so_far = float("inf")
     for e in range(opt_cfg["epochs"]):
         start = time.time()
+        scheduler.step()
+        for g in optimizer.param_groups:
+            print(f"learning rate: {g["lr"]}")
         
         run_state = run_epoch(model, optimizer, train_ldr, logger, *run_state)
         if use_log: logger.info(f"====== Run_state finished =======") 
