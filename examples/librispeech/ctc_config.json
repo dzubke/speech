@@ -1,6 +1,6 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200412/",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200413/",
 
     "data" : {
          "train_set" : "/home/dzubke/awni_speech/data/lib-ted-cv-vox-tat/train_lib-ted-cv-vox-tat.json",
@@ -13,10 +13,10 @@
         "window_size": 32,
         "step_size": 16,
         "use_spec_augment": true,
-        "inject_noise": false,
+        "inject_noise": true,
         "noise_directory": "/home/dzubke/awni_speech/data/background_noise/",
         "noise_prob": 0.7,
-        "noise_levels": [0,1.0] 
+        "noise_levels": [0,0.9] 
     },
 
     "optimizer": {
