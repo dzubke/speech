@@ -73,7 +73,7 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         tq.set_postfix(iter=it, loss=loss,
                 avg_loss=avg_loss, grad_norm=grad_norm,
                 model_time=model_t, data_time=data_t)
-        if use_log: logger.info(f"loss is inf: {loss == float("inf")}")
+        if use_log: logger.info(f'loss is inf: {loss == float("inf")}')
         if use_log: logger.info(f"iter={it}, loss={round(loss,3)}, grad_norm={round(grad_norm,3)}")
         inputs, labels, input_lens, label_lens = model.collate(*temp_batch)
 
@@ -127,25 +127,27 @@ def eval_dev(model, ldr, preproc,  logger):
 
     return loss, cer
 
-def run(config, use_log, log_path):
+def run(config):
 
-    if use_log: 
+    data_cfg = config["data"]
+    log_cfg = config["logger"]
+    preproc_cfg = config["preproc"]
+    opt_cfg = config["optimizer"]
+    model_cfg = config["model"]
+    
+    use_log = log_cfg["use_log"]
+    if use_log:
         # create logger
         logger = logging.getLogger("train_log")
         logger.setLevel(logging.DEBUG)
         # create file handler which logs even debug messages
-        fh = logging.FileHandler(log_path+".log")
+        fh = logging.FileHandler(log_cfg["log_file"])
         fh.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
         fh.setFormatter(formatter)
         logger.addHandler(fh)
     else:
         logger = None
-
-    opt_cfg = config["optimizer"]
-    data_cfg = config["data"]
-    preproc_cfg = config["preproc"]
-    model_cfg = config["model"]
 
     # Loaders
     batch_size = opt_cfg["batch_size"]
@@ -188,7 +190,7 @@ def run(config, use_log, log_path):
         start = time.time()
         scheduler.step()
         for g in optimizer.param_groups:
-            print(f"learning rate: {g["lr"]}")
+            print(f'learning rate: {g["lr"]}')
         
         run_state = run_epoch(model, optimizer, train_ldr, logger, *run_state)
         if use_log: logger.info(f"====== Run_state finished =======") 
@@ -282,10 +284,6 @@ if __name__ == "__main__":
     parser.add_argument("--deterministic", default=False,
         action="store_true",
         help="Run in deterministic mode (no cudnn). Only works on GPU.")
-    parser.add_argument("--use-log", default=False, action="store_true",
-        help="Use a logger to store the calling of commands.")
-    parser.add_argument("--log-path", type=str, default='train-log',
-        help="Path to save log file.")
     args = parser.parse_args()
 
     with open(args.config, 'r') as fid:
@@ -300,4 +298,4 @@ if __name__ == "__main__":
 
     if use_cuda and args.deterministic:
         torch.backends.cudnn.enabled = False
-    run(config, args.use_log, args.log_path)
+    run(config)
