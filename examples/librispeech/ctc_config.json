@@ -12,8 +12,6 @@
         "use_log": true,
         "log_file": "logs/2020-04-13-0413_lib-ted-cv-vox-tat.log"
     },
-    
-    "preproc": {
         "preprocessor": "log_spec",
         "window_size": 32,
         "step_size": 16,
