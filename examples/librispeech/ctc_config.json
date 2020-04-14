@@ -7,7 +7,7 @@
         "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-combo.json",
         "start_and_end" : false
     },
-    
+
     "preproc": {
         "preprocessor": "log_spec",
         "window_size": 32,
