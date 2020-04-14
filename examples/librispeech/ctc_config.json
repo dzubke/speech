@@ -3,7 +3,7 @@
     "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200413/",
 
     "data" : {
-         "train_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
+         "train_set" : "/home/dzubke/awni_speech/data/lib-ted-cv-vox-tat/train_lib-ted-cv-vox-tat.json",
         "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
         "start_and_end" : false
     },
