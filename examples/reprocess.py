@@ -11,6 +11,9 @@ from speech import dataset_info
 
 
 def reprocess_all(force_convert:bool):
+    """
+    if force_convert is true, all files will be converted to_wave
+    """
     all_datasets = dataset_info.AllDatasets()
     num_datasets = len(all_datasets.dataset_list)
     process_list = list()
@@ -19,8 +22,11 @@ def reprocess_all(force_convert:bool):
         process_list.append((dataset.get_audio_files(), dataset.corpus_name, force_convert))
         print(f"Finished collecting {dataset.dataset_name}")
     
-    with Pool(num_datasets) as p:
-        p.starmap(convert_glob, process_list)
+    if force_convert:
+        raise NotImplementedError("I'm lazy. sue me")
+    else:
+        with Pool(num_datasets) as p:
+            p.starmap(convert_glob, process_list)
 
 def reprocess_one(dataset_name:str, force_convert:bool):
     """
