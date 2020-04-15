@@ -19,7 +19,7 @@ def reprocess_all(force_convert:bool):
     process_list = list()
     for dataset in all_datasets.dataset_list:
         print(f"Collecting {dataset.dataset_name}...")
-        process_list.append((dataset.get_audio_files(), dataset.corpus_name))
+        process_list.append((dataset.get_audio_files(), dataset.corpus_name, force_convert))
         print(f"Finished collecting {dataset.dataset_name}")
     
     if force_convert:
@@ -35,7 +35,7 @@ def reprocess_one(dataset_name:str, force_convert:bool):
     # initializing the dataset object specified by dataset_name
     dataset = eval("dataset_info."+dataset_name+"Dataset")()
     print(f"Processing {dataset.dataset_name}...")
-    convert_glob((dataset.get_audio_files(), dataset.corpus_name, force_convert:bool)
+    convert_glob(dataset.get_audio_files(), dataset.corpus_name, force_convert)
     print(f"Finished processing {dataset.dataset_name}")
 
 

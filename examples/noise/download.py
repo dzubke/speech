@@ -1,4 +1,4 @@
-# this file p downloads the source file to create a collection
+# this file  downloads the source file to create a collection
 # of long-duration background noise files
 
 # standard library
@@ -48,18 +48,19 @@ def get_and_write(sound_ids:list, download_dir:str):
     sound_ids and writes the low-quality audio identified by sound_id to the download_dir
     """
     # replace APIKEY_FILE to file with freesound API key
-    APIKEY_FILE = "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/freesound_apikey.txt"
+    APIKEY_FILE = "/home/dzubke/awni_speech/freesound_apikey.txt"
     with open(APIKEY_FILE, 'r') as fid:
-        API_KEY = fid.readline()
-
+        API_KEY = fid.readline().strip()
+    print(f"api key loaded:{API_KEY}")
+    
     GET_TEMPLATE = "https://freesound.org/apiv2/sounds/{sound_id}/?token={API_KEY}"
     min_duration = 20   # min file duration to filter upon
     count_filesnotfound = 0
     count_shortfiles = 0
+    wait_time = 0.100    # wait 100 ms between api calls
 
     print("Processing sound_id list...")
-    for i in tqdm.tqdm(range(5)):
-        sound_id = sound_ids[i]
+    for sound_id in tqdm.tqdm(sound_ids):
         response = requests.get(GET_TEMPLATE.format(sound_id=sound_id, API_KEY=API_KEY))
         properties = json.loads(response.text)
         if len(properties)==1: 
@@ -75,12 +76,12 @@ def get_and_write(sound_ids:list, download_dir:str):
             download_file = os.path.join(download_dir, download_file)
             with open(download_file, 'wb') as fid:
                 fid.write(download_response.content)
-            time.sleep(0.200)    # sleep for 200 ms to not overload API
+            time.sleep(wait_time)    # sleep to not overload API
         else: 
             count_shortfiles +=1
 
     print("finished processing")
-    print(f"Number files not found {count_filesnotfound}")
+    print(f"Number files not found: {count_filesnotfound}")
     print(f"Number files less than  {min_duration} sec: {count_shortfiles}")
 
 
