@@ -125,5 +125,5 @@ class TestNoiseDataset(Dataset):
     def __init__(self):
         self.corpus_name = "noise"
         self.dataset_name = "test-noise"
-        self.audio_dir = "/home/dzubke/awni_speech/data/background_noise/freesound/"
-        self.pattern = "*.mp3"
+        self.audio_dir = "/home/dzubke/awni_speech/data/background_noise/new_20200410/"
+        self.pattern = "*.wav"
