@@ -10,30 +10,36 @@ from speech.utils import convert, data_helpers
 from speech import dataset_info
 
 
-def reprocess_all():
+def reprocess_all(force_convert:bool):
+    """
+    if force_convert is true, all files will be converted to_wave
+    """
     all_datasets = dataset_info.AllDatasets()
     num_datasets = len(all_datasets.dataset_list)
     process_list = list()
     for dataset in all_datasets.dataset_list:
         print(f"Collecting {dataset.dataset_name}...")
-        process_list.append((dataset.get_audio_files(), dataset.corpus_name))
+        process_list.append((dataset.get_audio_files(), dataset.corpus_name, force_convert))
         print(f"Finished collecting {dataset.dataset_name}")
     
-    with Pool(num_datasets) as p:
-        p.starmap(convert_glob, process_list)
+    if force_convert:
+        raise NotImplementedError("I'm lazy. sue me")
+    else:
+        with Pool(num_datasets) as p:
+            p.starmap(convert_glob, process_list)
 
-def reprocess_one(dataset_name:str):
+def reprocess_one(dataset_name:str, force_convert:bool):
     """
     Dataset names should be consistent with class names in speech/dataset_info.py
     """
     # initializing the dataset object specified by dataset_name
     dataset = eval("dataset_info."+dataset_name+"Dataset")()
     print(f"Processing {dataset.dataset_name}...")
-    convert_glob((dataset.get_audio_files(), dataset.corpus_name)
+    convert_glob(dataset.get_audio_files(), dataset.corpus_name, force_convert)
     print(f"Finished processing {dataset.dataset_name}")
 
 
-def convert_glob(audio_files:list, corpus_name:str):
+def convert_glob(audio_files:list, corpus_name:str, force_convert:bool):
     """
     Takes in a glob list of audio file names and applies convert
     to those files. The corpus_name is used to determine which
@@ -44,7 +50,12 @@ def convert_glob(audio_files:list, corpus_name:str):
         if data_helpers.skip_file(corpus_name, audio_file):
             print(f"skipping: {audio_file}")
             continue
-        convert.convert_2channels(audio_file)
+        if force_convert:
+            filename, ext = os.path.splitext(audio_file)
+            wave_file = filename + os.extsep + "wav"
+            convert.to_wave(audio_file, wave_file)
+        else:
+            convert.convert_2channels(audio_file)
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(
@@ -52,9 +63,10 @@ if __name__=="__main__":
     parser.add_argument("--dataset-name", type=str,
         help="dataset name. Options: Librispeech100, Librispeech360, Librispeech500, Commonvoice, Tedlium, Voxforge, Tatoeba")
     parser.add_argument("--all", action='store_true', default=False, help="will reprocess all datasets")
+    parser.add_argument("--force-convert", action='store_true', default=False, help="convert all files")
     args = parser.parse_args()
     
     if args.all:
-        reprocess_all()
+        reprocess_all(args.force_convert)
     else:
-        reprocess_one(args.dataset_name)
+        reprocess_one(args.dataset_name, args.force_convert)

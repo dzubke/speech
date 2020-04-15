@@ -147,8 +147,6 @@ def skip_file(dataset_name:str, audio_path:str)->bool:
     """
     if the audio path is in one of the noted files with errors, return True
     """
-    valid_data_names = ["librispeech", "tedlium", "common-voice", "voxforge", "tatoeba"]
-    if dataset_name not in valid_data_names: raise ValueError("Invalid dataset name")
 
     sets_with_errors = ["tatoeba", "voxforge"]
     # CK is directory name and min, max are the ranges of filenames
