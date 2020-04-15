@@ -45,14 +45,15 @@ def to_wave(audio_file, wave_file, use_avconv=USE_AVCONV):
     args = [prog, "-y", "-i", audio_file, "-ac", "1", "-ar", "16000","-f", "wav", wave_file]
     subprocess.check_output(args, stderr=subprocess.STDOUT)
 
-def convert_2channels(audio_file:str):
+def convert_2channels(audio_file:str, max_channels:int=1):
     """
-    if the input audio file has two channels, the file will be converted
-    to a version with a single channel
+    if the input audio file has more than the max_channels, the file will be converted
+    to a version with a single channel.
+    Set max_channels=0 to convert all files
     """
-    cmd = subprocess.check_output(["soxi", audio_file])  
+    cmd = subprocess.check_output(["soxi", audio_file])
     num_chan = parse_soxi_out(cmd)
-    if num_chan>1: 
+    if num_chan>max_channels: 
         os.rename(audio_file, "/tmp/convert_2channels_audio.wav")
         to_wave("/tmp/convert_2channels_audio.wav", audio_file)
 

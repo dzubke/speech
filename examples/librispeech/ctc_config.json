@@ -1,7 +1,6 @@
 {
     "seed" : 2017,
     "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200412/",
-
     "data" : {
          "train_set" : "/home/dzubke/awni_speech/data/lib-ted-cv-vox-tat/train_lib-ted-cv-vox-tat.json",
         "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-combo.json",
@@ -10,18 +9,16 @@
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-04-12-0413_lib-ted-cv-vox-tat.log"
+        "log_file": "logs/2020-04-13-0413_lib-ted-cv-vox-tat.log"
     },
-    
-    "preproc": {
         "preprocessor": "log_spec",
         "window_size": 32,
         "step_size": 16,
         "use_spec_augment": true,
-        "inject_noise": false,
+        "inject_noise": true,
         "noise_directory": "/home/dzubke/awni_speech/data/background_noise/",
         "noise_prob": 0.7,
-        "noise_levels": [0,1.0] 
+        "noise_levels": [0,0.9] 
     },
 
     "optimizer": {
@@ -39,7 +36,7 @@
         "dropout" : 0.4,
         "convert_model": false,
         "load_trained": true,
-        "trained_path": "examples/librispeech/models/ctc_models/20200412/20200413/best_model", 
+        "trained_path": "examples/librispeech/models/ctc_models/20200413/20200413/best_model", 
         "remove_layers": [],
         "encoder" : {
             "conv" : [
