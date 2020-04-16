@@ -7,6 +7,9 @@ license: MIT
 import argparse
 # third party libraries
 import pandas as pd
+# project libraries
+from speech import dataset_info
+
 
 def assess_commonvoice(validated_path:str, max_occurance:int):
     # 854445 rows total
@@ -27,7 +30,7 @@ def assess_commonvoice(validated_path:str, max_occurance:int):
     val_df, drop_row_count = filter_by_count(val_df, count_dict, max_occurance)
     print(f"number of rows dropped: {drop_row_count}")
     write_path=f"./validated-filtered-{max_occurance}.tsv"
-    val_df.to_csv(write_path, sep="\t")
+    val_df.to_csv(write_path, sep="\t", index=False)
 
 def filter_by_count(in_df:pd.DataFrame, count_dict:dict, filter_value:int):
     """
@@ -49,6 +52,21 @@ def filter_by_count(in_df:pd.DataFrame, count_dict:dict, filter_value:int):
             # dropping the rows in drop_index
             in_df = in_df.drop(index=drop_index)
     return in_df, drop_row_count
+
+
+class TatoebaAssessor():
+
+    def __init__(self):
+        self.dataset = dataset_info.TatoebaDataset()
+    
+
+    def create_report(self):
+        raise NotImplementedError
+    
+
+    def audio_by_speaker(self):
+
+
     
 
 if __name__=="__main__":
