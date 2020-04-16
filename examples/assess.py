@@ -8,6 +8,9 @@ import argparse
 import os
 # third party libraries
 import pandas as pd
+# project libraries
+from speech import dataset_info
+
 
 def assess_commonvoice(validated_path:str, max_occurence:int):
     # 854445 rows total
@@ -52,6 +55,21 @@ def filter_by_count(in_df:pd.DataFrame, count_dict:dict, filter_value:int):
             # dropping the rows in drop_index
             in_df = in_df.drop(index=drop_index)
     return in_df, drop_row_count
+
+
+class TatoebaAssessor():
+
+    def __init__(self):
+        self.dataset = dataset_info.TatoebaDataset()
+    
+
+    def create_report(self):
+        raise NotImplementedError
+    
+
+    def audio_by_speaker(self):
+
+
     
 
 if __name__=="__main__":
