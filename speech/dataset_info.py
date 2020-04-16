@@ -108,6 +108,7 @@ class VoxforgeDataset(Dataset):
 
 class TatoebaDataset(Dataset):
     def __init__(self):
+        super(TatoebaDataset, self).__init__()
         self.corpus_name = "tatoeba"
         self.dataset_name = "tatoeba"
         self.audio_dir = "/home/dzubke/awni_speech/data/tatoeba/tatoeba_audio_eng/audio/"
