@@ -24,7 +24,8 @@ def assess_commonvoice(validated_path:str, max_occurance:int):
     #pd.cut(val_df.sentence.value_counts(sort=True, ascending=False),bin_range).value_counts().sort_index() 
     # dictionary of frequency counts
     count_dict=val_df.sentence.value_counts(sort=True, ascending=False).to_dict() 
-    val_df = filter_by_count(val_df, count_dict, max_occurance)
+    val_df, drop_row_count = filter_by_count(val_df, count_dict, max_occurance)
+    print(f"number of rows dropped: {drop_row_count}")
     write_path=f"./validated-filtered-{max_occurance}.tsv"
     val_df.to_csv(write_path, sep="\t")
 
@@ -34,8 +35,9 @@ def filter_by_count(in_df:pd.DataFrame, count_dict:dict, filter_value:int):
     the fitler_value are reduced to a nubmer of occurances equal to the filter value,
     sentences to be filters will be done based on the difference between the up_votes and down_votes
     """
+    drop_row_count = 0 
     for sentence, count in count_dict.items():
-        if count> filter_value:
+        if count > filter_value:
             # selecting rows that equal sentence
             # then sorting that subset by the vote_diff value in descending order
             # then taking the indicies of the rows after the first # of filter_values
@@ -43,9 +45,10 @@ def filter_by_count(in_df:pd.DataFrame, count_dict:dict, filter_value:int):
             .sort_values("vote_diff", ascending=False)\
             .iloc[filter_value:,:].index
             
+            drop_row_count += len(drop_index)
             # dropping the rows in drop_index
             in_df = in_df.drop(index=drop_index)
-    return in_df
+    return in_df, drop_row_count
     
 
 if __name__=="__main__":
