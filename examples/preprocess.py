@@ -19,7 +19,8 @@ class Preprocessor(object):
                         force_convert:bool, min_duration:float, max_duration:float):
 
         self.dataset_dir = dataset_dir
-        self.lex_dict = data_helpers.lexicon_to_dict(lexicon_path, dataset_name.lower()) if lexicon_path !='' else None
+        self.lex_dict = data_helpers.lexicon_to_dict(lexicon_path, dataset_name.lower())\
+             if lexicon_path !='' else None
         # list of tuples of audio_path and transcripts
         self.audio_trans=list()
         self.force_convert = force_convert
@@ -108,20 +109,21 @@ class Preprocessor(object):
         return transcript
 
     
-class CommonVoicePreprocessor(Preprocessor):
+class CommonvoicePreprocessor(Preprocessor):
     def __init__(self, dataset_dir, dataset_name, lexicon_path,
                         force_convert, min_duration, max_duration):
-        super(CommonVoicePreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
+        super(CommonvoicePreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
             force_convert, min_duration, max_duration)
-        self.dataset_dict = {"dev": "dev.tsv",
-                            "test": "test.tsv",
-                            "train":"train.tsv",
-                            "validated": "validated.tsv"}
+        self.dataset_dict = {
+                            "validated-25-max-repeat": "validated-25-maxrepeat.tsv"
+        }
 
     def process_datasets(self):
         for set_name, label_name in self.dataset_dict.items():
             label_path = os.path.join(self.dataset_dir, label_name)
+            print(f"label_path: {label_path}")
             self.collect_audio_transcripts(label_path)
+            print(f"len of auddio_trans: {len(self.audio_trans)}")
             root, ext = os.path.splitext(label_path)
             json_path = root + os.path.extsep + "json"
             self.write_json(json_path)
@@ -361,9 +363,9 @@ if __name__ == "__main__":
         help="path to pronunciation lexicon, if desired.")
     parser.add_argument("--force-convert", action='store_true', default=False,
         help="Converts audio to wav file even if .wav file already exists.")
-    parser.add_argument("--min-duration", type=float,
+    parser.add_argument("--min-duration", type=float, default=1, 
         help="minimum audio duration in seconds")
-    parser.add_argument("--max-duration", type=float,
+    parser.add_argument("--max-duration", type=float, default=20,
         help="maximum audio duration in seconds")
     args = parser.parse_args()
 
