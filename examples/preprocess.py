@@ -56,6 +56,7 @@ class Preprocessor(object):
                     base, raw_ext = os.path.splitext(audio_path)
                     # using ".wv" extension so that original .wav files can be converteds
                     wav_path = base + os.path.extsep + "wv"
+                    # if the wave file doesn't exist or it should be re-converted, convert to wave
                     if not os.path.exists(wav_path) or self.force_convert:
                         try:
                             convert.to_wave(audio_path, wav_path)
@@ -133,20 +134,16 @@ class CommonVoicePreprocessor(Preprocessor):
         print(f"Filtering files by accents: {accents}")
         dir_path = os.path.dirname(label_path)
         with open(label_path) as fid: 
-            reader = list(csv.reader(fid, delimiter='\t'))
+            reader = csv.reader(fid, delimiter='\t')
             # first line in reader is the header which equals:
             # ['client_id','path','sentence','up_votes','down_votes','age','gender','accent']
-            is_header = True
+            header = next(reader)
             for line in reader:
-                if is_header:
-                    is_header=False
-                    continue
-                else: 
-                    # filter by accent
-                    if line[7] in accents:
-                        audio_path = os.path.join(dir_path, "clips", line[1])
-                        transcript = line[2]
-                        self.audio_trans.append((audio_path, transcript))
+                # filter by accent
+                if line[7] in accents:
+                    audio_path = os.path.join(dir_path, "clips", line[1])
+                    transcript = line[2]
+                    self.audio_trans.append((audio_path, transcript))
 
 
 class VoxforgePreprocessor(Preprocessor):
