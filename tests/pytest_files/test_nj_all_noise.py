@@ -5,7 +5,7 @@ from speech import dataset_info
 import testing_utils
 
 def test_all_noise():
-    noise_dataset = dataset_info.TestNoiseDataset()
+    noise_dataset = dataset_info.NoiseDataset()
     noise_files = noise_dataset.get_audio_files()
     audio_17s ="/home/dzubke/awni_speech/data/LibriSpeech/train-clean-100/19/198/19-198-0034.wav"
     audio_2s = "/home/dzubke/awni_speech/data/LibriSpeech/train-clean-100/19/198/19-198-0000.wav"
