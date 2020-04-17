@@ -48,8 +48,10 @@ def inject_noise_sample(data, sample_rate:int, noise_path:str, noise_level:float
         data = data.astype('float64')
         assert len(data) == len(noise_dst), f"data len: {len(data)}, noise len: {len(noise_dst)}, data size: {data.size}, noise size: {noise_dst.size}, noise_path: {noise_path}"
         noise_energy = np.sqrt(noise_dst.dot(noise_dst) / noise_dst.size)
-        data_energy = np.sqrt(np.abs(data.dot(data)) / data.size)
-        data += noise_level * noise_dst * data_energy / noise_energy
+        # avoid dividing by zero
+        if noise_energy != 0:
+            data_energy = np.sqrt(np.abs(data.dot(data)) / data.size)
+            data += noise_level * noise_dst * data_energy / noise_energy
         return data.astype('int16')
 
 
