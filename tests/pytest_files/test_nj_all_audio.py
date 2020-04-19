@@ -3,7 +3,7 @@ import pytest
 # project libraries
 from speech.utils import noise_injector, data_helpers
 from speech import dataset_info
-import testing_utils
+import utils
 
 def test_dataset():
     dataset_name = "Commonvoice"
@@ -16,7 +16,7 @@ def test_dataset():
             print(f"skipping: {audio_file}")
             continue            
         try:
-            testing_utils.check_length(audio_file, noise_path)
+            utils.check_length(audio_file, noise_path)
         except AssertionError:
             raise AssertionError(f"error in audio: {audio_file} and noise: {noise_path}")
 

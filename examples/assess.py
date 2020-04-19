@@ -6,10 +6,13 @@ license: MIT
 # standard libary
 import argparse
 import os
+import json
 # third party libraries
 import pandas as pd
+import tqdm
 # project libraries
 from speech import dataset_info
+from speech.utils import wave, data_helpers
 
 
 def assess_commonvoice(validated_path:str, max_occurence:int):
@@ -64,12 +67,35 @@ class TatoebaAssessor():
     
 
     def create_report(self):
-        raise NotImplementedError
+        assess_dict  = self.audio_by_speaker()
+        with open("tatoeba_assess.txt", 'w') as fid:
+            fid.write(json.dumps(assess_dict))
     
 
     def audio_by_speaker(self):
-
-
+        """
+        this method counts the duration and number of utterances
+        for each speaker
+        """
+        audio_files = self.dataset.get_audio_files()
+        assess_dict = dict()        
+    
+        print("Analyzing audio files...")
+        for audio_file in tqdm.tqdm(audio_files):
+            # skipping corrupted files
+            if data_helpers.skip_file("tatoeba", audio_file):
+                continue
+            speaker = os.path.basename(os.path.dirname(audio_file))
+            dur = wave.wav_duration(audio_file)/60    # dur in minutes
+            # if no entry for the speaker, create entry
+            if assess_dict.get(speaker) is None:
+                assess_dict.update({speaker: {"dur": dur, "count": 1}}) 
+            else:
+                dur = assess_dict.get(speaker).get("dur") + dur
+                count = assess_dict.get(speaker).get("count") + 1
+                assess_dict.update({speaker: {"dur": dur, "count": count}})
+        
+        return assess_dict
     
 
 if __name__=="__main__":
