@@ -4,7 +4,7 @@ import numpy as np
 # project libraries
 from speech.utils import noise_injector, data_helpers, wave
 from speech import dataset_info
-import testing_utils
+import utils
 
 def test_all_noise_audio():
     all_datasets = dataset_info.AllDatasets()
