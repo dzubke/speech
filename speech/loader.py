@@ -18,6 +18,7 @@ import python_speech_features
 # project libraries
 from speech.utils import wave, spec_augment
 from speech.utils.noise_injector import inject_noise
+from speech.utils.speed_vol_perturb import speed_vol_perturb
 
 
 
@@ -60,6 +61,9 @@ class Preprocessor():
         self.noise_dir = preproc_cfg['noise_directory']
         self.noise_prob = preproc_cfg['noise_prob']
         self.noise_levels = preproc_cfg['noise_levels']
+        self.speed_vol_perturb = preproc_cfg['speed_vol_perturb']
+        self.tempo_range = preproc_cfg['tempo_range']
+        self.gain_range = preproc_cfg['gain_range']
 
         self.mean, self.std = compute_mean_std(audio_files[:max_samples], 
                                                 preprocessor = self.preprocessor,
@@ -99,8 +103,11 @@ class Preprocessor():
 
     def preprocess(self, wave_file, text):
         
-        audio_data, samp_rate = wave.array_from_wave(wave_file)
-        if self.use_log: self.logger.info(f"preprc: audio_data read: {wave_file}")
+        if self.speed_vol_perturb:
+            audio_data, samp_rate = speed_vol_perturb(wave_file, tempo_range=self.tempo_range)
+        else:
+            audio_data, samp_rate = wave.array_from_wave(wave_file)
+        if self.use_log: self.logger.info(f"preproc: audio_data read: {wave_file}")
         
         if self.inject_noise:
             add_noise = np.random.binomial(1, self.noise_prob)
@@ -111,7 +118,6 @@ class Preprocessor():
         if self.preprocessor == "log_spec":
             inputs = log_specgram_from_data(audio_data, samp_rate, self.window_size, self.step_size)
             if self.use_log: self.logger.info(f"preproc: log_spec calculated")
-
         elif self.preprocessor == "mfcc":
            inputs = mfcc_from_data(audio_data, samp_rate, self.window_size, self.step_size)
         else: 
@@ -124,10 +130,8 @@ class Preprocessor():
             inputs = apply_spec_augment(inputs, self.logger)
             if self.use_log: self.logger.info(f"preproc: spec_aug applied")
 
-
         targets = self.encode(text)
         if self.use_log: self.logger.info(f"preproc: text encoded")
-
 
         return inputs, targets
 

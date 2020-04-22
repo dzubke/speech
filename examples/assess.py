@@ -5,17 +5,14 @@ license: MIT
 """
 # standard libary
 import argparse
-import os
-import json
 # third party libraries
 import pandas as pd
-import tqdm
 # project libraries
 from speech.dataset_info import AllDatasets, TatoebaDataset
 from speech.utils import wave, data_helpers
 
 
-def assess_commonvoice(validated_path:str, max_occurence:int):
+def assess_commonvoice(validated_path:str, max_occurance:int):
     # 854445 rows total
     val_df = pd.read_csv(validated_path, delimiter='\t',encoding='utf-8')    
     accents=["us", "canada"]    
@@ -31,17 +28,15 @@ def assess_commonvoice(validated_path:str, max_occurence:int):
     #pd.cut(val_df.sentence.value_counts(sort=True, ascending=False),bin_range).value_counts().sort_index() 
     # dictionary of frequency counts
     count_dict=val_df.sentence.value_counts(sort=True, ascending=False).to_dict() 
-    val_df, drop_row_count = filter_by_count(val_df, count_dict, max_occurence)
-    print(f"dropped {drop_row_count} rows")
-    print(f"expected to drop 6715 rows")
-    cv_dir = os.path.dirname(validated_path)
-    write_path = os.path.join(cv_dir, f"./validated-{max_occurence}-maxrepeat.tsv")
+    val_df, drop_row_count = filter_by_count(val_df, count_dict, max_occurance)
+    print(f"number of rows dropped: {drop_row_count}")
+    write_path=f"./validated-filtered-{max_occurance}.tsv"
     val_df.to_csv(write_path, sep="\t", index=False)
 
 def filter_by_count(in_df:pd.DataFrame, count_dict:dict, filter_value:int):
     """
     filters the dataframe so that seteneces that occur more frequently than
-    the fitler_value are reduced to a nubmer of occurences equal to the filter value,
+    the fitler_value are reduced to a nubmer of occurances equal to the filter value,
     sentences to be filters will be done based on the difference between the up_votes and down_votes
     """
     drop_row_count = 0 
@@ -82,43 +77,23 @@ class TatoebaAssessor():
         self.dataset = TatoebaDataset()  
 
     def create_report(self):
-        assess_dict  = self.audio_by_speaker()
-        with open("tatoeba_assess.txt", 'w') as fid:
-            fid.write(json.dumps(assess_dict))
+        raise NotImplementedError
     
     def audio_by_speaker(self):
-        """
-        this method counts the duration and number of utterances
-        for each speaker
-        """
+        assess_dict = dict()
         audio_files = self.dataset.get_audio_files()
-        assess_dict = dict()        
-    
-        print("Analyzing audio files...")
-        for audio_file in tqdm.tqdm(audio_files):
-            # skipping corrupted files
-            if data_helpers.skip_file("tatoeba", audio_file):
-                continue
-            speaker = os.path.basename(os.path.dirname(audio_file))
-            dur = wave.wav_duration(audio_file)/60    # dur in minutes
-            # if no entry for the speaker, create entry
-            if assess_dict.get(speaker) is None:
-                assess_dict.update({speaker: {"dur": dur, "count": 1}}) 
-            else:
-                dur = assess_dict.get(speaker).get("dur") + dur
-                count = assess_dict.get(speaker).get("count") + 1
-                assess_dict.update({speaker: {"dur": dur, "count": count}})
-        
-        return assess_dict
+
+
+
     
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(
-        description="filters the validated.tsv file based on accent and sentence occurence")
+        description="filters the validated.tsv file based on accent and sentence occurance")
     parser.add_argument("--validated-path", type=str,
         help="path to validated.tsv file to parse.")
-    parser.add_argument("--max-occurence", type=int,
+    parser.add_argument("--max-occurance", type=int,
         help="max number of times a sentence can occur in output")
     args = parser.parse_args()
 
-    assess_commonvoice(args.validated_path, args.max_occurence)
+    assess_commonvoice(args.validated_path, args.max_occurance)
