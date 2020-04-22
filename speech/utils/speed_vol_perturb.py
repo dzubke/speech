@@ -14,7 +14,7 @@ of an input file by path.
 """
 
 
-def augment_audio_with_sox(path, sample_rate, tempo, gain):
+def augment_audio_with_sox(path, sample_rate, tempo, gain)->tuple:
     """
     Changes tempo and gain of the recording with sox and loads it.
     """
@@ -26,10 +26,10 @@ def augment_audio_with_sox(path, sample_rate, tempo, gain):
                                                                                       " ".join(sox_augment_params))
         os.system(sox_params)
         data, samp_rate = array_from_wave(augmented_filename)
-        return data
+        return data, samp_rate
 
 def speed_vol_perturb(path, sample_rate=16000, tempo_range=(0.85, 1.15),
-                                  gain_range=(-6, 8)):
+                                  gain_range=(-6, 8))->tuple:
     """
     Picks tempo and gain uniformly, applies it to the utterance by using sox utility.
     Returns the augmented utterance.
@@ -38,6 +38,6 @@ def speed_vol_perturb(path, sample_rate=16000, tempo_range=(0.85, 1.15),
     tempo_value = np.random.uniform(low=low_tempo, high=high_tempo)
     low_gain, high_gain = gain_range
     gain_value = np.random.uniform(low=low_gain, high=high_gain)
-    audio = augment_audio_with_sox(path=path, sample_rate=sample_rate,
+    audio, samp_rate = augment_audio_with_sox(path=path, sample_rate=sample_rate,
                                    tempo=tempo_value, gain=gain_value)
-    return audio
+    return audio, samp_rate 
