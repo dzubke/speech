@@ -111,7 +111,6 @@ class Preprocessor():
         if self.preprocessor == "log_spec":
             inputs = log_specgram_from_data(audio_data, samp_rate, self.window_size, self.step_size)
             if self.use_log: self.logger.info(f"preproc: log_spec calculated")
-
         elif self.preprocessor == "mfcc":
            inputs = mfcc_from_data(audio_data, samp_rate, self.window_size, self.step_size)
         else: 
@@ -124,10 +123,8 @@ class Preprocessor():
             inputs = apply_spec_augment(inputs, self.logger)
             if self.use_log: self.logger.info(f"preproc: spec_aug applied")
 
-
         targets = self.encode(text)
         if self.use_log: self.logger.info(f"preproc: text encoded")
-
 
         return inputs, targets
 

@@ -7,13 +7,11 @@ import soundfile
 
 def array_from_wave(file_name):
     audio, samp_rate = soundfile.read(file_name, dtype='int16')
-    
     return audio, samp_rate
 
 def wav_duration(file_name):
     audio, samp_rate = soundfile.read(file_name, dtype='int16')
     nframes = audio.shape[0]
     duration = nframes / samp_rate
-
     return duration
  
