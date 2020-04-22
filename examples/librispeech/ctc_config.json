@@ -19,7 +19,10 @@
         "inject_noise": true,
         "noise_directory": "/home/dzubke/awni_speech/data/background_noise/",
         "noise_prob": 0.7,
-        "noise_levels": [0,0.9] 
+        "noise_levels": [0,0.9], 
+        "speed_vol_perturb":true, 
+        "tempo_range": [0.85, 1.15],
+        "gain_range":[1.0,1.0]
     },
 
     "optimizer": {
