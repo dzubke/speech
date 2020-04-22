@@ -9,7 +9,7 @@
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-04-19_lib-ted-cv-VAL.log"
+        "log_file": "logs/2020-04-19-21_lib-ted-cv-VAL.log"
     },
     "preproc":{
         "preprocessor": "log_spec",
@@ -37,7 +37,7 @@
         "dropout" : 0.4,
         "convert_model": false,
         "load_trained": true,
-        "trained_path": "examples/librispeech/models/ctc_models/20200418/model", 
+        "trained_path": "examples/librispeech/models/ctc_models/20200419/20200420/best_model", 
         "remove_layers": [],
         "encoder" : {
             "conv" : [

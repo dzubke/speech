@@ -1,0 +1,11 @@
+<class 'speech.dataset_info.Librispeech100Dataset'>: 100.59054965277778
+<class 'speech.dataset_info.Librispeech360Dataset'>: 363.60299008680494
+<class 'speech.dataset_info.Librispeech500Dataset'>: 496.8528439409678
+<class 'speech.dataset_info.LibrispeechTestCleanDataset'>: 5.403466840277771
+<class 'speech.dataset_info.LibrispeechTestOtherDataset'>: 5.3415472569444296
+<class 'speech.dataset_info.LibrispeechDevCleanDataset'>: 5.387811319444452
+<class 'speech.dataset_info.LibrispeechDevOtherDataset'>: 5.121184826388883
+<class 'speech.dataset_info.TedliumDataset'>: 162.54123055555795
+<class 'speech.dataset_info.CommonvoiceDataset'>: 277.61228000004303
+<class 'speech.dataset_info.VoxforgeDataset'>: 129.72241222222266
+<class 'speech.dataset_info.TatoebaDataset'>: 183.1524260936911
