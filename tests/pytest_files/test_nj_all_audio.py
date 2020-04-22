@@ -19,5 +19,7 @@ def test_dataset():
             utils.check_length(audio_file, noise_path)
         except AssertionError:
             raise AssertionError(f"error in audio: {audio_file} and noise: {noise_path}")
-
-
+        except FileNotFoundError:
+            raise FileNotFoundError(f"audio: {audio_file} and noise: {noise_file}")
+        except:
+            raise Exception(f"audio: {audio_file}, noise: {noise_path}")

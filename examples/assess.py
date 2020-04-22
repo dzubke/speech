@@ -11,7 +11,7 @@ import json
 import pandas as pd
 import tqdm
 # project libraries
-from speech import dataset_info
+from speech.dataset_info import AllDatasets, TatoebaDataset
 from speech.utils import wave, data_helpers
 
 
@@ -60,18 +60,32 @@ def filter_by_count(in_df:pd.DataFrame, count_dict:dict, filter_value:int):
     return in_df, drop_row_count
 
 
+class DurationAssessor():
+
+    def __init__(self):
+        self.datasets = AllDatasets().dataset_list
+
+    def duration_report(self, save_path:str):
+        with open(save_path, 'w') as fid:
+            for dataset in self.datasets:
+                duration = dataset.get_duration()
+                name = str(type(dataset))
+                out_string = "{0}: {1}\n".format(name, duration)
+                fid.write(out_string)
+            
+
+
+
 class TatoebaAssessor():
 
     def __init__(self):
-        self.dataset = dataset_info.TatoebaDataset()
-    
+        self.dataset = TatoebaDataset()  
 
     def create_report(self):
         assess_dict  = self.audio_by_speaker()
         with open("tatoeba_assess.txt", 'w') as fid:
             fid.write(json.dumps(assess_dict))
     
-
     def audio_by_speaker(self):
         """
         this method counts the duration and number of utterances
