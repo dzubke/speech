@@ -229,7 +229,6 @@ def load_from_trained(model, model_cfg):
             model (torch model)
             model_cfg (dict)
     """
-
     trained_model = torch.load(model_cfg["trained_path"], map_location=torch.device('cpu'))
     trained_state_dict = trained_model.state_dict()
     trained_state_dict = filter_state_dict(trained_state_dict, remove_layers=model_cfg["remove_layers"])
