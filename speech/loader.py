@@ -21,12 +21,13 @@ from speech.utils.noise_injector import inject_noise
 from speech.utils.speed_vol_perturb import speed_vol_perturb
 
 
+
 class Preprocessor():
 
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, preproc_cfg, logger, max_samples=100, start_and_end=True):
+    def __init__(self, data_json, preproc_cfg, logger=None, max_samples=100, start_and_end=True):
         """
         Builds a preprocessor from a dataset.
         Arguments:
@@ -53,7 +54,6 @@ class Preprocessor():
         self.preprocessor = preproc_cfg['preprocessor']
         self.window_size = preproc_cfg['window_size']
         self.step_size = preproc_cfg['step_size']
-        self.normalize = preproc_cfg['normalize']
         self.SPEC_AUGMENT_STATIC = preproc_cfg['use_spec_augment']
         self.spec_augment = preproc_cfg['use_spec_augment']
         self.INJECT_NOISE_STATIC = preproc_cfg['inject_noise']
@@ -123,13 +123,7 @@ class Preprocessor():
         else: 
            raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
         
-        #inputs = (inputs - self.mean) / self.std
-        if self.normalize:
-            mean = inputs.mean()
-            std = inputs.std()
-            inputs -= mean
-            inputs /= std
-            
+        inputs = (inputs - self.mean) / self.std
         if self.use_log: self.logger.info(f"preproc: normalized")
 
         if self.spec_augment:
@@ -160,6 +154,7 @@ class Preprocessor():
             self.spec_augment = True
         if self.INJECT_NOISE_STATIC:
             self.inject_noise = True
+
 
     @property
     def input_dim(self):
