@@ -1,0 +1,60 @@
+{
+    "seed" : 2017,
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200422/",
+    "data" : {
+         "train_set" : "/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv.json",
+        "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-combo.json",
+        "start_and_end" : false
+    },
+
+    "logger":{
+        "use_log": true,
+        "log_file": "logs/2020-04-22_lib-ted-cv.log"
+    },
+    "preproc":{
+        "preprocessor": "log_spec",
+        "window_size": 32,
+        "step_size": 16,
+        "normalize": true,
+        "use_spec_augment": true,
+        "inject_noise": true,
+        "noise_directory": "/home/dzubke/awni_speech/data/background_noise/",
+        "noise_prob": 0.7,
+        "noise_levels": [0,0.7], 
+        "speed_vol_perturb":true, 
+        "tempo_range": [0.85, 1.15],
+        "gain_range":[1.0,1.0]
+    },
+
+    "optimizer": {
+        "batch_size" : 8,
+        "epochs" : 100,
+        "learning_rate" : 8e-4,
+        "momentum" : 0.9, 
+        "dampening": 0.98,
+        "sched_gamma": 0.90, 
+        "sched_step": 1
+    },
+
+    "model" : {
+        "class" : "CTC",
+        "dropout" : 0.4,
+        "convert_model": false,
+        "load_trained": true,
+        "trained_path": "examples/librispeech/models/ctc_models/20200419/20200420/best_model", 
+        "remove_layers": [],
+        "encoder" : {
+            "conv" : [
+			[32, 11, 41, 1, 2, 0, 20],
+			[32, 11, 21, 1, 2, 0, 10],
+			[96, 11, 21, 1, 1, 0, 10]
+             ],
+            "rnn" : {
+                "type": "LSTM",
+                "dim" : 512,
+                "bidirectional" : false,
+                "layers" : 5
+            }
+        }
+    }
+}
