@@ -426,7 +426,7 @@ def plot_spectrogram(f, t, Sxx):
     Note: the function scipy.signal.spectrogram returns f, t, Sxx in that order
     """
     plt.pcolormesh(t, f, Sxx)
-    plt.ylabel('Frequency [Hz]')
+    plt.ylabel('Frequency [Hz]')k
     plt.xlabel('Time [sec]')
     plt.show()
 
@@ -438,7 +438,7 @@ def read_data_json(data_json):
 def apply_spec_augment(inputs, logger):
     """calls the spec_augment function on the normalized log_spec. A policy defined 
         in the policy_dict will be chosen uniformly at random.
-    Arguments:git a
+    Arguments:
         inputs (np.ndarray): normalized log_spec with dimensional order time x freq
     Returns:
         inputs (nd.ndarray): the modified log_spec array with order time x freq
