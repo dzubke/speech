@@ -19,3 +19,5 @@ class Config:
         self.opt_cfg = config["optimizer"]
         self.model_cfg = config["model"]
 
+    def __str__(self):
+        return "hello"

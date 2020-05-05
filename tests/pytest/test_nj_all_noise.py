@@ -13,13 +13,13 @@ import utils
 def test_main():
     
     # runs all the noise files against a set of audio files
-    #check_all_noise()
+    check_all_noise()
     
     # tests a set of noise and audio files against a range of noise_levels
-    #check_noise_level()
+    check_noise_level()
 
     # tests audio_with_sox utility that creates a range of segments for all noise files 
-    check_audio_with_sox()
+    #check_audio_with_sox()
 
 
 def check_all_noise():
@@ -37,8 +37,8 @@ def check_all_noise():
                 raise AssertionError(f"audio: {audio_file} and noise: {noise_file}")
             except FileNotFoundError:
                 raise FileNotFoundError(f"audio: {audio_file} and noise: {noise_file}")
-            except:
-                raise Exception(f"audio: {audio_file}, noise: {noise_path}")
+            #except:
+                #raise Exception(f"audio: {audio_file}, noise: {noise_file}")
             
 def check_noise_level():
     """
