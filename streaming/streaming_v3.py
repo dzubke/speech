@@ -1,13 +1,24 @@
+# standard libraries
 import time, logging
 from datetime import datetime
 import threading, collections, queue, os, os.path
-import deepspeech
+# third-party libraries
 import numpy as np
 import pyaudio
 import wave
 import webrtcvad
 from halo import Halo
 from scipy import signal
+import matplotlib.pyplot as plt
+import torch
+# project libraries
+import speech
+from speech.utils.convert import to_numpy
+import speech.models as models
+from speech.loader import log_specgram_from_data
+from speech.models.ctc_decoder import decode as ctc_decode
+from speech.utils import compat 
+
 
 logging.basicConfig(level=20)
 
@@ -18,7 +29,7 @@ class Audio(object):
     # Network/VAD rate-space
     RATE_PROCESS = 16000
     CHANNELS = 1
-    BLOCKS_PER_SECOND = 50
+    BLOCKS_PER_SECOND = 62.5
 
     def __init__(self, callback=None, device=None, input_rate=RATE_PROCESS, file=None):
         def proxy_callback(in_data, frame_count, time_info, status):
@@ -34,6 +45,7 @@ class Audio(object):
         self.sample_rate = self.RATE_PROCESS
         self.block_size = int(self.RATE_PROCESS / float(self.BLOCKS_PER_SECOND))
         self.block_size_input = int(self.input_rate / float(self.BLOCKS_PER_SECOND))
+        print(f"block_size input {self.block_size_input}")
         self.pa = pyaudio.PyAudio()
 
         kwargs = {
@@ -50,7 +62,7 @@ class Audio(object):
         if self.device:
             kwargs['input_device_index'] = self.device
         elif file is not None:
-            self.chunk = 320
+            self.chunk = 256
             self.wf = wave.open(file, 'rb')
 
         self.stream = self.pa.open(**kwargs)
@@ -89,14 +101,13 @@ class Audio(object):
 
     def write_wav(self, filename, data):
         logging.info("write wav %s", filename)
-        wf = wave.open(filename, 'wb')
-        wf.setnchannels(self.CHANNELS)
-        # wf.setsampwidth(self.pa.get_sample_size(FORMAT))
-        assert self.FORMAT == pyaudio.paInt16
-        wf.setsampwidth(2)
-        wf.setframerate(self.sample_rate)
-        wf.writeframes(data)
-        wf.close()
+        with wave.open(filename, 'wb') as wf:
+            wf.setnchannels(self.CHANNELS)
+            # wf.setsampwidth(self.pa.get_sample_size(FORMAT))
+            assert self.FORMAT == pyaudio.paInt16
+            wf.setsampwidth(2)
+            wf.setframerate(self.sample_rate)
+            wf.writeframes(data)
 
 
 class VADAudio(Audio):
@@ -122,50 +133,25 @@ class VADAudio(Audio):
                       |---utterence---|        |---utterence---|
         """
         if frames is None: frames = self.frame_generator()
-        num_padding_frames = padding_ms // self.frame_duration_ms
-        ring_buffer = collections.deque(maxlen=num_padding_frames)
-        triggered = False
-
         for frame in frames:
-            if len(frame) < 640:
-                return
+            yield frame
 
-            is_speech = self.vad.is_speech(frame, self.sample_rate)
 
-            if not triggered:
-                ring_buffer.append((frame, is_speech))
-                num_voiced = len([f for f, speech in ring_buffer if speech])
-                if num_voiced > ratio * ring_buffer.maxlen:
-                    triggered = True
-                    for f, s in ring_buffer:
-                        yield f
-                    ring_buffer.clear()
-
-            else:
-                yield frame
-                ring_buffer.append((frame, is_speech))
-                num_unvoiced = len([f for f, speech in ring_buffer if not speech])
-                if num_unvoiced > ratio * ring_buffer.maxlen:
-                    triggered = False
-                    yield None
-                    ring_buffer.clear()
+def max_decode(output, blank=39):
+    pred = np.argmax(output, 1)
+    prev = pred[0]
+    seq = [prev] if prev != blank else []
+    for p in pred[1:]:
+        if p != blank and p != prev:
+            seq.append(p)
+        prev = p
+    return seq
 
 def main(ARGS):
-    # Load DeepSpeech model
-    if os.path.isdir(ARGS.model):
-        model_dir = ARGS.model
-        ARGS.model = os.path.join(model_dir, 'output_graph.pb')
-        ARGS.lm = os.path.join(model_dir, ARGS.lm)
-        ARGS.trie = os.path.join(model_dir, ARGS.trie)
 
     print('Initializing model...')
-    logging.info("ARGS.model: %s", ARGS.model)
-    model = deepspeech.Model(ARGS.model, ARGS.beam_width)
-    if ARGS.lm and ARGS.trie:
-        logging.info("ARGS.lm: %s", ARGS.lm)
-        logging.info("ARGS.trie: %s", ARGS.trie)
-        model.enableDecoderWithLM(ARGS.lm, ARGS.trie, ARGS.lm_alpha, ARGS.lm_beta)
-
+    model, preproc = speech.load(ARGS.model, tag='best')
+    model.eval()
     # Start audio with VAD
     vad_audio = VADAudio(aggressiveness=ARGS.vad_aggressiveness,
                          device=ARGS.device,
@@ -178,23 +164,117 @@ def main(ARGS):
     spinner = None
     if not ARGS.nospinner:
         spinner = Halo(spinner='line')
-    stream_context = model.createStream()
-    wav_data = bytearray()
-    for frame in frames:
-        if frame is not None:
+
+    wav_data           = bytearray()
+    audio_buffer_size   = 2   # 2 steps in the log_spec window
+    conv_buffer_size    = 31 # num of log_spec timesteps to feed into model
+    audio_ring_buffer   = collections.deque(maxlen=audio_buffer_size)
+    conv_ring_buffer    = collections.deque(maxlen=conv_buffer_size)
+    predictions         = list()
+    probs_list          = list()
+    frames_per_block    = round(
+        vad_audio.RATE_PROCESS / vad_audio.BLOCKS_PER_SECOND * 2
+    ) 
+    # initialize the hidden and cells states of the LSTM layers
+    hidden_in           = torch.zeros((5, 1, 512), dtype=torch.float32)
+    cell_in             = torch.zeros((5, 1, 512), dtype=torch.float32)
+
+    # ------------ logging ---------------
+    logging.info(ARGS)
+    logging.info(model)
+    logging.info(preproc)
+    # ------------ logging ---------------
+
+    try:
+        for count, frame in enumerate(frames):
             if spinner: spinner.start()
-            logging.debug("streaming frame")
-            model.feedAudioContent(stream_context, np.frombuffer(frame, np.int16))
+            # exit the loop if there are no more full input frames
+            if len(frame) <  frames_per_block:
+                break
+
+            # ------------ logging ---------------
+            logging.debug(f"frame length: {len(frame)}")
+            logging.debug(f"audio_buffer length: {len(audio_ring_buffer)}")
+            # ------------ logging ---------------
+
+            # fill up the audio_ring_buffer and then feed into the model
+            if len(audio_ring_buffer) < audio_buffer_size-1:
+                audio_ring_buffer.append(frame)
+            else: 
+                audio_ring_buffer.append(frame)
+                buffer_list = list(audio_ring_buffer)
+                numpy_buffer = np.concatenate(
+                    (np.frombuffer(buffer_list[0], np.int16), 
+                    np.frombuffer(buffer_list[1], np.int16)))
+                log_spec_step = log_specgram_from_data(numpy_buffer, samp_rate=16000)
+                # normalize the log_spec, older preproc objects do not have "normalize" method
+                if hasattr(preproc, "normalize"):
+                    norm_log_spec = preproc.normalize(log_spec_step)
+                else: 
+                    norm_log_spec = compat.normalize(preproc, log_spec_step)
+
+                # ------------ logging ---------------
+                logging.debug(f"numpy_buffer shape: {numpy_buffer.shape}")
+                logging.debug(f"log_spec_step shape: {log_spec_step.shape}")
+                # ------------ logging ---------------
+
+                # fill up the conv_ring_buffer and then feed into the model
+                logging.debug(f"conv_buffer length: {len(conv_ring_buffer)}")
+                if len(conv_ring_buffer) < conv_buffer_size-1:
+                    conv_ring_buffer.append(norm_log_spec)
+                else: 
+                    conv_ring_buffer.append(norm_log_spec)
+                    # log_spec are freq (257) x time (11)
+                    conv_context = np.concatenate(list(conv_ring_buffer), axis=0)
+                    # addding batch dimension
+                    conv_context = np.expand_dims(conv_context, axis=0)
+                    model_out = model(torch.from_numpy(conv_context), (hidden_in, cell_in))
+                    probs, (hidden_out, cell_out) = model_out
+                    probs = to_numpy(probs)
+                    probs_list.append(probs)
+                    hidden_in, cell_in = hidden_out, cell_out
+                    
+                    # ------------ logging ---------------
+                    logging.debug(f"conv_context shape: {conv_context.shape}")
+                    logging.debug(f"probs shape: {probs.shape}")
+                    logging.debug(f"probs_list len: {len(probs_list)}")
+                    #logging.debug(f"probs value: {probs}")
+                    # ------------ logging ---------------
+                
+                    # decoder_context = 1
+                    # count_offset = 30 + decoder_context   # num of steps decoder is behind loop counnt
+                    # if len(probs_list) >= decoder_context:
+                    #     probs_start = count - count_offset
+                    #     probs_end = count - count_offset + decoder_context
+                    #     probs_steps = np.concatenate(probs_list[probs_start:probs_end], axis=1)
+                    #     int_labels = max_decode(probs_steps[0], blank=39)
+                    #     # int_labels, likelihood = ctc_decode(probs[0], beam_size=50, blank=39)
+                    #     predictions = preproc.decode(int_labels)
+
+
+                    if count%20 ==0 and count!=0:
+                        probs_steps = np.concatenate(probs_list, axis=1)
+                        int_labels = max_decode(probs_steps[0], blank=39)
+                        # int_labels, likelihood = ctc_decode(probs[0], beam_size=50, blank=39)
+                        predictions = preproc.decode(int_labels)
+
+                        # ------------ logging ---------------
+                        logging.info(f"predictions: {predictions}")
+                        # ------------ logging ---------------
+
             if ARGS.savewav: wav_data.extend(frame)
-        else:
-            if spinner: spinner.stop()
-            logging.debug("end utterence")
-            if ARGS.savewav:
-                vad_audio.write_wav(os.path.join(ARGS.savewav, datetime.now().strftime("savewav_%Y-%m-%d_%H-%M-%S_%f.wav")), wav_data)
-                wav_data = bytearray()
-            text = model.finishStream(stream_context)
-            print("Recognized: %s" % text)
-            stream_context = model.createStream()
+
+    except KeyboardInterrupt:
+        pass
+    finally: 
+        vad_audio.destroy()
+        if ARGS.savewav:
+            vad_audio.write_wav(os.path.join(ARGS.savewav, datetime.now().strftime("savewav_%Y-%m-%d_%H-%M-%S_%f.wav")), wav_data)
+            all_audio = np.frombuffer(wav_data, np.int16)
+            plt.plot(all_audio)
+            #plt.figure()
+            plt.show()
+
 
 if __name__ == '__main__':
     BEAM_WIDTH = 500
@@ -213,21 +293,12 @@ if __name__ == '__main__':
                         help="Save .wav files of utterences to given directory")
     parser.add_argument('-f', '--file',
                         help="Read from .wav file instead of microphone")
-
-    parser.add_argument('-m', '--model', required=True,
+    parser.add_argument('-m', '--model',
                         help="Path to the model (protocol buffer binary file, or entire directory containing all standard-named files for model)")
-    parser.add_argument('-l', '--lm', default='lm.binary',
-                        help="Path to the language model binary file. Default: lm.binary")
-    parser.add_argument('-t', '--trie', default='trie',
-                        help="Path to the language model trie file created with native_client/generate_trie. Default: trie")
     parser.add_argument('-d', '--device', type=int, default=None,
                         help="Device input index (Int) as listed by pyaudio.PyAudio.get_device_info_by_index(). If not provided, falls back to PyAudio.get_default_device().")
     parser.add_argument('-r', '--rate', type=int, default=DEFAULT_SAMPLE_RATE,
                         help=f"Input device sample rate. Default: {DEFAULT_SAMPLE_RATE}. Your device may require 44100.")
-    parser.add_argument('-la', '--lm_alpha', type=float, default=LM_ALPHA,
-                        help=f"The alpha hyperparameter of the CTC decoder. Language Model weight. Default: {LM_ALPHA}")
-    parser.add_argument('-lb', '--lm_beta', type=float, default=LM_BETA,
-                        help=f"The beta hyperparameter of the CTC decoder. Word insertion bonus. Default: {LM_BETA}")
     parser.add_argument('-bw', '--beam_width', type=int, default=BEAM_WIDTH,
                         help=f"Beam width used in the CTC decoder when building candidate transcriptions. Default: {BEAM_WIDTH}")
 

@@ -101,6 +101,10 @@ class Preprocessor():
             e = text.index(self.END)
         return text[s:e]
 
+    def normalize(self, np_arr:np.ndarray):
+        output = (np_arr - self.mean) / self.std
+        return output.astype(np.float32)
+
     def preprocess(self, wave_file, text):
         
         if self.speed_vol_perturb:
@@ -123,7 +127,7 @@ class Preprocessor():
         else: 
            raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
         
-        inputs = (inputs - self.mean) / self.std
+        inputs = self.normalize(inputs)
         if self.use_log: self.logger.info(f"preproc: normalized")
 
         if self.spec_augment:
@@ -171,13 +175,13 @@ class Preprocessor():
             "start_and_end", "int_to_char", "char_to_int"]
             string="Showing up-to-date attributes"
             for name in attribute_names:
-                string += name +": " + str(eval("self."+name))+"\n"
+                string += "\n" + name + ": " + str(eval("self."+name))
             return string
         except AttributeError:
             attribute_names = ["_input_dim", "start_and_end", "int_to_char", "char_to_int"]
             string="Showing limited attributes as not all new attributes are supported\n"
             for name in attribute_names:
-                string += name +": " + str(eval("self."+name))+"\n"
+                string += "\n" + name +": " + str(eval("self."+name))
             return string
 
 def compute_mean_std(audio_files, preprocessor, window_size, step_size):
@@ -426,7 +430,7 @@ def plot_spectrogram(f, t, Sxx):
     Note: the function scipy.signal.spectrogram returns f, t, Sxx in that order
     """
     plt.pcolormesh(t, f, Sxx)
-    plt.ylabel('Frequency [Hz]')k
+    plt.ylabel('Frequency [Hz]')
     plt.xlabel('Time [sec]')
     plt.show()
 
