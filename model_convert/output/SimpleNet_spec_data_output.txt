@@ -1,0 +1,79 @@
+torch version: 1.4.0
+onnx version: 1.6.0
+onnxruntime version: 1.1.1
+before export
+shape before conv:  torch.Size([1, 1, 200, 161])
+shape after conv:  torch.Size([1, 32, 196, 130])
+shape after transpose:  torch.Size([1, 196, 32, 130])
+shape after flattening:  torch.Size([1, 196, 4160])
+graph(%input : Float(1, 200, 161),
+      %conv.weight : Float(32, 1, 5, 32),
+      %conv.bias : Float(32),
+      %gru.weight_ih_l0 : Float(60, 4160),
+      %gru.weight_hh_l0 : Float(60, 20),
+      %gru.bias_ih_l0 : Float(60),
+      %gru.bias_hh_l0 : Float(60)):
+  %7 : Float(1, 1, 200, 161) = onnx::Unsqueeze[axes=[1]](%input) # SimpleNet.py:32:0
+  %8 : Float(1, 32, 196, 130) = onnx::Conv[dilations=[1, 1], group=1, kernel_shape=[5, 32], pads=[0, 0, 0, 0], strides=[1, 1]](%7, %conv.weight, %conv.bias) # /Users/dustin/opt/miniconda3/envs/awni_env36/lib/python3.6/site-packages/torch/nn/modules/conv.py:342:0
+  %9 : Float(1, 196, 32, 130) = onnx::Transpose[perm=[0, 2, 1, 3]](%8) # SimpleNet.py:43:0
+  %10 : Tensor = onnx::Constant[value=    1   196  4160 [ CPULongType{3} ]]()
+  %11 : Float(1, 196, 4160) = onnx::Reshape(%9, %10) # SimpleNet.py:74:0
+  %12 : Tensor = onnx::Shape(%11)
+  %13 : Tensor = onnx::Constant[value={0}]()
+  %14 : Long() = onnx::Gather[axis=0](%12, %13) # /Users/dustin/opt/miniconda3/envs/awni_env36/lib/python3.6/site-packages/torch/nn/modules/rnn.py:699:0
+  %15 : Long() = onnx::Constant[value={1}]()
+  %16 : Long() = onnx::Constant[value={20}]()
+  %17 : Tensor = onnx::Unsqueeze[axes=[0]](%15)
+  %18 : Tensor = onnx::Unsqueeze[axes=[0]](%14)
+  %19 : Tensor = onnx::Unsqueeze[axes=[0]](%16)
+  %20 : Tensor = onnx::Concat[axis=0](%17, %18, %19)
+  %21 : Float(1, 1, 20) = onnx::ConstantOfShape[value={0}](%20) # /Users/dustin/opt/miniconda3/envs/awni_env36/lib/python3.6/site-packages/torch/nn/modules/rnn.py:707:0
+  %22 : Tensor = onnx::Transpose[perm=[1, 0, 2]](%11)
+  %23 : Tensor? = prim::Constant()
+  %24 : Tensor = onnx::Slice[axes=[0], ends=[40], starts=[20]](%gru.weight_ih_l0)
+  %25 : Tensor = onnx::Slice[axes=[0], ends=[20], starts=[0]](%gru.weight_ih_l0)
+  %26 : Tensor = onnx::Slice[axes=[0], ends=[60], starts=[40]](%gru.weight_ih_l0)
+  %27 : Tensor = onnx::Concat[axis=0](%24, %25, %26)
+  %28 : Tensor = onnx::Slice[axes=[0], ends=[40], starts=[20]](%gru.weight_hh_l0)
+  %29 : Tensor = onnx::Slice[axes=[0], ends=[20], starts=[0]](%gru.weight_hh_l0)
+  %30 : Tensor = onnx::Slice[axes=[0], ends=[60], starts=[40]](%gru.weight_hh_l0)
+  %31 : Tensor = onnx::Concat[axis=0](%28, %29, %30)
+  %32 : Tensor = onnx::Slice[axes=[0], ends=[40], starts=[20]](%gru.bias_ih_l0)
+  %33 : Tensor = onnx::Slice[axes=[0], ends=[20], starts=[0]](%gru.bias_ih_l0)
+  %34 : Tensor = onnx::Slice[axes=[0], ends=[60], starts=[40]](%gru.bias_ih_l0)
+  %35 : Tensor = onnx::Concat[axis=0](%32, %33, %34)
+  %36 : Tensor = onnx::Slice[axes=[0], ends=[40], starts=[20]](%gru.bias_hh_l0)
+  %37 : Tensor = onnx::Slice[axes=[0], ends=[20], starts=[0]](%gru.bias_hh_l0)
+  %38 : Tensor = onnx::Slice[axes=[0], ends=[60], starts=[40]](%gru.bias_hh_l0)
+  %39 : Tensor = onnx::Concat[axis=0](%36, %37, %38)
+  %40 : Tensor = onnx::Concat[axis=0](%35, %39)
+  %41 : Tensor = onnx::Unsqueeze[axes=[0]](%27)
+  %42 : Tensor = onnx::Unsqueeze[axes=[0]](%31)
+  %43 : Tensor = onnx::Unsqueeze[axes=[0]](%40)
+  %44 : Tensor, %45 : Float(1, 1, 20) = onnx::GRU[hidden_size=20, linear_before_reset=1](%22, %41, %42, %43, %23, %21) # /Users/dustin/opt/miniconda3/envs/awni_env36/lib/python3.6/site-packages/torch/nn/modules/rnn.py:716:0
+  %46 : Tensor = onnx::Squeeze[axes=[1]](%44)
+  %output : Float(1, 196, 20) = onnx::Transpose[perm=[1, 0, 2]](%46) # /Users/dustin/opt/miniconda3/envs/awni_env36/lib/python3.6/site-packages/torch/nn/modules/rnn.py:716:0
+  return (%output)
+
+after export
+----- ONNX printable graph -----
+~~~
+-------------------
+~~~
+shape before conv:  torch.Size([1, 1, 1000, 161])
+shape after conv:  torch.Size([1, 32, 996, 130])
+shape after transpose:  torch.Size([1, 996, 32, 130])
+shape after flattening:  torch.Size([1, 996, 4160])
+torch test output torch.Size([1, 996, 20]): tensor([[[-4.5294e-04,  2.9003e-01, -9.8764e-02,  ..., -4.1991e-02,
+          -9.1267e-04, -9.4429e-01],
+         [ 7.2516e-01,  3.8873e-01,  6.2933e-02,  ..., -4.2006e-02,
+          -5.9622e-03, -9.5272e-01],
+         [-6.7012e-02, -5.8575e-01, -1.8989e-01,  ..., -9.6567e-01,
+          -4.9810e-02, -9.8759e-01],
+         ...,
+         [ 9.9757e-01, -9.4632e-01, -8.9382e-01,  ...,  6.9937e-01,
+           9.9890e-01, -2.0880e-01],
+         [ 8.7428e-01, -9.0683e-01,  9.0956e-01,  ..., -6.3902e-01,
+          -8.7551e-01,  8.5652e-01],
+         [ 4.1523e-02, -9.0373e-02,  9.0277e-01,  ..., -6.3906e-01,
+          -8.7193e-01, -7.3003e-01]]], grad_fn=<TransposeBackward1>)
