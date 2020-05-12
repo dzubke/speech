@@ -1,12 +1,20 @@
+<<<<<<< HEAD
 # standard libraries
 import time, logging
 from datetime import datetime
 import threading, collections, queue, os, os.path
 # third-party libraries
+=======
+import time, logging
+from datetime import datetime
+import threading, collections, queue, os, os.path
+import deepspeech
+>>>>>>> b7447885fcb6d0d9d8f68ae96baac7207972f79d
 import numpy as np
 import pyaudio
 import wave
 import webrtcvad
+<<<<<<< HEAD
 from scipy import signal
 import matplotlib.pyplot as plt
 import torch
@@ -18,6 +26,10 @@ from speech.loader import log_specgram_from_data
 from speech.models.ctc_decoder import decode as ctc_decode
 from speech.utils import compat 
 
+=======
+from halo import Halo
+from scipy import signal
+>>>>>>> b7447885fcb6d0d9d8f68ae96baac7207972f79d
 
 logging.basicConfig(level=20)
 
@@ -28,7 +40,11 @@ class Audio(object):
     # Network/VAD rate-space
     RATE_PROCESS = 16000
     CHANNELS = 1
+<<<<<<< HEAD
     BLOCKS_PER_SECOND = 62.5
+=======
+    BLOCKS_PER_SECOND = 50
+>>>>>>> b7447885fcb6d0d9d8f68ae96baac7207972f79d
 
     def __init__(self, callback=None, device=None, input_rate=RATE_PROCESS, file=None):
         def proxy_callback(in_data, frame_count, time_info, status):
@@ -44,7 +60,10 @@ class Audio(object):
         self.sample_rate = self.RATE_PROCESS
         self.block_size = int(self.RATE_PROCESS / float(self.BLOCKS_PER_SECOND))
         self.block_size_input = int(self.input_rate / float(self.BLOCKS_PER_SECOND))
+<<<<<<< HEAD
         print(f"block_size input {self.block_size_input}")
+=======
+>>>>>>> b7447885fcb6d0d9d8f68ae96baac7207972f79d
         self.pa = pyaudio.PyAudio()
 
         kwargs = {
@@ -61,7 +80,11 @@ class Audio(object):
         if self.device:
             kwargs['input_device_index'] = self.device
         elif file is not None:
+<<<<<<< HEAD
             self.chunk = 256
+=======
+            self.chunk = 320
+>>>>>>> b7447885fcb6d0d9d8f68ae96baac7207972f79d
             self.wf = wave.open(file, 'rb')
 
         self.stream = self.pa.open(**kwargs)
@@ -100,6 +123,7 @@ class Audio(object):
 
     def write_wav(self, filename, data):
         logging.info("write wav %s", filename)
+<<<<<<< HEAD
         with wave.open(filename, 'wb') as wf:
             wf.setnchannels(self.CHANNELS)
             # wf.setsampwidth(self.pa.get_sample_size(FORMAT))
@@ -107,6 +131,16 @@ class Audio(object):
             wf.setsampwidth(2)
             wf.setframerate(self.sample_rate)
             wf.writeframes(data)
+=======
+        wf = wave.open(filename, 'wb')
+        wf.setnchannels(self.CHANNELS)
+        # wf.setsampwidth(self.pa.get_sample_size(FORMAT))
+        assert self.FORMAT == pyaudio.paInt16
+        wf.setsampwidth(2)
+        wf.setframerate(self.sample_rate)
+        wf.writeframes(data)
+        wf.close()
+>>>>>>> b7447885fcb6d0d9d8f68ae96baac7207972f79d
 
 
 class VADAudio(Audio):
@@ -126,6 +160,7 @@ class VADAudio(Audio):
                 yield self.read_resampled()
 
     def vad_collector(self, padding_ms=300, ratio=0.75, frames=None):
+<<<<<<< HEAD
         """Yields the frames from frame_generator. padding_ms and ratio are not used.  
         """
         if frames is None: frames = self.frame_generator()
@@ -148,6 +183,58 @@ def main(ARGS):
     print('Initializing model...')
     model, preproc = speech.load(ARGS.model, tag='best')
     model.eval()
+=======
+        """Generator that yields series of consecutive audio frames comprising each utterence, separated by yielding a single None.
+            Determines voice activity by ratio of frames in padding_ms. Uses a buffer to include padding_ms prior to being triggered.
+            Example: (frame, ..., frame, None, frame, ..., frame, None, ...)
+                      |---utterence---|        |---utterence---|
+        """
+        if frames is None: frames = self.frame_generator()
+        num_padding_frames = padding_ms // self.frame_duration_ms
+        ring_buffer = collections.deque(maxlen=num_padding_frames)
+        triggered = False
+
+        for frame in frames:
+            if len(frame) < 640:
+                return
+
+            is_speech = self.vad.is_speech(frame, self.sample_rate)
+
+            if not triggered:
+                ring_buffer.append((frame, is_speech))
+                num_voiced = len([f for f, speech in ring_buffer if speech])
+                if num_voiced > ratio * ring_buffer.maxlen:
+                    triggered = True
+                    for f, s in ring_buffer:
+                        yield f
+                    ring_buffer.clear()
+
+            else:
+                yield frame
+                ring_buffer.append((frame, is_speech))
+                num_unvoiced = len([f for f, speech in ring_buffer if not speech])
+                if num_unvoiced > ratio * ring_buffer.maxlen:
+                    triggered = False
+                    yield None
+                    ring_buffer.clear()
+
+def main(ARGS):
+    # Load DeepSpeech model
+    if os.path.isdir(ARGS.model):
+        model_dir = ARGS.model
+        ARGS.model = os.path.join(model_dir, 'output_graph.pb')
+        ARGS.lm = os.path.join(model_dir, ARGS.lm)
+        ARGS.trie = os.path.join(model_dir, ARGS.trie)
+
+    print('Initializing model...')
+    logging.info("ARGS.model: %s", ARGS.model)
+    model = deepspeech.Model(ARGS.model, ARGS.beam_width)
+    if ARGS.lm and ARGS.trie:
+        logging.info("ARGS.lm: %s", ARGS.lm)
+        logging.info("ARGS.trie: %s", ARGS.trie)
+        model.enableDecoderWithLM(ARGS.lm, ARGS.trie, ARGS.lm_alpha, ARGS.lm_beta)
+
+>>>>>>> b7447885fcb6d0d9d8f68ae96baac7207972f79d
     # Start audio with VAD
     vad_audio = VADAudio(aggressiveness=ARGS.vad_aggressiveness,
                          device=ARGS.device,
@@ -156,6 +243,7 @@ def main(ARGS):
     print("Listening (ctrl-C to exit)...")
     frames = vad_audio.vad_collector()
 
+<<<<<<< HEAD
 
     wav_data           = bytearray()
     audio_buffer_size   = 2   # 2 steps in the log_spec window
@@ -274,27 +362,80 @@ def main(ARGS):
             plt.plot(all_audio)
             plt.show()
 
+=======
+    # Stream from microphone to DeepSpeech using VAD
+    spinner = None
+    if not ARGS.nospinner:
+        spinner = Halo(spinner='line')
+    stream_context = model.createStream()
+    wav_data = bytearray()
+    for frame in frames:
+        if frame is not None:
+            if spinner: spinner.start()
+            logging.debug("streaming frame")
+            model.feedAudioContent(stream_context, np.frombuffer(frame, np.int16))
+            if ARGS.savewav: wav_data.extend(frame)
+        else:
+            if spinner: spinner.stop()
+            logging.debug("end utterence")
+            if ARGS.savewav:
+                vad_audio.write_wav(os.path.join(ARGS.savewav, datetime.now().strftime("savewav_%Y-%m-%d_%H-%M-%S_%f.wav")), wav_data)
+                wav_data = bytearray()
+            text = model.finishStream(stream_context)
+            print("Recognized: %s" % text)
+            stream_context = model.createStream()
+>>>>>>> b7447885fcb6d0d9d8f68ae96baac7207972f79d
 
 if __name__ == '__main__':
     BEAM_WIDTH = 500
     DEFAULT_SAMPLE_RATE = 16000
+<<<<<<< HEAD
 
     import argparse
     parser = argparse.ArgumentParser(description="Stream from microphone to DeepSpeech using VAD")
     # VAD currenlty not used
     parser.add_argument('-v', '--vad_aggressiveness', type=int, default=3,
                         help="Set aggressiveness of VAD: an integer between 0 and 3, 0 being the least aggressive about filtering out non-speech, 3 the most aggressive. Default: 3")
+=======
+    LM_ALPHA = 0.75
+    LM_BETA = 1.85
+
+    import argparse
+    parser = argparse.ArgumentParser(description="Stream from microphone to DeepSpeech using VAD")
+
+    parser.add_argument('-v', '--vad_aggressiveness', type=int, default=3,
+                        help="Set aggressiveness of VAD: an integer between 0 and 3, 0 being the least aggressive about filtering out non-speech, 3 the most aggressive. Default: 3")
+    parser.add_argument('--nospinner', action='store_true',
+                        help="Disable spinner")
+>>>>>>> b7447885fcb6d0d9d8f68ae96baac7207972f79d
     parser.add_argument('-w', '--savewav',
                         help="Save .wav files of utterences to given directory")
     parser.add_argument('-f', '--file',
                         help="Read from .wav file instead of microphone")
+<<<<<<< HEAD
     parser.add_argument('-m', '--model',
                         help="Path to the model (protocol buffer binary file, or entire directory containing all standard-named files for model)")
+=======
+
+    parser.add_argument('-m', '--model', required=True,
+                        help="Path to the model (protocol buffer binary file, or entire directory containing all standard-named files for model)")
+    parser.add_argument('-l', '--lm', default='lm.binary',
+                        help="Path to the language model binary file. Default: lm.binary")
+    parser.add_argument('-t', '--trie', default='trie',
+                        help="Path to the language model trie file created with native_client/generate_trie. Default: trie")
+>>>>>>> b7447885fcb6d0d9d8f68ae96baac7207972f79d
     parser.add_argument('-d', '--device', type=int, default=None,
                         help="Device input index (Int) as listed by pyaudio.PyAudio.get_device_info_by_index(). If not provided, falls back to PyAudio.get_default_device().")
     parser.add_argument('-r', '--rate', type=int, default=DEFAULT_SAMPLE_RATE,
                         help=f"Input device sample rate. Default: {DEFAULT_SAMPLE_RATE}. Your device may require 44100.")
+<<<<<<< HEAD
     # ctc decoder not currenlty used
+=======
+    parser.add_argument('-la', '--lm_alpha', type=float, default=LM_ALPHA,
+                        help=f"The alpha hyperparameter of the CTC decoder. Language Model weight. Default: {LM_ALPHA}")
+    parser.add_argument('-lb', '--lm_beta', type=float, default=LM_BETA,
+                        help=f"The beta hyperparameter of the CTC decoder. Word insertion bonus. Default: {LM_BETA}")
+>>>>>>> b7447885fcb6d0d9d8f68ae96baac7207972f79d
     parser.add_argument('-bw', '--beam_width', type=int, default=BEAM_WIDTH,
                         help=f"Beam width used in the CTC decoder when building candidate transcriptions. Default: {BEAM_WIDTH}")
 
