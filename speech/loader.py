@@ -127,11 +127,7 @@ class Preprocessor():
         else: 
            raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
         
-<<<<<<< HEAD
         inputs = self.normalize(inputs)
-=======
-        inputs = (inputs - self.mean) / self.std
->>>>>>> b7447885fcb6d0d9d8f68ae96baac7207972f79d
         if self.use_log: self.logger.info(f"preproc: normalized")
 
         if self.spec_augment:
@@ -179,21 +175,13 @@ class Preprocessor():
             "start_and_end", "int_to_char", "char_to_int"]
             string="Showing up-to-date attributes"
             for name in attribute_names:
-<<<<<<< HEAD
                 string += "\n" + name + ": " + str(eval("self."+name))
-=======
-                string += name +": " + str(eval("self."+name))+"\n"
->>>>>>> b7447885fcb6d0d9d8f68ae96baac7207972f79d
             return string
         except AttributeError:
             attribute_names = ["_input_dim", "start_and_end", "int_to_char", "char_to_int"]
             string="Showing limited attributes as not all new attributes are supported\n"
             for name in attribute_names:
-<<<<<<< HEAD
                 string += "\n" + name +": " + str(eval("self."+name))
-=======
-                string += name +": " + str(eval("self."+name))+"\n"
->>>>>>> b7447885fcb6d0d9d8f68ae96baac7207972f79d
             return string
 
 def compute_mean_std(audio_files, preprocessor, window_size, step_size):
