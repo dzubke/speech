@@ -7,7 +7,6 @@ import numpy as np
 import pyaudio
 import wave
 import webrtcvad
-from halo import Halo
 from scipy import signal
 import matplotlib.pyplot as plt
 import torch
@@ -127,15 +126,11 @@ class VADAudio(Audio):
                 yield self.read_resampled()
 
     def vad_collector(self, padding_ms=300, ratio=0.75, frames=None):
-        """Generator that yields series of consecutive audio frames comprising each utterence, separated by yielding a single None.
-            Determines voice activity by ratio of frames in padding_ms. Uses a buffer to include padding_ms prior to being triggered.
-            Example: (frame, ..., frame, None, frame, ..., frame, None, ...)
-                      |---utterence---|        |---utterence---|
+        """Yields the frames from frame_generator. padding_ms and ratio are not used.  
         """
         if frames is None: frames = self.frame_generator()
         for frame in frames:
             yield frame
-
 
 def max_decode(output, blank=39):
     pred = np.argmax(output, 1)
@@ -146,6 +141,7 @@ def max_decode(output, blank=39):
             seq.append(p)
         prev = p
     return seq
+
 
 def main(ARGS):
 
@@ -160,10 +156,6 @@ def main(ARGS):
     print("Listening (ctrl-C to exit)...")
     frames = vad_audio.vad_collector()
 
-    # Stream from microphone to DeepSpeech using VAD
-    spinner = None
-    if not ARGS.nospinner:
-        spinner = Halo(spinner='line')
 
     wav_data           = bytearray()
     audio_buffer_size   = 2   # 2 steps in the log_spec window
@@ -187,7 +179,6 @@ def main(ARGS):
 
     try:
         for count, frame in enumerate(frames):
-            if spinner: spinner.start()
             # exit the loop if there are no more full input frames
             if len(frame) <  frames_per_block:
                 break
@@ -199,15 +190,22 @@ def main(ARGS):
 
             # fill up the audio_ring_buffer and then feed into the model
             if len(audio_ring_buffer) < audio_buffer_size-1:
+                # note: appending new frame to right of the buffer
                 audio_ring_buffer.append(frame)
             else: 
                 audio_ring_buffer.append(frame)
                 buffer_list = list(audio_ring_buffer)
+                # convert the buffer to numpy array
+                # a single frame has dims: (512,) and numpy buffer (2 frames) is: (512,)
+                # The dimension of numpy buffer is reduced by half because each 
+                # integer in numpy buffer is encoded as 2 hexidecimal entries in frame
                 numpy_buffer = np.concatenate(
                     (np.frombuffer(buffer_list[0], np.int16), 
                     np.frombuffer(buffer_list[1], np.int16)))
+                # calculate the log_spec with dim: (1, 257)
                 log_spec_step = log_specgram_from_data(numpy_buffer, samp_rate=16000)
-                # normalize the log_spec, older preproc objects do not have "normalize" method
+                
+                # normalize the log_spec_step, older preproc objects do not have "normalize" method
                 if hasattr(preproc, "normalize"):
                     norm_log_spec = preproc.normalize(log_spec_step)
                 else: 
@@ -216,20 +214,21 @@ def main(ARGS):
                 # ------------ logging ---------------
                 logging.debug(f"numpy_buffer shape: {numpy_buffer.shape}")
                 logging.debug(f"log_spec_step shape: {log_spec_step.shape}")
+                logging.debug(f"conv_buffer length: {len(conv_ring_buffer)}")
                 # ------------ logging ---------------
 
                 # fill up the conv_ring_buffer and then feed into the model
-                logging.debug(f"conv_buffer length: {len(conv_ring_buffer)}")
                 if len(conv_ring_buffer) < conv_buffer_size-1:
                     conv_ring_buffer.append(norm_log_spec)
                 else: 
                     conv_ring_buffer.append(norm_log_spec)
-                    # log_spec are freq (257) x time (11)
+                    # conv_context dim: (31, 257)
                     conv_context = np.concatenate(list(conv_ring_buffer), axis=0)
-                    # addding batch dimension
+                    # addding batch dimension: (1, 31, 257)
                     conv_context = np.expand_dims(conv_context, axis=0)
                     model_out = model(torch.from_numpy(conv_context), (hidden_in, cell_in))
                     probs, (hidden_out, cell_out) = model_out
+                    # probs dim: (1, 1, 40)
                     probs = to_numpy(probs)
                     probs_list.append(probs)
                     hidden_in, cell_in = hidden_out, cell_out
@@ -240,7 +239,15 @@ def main(ARGS):
                     logging.debug(f"probs_list len: {len(probs_list)}")
                     #logging.debug(f"probs value: {probs}")
                     # ------------ logging ---------------
-                
+            
+                    # decoding every 20 time-steps
+                    if count%20 ==0 and count!=0:
+                        probs_steps = np.concatenate(probs_list, axis=1)
+                        int_labels = max_decode(probs_steps[0], blank=39)
+                        # int_labels, likelihood = ctc_decode(probs[0], beam_size=50, blank=39)
+                        predictions = preproc.decode(int_labels)
+
+                    # alternative decoding approach using decoding context
                     # decoder_context = 1
                     # count_offset = 30 + decoder_context   # num of steps decoder is behind loop counnt
                     # if len(probs_list) >= decoder_context:
@@ -251,16 +258,9 @@ def main(ARGS):
                     #     # int_labels, likelihood = ctc_decode(probs[0], beam_size=50, blank=39)
                     #     predictions = preproc.decode(int_labels)
 
-
-                    if count%20 ==0 and count!=0:
-                        probs_steps = np.concatenate(probs_list, axis=1)
-                        int_labels = max_decode(probs_steps[0], blank=39)
-                        # int_labels, likelihood = ctc_decode(probs[0], beam_size=50, blank=39)
-                        predictions = preproc.decode(int_labels)
-
-                        # ------------ logging ---------------
-                        logging.info(f"predictions: {predictions}")
-                        # ------------ logging ---------------
+                    # ------------ logging ---------------
+                    logging.info(f"predictions: {predictions}")
+                    # ------------ logging ---------------
 
             if ARGS.savewav: wav_data.extend(frame)
 
@@ -272,23 +272,18 @@ def main(ARGS):
             vad_audio.write_wav(os.path.join(ARGS.savewav, datetime.now().strftime("savewav_%Y-%m-%d_%H-%M-%S_%f.wav")), wav_data)
             all_audio = np.frombuffer(wav_data, np.int16)
             plt.plot(all_audio)
-            #plt.figure()
             plt.show()
 
 
 if __name__ == '__main__':
     BEAM_WIDTH = 500
     DEFAULT_SAMPLE_RATE = 16000
-    LM_ALPHA = 0.75
-    LM_BETA = 1.85
 
     import argparse
     parser = argparse.ArgumentParser(description="Stream from microphone to DeepSpeech using VAD")
-
+    # VAD currenlty not used
     parser.add_argument('-v', '--vad_aggressiveness', type=int, default=3,
                         help="Set aggressiveness of VAD: an integer between 0 and 3, 0 being the least aggressive about filtering out non-speech, 3 the most aggressive. Default: 3")
-    parser.add_argument('--nospinner', action='store_true',
-                        help="Disable spinner")
     parser.add_argument('-w', '--savewav',
                         help="Save .wav files of utterences to given directory")
     parser.add_argument('-f', '--file',
@@ -299,6 +294,7 @@ if __name__ == '__main__':
                         help="Device input index (Int) as listed by pyaudio.PyAudio.get_device_info_by_index(). If not provided, falls back to PyAudio.get_default_device().")
     parser.add_argument('-r', '--rate', type=int, default=DEFAULT_SAMPLE_RATE,
                         help=f"Input device sample rate. Default: {DEFAULT_SAMPLE_RATE}. Your device may require 44100.")
+    # ctc decoder not currenlty used
     parser.add_argument('-bw', '--beam_width', type=int, default=BEAM_WIDTH,
                         help=f"Beam width used in the CTC decoder when building candidate transcriptions. Default: {BEAM_WIDTH}")
 
