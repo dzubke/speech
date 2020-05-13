@@ -157,11 +157,11 @@ def main(ARGS):
     frames = vad_audio.vad_collector()
 
 
-    wav_data           = bytearray()
+    wav_data            = bytearray()
     audio_buffer_size   = 2   # 2 steps in the log_spec window
-    conv_buffer_size    = 31 # num of log_spec timesteps to feed into model
+    log_spec_buffer_size= 31 # num of log_spec timesteps to feed into model
     audio_ring_buffer   = collections.deque(maxlen=audio_buffer_size)
-    conv_ring_buffer    = collections.deque(maxlen=conv_buffer_size)
+    log_spec_ring_buffer= collections.deque(maxlen=log_spec_buffer_size)
     predictions         = list()
     probs_list          = list()
     frames_per_block    = round(
@@ -214,6 +214,8 @@ def main(ARGS):
                 audio_ring_buffer.append(frame)
                 audio_buffer_time += time.time() - audio_buffer_time_start
                 audio_buffer_count += 1
+                
+                numpy_buffer_time_start = time.time()
                 buffer_list = list(audio_ring_buffer)
                 # convert the buffer to numpy array
                 # a single frame has dims: (512,) and numpy buffer (2 frames) is: (512,)
@@ -223,35 +225,63 @@ def main(ARGS):
                     (np.frombuffer(buffer_list[0], np.int16), 
                     np.frombuffer(buffer_list[1], np.int16)))
                 # calculate the log_spec with dim: (1, 257)
+                numpy_buffer_time += time.time() - numpy_buffer_time_start
+                numpy_buffer_count += 1
+
+                log_spec_time_start = time.time()
                 log_spec_step = log_specgram_from_data(numpy_buffer, samp_rate=16000)
+                log_spec_time += time.time() - log_spec_time_start
+                log_spec_count += 1
                 
+                normalize_time_start = time.time()
                 # normalize the log_spec_step, older preproc objects do not have "normalize" method
                 if hasattr(preproc, "normalize"):
                     norm_log_spec = preproc.normalize(log_spec_step)
                 else: 
                     norm_log_spec = compat.normalize(preproc, log_spec_step)
+                normalize_time += time.time() - normalize_time_start
+                normalize_count += 1
 
                 # ------------ logging ---------------
                 logging.debug(f"numpy_buffer shape: {numpy_buffer.shape}")
                 logging.debug(f"log_spec_step shape: {log_spec_step.shape}")
-                logging.debug(f"conv_buffer length: {len(conv_ring_buffer)}")
+                logging.debug(f"log_spec_buffer length: {len(log_spec_ring_buffer)}")
                 # ------------ logging ---------------
 
-                # fill up the conv_ring_buffer and then feed into the model
-                if len(conv_ring_buffer) < conv_buffer_size-1:
-                    conv_ring_buffer.append(norm_log_spec)
+                # fill up the log_spec_ring_buffer and then feed into the model
+                if len(log_spec_ring_buffer) < log_spec_buffer_size-1:
+                    log_spec_buffer_time_start = time.time()
+                    log_spec_ring_buffer.append(norm_log_spec)
+                    log_spec_buffer_time += time.time() - log_spec_buffer_time_start
+                    log_spec_buffer_count += 1
                 else: 
-                    conv_ring_buffer.append(norm_log_spec)
+                    log_spec_buffer_time_start = time.time()
+                    log_spec_ring_buffer.append(norm_log_spec)
+                    log_spec_buffer_time += time.time() - log_spec_buffer_time_start
+                    log_spec_buffer_count += 1
+
+                    numpy_conv_time_start = time.time()
                     # conv_context dim: (31, 257)
-                    conv_context = np.concatenate(list(conv_ring_buffer), axis=0)
+                    conv_context = np.concatenate(list(log_spec_ring_buffer), axis=0)
                     # addding batch dimension: (1, 31, 257)
                     conv_context = np.expand_dims(conv_context, axis=0)
+                    numpy_conv_time += time.time() - numpy_conv_time_start
+                    numpy_conv_count += 1
+
+                    model_infer_time_start = time.time()
                     model_out = model(torch.from_numpy(conv_context), (hidden_in, cell_in))
+                    model_infer_time += time.time() - model_infer_time_start
+                    model_infer_count += 1
+
+                    output_assign_time_start = time.time()
                     probs, (hidden_out, cell_out) = model_out
                     # probs dim: (1, 1, 40)
                     probs = to_numpy(probs)
                     probs_list.append(probs)
                     hidden_in, cell_in = hidden_out, cell_out
+                    output_assign_time += time.time() - output_assign_time_start
+                    output_assign_count += 1
+
                     
                     # ------------ logging ---------------
                     logging.debug(f"conv_context shape: {conv_context.shape}")
@@ -262,15 +292,19 @@ def main(ARGS):
             
                     # decoding every 20 time-steps
                     if count%20 ==0 and count!=0:
+                        decoder_time_start = time.time()
                         probs_steps = np.concatenate(probs_list, axis=1)
                         int_labels = max_decode(probs_steps[0], blank=39)
                         # int_labels, likelihood = ctc_decode(probs[0], beam_size=50, blank=39)
                         predictions = preproc.decode(int_labels)
+                        decoder_time += time.time() - decoder_time_start
+                        decoder_count += 1
                         
                         # ------------ logging ---------------
                         logging.info(f"predictions: {predictions}")
                         # ------------ logging ---------------
-
+                    
+                    total_count += 1
 
                     # alternative decoding approach using decoding context
                     # decoder_context = 1
@@ -290,6 +324,19 @@ def main(ARGS):
         pass
     finally: 
         vad_audio.destroy()
+        total_time = time.time() - total_time_start
+        print(f"audio_buffer        time, count: {round(audio_buffer_time/60, 4)}, {audio_buffer_count}")
+        print(f"numpy_buffer        time, count: {round(numpy_buffer_time /60, 4)}, {numpy_buffer_count}")
+        print(f"log_spec_operation  time, count: {round(log_spec_time /60, 4)}, {log_spec_count}")
+        print(f"normalize           time, count: {round(normalize_time /60, 4)}, {normalize_count}")
+        print(f"log_spec_buffer     time, count: {round(log_spec_buffer_time /60, 4)}, {log_spec_buffer_count}")
+        print(f"numpy_conv          time, count: {round(numpy_conv_time /60, 4)}, {numpy_conv_count}")
+        print(f"model_infer         time, count: {round(model_infer_time /60, 4)}, {model_infer_count}")
+        print(f"output_assign       time, count: {round(output_assign_time /60, 4)}, {output_assign_count}")
+        print(f"decoder             time, count: {round(decoder_time /60, 4)}, {decoder_count}")
+        print(f"total               time, count: {round(total_time /60, 4)}, {total_count}")
+
+
         if ARGS.savewav:
             vad_audio.write_wav(os.path.join(ARGS.savewav, datetime.now().strftime("savewav_%Y-%m-%d_%H-%M-%S_%f.wav")), wav_data)
             all_audio = np.frombuffer(wav_data, np.int16)
