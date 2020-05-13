@@ -393,7 +393,7 @@ def to_numpy(tensor):
         return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
 
 
-def max_decode(output, blank=40):
+def max_decode(output, blank=39):
     pred = np.argmax(output, 1)
     prev = pred[0]
     seq = [prev] if prev != blank else []

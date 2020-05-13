@@ -430,7 +430,7 @@ def plot_spectrogram(f, t, Sxx):
     Note: the function scipy.signal.spectrogram returns f, t, Sxx in that order
     """
     plt.pcolormesh(t, f, Sxx)
-    plt.ylabel('Frequency [Hz]')k
+    plt.ylabel('Frequency [Hz]')
     plt.xlabel('Time [sec]')
     plt.show()
 
