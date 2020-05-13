@@ -15,7 +15,7 @@ from tqdm import tqdm
 
 #project libraries
 from speech.utils import data_helpers
-from speech.utils import wave
+from speech.utils import wave 
 
 
 def main(target_dir, tar_path, sample_rate, min_duration, max_duration, use_phonemes, no_segment):
@@ -31,7 +31,7 @@ def main(target_dir, tar_path, sample_rate, min_duration, max_duration, use_phon
         #wget.download(TED_LIUM_V2_DL_URL, target_dl_dir)
         target_file = os.path.join(target_dl_dir, "TEDLIUM_release-3.tgz")
 
-    if not os.path.exists(target_unpacked_dir):
+    if not os.path.exists(target_unpacked_dir):π
         print("Unpacking corpus...")
         tar = tarfile.open(target_file)
         tar.close()

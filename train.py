@@ -277,7 +277,6 @@ def log_conv_grads(model, logger):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
             description="Train a speech model.")
-
     parser.add_argument("config",
         help="A json file with the training configuration.")
     parser.add_argument("--deterministic", default=False,
