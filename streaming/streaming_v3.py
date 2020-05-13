@@ -171,13 +171,27 @@ def main(ARGS):
     hidden_in           = torch.zeros((5, 1, 512), dtype=torch.float32)
     cell_in             = torch.zeros((5, 1, 512), dtype=torch.float32)
 
-    # ------------ logging ---------------
+    # -------time evaluation variables-----------
+    audio_buffer_time, audio_buffer_count = 0.0, 0 
+    numpy_buffer_time, numpy_buffer_count = 0.0, 0 
+    log_spec_time, log_spec_count = 0.0, 0
+    normalize_time, normalize_count = 0.0, 0 
+    log_spec_buffer_time, log_spec_buffer_count = 0.0, 0
+    numpy_conv_time, numpy_conv_count = 0.0, 0
+    model_infer_time, model_infer_count = 0.0, 0 
+    output_assign_time, output_assign_count = 0.0, 0
+    decoder_time, decoder_count = 0.0, 0
+    total_time, total_count = 0.0, 0 
+    # -------------------------------------------
+
+    # ------------ logging ----------------------
     logging.info(ARGS)
     logging.info(model)
     logging.info(preproc)
-    # ------------ logging ---------------
+    # -------------------------------------------
 
     try:
+        total_time_start = time.time()
         for count, frame in enumerate(frames):
             # exit the loop if there are no more full input frames
             if len(frame) <  frames_per_block:
@@ -191,9 +205,15 @@ def main(ARGS):
             # fill up the audio_ring_buffer and then feed into the model
             if len(audio_ring_buffer) < audio_buffer_size-1:
                 # note: appending new frame to right of the buffer
+                audio_buffer_time_start = time.time()
                 audio_ring_buffer.append(frame)
+                audio_buffer_time += time.time() - audio_buffer_time_start
+                audio_buffer_count += 1
             else: 
+                audio_buffer_time_start = time.time()
                 audio_ring_buffer.append(frame)
+                audio_buffer_time += time.time() - audio_buffer_time_start
+                audio_buffer_count += 1
                 buffer_list = list(audio_ring_buffer)
                 # convert the buffer to numpy array
                 # a single frame has dims: (512,) and numpy buffer (2 frames) is: (512,)
@@ -246,6 +266,11 @@ def main(ARGS):
                         int_labels = max_decode(probs_steps[0], blank=39)
                         # int_labels, likelihood = ctc_decode(probs[0], beam_size=50, blank=39)
                         predictions = preproc.decode(int_labels)
+                        
+                        # ------------ logging ---------------
+                        logging.info(f"predictions: {predictions}")
+                        # ------------ logging ---------------
+
 
                     # alternative decoding approach using decoding context
                     # decoder_context = 1
@@ -258,10 +283,7 @@ def main(ARGS):
                     #     # int_labels, likelihood = ctc_decode(probs[0], beam_size=50, blank=39)
                     #     predictions = preproc.decode(int_labels)
 
-                    # ------------ logging ---------------
-                    logging.info(f"predictions: {predictions}")
-                    # ------------ logging ---------------
-
+                   
             if ARGS.savewav: wav_data.extend(frame)
 
     except KeyboardInterrupt:

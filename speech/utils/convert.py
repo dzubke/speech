@@ -66,7 +66,6 @@ def parse_soxi_out(cmd:bytes):
     """
     return int(cmd.decode("utf-8").strip().split("\n")[1].split(':')[1].strip())
 
-<<<<<<< HEAD
 def to_numpy(tensor):
     """
     converts a torch tensor to numpy array
@@ -74,8 +73,6 @@ def to_numpy(tensor):
     return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
 
 
-=======
->>>>>>> b7447885fcb6d0d9d8f68ae96baac7207972f79d
 if __name__ == "__main__":
     print("Use avconv", USE_AVCONV)
 
