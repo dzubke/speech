@@ -80,3 +80,45 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     predict_from_stream(args.model) 
+
+
+"""scratch from ipython
+
+stream_log_spec = np.empty((0,257)).astype(np.float32) 
+    ...: model.eval() 
+    ...: with wave.open(audio_path, 'rb') as wf:  
+    ...:         chunk_size = 256 
+    ...:         audio_ring_buffer = deque(maxlen=2)   
+    ...:         conv_ring_buffer    = collections.deque(maxlen=31) 
+    ...:         probs_list          = list() 
+    ...:         hidden_in           = torch.zeros((5, 1, 512), dtype=torch.float32) 
+    ...:         cell_in             = torch.zeros((5, 1, 512), dtype=torch.float32) 
+    ...:         num_samples = wf.getnframes()//chunk_size  
+    ...:         print("num frames: ", wf.getnframes())  
+    ...:         print("num_samples: ", num_samples)  
+    ...:         for i in range(num_samples):  
+    ...:             if len(audio_ring_buffer) < 1:  
+    ...:                 audio_ring_buffer.append(wf.readframes(chunk_size))  
+    ...:             else:  
+    ...:                 audio_ring_buffer.append(wf.readframes(chunk_size))  
+    ...:                 buffer_list = list(audio_ring_buffer)  
+    ...:                 numpy_buffer = np.concatenate(  
+    ...:                         (np.frombuffer(buffer_list[0], np.int16),   
+    ...:                         np.frombuffer(buffer_list[1], np.int16)))  
+    ...:                 log_spec_step = log_specgram_from_data( 
+    ...:                     numpy_buffer, samp_rate=16000, window_size=32, step_size=16) 
+    ...:                 norm_log_spec = normalize(preproc, log_spec_step) 
+    ...:                 stream_log_spec = np.concatenate((stream_log_spec, norm_log_spec), axis=0) 
+    ...:                 if len(conv_ring_buffer) < 30: 
+    ...:                     conv_ring_buffer.append(norm_log_spec) 
+    ...:                 else: 
+    ...:                     conv_ring_buffer.append(norm_log_spec) 
+    ...:                     conv_context = np.concatenate(list(conv_ring_buffer), axis=0) 
+    ...:                     conv_context = np.expand_dims(conv_context, axis=0) 
+    ...:                     model_out = model(torch.from_numpy(conv_context), (hidden_in, cell_in)) 
+    ...:                     probs, (hidden_out, cell_out) = model_out 
+    ...:                     probs = to_numpy(probs) 
+    ...:                     probs_list.append(probs) 
+    ...:                     hidden_in, cell_in = hidden_out, cell_out 
+
+"""
