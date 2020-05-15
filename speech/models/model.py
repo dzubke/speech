@@ -87,7 +87,7 @@ class Model(nn.Module):
         """
         x = x.unsqueeze(1)      #
         
-        # padding will be added during training, but not when converting the model to onnx and coreml
+        # # padding will be added during training, but not when converting the model to onnx and coreml
         # if not self.convert_model:
         #     # calculates the necessary padding based on half the filter size
         #     # WARNING: this calcuation does not generalize to all cases
