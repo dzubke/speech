@@ -9,6 +9,7 @@ import wave
 from scipy import signal
 import matplotlib.pyplot as plt
 import torch
+import editdistance as ed
 # project libraries
 import speech
 from speech.utils.convert import to_numpy
@@ -16,6 +17,7 @@ from speech.models.ctc_model_pyt14 import CTC_pyt14
 from speech.loader import log_specgram_from_data, log_specgram_from_file
 from speech.models.ctc_decoder import decode as ctc_decode
 from speech.utils import compat
+from speech.utils.wave import wav_duration
 
 logging.basicConfig(level=20)
 
@@ -40,15 +42,25 @@ def main(ARGS):
     lstm_states = (hidden_in, cell_in)
 
 
-    stream_infer(model, preproc, lstm_states, ARGS)
+    stream_probs, stream_preds = stream_infer(model, preproc, lstm_states, ARGS)
 
-    list_chunk_infer(model, preproc, lstm_states, ARGS)
+    lc_probs, lc_preds = list_chunk_infer(model, preproc, lstm_states, ARGS)
 
-    fullaudio_infer(model, preproc, lstm_states, ARGS)
+    fa_probs, fa_preds = full_audio_infer(model, preproc, lstm_states, ARGS)
 
 
+    np.testing.assert_allclose(stream_probs, lc_probs, rtol=1e-03, atol=1e-05)
+    np.testing.assert_allclose(stream_probs, fa_probs, rtol=1e-03, atol=1e-05)
+    np.testing.assert_allclose(lc_probs, fa_probs, rtol=1e-03, atol=1e-05)
 
-def stream_infer(model, preproc, lstm_states, ARGS):
+    assert ed.eval(stream_preds, lc_preds)==0, "stream and list-chunk predictions are not the same"
+    assert ed.eval(stream_preds, fa_preds)==0, "stream and full-audio predictions are not the same"
+    assert ed.eval(lc_preds, fa_preds)==0, "list-chunk and full-audio predictions are not the same"
+
+    logging.info(f"all probabilities and predictions are the same")
+
+
+def stream_infer(model, preproc, lstm_states, ARGS)->tuple:
     """
     Performs streaming inference of an input wav file (if provided in ARGS) or from
     the micropohone. Inference is performed my model and the preproc preprocessing
@@ -210,14 +222,26 @@ def stream_infer(model, preproc, lstm_states, ARGS):
    
             if ARGS.savewav: wav_data.extend(frame)
         
-        logging.debug(f"final predictions: {predictions}")
 
     except KeyboardInterrupt:
         pass
-    finally: 
+    finally:
+
+        decoder_time_start = time.time()
+        probs_steps = np.concatenate(probs_list, axis=1)
+        int_labels = max_decode(probs_steps[0], blank=39)
+        # int_labels, likelihood = ctc_decode(probs[0], beam_size=50, blank=39)
+        predictions = preproc.decode(int_labels)
+        decoder_time += time.time() - decoder_time_start
+        decoder_count += 1
+        logging.debug(f"final predictions: {predictions}")
+
+        
         audio.destroy()
         total_time = time.time() - total_time_start
         acc = 3
+        duration = wav_duration(ARGS.file)
+
 
         logging.info(f"audio_buffer        time (s), count: {round(audio_buffer_time, acc)}, {audio_buffer_count}")
         logging.info(f"numpy_buffer        time (s), count: {round(numpy_buffer_time, acc)}, {numpy_buffer_count}")
@@ -229,16 +253,19 @@ def stream_infer(model, preproc, lstm_states, ARGS):
         logging.info(f"output_assign       time (s), count: {round(output_assign_time, acc)}, {output_assign_count}")
         logging.info(f"decoder             time (s), count: {round(decoder_time, acc)}, {decoder_count}")
         logging.info(f"total               time (s), count: {round(total_time, acc)}, {total_count}")
-        #logging.info(f"total 2             time (s), count: {round((time.time()-begin_time), acc)}, ")
+        logging.info(f"Multiples faster than realtime      : {round(duration/total_time, acc)}x")
 
         if ARGS.savewav:
             audio.write_wav(os.path.join(ARGS.savewav, datetime.now().strftime("savewav_%Y-%m-%d_%H-%M-%S_%f.wav")), wav_data)
             all_audio = np.frombuffer(wav_data, np.int16)
             plt.plot(all_audio)
             plt.show()
+        
+        probs = np.concatenate(probs_list, axis=1)
+        return probs, predictions
 
 
-def list_chunk_infer(model, preproc, lstm_states, ARGS):
+def list_chunk_infer(model, preproc, lstm_states, ARGS)->tuple:
     
 
     
@@ -251,6 +278,7 @@ def list_chunk_infer(model, preproc, lstm_states, ARGS):
         lc_output_assign_time, lc_output_assign_count = 0.0, 0
         lc_decode_time, lc_decode_count = 0.0, 0
         lc_total_time, lc_total_count = 0.0, 0 
+
 
         lc_total_time = time.time()
 
@@ -267,9 +295,6 @@ def list_chunk_infer(model, preproc, lstm_states, ARGS):
         padding = (0, 0, 15, 15)
         padded_input = torch.nn.functional.pad(torch_input, padding, value=0)
 
-        context_size = 31
-        iterations = torch_input.shape[1] - (context_size - 1)
-
         # ------------ logging ---------------
         logging.info(f"--------- starting list_chunck_infer ----------")
         logging.debug(f"log_spec shape: {log_spec.shape}")
@@ -278,9 +303,49 @@ def list_chunk_infer(model, preproc, lstm_states, ARGS):
         logging.debug(f"padded_input shape: {padded_input.shape}")
         # ------------ logging ---------------
 
+        context_size = 31
+        chunk_size = 40
+        #logging.info(f"chunk_size: {chunk_size}")
+        stride = chunk_size - (context_size - 1)
+        #logging.info(f"stride: {stride}")
+        # torch_input.shape[1] is time dimension
+        iterations = (torch_input.shape[1] - chunk_size)// stride + 2
+        #logging.info(f"time dim: {torch_input.shape[1]}")
+        #logging.info(f"iterations: {iterations}")
+        for i in range(iterations):
+            # special logic for the last iteration to handle any leftover
+            if i == iterations - 1:  
+                #logging.info(f"-------- last iteration ----------- ")
+                # if the stride perfectly matches, don't do anything
+                if (torch_input.shape[1] - chunk_size)%stride == 0:
+                    #logging.info(f"-------- no leftover ----------- ")
+                    break
+                # otherwise take all that is left in the array
+                else: 
+                    index = (i-1)*stride + 1+ (chunk_size - context_size)
+                    #logging.info(f"index: {index}")
 
-        for i in range(iterations): 
-            input_chunk = torch_input[:, i:i+context_size, :]
+                    while (index+context_size)<=(torch_input.shape[1] - 1):
+                        #logging.info(f"index: {index}")
+                        #logging.info(f"index+context: {index+context_size}")
+                        input_chunk = torch_input[:,index:index+context_size:, :]
+                        lc_model_infer_time_start = time.time()
+                        model_output = model(input_chunk, (hidden_in, cell_in))
+                        lc_model_infer_time += time.time() - lc_model_infer_time_start
+                        lc_model_infer_count += 1
+
+                        lc_output_assign_time_start = time.time()
+                        probs, (hidden_out, cell_out) = model_output
+                        hidden_in, cell_in = hidden_out, cell_out
+                        probs = to_numpy(probs)
+                        probs_list.append(probs)
+                        lc_output_assign_time += time.time() - lc_output_assign_time_start
+                        lc_output_assign_count += 1
+
+                        index += 1
+
+            else: 
+                input_chunk = torch_input[:, i*stride:i*stride+chunk_size, :]
             
             lc_model_infer_time_start = time.time()
             model_output = model(input_chunk, (hidden_in, cell_in))
@@ -296,7 +361,7 @@ def list_chunk_infer(model, preproc, lstm_states, ARGS):
             lc_output_assign_count += 1
             
             # decoding every 20 time-steps
-            if i%20 ==0 and i !=0:
+            if i%10 ==0 and i !=0:
                 lc_decode_time_start = time.time()
                 probs_steps = np.concatenate(probs_list, axis=1)
                 int_labels = max_decode(probs_steps[0], blank=39)
@@ -308,6 +373,16 @@ def list_chunk_infer(model, preproc, lstm_states, ARGS):
             
             lc_total_count += 1
 
+
+            # decoding the last section
+            lc_decode_time_start = time.time()
+            probs_steps = np.concatenate(probs_list, axis=1)
+            int_labels = max_decode(probs_steps[0], blank=39)
+            # int_labels, likelihood = ctc_decode(probs[0], beam_size=50, blank=39)
+            predictions = preproc.decode(int_labels)
+            lc_decode_time += time.time() - lc_decode_time_start
+            lc_decode_count += 1
+
             # ------------ logging ---------------
             logging.debug(f"input_chunk shape: {input_chunk.shape}")
             logging.debug(f"probs shape: {probs.shape}")
@@ -315,6 +390,7 @@ def list_chunk_infer(model, preproc, lstm_states, ARGS):
             # ------------ logging ---------------
         lc_total_time = time.time() - lc_total_time
 
+        duration = wav_duration(ARGS.file)
         # ------------ logging ---------------
         logging.info(f"final predictions: {predictions}")
         acc = 3
@@ -322,9 +398,14 @@ def list_chunk_infer(model, preproc, lstm_states, ARGS):
         logging.info(f"output assign        time (s), count: {round(lc_output_assign_time, acc)}, {lc_output_assign_count}")
         logging.info(f"decoder              time (s), count: {round(lc_decode_time, acc)}, {lc_decode_count}")
         logging.info(f"total                time (s), count: {round(lc_total_time, acc)}, {lc_total_count}")
+        logging.info(f"Multiples faster than realtime      : {round(duration/lc_total_time, acc)}x")
 
 
-def fullaudio_infer(model, preproc, lstm_states, ARGS):
+        probs = np.concatenate(probs_list, axis=1)
+        return probs, predictions
+
+
+def full_audio_infer(model, preproc, lstm_states, ARGS)->tuple:
     """
     conducts inference from an entire audio file. If no audio file
     is provided in ARGS when recording from mic, this function is exited.
@@ -380,6 +461,8 @@ def fullaudio_infer(model, preproc, lstm_states, ARGS):
         fa_total_time = time.time() - fa_total_time
         
 
+        duration = wav_duration(ARGS.file)
+
         # ------------ logging ---------------
         logging.info(f"--------- starting fullaudio_infer ----------")
         logging.debug(f"log_spec shape: {log_spec.shape}")
@@ -395,9 +478,12 @@ def fullaudio_infer(model, preproc, lstm_states, ARGS):
         logging.info(f"model infer          time (s): {round(fa_model_infer_time, acc)}")
         logging.info(f"decoder              time (s): {round(fa_decode_time, acc)}")
         logging.info(f"total                time (s): {round(fa_total_time, acc)}")
+        logging.info(f"Multiples faster than realtime      : {round(duration/fa_total_time, acc)}x")
+
         # ------------ logging ---------------
 
 
+        return probs, predictions
 
 
 class Audio(object):
