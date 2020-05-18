@@ -1,6 +1,3 @@
-# The CTC.loss function in ctc_model.py is incompatible with pytorch 1.X, so this class
-#  just removes that loss function so that this class is compatible with pytorch 1.X
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -9,13 +6,14 @@ import numpy as np
 import torch
 import torch.autograd as autograd
 
+from . import ctc_model
 #import functions.ctc as ctc #awni hannun's ctc bindings
 from . import model
 from .ctc_decoder import decode
 from .ctc_decoder_dist import decode_dist
 
 
-class CTC(model.Model):
+class CTC_train(ctc_model.CTC):
     def __init__(self, freq_dim, output_dim, config):
         super().__init__(freq_dim, config)
 
@@ -37,8 +35,11 @@ class CTC(model.Model):
         return x, rnn_args
 
     def loss(self, batch):
-        pass
-
+        x, y, x_lens, y_lens = self.collate(*batch)
+        out, rnn_args = self.forward_impl(x)
+        loss_fn = ctc.CTCLoss()         # awni's ctc loss call        
+        loss = loss_fn(out, y, x_lens, y_lens)
+        return loss
 
     def collate(self, inputs, labels):
         max_t = max(i.shape[0] for i in inputs)
@@ -78,3 +79,4 @@ class CTC(model.Model):
                 seq.append(p)
             prev = p
         return seq
+

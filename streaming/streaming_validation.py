@@ -267,8 +267,6 @@ def stream_infer(model, preproc, lstm_states, ARGS)->tuple:
 
 def list_chunk_infer(model, preproc, lstm_states, ARGS)->tuple:
     
-
-    
     if ARGS.file is None:
         logging.info(f"--- Skipping list_chunk_infer. No input file ---")
     else:
