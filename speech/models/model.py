@@ -93,7 +93,6 @@ class Model(nn.Module):
         #     # WARNING: this calcuation does not generalize to all cases
         #     pad = list(self.conv.children())[0].kernel_size[0]//2
         #     x = nn.functional.pad(x, (0,0,pad,pad))
-            
 
         x = self.conv(x)
         # At this point x should have shape

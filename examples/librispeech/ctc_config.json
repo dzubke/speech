@@ -37,7 +37,7 @@
     },
 
     "model" : {
-        "class" : "CTC",
+        "class" : "CTC_train",
         "dropout" : 0.4,
         "convert_model": false,
         "load_trained": true,
