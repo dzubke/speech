@@ -19,7 +19,7 @@ from speech.models.ctc_decoder import decode as ctc_decode
 from speech.utils import compat
 from speech.utils.wave import wav_duration
 
-logging.basicConfig(level=20)
+logging.basicConfig(level=10)
 
 
 def main(ARGS):
@@ -44,10 +44,9 @@ def main(ARGS):
 
     stream_probs, stream_preds = stream_infer(model, preproc, lstm_states, ARGS)
 
-    lc_probs, lc_preds = list_chunk_infer(model, preproc, lstm_states, ARGS)
+    lc_probs, lc_preds = list_chunk_infer_full_chunks(model, preproc, lstm_states, ARGS)
 
     fa_probs, fa_preds = full_audio_infer(model, preproc, lstm_states, ARGS)
-
 
     np.testing.assert_allclose(stream_probs, lc_probs, rtol=1e-03, atol=1e-05)
     np.testing.assert_allclose(stream_probs, fa_probs, rtol=1e-03, atol=1e-05)
@@ -77,10 +76,15 @@ def stream_infer(model, preproc, lstm_states, ARGS)->tuple:
 
     hidden_in, cell_in = lstm_states
     wav_data = bytearray()
-    audio_buffer_size = 2   # 2 16 ms steps in the log_spec window
-    log_spec_buffer_size = 31
+    audio_buffer_size = 2   # 2 16 ms steps in the features window
+    n_context = 15
+    features_buffer_size = (2*n_context + 1)
     audio_ring_buffer = collections.deque(maxlen=audio_buffer_size)
-    log_spec_ring_buffer = collections.deque(maxlen=log_spec_buffer_size)
+    features_ring_buffer = collections.deque(maxlen=features_buffer_size)
+    # add n_context zero frames as padding to the buffer
+    zero_frame = np.zeros((1,257), dtype=np.float32)
+    for _ in range(n_context): features_ring_buffer.append(zero_frame)
+
     predictions = list()
     probs_list  = list()
     frames_per_block = round( audio.RATE_PROCESS/ audio.BLOCKS_PER_SECOND * 2) 
@@ -88,9 +92,9 @@ def stream_infer(model, preproc, lstm_states, ARGS)->tuple:
     # -------time evaluation variables-----------
     audio_buffer_time, audio_buffer_count = 0.0, 0 
     numpy_buffer_time, numpy_buffer_count = 0.0, 0 
-    log_spec_time, log_spec_count = 0.0, 0
+    features_time, features_count = 0.0, 0
     normalize_time, normalize_count = 0.0, 0 
-    log_spec_buffer_time, log_spec_buffer_count = 0.0, 0
+    features_buffer_time, features_buffer_count = 0.0, 0
     numpy_conv_time, numpy_conv_count = 0.0, 0
     model_infer_time, model_infer_count = 0.0, 0 
     output_assign_time, output_assign_count = 0.0, 0
@@ -109,6 +113,8 @@ def stream_infer(model, preproc, lstm_states, ARGS)->tuple:
         for count, frame in enumerate(frames):
             # exit the loop if there are no more full input frames
             if len(frame) <  frames_per_block:
+                logging.info(f"final sample length {len(frame)}")
+                final_sample = frame
                 break
 
             # ------------ logging ---------------
@@ -138,45 +144,45 @@ def stream_infer(model, preproc, lstm_states, ARGS)->tuple:
                 numpy_buffer = np.concatenate(
                     (np.frombuffer(buffer_list[0], np.int16), 
                     np.frombuffer(buffer_list[1], np.int16)))
-                # calculate the log_spec with dim: (1, 257)
+                # calculate the features with dim: (1, 257)
                 numpy_buffer_time += time.time() - numpy_buffer_time_start
                 numpy_buffer_count += 1
 
-                log_spec_time_start = time.time()
-                log_spec_step = log_specgram_from_data(numpy_buffer, samp_rate=16000)
-                log_spec_time += time.time() - log_spec_time_start
-                log_spec_count += 1
+                features_time_start = time.time()
+                features_step = log_specgram_from_data(numpy_buffer, samp_rate=16000)
+                features_time += time.time() - features_time_start
+                features_count += 1
                 
                 normalize_time_start = time.time()
-                # normalize the log_spec_step, older preproc objects do not have "normalize" method
+                # normalize the features_step, older preproc objects do not have "normalize" method
                 if hasattr(preproc, "normalize"):
-                    norm_log_spec = preproc.normalize(log_spec_step)
+                    norm_features = preproc.normalize(features_step)
                 else: 
-                    norm_log_spec = compat.normalize(preproc, log_spec_step)
+                    norm_features = compat.normalize(preproc, features_step)
                 normalize_time += time.time() - normalize_time_start
                 normalize_count += 1
 
                 # ------------ logging ---------------
                 logging.debug(f"numpy_buffer shape: {numpy_buffer.shape}")
-                logging.debug(f"log_spec_step shape: {log_spec_step.shape}")
-                logging.debug(f"log_spec_buffer length: {len(log_spec_ring_buffer)}")
+                logging.debug(f"features_step shape: {features_step.shape}")
+                logging.debug(f"features_buffer length: {len(features_ring_buffer)}")
                 # ------------ logging ---------------
 
-                # fill up the log_spec_ring_buffer and then feed into the model
-                if len(log_spec_ring_buffer) < log_spec_buffer_size-1:
-                    log_spec_buffer_time_start = time.time()
-                    log_spec_ring_buffer.append(norm_log_spec)
-                    log_spec_buffer_time += time.time() - log_spec_buffer_time_start
-                    log_spec_buffer_count += 1
+                # fill up the features_ring_buffer and then feed into the model
+                if len(features_ring_buffer) < features_buffer_size-1:
+                    features_buffer_time_start = time.time()
+                    features_ring_buffer.append(norm_features)
+                    features_buffer_time += time.time() - features_buffer_time_start
+                    features_buffer_count += 1
                 else: 
-                    log_spec_buffer_time_start = time.time()
-                    log_spec_ring_buffer.append(norm_log_spec)
-                    log_spec_buffer_time += time.time() - log_spec_buffer_time_start
-                    log_spec_buffer_count += 1
+                    features_buffer_time_start = time.time()
+                    features_ring_buffer.append(norm_features)
+                    features_buffer_time += time.time() - features_buffer_time_start
+                    features_buffer_count += 1
 
                     numpy_conv_time_start = time.time()
                     # conv_context dim: (31, 257)
-                    conv_context = np.concatenate(list(log_spec_ring_buffer), axis=0)
+                    conv_context = np.concatenate(list(features_ring_buffer), axis=0)
                     # addding batch dimension: (1, 31, 257)
                     conv_context = np.expand_dims(conv_context, axis=0)
                     numpy_conv_time += time.time() - numpy_conv_time_start
@@ -226,6 +232,141 @@ def stream_infer(model, preproc, lstm_states, ARGS)->tuple:
     except KeyboardInterrupt:
         pass
     finally:
+        # IN THE FINALLY BLOCK
+        # if frames is empty
+        if not next(frames):
+            # flush_buffer = list()
+            # audio_ring_buffer.clear()
+            # zero_buffer = b'\x00'
+            # for reference frames_per_block = 512
+            # while len(final_sample) < frames_per_block:
+            #     final_sample += zero_buffer
+            # assert len(final_sample) == frames_per_block
+            # flush_buffer.append(final_sample)
+            # zero padding for n_context feature frames
+            # for _ in range(n_context+1):
+            #     flush_buffer.append(zero_buffer*int(frames_per_block))
+            
+            for count, frame in enumerate(range(n_context+1)):
+                # logging.info("--------Inside second inference block------")
+                # # exit the loop if there are no more full input frames
+                # if len(frame) <  frames_per_block:
+                #     logging.info(f"final frames length 2 {len(frame)}")
+                #     final_sample = frame
+                #     break
+
+                # # ------------ logging ---------------
+                # logging.debug(f"frame length: {len(frame)}")
+                # logging.debug(f"audio_buffer length: {len(audio_ring_buffer)}")
+                # # ------------ logging ---------------
+
+                # # fill up the audio_ring_buffer and then feed into the model
+                # if len(audio_ring_buffer) < audio_buffer_size-1:
+                #     # note: appending new frame to right of the buffer
+                #     audio_buffer_time_start = time.time()
+                #     audio_ring_buffer.append(frame)
+                #     audio_buffer_time += time.time() - audio_buffer_time_start
+                #     audio_buffer_count += 1
+                # else: 
+                #     audio_buffer_time_start = time.time()
+                #     audio_ring_buffer.append(frame)
+                #     audio_buffer_time += time.time() - audio_buffer_time_start
+                #     audio_buffer_count += 1
+                
+                #     numpy_buffer_time_start = time.time()
+                #     buffer_list = list(audio_ring_buffer)
+                #     # convert the buffer to numpy array
+                #     # a single frame has dims: (512,) and numpy buffer (2 frames) is: (512,)
+                #     # The dimension of numpy buffer is reduced by half because each 
+                #     # integer in numpy buffer is encoded as 2 hexidecimal entries in frame
+                #     numpy_buffer = np.concatenate(
+                #         (np.frombuffer(buffer_list[0], np.int16), 
+                #         np.frombuffer(buffer_list[1], np.int16)))
+                #     assert numpy_buffer.sum() == 0, "numpy buffer should be zero when feed in only zeros"
+                #     # calculate the features with dim: (1, 257)
+                #     numpy_buffer_time += time.time() - numpy_buffer_time_start
+                #     numpy_buffer_count += 1
+
+                #     features_time_start = time.time()
+                #     features_step = log_specgram_from_data(numpy_buffer, samp_rate=16000)
+                #     features_time += time.time() - features_time_start
+                #     features_count += 1
+                    
+                #     normalize_time_start = time.time()
+                #     # normalize the features_step, older preproc objects do not have "normalize" method
+                #     if hasattr(preproc, "normalize"):
+                #         norm_features = preproc.normalize(features_step)
+                #     else: 
+                #         norm_features = compat.normalize(preproc, features_step)
+                #     normalize_time += time.time() - normalize_time_start
+                #     normalize_count += 1
+
+                #     # ------------ logging ---------------
+                #     logging.debug(f"numpy_buffer shape: {numpy_buffer.shape}")
+                #     logging.debug(f"features_step shape: {features_step.shape}")
+                #     logging.debug(f"features_buffer length: {len(features_ring_buffer)}")
+                #     # ------------ logging ---------------
+
+                #     # fill up the features_ring_buffer and then feed into the model
+                #     assert len(features_ring_buffer) == features_buffer_size, "feature buffer should be filled"
+
+
+                features_buffer_time_start = time.time()
+                features_ring_buffer.append(np.zeros((1,257), dtype=np.float32))
+                features_buffer_time += time.time() - features_buffer_time_start
+                features_buffer_count += 1
+
+                numpy_conv_time_start = time.time()
+                # conv_context dim: (31, 257)
+                conv_context = np.concatenate(list(features_ring_buffer), axis=0)
+                # addding batch dimension: (1, 31, 257)
+                conv_context = np.expand_dims(conv_context, axis=0)
+                numpy_conv_time += time.time() - numpy_conv_time_start
+                numpy_conv_count += 1
+
+                model_infer_time_start = time.time()
+                model_out = model(torch.from_numpy(conv_context), (hidden_in, cell_in))
+                model_infer_time += time.time() - model_infer_time_start
+                model_infer_count += 1
+
+                output_assign_time_start = time.time()
+                probs, (hidden_out, cell_out) = model_out
+                # probs dim: (1, 1, 40)
+                probs = to_numpy(probs)
+                probs_list.append(probs)
+                hidden_in, cell_in = hidden_out, cell_out
+                output_assign_time += time.time() - output_assign_time_start
+                output_assign_count += 1
+
+                
+                # ------------ logging ---------------
+                logging.debug(f"conv_context shape: {conv_context.shape}")
+                logging.debug(f"probs shape: {probs.shape}")
+                logging.debug(f"probs_list len: {len(probs_list)}")
+                #logging.debug(f"probs value: {probs}")
+                # ------------ logging ---------------
+        
+                # decoding every 20 time-steps
+                if count%20 ==0:
+                    decoder_time_start = time.time()
+                    probs_steps = np.concatenate(probs_list, axis=1)
+                    int_labels = max_decode(probs_steps[0], blank=39)
+                    # int_labels, likelihood = ctc_decode(probs[0], beam_size=50, blank=39)
+                    predictions = preproc.decode(int_labels)
+                    decoder_time += time.time() - decoder_time_start
+                    decoder_count += 1
+                    
+                    # ------------ logging ---------------
+                    logging.info(f"predictions: {predictions}")
+                    # ------------ logging ---------------
+                
+                total_count += 1
+
+                if ARGS.savewav: wav_data.extend(frame)
+
+        # process the final frames
+        logging.info(f"length of final_frames: {len(final_sample)}")
+
 
         decoder_time_start = time.time()
         probs_steps = np.concatenate(probs_list, axis=1)
@@ -242,12 +383,12 @@ def stream_infer(model, preproc, lstm_states, ARGS)->tuple:
         acc = 3
         duration = wav_duration(ARGS.file)
 
-
+        logging.info(f"-------------- streaming_infer --------------")
         logging.info(f"audio_buffer        time (s), count: {round(audio_buffer_time, acc)}, {audio_buffer_count}")
         logging.info(f"numpy_buffer        time (s), count: {round(numpy_buffer_time, acc)}, {numpy_buffer_count}")
-        logging.info(f"log_spec_operation  time (s), count: {round(log_spec_time, acc)}, {log_spec_count}")
+        logging.info(f"features_operation  time (s), count: {round(features_time, acc)}, {features_count}")
         logging.info(f"normalize           time (s), count: {round(normalize_time, acc)}, {normalize_count}")
-        logging.info(f"log_spec_buffer     time (s), count: {round(log_spec_buffer_time, acc)}, {log_spec_buffer_count}")
+        logging.info(f"features_buffer     time (s), count: {round(features_buffer_time, acc)}, {features_buffer_count}")
         logging.info(f"numpy_conv          time (s), count: {round(numpy_conv_time, acc)}, {numpy_conv_count}")
         logging.info(f"model_infer         time (s), count: {round(model_infer_time, acc)}, {model_infer_count}")
         logging.info(f"output_assign       time (s), count: {round(output_assign_time, acc)}, {output_assign_count}")
@@ -265,7 +406,7 @@ def stream_infer(model, preproc, lstm_states, ARGS)->tuple:
         return probs, predictions
 
 
-def list_chunk_infer(model, preproc, lstm_states, ARGS)->tuple:
+def list_chunk_infer_full_chunks(model, preproc, lstm_states, ARGS)->tuple:
     
     if ARGS.file is None:
         logging.info(f"--- Skipping list_chunk_infer. No input file ---")
@@ -283,67 +424,45 @@ def list_chunk_infer(model, preproc, lstm_states, ARGS)->tuple:
         hidden_in, cell_in = lstm_states
         probs_list = list()
 
-        log_spec = log_specgram_from_file(ARGS.file)
+        features = log_specgram_from_file(ARGS.file)
         if hasattr(preproc, "normalize"):
-            norm_log_spec = preproc.normalize(log_spec)
+            norm_features = preproc.normalize(features)
         else: 
-            norm_log_spec = compat.normalize(preproc, log_spec)
-        norm_log_spec = np.expand_dims(norm_log_spec, axis=0)
-        torch_input = torch.from_numpy(norm_log_spec)
+            norm_features= compat.normalize(preproc, features)
+        norm_features = np.expand_dims(norm_features, axis=0)
+        torch_input = torch.from_numpy(norm_features)
         padding = (0, 0, 15, 15)
         padded_input = torch.nn.functional.pad(torch_input, padding, value=0)
 
+        context_size = 31
+        chunk_size = 31
+        stride = chunk_size - (context_size - 1)
+        full_chunks, variable_padding = divmod(padded_input.shape[1] - chunk_size, stride)
+        # if there is a remainder
+        if variable_padding != 0:
+            full_chunks += 1    # to include the last full chunk
+            final_padding = torch.zeros((1, variable_padding, 257), dytpe=torch.float32, requires_grad=False)
+            padded_input = torch.cat((padded_input, final_padding),dim=1)
+
         # ------------ logging ---------------
-        logging.info(f"--------- starting list_chunck_infer ----------")
-        logging.debug(f"log_spec shape: {log_spec.shape}")
-        logging.debug(f"norm_log_spec with batch shape: {norm_log_spec.shape}")
+        logging.info(f"-------------- list_chunck_infer --------------")
+        logging.info(f"======= chunk_size: {chunk_size}===========")
+        logging.info(f"======= full_chunks: {full_chunks}===========")
+        logging.info(f"======= final_padding: {variable_padding}===========")
+        logging.debug(f"features shape: {features.shape}")
+        logging.debug(f"norm_features with batch shape: {norm_features.shape}")
         logging.debug(f"torch_input shape: {torch_input.shape}")
         logging.debug(f"padded_input shape: {padded_input.shape}")
-        # ------------ logging ---------------
-
-        context_size = 31
-        chunk_size = 40
-        #logging.info(f"chunk_size: {chunk_size}")
-        stride = chunk_size - (context_size - 1)
         #logging.info(f"stride: {stride}")
         # torch_input.shape[1] is time dimension
-        iterations = (torch_input.shape[1] - chunk_size)// stride + 2
         #logging.info(f"time dim: {torch_input.shape[1]}")
         #logging.info(f"iterations: {iterations}")
-        for i in range(iterations):
-            # special logic for the last iteration to handle any leftover
-            if i == iterations - 1:  
-                #logging.info(f"-------- last iteration ----------- ")
-                # if the stride perfectly matches, don't do anything
-                if (torch_input.shape[1] - chunk_size)%stride == 0:
-                    #logging.info(f"-------- no leftover ----------- ")
-                    break
-                # otherwise take all that is left in the array
-                else: 
-                    index = (i-1)*stride + 1+ (chunk_size - context_size)
-                    #logging.info(f"index: {index}")
+        # ------------ logging ---------------
 
-                    while (index+context_size)<=(torch_input.shape[1] - 1):
-                        #logging.info(f"index: {index}")
-                        #logging.info(f"index+context: {index+context_size}")
-                        input_chunk = torch_input[:,index:index+context_size:, :]
-                        lc_model_infer_time_start = time.time()
-                        model_output = model(input_chunk, (hidden_in, cell_in))
-                        lc_model_infer_time += time.time() - lc_model_infer_time_start
-                        lc_model_infer_count += 1
 
-                        lc_output_assign_time_start = time.time()
-                        probs, (hidden_out, cell_out) = model_output
-                        hidden_in, cell_in = hidden_out, cell_out
-                        probs = to_numpy(probs)
-                        probs_list.append(probs)
-                        lc_output_assign_time += time.time() - lc_output_assign_time_start
-                        lc_output_assign_count += 1
-
-                        index += 1
-
-            else: 
-                input_chunk = torch_input[:, i*stride:i*stride+chunk_size, :]
+        for i in range(full_chunks):
+            
+            input_chunk = padded_input[:, i*stride:i*stride+chunk_size, :]
             
             lc_model_infer_time_start = time.time()
             model_output = model(input_chunk, (hidden_in, cell_in))
@@ -390,7 +509,7 @@ def list_chunk_infer(model, preproc, lstm_states, ARGS)->tuple:
 
         duration = wav_duration(ARGS.file)
         # ------------ logging ---------------
-        logging.info(f"final predictions: {predictions}")
+        logging.info(f"predictions: {predictions}")
         acc = 3
         logging.info(f"model infer          time (s), count: {round(lc_model_infer_time, acc)}, {lc_model_infer_count}")
         logging.info(f"output assign        time (s), count: {round(lc_output_assign_time, acc)}, {lc_output_assign_count}")
@@ -414,7 +533,7 @@ def full_audio_infer(model, preproc, lstm_states, ARGS)->tuple:
     else:
         # fa means fullaudio
         fa_total_time = 0.0
-        fa_log_spec_time = 0.0
+        fa_features_time = 0.0
         fa_normalize_time = 0.0
         fa_convert_pad_time = 0.0
         fa_model_infer_time = 0.0
@@ -424,28 +543,28 @@ def full_audio_infer(model, preproc, lstm_states, ARGS)->tuple:
 
         fa_total_time = time.time()
 
-        fa_log_spec_time = time.time()
-        log_spec = log_specgram_from_file(ARGS.file)
-        fa_log_spec_time = time.time() - fa_log_spec_time
+        fa_features_time = time.time()
+        features = log_specgram_from_file(ARGS.file)
+        fa_features_time = time.time() - fa_features_time
         
         fa_normalize_time = time.time()
         if hasattr(preproc, "normalize"):
-            norm_log_spec = preproc.normalize(log_spec)
+            norm_features = preproc.normalize(features)
         else: 
-            norm_log_spec = compat.normalize(preproc, log_spec)
+            norm_features = compat.normalize(preproc, features)
         fa_normalize_time = time.time() - fa_normalize_time
 
         fa_convert_pad_time = time.time()
         # adds the batch dimension (1, time, 257)
-        norm_log_spec = np.expand_dims(norm_log_spec, axis=0)
-        torch_input = torch.from_numpy(norm_log_spec)
+        norm_features = np.expand_dims(norm_features, axis=0)
+        torch_input = torch.from_numpy(norm_features)
         # paddings starts from the back, zero padding to freq, 15 paddding to time
         padding = (0, 0, 15, 15)
         padded_input = torch.nn.functional.pad(torch_input, padding, value=0)
         fa_convert_pad_time = time.time() - fa_convert_pad_time
         # !!! curently not padding !!!!
         fa_model_infer_time = time.time()
-        model_output = model(torch_input, (hidden_in, cell_in))
+        model_output = model(padded_input, (hidden_in, cell_in))
         fa_model_infer_time = time.time() - fa_model_infer_time
 
         probs, (hidden_out, cell_out) = model_output
@@ -462,15 +581,15 @@ def full_audio_infer(model, preproc, lstm_states, ARGS)->tuple:
         duration = wav_duration(ARGS.file)
 
         # ------------ logging ---------------
-        logging.info(f"--------- starting fullaudio_infer ----------")
-        logging.debug(f"log_spec shape: {log_spec.shape}")
-        logging.debug(f"norm_log_spec with batch shape: {norm_log_spec.shape}")
+        logging.info(f"------------ fullaudio_infer -------------")
+        logging.debug(f"features shape: {features.shape}")
+        logging.debug(f"norm_features with batch shape: {norm_features.shape}")
         logging.debug(f"torch_input shape: {torch_input.shape}")
         logging.debug(f"padded_input shape: {padded_input.shape}")
         logging.debug(f"model probs shape: {probs.shape}")
         logging.info(f"predictions: {predictions}")
         acc = 3
-        logging.info(f"log_spec             time (s): {round(fa_log_spec_time, acc)}")
+        logging.info(f"features             time (s): {round(fa_features_time, acc)}")
         logging.info(f"normalization        time (s): {round(fa_normalize_time, acc)}")
         logging.info(f"convert & pad        time (s): {round(fa_convert_pad_time, acc)}")
         logging.info(f"model infer          time (s): {round(fa_model_infer_time, acc)}")
@@ -482,6 +601,129 @@ def full_audio_infer(model, preproc, lstm_states, ARGS)->tuple:
 
 
         return probs, predictions
+
+
+
+def list_chunk_infer_fractional_chunks(model, preproc, lstm_states, ARGS)->tuple:
+    
+    if ARGS.file is None:
+        logging.info(f"--- Skipping list_chunk_infer. No input file ---")
+    else:
+        
+        #lc means listchunk
+        lc_model_infer_time, lc_model_infer_count = 0.0, 0 
+        lc_output_assign_time, lc_output_assign_count = 0.0, 0
+        lc_decode_time, lc_decode_count = 0.0, 0
+        lc_total_time, lc_total_count = 0.0, 0 
+
+
+        lc_total_time = time.time()
+
+        hidden_in, cell_in = lstm_states
+        probs_list = list()
+
+        features = log_specgram_from_file(ARGS.file)
+        if hasattr(preproc, "normalize"):
+            norm_features = preproc.normalize(features)
+        else: 
+            norm_features= compat.normalize(preproc, features)
+        norm_features = np.expand_dims(norm_features, axis=0)
+        torch_input = torch.from_numpy(norm_features)
+        padding = (0, 0, 15, 15)
+        padded_input = torch.nn.functional.pad(torch_input, padding, value=0)
+
+        context_size = 31
+        chunk_size = 31
+        stride = chunk_size - (context_size - 1)
+        full_chunks, fraction_chunks = divmod(padded_input.shape[1] - chunk_size, stride)
+        full_chunks += 1
+
+        # ------------ logging ---------------
+        logging.info(f"-------------- list_chunck_infer --------------")
+        logging.info(f"======= chunk_size: {chunk_size}===========")
+        logging.info(f"======= full_chunks: {full_chunks}===========")
+        logging.info(f"======= fraction_chunks: { fraction_chunks}===========")
+        logging.debug(f"features shape: {features.shape}")
+        logging.debug(f"norm_features with batch shape: {norm_features.shape}")
+        logging.debug(f"torch_input shape: {torch_input.shape}")
+        logging.debug(f"padded_input shape: {padded_input.shape}")
+        #logging.info(f"stride: {stride}")
+        # torch_input.shape[1] is time dimension
+        #logging.info(f"time dim: {torch_input.shape[1]}")
+        #logging.info(f"iterations: {iterations}")
+        # ------------ logging ---------------
+
+
+        for i in range(full_chunks+fraction_chunks):
+            
+            # if and elif handle fractional chunks, else handles full chunks
+            if i == full_chunks:  
+                inner_bound = i*stride
+                input_chunk = padded_input[:, inner_bound:inner_bound+context_size:, :]
+            elif i > full_chunks:
+                # stride of 1
+                inner_bound += 1
+                input_chunk = padded_input[:,inner_bound:inner_bound+context_size:, :]
+            else: 
+                input_chunk = padded_input[:, i*stride:i*stride+chunk_size, :]
+            
+            lc_model_infer_time_start = time.time()
+            model_output = model(input_chunk, (hidden_in, cell_in))
+            lc_model_infer_time += time.time() - lc_model_infer_time_start
+            lc_model_infer_count += 1
+
+            lc_output_assign_time_start = time.time()
+            probs, (hidden_out, cell_out) = model_output
+            hidden_in, cell_in = hidden_out, cell_out
+            probs = to_numpy(probs)
+            probs_list.append(probs)
+            lc_output_assign_time += time.time() - lc_output_assign_time_start
+            lc_output_assign_count += 1
+            
+            # decoding every 20 time-steps
+            if i%10 ==0 and i !=0:
+                lc_decode_time_start = time.time()
+                probs_steps = np.concatenate(probs_list, axis=1)
+                int_labels = max_decode(probs_steps[0], blank=39)
+                # int_labels, likelihood = ctc_decode(probs[0], beam_size=50, blank=39)
+                predictions = preproc.decode(int_labels)
+                lc_decode_time += time.time() - lc_decode_time_start
+                lc_decode_count += 1
+                #logging.debug(f"intermediate predictions: {predictions}")
+            
+            lc_total_count += 1
+
+
+            # decoding the last section
+            lc_decode_time_start = time.time()
+            probs_steps = np.concatenate(probs_list, axis=1)
+            int_labels = max_decode(probs_steps[0], blank=39)
+            # int_labels, likelihood = ctc_decode(probs[0], beam_size=50, blank=39)
+            predictions = preproc.decode(int_labels)
+            lc_decode_time += time.time() - lc_decode_time_start
+            lc_decode_count += 1
+
+            # ------------ logging ---------------
+            logging.debug(f"input_chunk shape: {input_chunk.shape}")
+            logging.debug(f"probs shape: {probs.shape}")
+            logging.debug(f"probs list len: {len(probs_list)}")
+            # ------------ logging ---------------
+        lc_total_time = time.time() - lc_total_time
+
+        duration = wav_duration(ARGS.file)
+        # ------------ logging ---------------
+        logging.info(f"predictions: {predictions}")
+        acc = 3
+        logging.info(f"model infer          time (s), count: {round(lc_model_infer_time, acc)}, {lc_model_infer_count}")
+        logging.info(f"output assign        time (s), count: {round(lc_output_assign_time, acc)}, {lc_output_assign_count}")
+        logging.info(f"decoder              time (s), count: {round(lc_decode_time, acc)}, {lc_decode_count}")
+        logging.info(f"total                time (s), count: {round(lc_total_time, acc)}, {lc_total_count}")
+        logging.info(f"Multiples faster than realtime      : {round(duration/lc_total_time, acc)}x")
+
+
+        probs = np.concatenate(probs_list, axis=1)
+        return probs, predictions
+
 
 
 class Audio(object):
