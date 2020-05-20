@@ -13,13 +13,20 @@ import editdistance as ed
 # project libraries
 import speech
 from speech.utils.convert import to_numpy
-from speech.models.ctc_model_pyt14 import CTC_pyt14
+from speech.models.ctc_model import CTC
 from speech.loader import log_specgram_from_data, log_specgram_from_file
 from speech.models.ctc_decoder import decode as ctc_decode
 from speech.utils import compat
 from speech.utils.wave import wav_duration, array_from_wave
 
-logging.basicConfig(level=20)
+set_linewidth=160
+np.set_printoptions(linewidth=set_linewidth)
+torch.set_printoptions(linewidth=set_linewidth)
+
+log_filename = "logs_probs-hiddencell_2020-05-20.log"
+log_level = 20
+logging.basicConfig(filename=None, filemode='w', level=log_level)
+log_sample_len = 50     # number of data samples outputted to the log
 
 
 def main(ARGS):
@@ -31,7 +38,7 @@ def main(ARGS):
         config = json.load(fid)
         model_config = config["model"]
 
-    model = CTC_pyt14(preproc.input_dim, preproc.vocab_size, model_config)
+    model = CTC(preproc.input_dim, preproc.vocab_size, model_config)
     state_dict = state_dict_model.state_dict()
     model.load_state_dict(state_dict)
     model.eval()
@@ -53,7 +60,7 @@ def main(ARGS):
     PARAMS['remainder'] = (PARAMS['padded_frames_length'] - PARAMS['chunk_size']) % PARAMS['stride']
     PARAMS['final_padding'] = PARAMS['stride'] - PARAMS['remainder'] if PARAMS['remainder'] !=0 else 0
 
-    logging.info(f"PARAMS dict: {PARAMS}")
+    logging.warning(f"PARAMS dict: {PARAMS}")
 
     stream_probs, stream_preds = stream_infer(model, preproc, lstm_states, PARAMS, ARGS)
 
@@ -69,7 +76,7 @@ def main(ARGS):
     assert ed.eval(stream_preds, fa_preds)==0, "stream and full-audio predictions are not the same"
     assert ed.eval(lc_preds, fa_preds)==0, "list-chunk and full-audio predictions are not the same"
 
-    logging.info(f"all probabilities and predictions are the same")
+    logging.warning(f"all probabilities and predictions are the same")
 
 
 def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
@@ -85,7 +92,7 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
     frames = audio.frame_generator()
 
     print("Listening (ctrl-C to exit)...")
-    logging.info(f"--- starting stream_infer  ---")
+    logging.warning(f"--- starting stream_infer  ---")
 
     hidden_in, cell_in = lstm_states
     wav_data = bytearray()
@@ -116,23 +123,28 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
     # -------------------------------------------
 
     # ------------ logging ----------------------
-    logging.debug(ARGS)
-    logging.debug(model)
-    logging.debug(preproc)
+    logging.warning(ARGS)
+    logging.warning(model)
+    logging.warning(preproc)
+    logging.warning(f"audio_ring_buffer size: {audio_buffer_size}")
+    logging.warning(f"feature_ring_buffer size: {features_buffer_size}")
     # -------------------------------------------
 
     try:
         total_time_start = time.time()
         for count, frame in enumerate(frames):
+            logging.debug(f"----------iteration {count}------------")
+
             # exit the loop if there are no more full input frames
             if len(frame) <  frames_per_block:
-                logging.info(f"final sample length {len(frame)}")
+                logging.warning(f"final sample length {len(frame)}")
                 final_sample = frame
                 break
 
             # ------------ logging ---------------
-            logging.debug(f"frame length: {len(frame)}")
-            logging.debug(f"audio_buffer length: {len(audio_ring_buffer)}")
+            logging.info(f"sample length: {len(frame)}")
+            logging.info(f"audio_buffer length: {len(audio_ring_buffer)}")
+            #logging.debug(f"iter {count}: first {log_sample_len} raw audio buffer values added to audio_ring_buffer: {frame[:log_sample_len]}")
             # ------------ logging ---------------
 
             # fill up the audio_ring_buffer and then feed into the model
@@ -167,16 +179,18 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
                 features_count += 1
                 
                 normalize_time_start = time.time()
-                # normalize the features_step, older preproc objects do not have "normalize" method
                 norm_features = preproc_normalize(preproc, features_step)
                 normalize_time += time.time() - normalize_time_start
                 normalize_count += 1
 
                 # ------------ logging ---------------
-                logging.debug(f"numpy_buffer shape: {numpy_buffer.shape}")
-                logging.debug(f"features_step shape: {features_step.shape}")
-                logging.debug(f"features_buffer length: {len(features_ring_buffer)}")
-                logging.debug(f"stride modulus: {stride_counter % PARAMS['stride']}")
+                logging.info(f"audio integers shape: {numpy_buffer.shape}")  
+                #logging.debug(f"iter {count}: first {log_sample_len} input audio samples {numpy_buffer.shape}: \n {numpy_buffer[:log_sample_len]}")
+                logging.info(f"features_step shape: {features_step.shape}")
+                #logging.debug(f"iter {count}: log_spec frame (all 257 values) {features_step.shape}:\n {features_step}")
+                logging.info(f"features_buffer length: {len(features_ring_buffer)}")
+                #logging.debug(f"iter {count}: normalized log_spec (all 257 values) {norm_features.shape}:\n {norm_features[0,:log_sample_len]}")
+                logging.info(f"stride modulus: {stride_counter % PARAMS['stride']}")
                 # ------------ logging ---------------
 
                 # fill up the features_ring_buffer and then feed into the model
@@ -205,12 +219,18 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
                         numpy_conv_count += 1
 
                         model_infer_time_start = time.time()
+                        logging.debug(f"iter {count}: first {log_sample_len} of input: {conv_context.shape}\n {conv_context[0, 0, :log_sample_len]}")                        
+                        logging.debug(f"iter {count}: first {log_sample_len} of hidden_in first layer: {hidden_in.shape}\n {hidden_in[0, :, :log_sample_len]}")
+                        logging.debug(f"iter {count}: first {log_sample_len} of cell_in first layer: {cell_in.shape}\n {cell_in[0, :, :log_sample_len]}")
                         model_out = model(torch.from_numpy(conv_context), (hidden_in, cell_in))
                         model_infer_time += time.time() - model_infer_time_start
                         model_infer_count += 1
 
                         output_assign_time_start = time.time()
                         probs, (hidden_out, cell_out) = model_out
+                        logging.debug(f"iter {count}: first {log_sample_len} of prob output {probs.shape}:\n {probs[0, 0, :log_sample_len]}")                        
+                        logging.debug(f"iter {count}: first {log_sample_len} of hidden_out first layer {hidden_out.shape}:\n {hidden_out[0, :, :log_sample_len]}")
+                        logging.debug(f"iter {count}: first {log_sample_len} of cell_out first layer {cell_out.shape}:\n {cell_out[0, :, :log_sample_len]}")                        
                         # probs dim: (1, 1, 40)
                         probs = to_numpy(probs)
                         probs_list.append(probs)
@@ -219,10 +239,10 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
                         output_assign_count += 1
 
                         # ------------ logging ---------------
-                        logging.debug(f"conv_context shape: {conv_context.shape}")
-                        logging.debug(f"probs shape: {probs.shape}")
-                        logging.debug(f"probs_list len: {len(probs_list)}")
-                        #logging.debug(f"probs value: {probs}")
+                        logging.info(f"conv_context shape: {conv_context.shape}")
+                        logging.info(f"probs shape: {probs.shape}")
+                        logging.info(f"probs_list len: {len(probs_list)}")
+                        #logging.info(f"probs value: {probs}")
                         # ------------ logging ---------------
                 
                         # decoding every 20 time-steps
@@ -236,7 +256,7 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
                             decoder_count += 1
                             
                             # ------------ logging ---------------
-                            logging.info(f"predictions: {predictions}")
+                            logging.warning(f"predictions: {predictions}")
                             # ------------ logging ---------------
                         
                     total_count += 1
@@ -250,7 +270,7 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
         # IN THE FINALLY BLOCK
         # if frames is empty
         if not next(frames):
-            
+            logging.debug(f"---------- procerssing final sample in audio buffer ------------")
             zero_byte = b'\x00'
             num_missing_bytes = PARAMS['feature_step']*2 - len(final_sample)
             final_sample += zero_byte * num_missing_bytes
@@ -259,17 +279,24 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
             numpy_buffer = np.concatenate(
                 (np.frombuffer(buffer_list[0], np.int16), 
                 np.frombuffer(buffer_list[1], np.int16)))
+
             features_step = log_specgram_from_data(numpy_buffer, samp_rate=16000)
-            # --------logging ------------
-            logging.info(f"final sample length 2: {len(final_sample)}")     
-            logging.info(f"numpy_buffer shape: {numpy_buffer}")
-            logging.info(f"audio_buffer 1 length: {len(buffer_list[0])}")
-            logging.info(f"audio_buffer 2 length: {len(buffer_list[1])}")
-            logging.info(f"features_step shape: {features_step.shape}")
-            logging.info(f"features_buffer length: {len(features_ring_buffer)}")
-            logging.info(f"stride modulus: {stride_counter % PARAMS['stride']}")
-            # --------logging ------------
             norm_features = preproc_normalize(preproc, features_step)
+            
+
+            # --------logging ------------
+            # logging.warning(f"final sample length 2: {len(final_sample)}")     
+            logging.warning(f"numpy_buffer shape: {len(numpy_buffer)}")
+            # logging.warning(f"audio_buffer 1 length: {len(buffer_list[0])}")
+            # logging.warning(f"audio_buffer 2 length: {len(buffer_list[1])}")
+            #logging.debug(f"iter {count}: first {log_sample_len} input audio samples {numpy_buffer.shape}: \n {numpy_buffer[:log_sample_len]}")
+            logging.warning(f"features_step shape: {features_step.shape}")
+            #logging.debug(f"iter {count}: log_spec frame (all 257 values) {features_step.shape}:\n {features_step}")
+            #logging.debug(f"iter {count}: normalized log_spec (all 257 values) {norm_features.shape}:\n {norm_features[0,:log_sample_len]}")
+            logging.warning(f"features_buffer length: {len(features_ring_buffer)}")
+            logging.warning(f"stride modulus: {stride_counter % PARAMS['stride']}")
+            # --------logging ------------
+
             if stride_counter % PARAMS['stride'] !=0:
                 features_ring_buffer.append(norm_features)
                 stride_counter += 1
@@ -278,14 +305,18 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
                 stride_counter += 1
                 model_out = model(torch.from_numpy(conv_context), (hidden_in, cell_in))
                 probs, (hidden_out, cell_out) = model_out
+                logging.debug(f"iter {count}: first {log_sample_len} of prob output {probs.shape}:\n {probs[0, 0, :log_sample_len]}")                        
+                logging.debug(f"iter {count}: first {log_sample_len} of hidden_out first layer {hidden_out.shape}:\n {hidden_out[0, :, :log_sample_len]}")
+                logging.debug(f"iter {count}: first {log_sample_len} of cell_out first layer {cell_out.shape}:\n {cell_out[0, :, :log_sample_len]}")                 
                 probs = to_numpy(probs)
                 probs_list.append(probs)
             
 
             for count, frame in enumerate(range(PARAMS['n_context']+PARAMS['final_padding'])):
-                
+                logging.debug(f"---------- adding zeros at the end of audio sample ------------")
+
                 # -------------logging ----------------
-                logging.debug(f"stride modulus: {stride_counter % PARAMS['stride']}")
+                logging.info(f"stride modulus: {stride_counter % PARAMS['stride']}")
                 # -------------logging ----------------
 
                 if stride_counter % PARAMS['stride'] !=0:
@@ -314,6 +345,7 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
 
                     output_assign_time_start = time.time()
                     probs, (hidden_out, cell_out) = model_out
+                    
                     # probs dim: (1, 1, 40)
                     probs = to_numpy(probs)
                     probs_list.append(probs)
@@ -323,10 +355,10 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
 
                     
                     # ------------ logging ---------------
-                    logging.debug(f"conv_context shape: {conv_context.shape}")
-                    logging.debug(f"probs shape: {probs.shape}")
-                    logging.debug(f"probs_list len: {len(probs_list)}")
-                    #logging.debug(f"probs value: {probs}")
+                    logging.info(f"conv_context shape: {conv_context.shape}")
+                    logging.info(f"probs shape: {probs.shape}")
+                    logging.info(f"probs_list len: {len(probs_list)}")
+                    #logging.info(f"probs value: {probs}")
                     # ------------ logging ---------------
             
                     # decoding every 20 time-steps
@@ -340,7 +372,7 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
                         decoder_count += 1
                         
                         # ------------ logging ---------------
-                        logging.info(f"predictions: {predictions}")
+                        logging.warning(f"predictions: {predictions}")
                         # ------------ logging ---------------
         
                 total_count += 1
@@ -348,7 +380,7 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
         if ARGS.savewav: wav_data.extend(frame)
 
         # process the final frames
-        logging.info(f"length of final_frames: {len(final_sample)}")
+        logging.warning(f"length of final_frames: {len(final_sample)}")
 
 
         decoder_time_start = time.time()
@@ -358,7 +390,7 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
         predictions = preproc.decode(int_labels)
         decoder_time += time.time() - decoder_time_start
         decoder_count += 1
-        logging.debug(f"final predictions: {predictions}")
+        logging.info(f"final predictions: {predictions}")
 
         
         audio.destroy()
@@ -366,18 +398,18 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
         acc = 3
         duration = wav_duration(ARGS.file)
 
-        logging.info(f"-------------- streaming_infer --------------")
-        logging.info(f"audio_buffer        time (s), count: {round(audio_buffer_time, acc)}, {audio_buffer_count}")
-        logging.info(f"numpy_buffer        time (s), count: {round(numpy_buffer_time, acc)}, {numpy_buffer_count}")
-        logging.info(f"features_operation  time (s), count: {round(features_time, acc)}, {features_count}")
-        logging.info(f"normalize           time (s), count: {round(normalize_time, acc)}, {normalize_count}")
-        logging.info(f"features_buffer     time (s), count: {round(features_buffer_time, acc)}, {features_buffer_count}")
-        logging.info(f"numpy_conv          time (s), count: {round(numpy_conv_time, acc)}, {numpy_conv_count}")
-        logging.info(f"model_infer         time (s), count: {round(model_infer_time, acc)}, {model_infer_count}")
-        logging.info(f"output_assign       time (s), count: {round(output_assign_time, acc)}, {output_assign_count}")
-        logging.info(f"decoder             time (s), count: {round(decoder_time, acc)}, {decoder_count}")
-        logging.info(f"total               time (s), count: {round(total_time, acc)}, {total_count}")
-        logging.info(f"Multiples faster than realtime      : {round(duration/total_time, acc)}x")
+        logging.warning(f"-------------- streaming_infer --------------")
+        logging.warning(f"audio_buffer        time (s), count: {round(audio_buffer_time, acc)}, {audio_buffer_count}")
+        logging.warning(f"numpy_buffer        time (s), count: {round(numpy_buffer_time, acc)}, {numpy_buffer_count}")
+        logging.warning(f"features_operation  time (s), count: {round(features_time, acc)}, {features_count}")
+        logging.warning(f"normalize           time (s), count: {round(normalize_time, acc)}, {normalize_count}")
+        logging.warning(f"features_buffer     time (s), count: {round(features_buffer_time, acc)}, {features_buffer_count}")
+        logging.warning(f"numpy_conv          time (s), count: {round(numpy_conv_time, acc)}, {numpy_conv_count}")
+        logging.warning(f"model_infer         time (s), count: {round(model_infer_time, acc)}, {model_infer_count}")
+        logging.warning(f"output_assign       time (s), count: {round(output_assign_time, acc)}, {output_assign_count}")
+        logging.warning(f"decoder             time (s), count: {round(decoder_time, acc)}, {decoder_count}")
+        logging.warning(f"total               time (s), count: {round(total_time, acc)}, {total_count}")
+        logging.warning(f"Multiples faster than realtime      : {round(duration/total_time, acc)}x")
 
         if ARGS.savewav:
             audio.write_wav(os.path.join(ARGS.savewav, datetime.now().strftime("savewav_%Y-%m-%d_%H-%M-%S_%f.wav")), wav_data)
@@ -392,7 +424,7 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
 def list_chunk_infer_full_chunks(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
     
     if ARGS.file is None:
-        logging.info(f"--- Skipping list_chunk_infer. No input file ---")
+        logging.warning(f"--- Skipping list_chunk_infer. No input file ---")
     else:
         
         #lc means listchunk
@@ -427,18 +459,18 @@ def list_chunk_infer_full_chunks(model, preproc, lstm_states, PARAMS:dict, ARGS)
             padded_input = torch.cat((padded_input, final_zero_pad),dim=1)
 
         # ------------ logging ---------------
-        logging.info(f"-------------- list_chunck_infer --------------")
-        logging.info(f"chunk_size: {PARAMS['chunk_size']}")
-        logging.info(f"full_chunks: {full_chunks}")
-        logging.info(f"features shape: {features.shape}")
-        logging.info(f"final_padding: {PARAMS['final_padding']}")
-        logging.debug(f"norm_features with batch shape: {norm_features.shape}")
-        logging.debug(f"torch_input shape: {torch_input.shape}")
-        logging.debug(f"padded_input shape: {padded_input.shape}")
-        #logging.info(f"stride: {PARAMS['stride']}")
+        logging.warning(f"-------------- list_chunck_infer --------------")
+        logging.warning(f"chunk_size: {PARAMS['chunk_size']}")
+        logging.warning(f"full_chunks: {full_chunks}")
+        logging.warning(f"features shape: {features.shape}")
+        logging.warning(f"final_padding: {PARAMS['final_padding']}")
+        logging.info(f"norm_features with batch shape: {norm_features.shape}")
+        logging.info(f"torch_input shape: {torch_input.shape}")
+        logging.info(f"padded_input shape: {padded_input.shape}")
+        #logging.warning(f"stride: {PARAMS['stride']}")
         # torch_input.shape[1] is time dimension
-        #logging.info(f"time dim: {torch_input.shape[1]}")
-        #logging.info(f"iterations: {iterations}")
+        #logging.warning(f"time dim: {torch_input.shape[1]}")
+        #logging.warning(f"iterations: {iterations}")
         # ------------ logging ---------------
 
 
@@ -468,7 +500,7 @@ def list_chunk_infer_full_chunks(model, preproc, lstm_states, PARAMS:dict, ARGS)
                 predictions = preproc.decode(int_labels)
                 lc_decode_time += time.time() - lc_decode_time_start
                 lc_decode_count += 1
-                #logging.debug(f"intermediate predictions: {predictions}")
+                #logging.info(f"intermediate predictions: {predictions}")
             
             lc_total_count += 1
 
@@ -483,21 +515,21 @@ def list_chunk_infer_full_chunks(model, preproc, lstm_states, PARAMS:dict, ARGS)
             lc_decode_count += 1
 
             # ------------ logging ---------------
-            logging.debug(f"input_chunk shape: {input_chunk.shape}")
-            logging.debug(f"probs shape: {probs.shape}")
-            logging.debug(f"probs list len: {len(probs_list)}")
+            logging.info(f"input_chunk shape: {input_chunk.shape}")
+            logging.info(f"probs shape: {probs.shape}")
+            logging.info(f"probs list len: {len(probs_list)}")
             # ------------ logging ---------------
         lc_total_time = time.time() - lc_total_time
 
         duration = wav_duration(ARGS.file)
         # ------------ logging ---------------
-        logging.info(f"predictions: {predictions}")
+        logging.warning(f"predictions: {predictions}")
         acc = 3
-        logging.info(f"model infer          time (s), count: {round(lc_model_infer_time, acc)}, {lc_model_infer_count}")
-        logging.info(f"output assign        time (s), count: {round(lc_output_assign_time, acc)}, {lc_output_assign_count}")
-        logging.info(f"decoder              time (s), count: {round(lc_decode_time, acc)}, {lc_decode_count}")
-        logging.info(f"total                time (s), count: {round(lc_total_time, acc)}, {lc_total_count}")
-        logging.info(f"Multiples faster than realtime      : {round(duration/lc_total_time, acc)}x")
+        logging.warning(f"model infer          time (s), count: {round(lc_model_infer_time, acc)}, {lc_model_infer_count}")
+        logging.warning(f"output assign        time (s), count: {round(lc_output_assign_time, acc)}, {lc_output_assign_count}")
+        logging.warning(f"decoder              time (s), count: {round(lc_decode_time, acc)}, {lc_decode_count}")
+        logging.warning(f"total                time (s), count: {round(lc_total_time, acc)}, {lc_total_count}")
+        logging.warning(f"Multiples faster than realtime      : {round(duration/lc_total_time, acc)}x")
 
 
         probs = np.concatenate(probs_list, axis=1)
@@ -511,7 +543,7 @@ def full_audio_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
     """
 
     if ARGS.file is None:
-        logging.info(f"--- Skipping fullaudio_infer. No input file ---")
+        logging.warning(f"--- Skipping fullaudio_infer. No input file ---")
     else:
         # fa means fullaudio
         fa_total_time = 0.0
@@ -565,23 +597,23 @@ def full_audio_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
         duration = wav_duration(ARGS.file)
 
         # ------------ logging ---------------
-        logging.info(f"------------ fullaudio_infer -------------")
-        logging.debug(f"features shape: {features.shape}")
-        logging.debug(f"norm_features with batch shape: {norm_features.shape}")
-        logging.debug(f"torch_input shape: {torch_input.shape}")
-        logging.info(f"chunk_size: {PARAMS['chunk_size']}")
-        logging.info(f"final_padding: {PARAMS['final_padding']}")
-        logging.debug(f"padded_input shape: {padded_input.shape}")
-        logging.debug(f"model probs shape: {probs.shape}")
-        logging.info(f"predictions: {predictions}")
+        logging.warning(f"------------ fullaudio_infer -------------")
+        logging.info(f"features shape: {features.shape}")
+        logging.info(f"norm_features with batch shape: {norm_features.shape}")
+        logging.info(f"torch_input shape: {torch_input.shape}")
+        logging.warning(f"chunk_size: {PARAMS['chunk_size']}")
+        logging.warning(f"final_padding: {PARAMS['final_padding']}")
+        logging.info(f"padded_input shape: {padded_input.shape}")
+        logging.info(f"model probs shape: {probs.shape}")
+        logging.warning(f"predictions: {predictions}")
         acc = 3
-        logging.info(f"features             time (s): {round(fa_features_time, acc)}")
-        logging.info(f"normalization        time (s): {round(fa_normalize_time, acc)}")
-        logging.info(f"convert & pad        time (s): {round(fa_convert_pad_time, acc)}")
-        logging.info(f"model infer          time (s): {round(fa_model_infer_time, acc)}")
-        logging.info(f"decoder              time (s): {round(fa_decode_time, acc)}")
-        logging.info(f"total                time (s): {round(fa_total_time, acc)}")
-        logging.info(f"Multiples faster than realtime      : {round(duration/fa_total_time, acc)}x")
+        logging.warning(f"features             time (s): {round(fa_features_time, acc)}")
+        logging.warning(f"normalization        time (s): {round(fa_normalize_time, acc)}")
+        logging.warning(f"convert & pad        time (s): {round(fa_convert_pad_time, acc)}")
+        logging.warning(f"model infer          time (s): {round(fa_model_infer_time, acc)}")
+        logging.warning(f"decoder              time (s): {round(fa_decode_time, acc)}")
+        logging.warning(f"total                time (s): {round(fa_total_time, acc)}")
+        logging.warning(f"Multiples faster than realtime      : {round(duration/fa_total_time, acc)}x")
 
         # ------------ logging ---------------
 
@@ -592,7 +624,7 @@ def full_audio_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
 def list_chunk_infer_fractional_chunks(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
     
     if ARGS.file is None:
-        logging.info(f"--- Skipping list_chunk_infer. No input file ---")
+        logging.warning(f"--- Skipping list_chunk_infer. No input file ---")
     else:
         
         #lc means listchunk
@@ -618,18 +650,18 @@ def list_chunk_infer_fractional_chunks(model, preproc, lstm_states, PARAMS:dict,
         full_chunks += 1
 
         # ------------ logging ---------------
-        logging.info(f"-------------- list_chunck_infer --------------")
-        logging.info(f"======= chunk_size: {PARAMS['chunk_size']}===========")
-        logging.info(f"======= full_chunks: {full_chunks}===========")
-        logging.info(f"======= fraction_chunks: {PARAMS['remainder']}===========")
-        logging.debug(f"features shape: {features.shape}")
-        logging.debug(f"norm_features with batch shape: {norm_features.shape}")
-        logging.debug(f"torch_input shape: {torch_input.shape}")
-        logging.debug(f"padded_input shape: {padded_input.shape}")
-        #logging.info(f"stride: {PARAMS['stride']}")
+        logging.warning(f"-------------- list_chunck_infer --------------")
+        logging.warning(f"======= chunk_size: {PARAMS['chunk_size']}===========")
+        logging.warning(f"======= full_chunks: {full_chunks}===========")
+        logging.warning(f"======= fraction_chunks: {PARAMS['remainder']}===========")
+        logging.info(f"features shape: {features.shape}")
+        logging.info(f"norm_features with batch shape: {norm_features.shape}")
+        logging.info(f"torch_input shape: {torch_input.shape}")
+        logging.info(f"padded_input shape: {padded_input.shape}")
+        #logging.warning(f"stride: {PARAMS['stride']}")
         # torch_input.shape[1] is time dimension
-        #logging.info(f"time dim: {torch_input.shape[1]}")
-        #logging.info(f"iterations: {iterations}")
+        #logging.warning(f"time dim: {torch_input.shape[1]}")
+        #logging.warning(f"iterations: {iterations}")
         # ------------ logging ---------------
 
 
@@ -670,7 +702,7 @@ def list_chunk_infer_fractional_chunks(model, preproc, lstm_states, PARAMS:dict,
                 predictions = preproc.decode(int_labels)
                 lc_decode_time += time.time() - lc_decode_time_start
                 lc_decode_count += 1
-                #logging.debug(f"intermediate predictions: {predictions}")
+                #logging.info(f"intermediate predictions: {predictions}")
             
             lc_total_count += 1
 
@@ -685,21 +717,21 @@ def list_chunk_infer_fractional_chunks(model, preproc, lstm_states, PARAMS:dict,
             lc_decode_count += 1
 
             # ------------ logging ---------------
-            logging.debug(f"input_chunk shape: {input_chunk.shape}")
-            logging.debug(f"probs shape: {probs.shape}")
-            logging.debug(f"probs list len: {len(probs_list)}")
+            logging.info(f"input_chunk shape: {input_chunk.shape}")
+            logging.info(f"probs shape: {probs.shape}")
+            logging.info(f"probs list len: {len(probs_list)}")
             # ------------ logging ---------------
         lc_total_time = time.time() - lc_total_time
 
         duration = wav_duration(ARGS.file)
         # ------------ logging ---------------
-        logging.info(f"predictions: {predictions}")
+        logging.warning(f"predictions: {predictions}")
         acc = 3
-        logging.info(f"model infer          time (s), count: {round(lc_model_infer_time, acc)}, {lc_model_infer_count}")
-        logging.info(f"output assign        time (s), count: {round(lc_output_assign_time, acc)}, {lc_output_assign_count}")
-        logging.info(f"decoder              time (s), count: {round(lc_decode_time, acc)}, {lc_decode_count}")
-        logging.info(f"total                time (s), count: {round(lc_total_time, acc)}, {lc_total_count}")
-        logging.info(f"Multiples faster than realtime      : {round(duration/lc_total_time, acc)}x")
+        logging.warning(f"model infer          time (s), count: {round(lc_model_infer_time, acc)}, {lc_model_infer_count}")
+        logging.warning(f"output assign        time (s), count: {round(lc_output_assign_time, acc)}, {lc_output_assign_count}")
+        logging.warning(f"decoder              time (s), count: {round(lc_decode_time, acc)}, {lc_decode_count}")
+        logging.warning(f"total                time (s), count: {round(lc_total_time, acc)}, {lc_total_count}")
+        logging.warning(f"Multiples faster than realtime      : {round(duration/lc_total_time, acc)}x")
 
 
         probs = np.concatenate(probs_list, axis=1)
@@ -804,7 +836,7 @@ class Audio(object):
     frame_duration_ms = property(lambda self: 1000 * self.block_size // self.sample_rate)
 
     def write_wav(self, filename, data):
-        logging.info("write wav %s", filename)
+        logging.warning("write wav %s", filename)
         with wave.open(filename, 'wb') as wf:
             wf.setnchannels(self.CHANNELS)
             # wf.setsampwidth(self.pa.get_sample_size(FORMAT))

@@ -48,10 +48,13 @@ def main(model_name, num_frames):
     with open(CONFIG_FN, 'rb') as fid:
         config = json.load(fid)
         model_cfg = config["model"]
+    
+    with open(PREPROC_FN, 'rb') as fid:
+        preproc = pickle.load(fid)
 
     #load models
     state_dict_model = torch.load(TRAINED_MODEL_FN, map_location=torch.device('cpu'))
-
+    #preproc.input_dim, preproc.vocab_size
     trained_model = models.CTC(freq_dim, 39, model_cfg)
     state_dict = state_dict_model.state_dict()
     torch.save(state_dict, state_dict_path)
@@ -88,11 +91,11 @@ def main(model_name, num_frames):
     data_dct = gen_test_data(PREPROC_FN, time_dim, freq_dim)
 
     #saving the preproc object as a dictionary
+    preproc_dict = preproc_to_dict(PREPROC_FN, export=False)
+
     preproc_json_path = PREPROC_FN[:-4]+".json"   #removes the .pyc extension and replaces with .pickle ext
     preproc_to_json(PREPROC_FN, preproc_json_path)
 
-    preproc_pickle_path = PREPROC_FN[:-4]+".pickle"
-    preproc_to_dict(PREPROC_FN, preproc_pickle_path, to_pickle=True)
 
 
     # make predictions

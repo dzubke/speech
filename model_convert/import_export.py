@@ -43,7 +43,7 @@ def onnx_coreml_export(onnx_path, coreml_path):
     coreml_model.save(coreml_path)
 
 
-def preproc_to_dict(preproc_path_in, preproc_path_out=None, to_pickle=True):
+def preproc_to_dict(preproc_path_in, preproc_path_out=None, export=False):
     with open(preproc_path_in, 'rb') as fid:
         preproc = pickle.load(fid)
         preproc_dict = {'mean':preproc.mean.tolist(),
@@ -54,7 +54,7 @@ def preproc_to_dict(preproc_path_in, preproc_path_out=None, to_pickle=True):
                         "char_to_int": preproc.char_to_int
                         }
 
-        if to_pickle:
+        if export:
             with open(preproc_path_out, 'wb') as fid:
                 pickle.dump(preproc_dict, fid)
         else:
@@ -66,6 +66,8 @@ def preproc_to_json(preproc_path, json_path):
 
     with open(json_path, 'w') as fid:
         json.dump(preproc_dict, fid)
+
+def export_metadata_json(json_path:str)
 
 
 def export_state_dict(model_path, state_dict_path):
