@@ -72,7 +72,7 @@ def audio_with_sox(path:str, sample_rate:int, start_time:float, end_time:float)-
             noise_len = round((end_time - start_time)/sample_rate)
             noise_data = np.zeros((noise_len,))
         
-        assert isinstance(np.ndarray), "not numpy array returned"
+        assert isinstance(noise_data, np.ndarray), "not numpy array returned"
         return noise_data
 
 def same_size(data:np.ndarray, noise_dst:np.ndarray) -> np.ndarray:

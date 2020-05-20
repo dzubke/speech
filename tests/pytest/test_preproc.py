@@ -16,6 +16,7 @@ def run_preprocess(config_json:str):
     """
     config = Config(config_json)
     data_json = config.data_cfg.get("train_set")
+    print(config)
     logger = None
     preproc = Preprocessor(data_json, config.preproc_cfg, logger)
     audio_dataset=AudioDataset(data_json, preproc, batch_size=8)

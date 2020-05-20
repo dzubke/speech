@@ -2,9 +2,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import logging
 import numpy as np
 import torch
 import torch.autograd as autograd
+import torch.nn as nn
 
 import functions.ctc as ctc #awni hannun's ctc bindings
 from speech.models import ctc_model
@@ -12,9 +14,10 @@ from .ctc_decoder import decode
 from .ctc_decoder_dist import decode_dist
 
 
+
 class CTC_train(ctc_model.CTC):
     def __init__(self, freq_dim, output_dim, config):
-        super().__init__(freq_dim, config)
+        super().__init__(freq_dim, output_dim, config)
 
         # include the blank token
         self.blank = output_dim
@@ -27,6 +30,13 @@ class CTC_train(ctc_model.CTC):
     def forward_impl(self, x, rnn_args=None, softmax=False):
         if self.is_cuda:
             x = x.cuda()
+        # padding is half the filters of the 3 conv layers. 
+        # conv.children is: [Conv2d, BatchNorm2d, ReLU, Dropout, Conv2d, 
+        # BatchNorm2d, ReLU, Dropout, Conv2d, BatchNorm2d, ReLU, Dropout]
+        pad = list(self.conv.children())[0].kernel_size[0]//2 + \
+            list(self.conv.children())[4].kernel_size[0]//2 + \
+            list(self.conv.children())[8].kernel_size[0]//2
+        x = nn.functional.pad(x, (0,0,pad,pad))
         x, rnn_args = self.encode(x, rnn_args)    
         x = self.fc(x)          
         if softmax:

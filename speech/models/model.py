@@ -11,17 +11,14 @@ class Model(nn.Module):
 
     def __init__(self, input_dim, config):
         """
-
         Parameters
         -----------
-
         conv_cfg: [out_c]
             list of list that define the parameters of the convolutions with format [out_c, h, w, s] 
             where out_c is the size of the output channel, h and w specify the height and width of the kernel or filter, 
             and s is the stride of the kernel and the stride is symmetric
 
         """
-
         
         super().__init__()
         self.input_dim = input_dim
@@ -85,15 +82,8 @@ class Model(nn.Module):
             in the model encoder config.
 
         """
-        x = x.unsqueeze(1)      #
+        x = x.unsqueeze(1)      
         
-        # # padding will be added during training, but not when converting the model to onnx and coreml
-        # if not self.convert_model:
-        #     # calculates the necessary padding based on half the filter size
-        #     # WARNING: this calcuation does not generalize to all cases
-        #     pad = list(self.conv.children())[0].kernel_size[0]//2
-        #     x = nn.functional.pad(x, (0,0,pad,pad))
-
         x = self.conv(x)
         # At this point x should have shape
         # (batch, channels, time, freq)
