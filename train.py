@@ -18,7 +18,7 @@ import pickle
 import itertools
 import speech
 import speech.loader as loader
-import speech.models as models
+from speech.models.ctc_model_train import CTC_train
 
 # TODO, (awni) why does putting this above crash..
 import tensorboard_logger as tb
@@ -159,8 +159,7 @@ def run(config):
                         preproc, batch_size)
 
     # Model
-    model_class = eval("models." + model_cfg["class"])
-    model = model_class(preproc.input_dim,
+    model = CTC_train(preproc.input_dim,
                         preproc.vocab_size,
                         model_cfg)
     if model_cfg["load_trained"]:
