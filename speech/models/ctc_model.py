@@ -9,7 +9,6 @@ import numpy as np
 import torch
 import torch.autograd as autograd
 
-#import functions.ctc as ctc #awni hannun's ctc bindings
 from . import model
 from .ctc_decoder import decode
 from .ctc_decoder_dist import decode_dist
@@ -38,7 +37,6 @@ class CTC(model.Model):
 
     def loss(self, batch):
         pass
-
 
     def collate(self, inputs, labels):
         max_t = max(i.shape[0] for i in inputs)
