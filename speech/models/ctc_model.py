@@ -1,3 +1,6 @@
+# The CTC.loss function in ctc_model.py is incompatible with pytorch 1.X, so this class
+#  just removes that loss function so that this class is compatible with pytorch 1.X
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -6,17 +9,11 @@ import numpy as np
 import torch
 import torch.autograd as autograd
 
-import functions.ctc as ctc #awni hannun's ctc bindings
-#from warpctc_pytorch import CTCLoss  #sean naren's ctc bindings
+#import functions.ctc as ctc #awni hannun's ctc bindings
 from . import model
 from .ctc_decoder import decode
 from .ctc_decoder_dist import decode_dist
 
-"""
-two different ctc loss functions can be used for this model: awni hannun and sean naren's pytorch bindings
-to baidu's warp-ctc. To change them, change the commented out code in the import statements above
- and in self.loss() below
-"""
 
 class CTC(model.Model):
     def __init__(self, freq_dim, output_dim, config):
@@ -40,15 +37,8 @@ class CTC(model.Model):
         return x, rnn_args
 
     def loss(self, batch):
-        x, y, x_lens, y_lens = self.collate(*batch)
-        out, rnn_args = self.forward_impl(x)
-        
-        loss_fn = ctc.CTCLoss()         # awni's ctc loss call
-        #loss_fn = CTCLoss(size_average=True)    # 1. naren's ctc loss call
-        #out = out.permute(1,0,2).float().requires_grad_(True) # 2. naren ctc loss
-        
-        loss = loss_fn(out, y, x_lens, y_lens)
-        return loss
+        pass
+
 
     def collate(self, inputs, labels):
         max_t = max(i.shape[0] for i in inputs)
