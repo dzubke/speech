@@ -6,9 +6,8 @@ import numpy as np
 import torch
 import torch.autograd as autograd
 
-from . import ctc_model
-#import functions.ctc as ctc #awni hannun's ctc bindings
-from . import model
+import functions.ctc as ctc #awni hannun's ctc bindings
+from speech.models import ctc_model
 from .ctc_decoder import decode
 from .ctc_decoder_dist import decode_dist
 
@@ -22,7 +21,7 @@ class CTC_train(ctc_model.CTC):
         self.fc = model.LinearND(self.encoder_dim, output_dim + 1)
 
     def forward(self, x, rnn_args=None):
-       # x, y, x_lens, y_lens = self.collate(*batch)
+        #x, y, x_lens, y_lens = self.collate(*batch)
         return self.forward_impl(x, rnn_args,  softmax=True)
 
     def forward_impl(self, x, rnn_args=None, softmax=False):
