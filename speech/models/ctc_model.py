@@ -1,6 +1,3 @@
-# The CTC.loss function in ctc_model.py is incompatible with pytorch 1.X, so this class
-#  just removes that loss function so that this class is compatible with pytorch 1.X
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function

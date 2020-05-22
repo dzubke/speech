@@ -16,8 +16,9 @@ from speech.utils.convert import to_numpy
 from speech.models.ctc_model import CTC
 from speech.loader import log_specgram_from_data, log_specgram_from_file
 from speech.models.ctc_decoder import decode as ctc_decode
-from speech.utils import compat
+from speech.utils.compat import normalize
 from speech.utils.wave import wav_duration, array_from_wave
+from speech.utils.stream_utils import make_full_window
 
 set_linewidth=160
 np.set_printoptions(linewidth=set_linewidth)
@@ -49,16 +50,16 @@ def main(ARGS):
     lstm_states = (hidden_in, cell_in)
 
     PARAMS = {
-        "padded_frames_length": 277,
         "chunk_size": 46,
         "n_context": 15,
         "feature_window": 512,
         "feature_step":256,
-        "feature_size":257
+        "feature_size":257,
+        "initial_padding":15,
+        "final_padding":0,
+        'fill_chunk_padding':7  #TODO hard-coded value that is calculatedd as fill_chunk_padding
     }
     PARAMS['stride'] = PARAMS['chunk_size'] - 2*PARAMS['n_context']
-    PARAMS['remainder'] = (PARAMS['padded_frames_length'] - PARAMS['chunk_size']) % PARAMS['stride']
-    PARAMS['final_padding'] = PARAMS['stride'] - PARAMS['remainder'] if PARAMS['remainder'] !=0 else 0
 
     logging.warning(f"PARAMS dict: {PARAMS}")
 
@@ -179,7 +180,7 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
                 features_count += 1
                 
                 normalize_time_start = time.time()
-                norm_features = preproc_normalize(preproc, features_step)
+                norm_features = normalize(preproc, features_step)
                 normalize_time += time.time() - normalize_time_start
                 normalize_count += 1
 
@@ -270,7 +271,7 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
         # IN THE FINALLY BLOCK
         # if frames is empty
         if not next(frames):
-            logging.debug(f"---------- procerssing final sample in audio buffer ------------")
+            logging.info(f"---------- procerssing final sample in audio buffer ------------")
             zero_byte = b'\x00'
             num_missing_bytes = PARAMS['feature_step']*2 - len(final_sample)
             final_sample += zero_byte * num_missing_bytes
@@ -281,7 +282,7 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
                 np.frombuffer(buffer_list[1], np.int16)))
 
             features_step = log_specgram_from_data(numpy_buffer, samp_rate=16000)
-            norm_features = preproc_normalize(preproc, features_step)
+            norm_features = normalize(preproc, features_step)
             
 
             # --------logging ------------
@@ -311,8 +312,8 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
                 probs = to_numpy(probs)
                 probs_list.append(probs)
             
-
-            for count, frame in enumerate(range(PARAMS['n_context']+PARAMS['final_padding'])):
+            padding_iterations = PARAMS["final_padding"]+PARAMS['fill_chunk_padding']+PARAMS['stride']
+            for count, frame in enumerate(range(padding_iterations)):
                 logging.debug(f"---------- adding zeros at the end of audio sample ------------")
 
                 # -------------logging ----------------
@@ -444,26 +445,35 @@ def list_chunk_infer_full_chunks(model, preproc, lstm_states, PARAMS:dict, ARGS)
         audio_data = make_full_window(audio_data, PARAMS['feature_window'], PARAMS['feature_step'])
 
         features = log_specgram_from_data(audio_data, samp_rate)
-        norm_features = preproc_normalize(preproc, features)
+        norm_features = normalize(preproc, features)
         norm_features = np.expand_dims(norm_features, axis=0)
         torch_input = torch.from_numpy(norm_features)
-        padding = (0, 0, 15, 15)
+        padding = (0, 0, PARAMS["initial_padding"], PARAMS["final_padding"])
         padded_input = torch.nn.functional.pad(torch_input, padding, value=0)
 
         full_chunks = (padded_input.shape[1] - PARAMS['chunk_size']) // PARAMS['stride']
         full_chunks += 1   
 
-        if PARAMS['remainder'] != 0:
-            full_chunks += 1 # to include the last full chunk
-            final_zero_pad = torch.zeros(1, PARAMS['final_padding'], PARAMS['feature_size'], dtype=torch.float32, requires_grad=False)
-            padded_input = torch.cat((padded_input, final_zero_pad),dim=1)
+        fill_chunk_remainder = (padded_input.shape[1] - PARAMS['chunk_size']) % PARAMS['stride']
 
+        if fill_chunk_remainder != 0:
+            full_chunks += 1 # to include the filled chunk
+            fill_chunk_padding = PARAMS['stride'] - fill_chunk_remainder
+            fill_chunk_pad = torch.zeros(1, fill_chunk_padding, PARAMS['feature_size'], dtype=torch.float32, requires_grad=False)
+            padded_input = torch.cat((padded_input, fill_chunk_pad),dim=1)
+
+        # process last chunk with stride of zeros
+        final_chunk_pad = torch.zeros(1, PARAMS['stride'], PARAMS['feature_size'], dtype=torch.float32, requires_grad=False)
+        padded_input = torch.cat((padded_input, final_chunk_pad),dim=1)
+        full_chunks += 1 # to include the last chunk
+
+    
         # ------------ logging ---------------
         logging.warning(f"-------------- list_chunck_infer --------------")
         logging.warning(f"chunk_size: {PARAMS['chunk_size']}")
         logging.warning(f"full_chunks: {full_chunks}")
         logging.warning(f"features shape: {features.shape}")
-        logging.warning(f"final_padding: {PARAMS['final_padding']}")
+        logging.warning(f"final_padding: {fill_chunk_padding}")
         logging.info(f"norm_features with batch shape: {norm_features.shape}")
         logging.info(f"torch_input shape: {torch_input.shape}")
         logging.info(f"padded_input shape: {padded_input.shape}")
@@ -557,12 +567,15 @@ def full_audio_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
 
         fa_total_time = time.time()
 
+        audio_data, samp_rate = array_from_wave(ARGS.file)
+        audio_data = make_full_window(audio_data, PARAMS['feature_window'], PARAMS['feature_step'])
+
         fa_features_time = time.time()
-        features = log_specgram_from_file(ARGS.file)
+        features = log_specgram_from_data(audio_data, samp_rate)
         fa_features_time = time.time() - fa_features_time
         
         fa_normalize_time = time.time()
-        norm_features = preproc_normalize(preproc, features)
+        norm_features = normalize(preproc, features)
 
         fa_normalize_time = time.time() - fa_normalize_time
 
@@ -570,15 +583,21 @@ def full_audio_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
         # adds the batch dimension (1, time, 257)
         norm_features = np.expand_dims(norm_features, axis=0)
         torch_input = torch.from_numpy(norm_features)
-        # paddings starts from the back, zero padding to freq, 15 paddding to time
-        padding = (0, 0, 15, 15)
+        # paddings starts from the back, zero padding to freq, 15 padding to time
+        padding = (0, 0, PARAMS["initial_padding"],PARAMS["final_padding"])
         padded_input = torch.nn.functional.pad(torch_input, padding, value=0)
 
-        if PARAMS['remainder'] != 0:
-            final_zero_pad = torch.zeros(1, PARAMS['final_padding'], PARAMS['feature_size'], dtype=torch.float32, requires_grad=False)
-            padded_input = torch.cat((padded_input, final_zero_pad),dim=1)
-        fa_convert_pad_time = time.time() - fa_convert_pad_time
-        
+        fill_chunk_remainder = (padded_input.shape[1] - PARAMS['chunk_size']) % PARAMS['stride']
+
+        if fill_chunk_remainder != 0:
+            fill_chunk_padding = PARAMS['stride'] - fill_chunk_remainder
+            fill_chunk_pad = torch.zeros(1, fill_chunk_padding, PARAMS['feature_size'], dtype=torch.float32, requires_grad=False)
+            padded_input = torch.cat((padded_input, fill_chunk_pad),dim=1)
+
+        # process last chunk with stride of zeros
+        final_chunk_pad = torch.zeros(1, PARAMS['stride'], PARAMS['feature_size'], dtype=torch.float32, requires_grad=False)
+        padded_input = torch.cat((padded_input, final_chunk_pad),dim=1)
+
         fa_model_infer_time = time.time()
         model_output = model(padded_input, (hidden_in, cell_in))
         fa_model_infer_time = time.time() - fa_model_infer_time
@@ -640,10 +659,10 @@ def list_chunk_infer_fractional_chunks(model, preproc, lstm_states, PARAMS:dict,
         probs_list = list()
 
         features = log_specgram_from_file(ARGS.file)
-        norm_features = preproc_normalize(preproc, features)
+        norm_features = normalize(preproc, features)
         norm_features = np.expand_dims(norm_features, axis=0)
         torch_input = torch.from_numpy(norm_features)
-        padding = (0, 0, 15, 15)
+        padding = (0, 0, PARAMS["initial_padding"], PARAMS["final_padding"])
         padded_input = torch.nn.functional.pad(torch_input, padding, value=0)
 
         full_chunks = (padded_input.shape[1] - PARAMS['chunk_size']) // PARAMS['stride']
@@ -738,23 +757,9 @@ def list_chunk_infer_fractional_chunks(model, preproc, lstm_states, PARAMS:dict,
         return probs, predictions
 
 
-def preproc_normalize(preproc, features:np.ndarray):
-    if hasattr(preproc, "normalize"):
-        norm_features = preproc.normalize(features)
-    else: 
-        norm_features= compat.normalize(preproc, features)
-    return norm_features
 
-def make_full_window(audio_data:np.ndarray, feature_window:int, feature_step:int):
-    """
-    Takes in a 1d numpy array as input and add appends zeros
-    until it is divisible by the feature_step input
-    """
-    assert audio_data.shape[0] == audio_data.size, "inpute data is not 1-d"
-    remainder = (audio_data.shape[0] - feature_window) % feature_step
-    num_zeros = feature_step - remainder
-    zero_steps = np.zeros((num_zeros, ), dtype=np.float32)
-    return np.concatenate((audio_data, zero_steps), axis=0)
+
+
 
 class Audio(object):
     """Streams raw audio from microphone. Data is received in a separate thread, 

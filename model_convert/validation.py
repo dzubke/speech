@@ -1,132 +1,202 @@
 # standard libraries
-import os
 import argparse
+from datetime import date
 import json
-import math
+import logging
+import os
 import pickle
-import math
-
 # third-party libaries
-import torch
-import torch.nn as nn
+import coremltools
+import editdistance
+import numpy as np
 import onnx
 from onnx import helper, shape_inference
 import onnxruntime
 import onnx_coreml
-import coremltools
-import numpy as np
-import editdistance
-
+import torch
+import torch.nn as nn 
 #project libraries
-from speech.loader import log_specgram_from_file
-from speech.models.ctc_decoder import decode as ctc_decode
-import speech.models as models
 from get_paths import validation_paths
 from import_export import preproc_to_dict, preproc_to_json, export_state_dict
+from speech.loader import log_specgram_from_data, log_specgram_from_file
+from speech.models.ctc_decoder import decode as ctc_decode
+from speech.models import ctc_model
+from speech.utils.compat import normalize
+from speech.utils.convert import to_numpy
+from speech.utils.stream_utils import make_full_window
+from speech.utils.wave import array_from_wave
 
-"""
-CONFIG_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/validation_scripts/ctc_config_20200121-0127.json'
-TRAINED_MODEL_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/torch_models/20200121-0127_best_model_pyt14.pth'
-STATE_DICT_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/validation_scripts/state_params_20200121-0127.pth'
-ONNX_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/onnx_models/20200121-0127_best_model_pyt14.onnx'
-COREML_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/coreml_models/20200121-0127_best_model_pyt14.mlmodel'
-PREPROC_FN = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/onnx_coreml/preproc/20200121-0127_best_preproc.pyc'
-"""
+# ----- logging format/setup -----------
+set_linewidth=160
+np.set_printoptions(linewidth=set_linewidth)
+torch.set_printoptions(linewidth=set_linewidth)
+
+log_filename = "logs_probs-hiddencell_2020-05-20.log"
+log_level = 10
+logging.basicConfig(filename=None, filemode='w', level=log_level)
+# -----------------------------
 
 np.random.seed(2020)
 torch.manual_seed(2020)
 
-freq_dim = 257 #freq dimension out of log_spectrogram 
-
 def main(model_name, num_frames):
 
-    time_dim = num_frames  #time dimension out of log_spectrogram 
-
+    model_fn, onnx_fn, coreml_fn, config_fn, preproc_fn, state_dict_path = validation_paths(model_name)
     
-    TRAINED_MODEL_FN, ONNX_FN, COREML_FN, CONFIG_FN, PREPROC_FN, state_dict_path = validation_paths(model_name)
-    
-    with open(CONFIG_FN, 'rb') as fid:
+    with open(config_fn, 'rb') as fid:
         config = json.load(fid)
         model_cfg = config["model"]
-    
-    with open(PREPROC_FN, 'rb') as fid:
+    with open(preproc_fn, 'rb') as fid:
         preproc = pickle.load(fid)
 
+    freq_dim = preproc.input_dim
+
+    PARAMS = {
+        "sample_rate": 16000,
+        "feature_win_len": 512,
+        "feature_win_step":256,
+        "feature_size":257,
+        "chunk_size": 46,
+        "n_context": 15
+    }
+    PARAMS['stride'] = PARAMS['chunk_size'] - 2*PARAMS['n_context']
+
+    logging.warning(f"PARAMS dict: {PARAMS}")
+    
     #load models
-    state_dict_model = torch.load(TRAINED_MODEL_FN, map_location=torch.device('cpu'))
-    #preproc.input_dim, preproc.vocab_size
-    trained_model = models.CTC(freq_dim, 39, model_cfg)
+    state_dict_model = torch.load(model_fn, map_location=torch.device('cpu'))
+    model = ctc_model.CTC(preproc.input_dim, preproc.vocab_size, model_cfg)
     state_dict = state_dict_model.state_dict()
     torch.save(state_dict, state_dict_path)
-    trained_model.load_state_dict(state_dict)
+    model.load_state_dict(state_dict)
 
-    onnx_model = onnx.load(ONNX_FN)
+    onnx_model = onnx.load(onnx_fn)
 
-    coreml_model = coremltools.models.MLModel(COREML_FN)
-
+    coreml_model = coremltools.models.MLModel(coreml_fn)
 
     # prepping and checking models
-    trained_model.eval()
-    ##CTCNet_model.eval()
-
+    model.eval()
     onnx.checker.check_model(onnx_model)
     inferred_model = shape_inference.infer_shapes(onnx_model)
     onnx.checker.check_model(inferred_model)
 
-    # print("---------trained model-------------")
-    # print(f"trained_model: {trained_model}")
-    # print("-------Trained State Dict------------")
-    # for k, v in trained_model.state_dict().items():
-    #     print(k, v.shape, v.dtype)
-
-    # print("---------CTCNet_model-------------")
-    # print(f"CTCNet_model: {CTCNet_model}")
-    # print("----------CTCNet state dict------------")
-    # for k, v in CTCNet_model.state_dict().items():
-    #     print(k, v.shape, v.dtype)
-    # print("-----------------------------")
-
-
     #creating the test data
-    data_dct = gen_test_data(PREPROC_FN, time_dim, freq_dim)
+    data_dct = gen_test_data(preproc, num_frames, freq_dim)
 
     #saving the preproc object as a dictionary
-    preproc_dict = preproc_to_dict(PREPROC_FN, export=False)
+    # TODO change preproc methods to use the python object
+    preproc_dict = preproc_to_dict(preproc_fn, export=False)
+    preproc_json_path = preproc_fn[:-4]+".json"   
+    preproc_to_json(preproc_fn, preproc_json_path)
 
-    preproc_json_path = PREPROC_FN[:-4]+".json"   #removes the .pyc extension and replaces with .pickle ext
-    preproc_to_json(PREPROC_FN, preproc_json_path)
+    # make predictions 
+
+    audio_dir = '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/model_convert/audio_files/Validatio-audio_2020-05-21'
+
+    validate_all_models(model, onnx_fn, coreml_model, preproc, audio_dir, model_name, num_frames)
+
+    validation_tests = full_audio_infer(model, preproc, PARAMS, audio_dir)
+    
+    write_output_json(PARAMS, preproc_dict, validation_tests, model_name)
+
+def write_output_json(PARAMS:dict, preproc_dict:dict, validation_tests:dict, model_name:str, output_path:str=None):
+    output_json = {
+        "metadata": PARAMS, 
+        "preproc": preproc_dict,
+        "validation_tests":validation_tests
+    }
+    logging.info(f"metadata to log: {PARAMS}")
+    logging.info(f"preproc to log: {preproc_dict}")
+
+    if output_path is None:
+        json_filename = model_name+"_metadata_"+str(date.today())+".json"
+        output_path = os.path.join("output", json_filename)
+    with open(output_path, 'w') as fid:
+        json.dump(output_json, fid)
+
+ 
+def full_audio_infer(model, preproc, PARAMS:dict, audio_dir)->dict:
+    """
+    conducts inference on all audio files in audio_dir and returns a dictionary
+    of the probabilities and phoneme predictions
+    """
+    validation_tests=dict()
+
+    for audio_file in os.listdir(audio_dir):
+        hidden_in = torch.zeros((5, 1, 512), dtype=torch.float32)
+        cell_in = torch.zeros((5, 1, 512), dtype=torch.float32)
+
+        audio_path = os.path.join(audio_dir, audio_file)
+
+        audio_data, samp_rate = array_from_wave(audio_path)
+        assert PARAMS['sample_rate'] == samp_rate, "audio sample rate is not equal to default sample rate"
+
+        audio_data = make_full_window(audio_data, PARAMS['feature_win_len'], PARAMS['feature_win_step'])
+        features = log_specgram_from_data(audio_data, samp_rate)
+        norm_features = normalize(preproc, features)
+        # adds the batch dimension (1, time, 257)
+        norm_features = np.expand_dims(norm_features, axis=0) 
+        torch_input = torch.from_numpy(norm_features)
+        
+        # padding time dim, pads from the back: zero padding (0,0) to freq, 15 paddding (15,0) to time
+        padding = (0, 0, 15, 0)
+        padded_input = torch.nn.functional.pad(torch_input, padding, value=0)
+
+        fill_chunk_remainder = (padded_input.shape[1] - PARAMS['chunk_size']) % PARAMS['stride']
+
+        if fill_chunk_remainder != 0:
+            fill_chunk_padding = PARAMS['stride'] - fill_chunk_remainder
+            fill_chunk_pad = torch.zeros(1, fill_chunk_padding, PARAMS['feature_size'], dtype=torch.float32, requires_grad=False)
+            padded_input = torch.cat((padded_input, fill_chunk_pad),dim=1)
+        
+        # process last chunk with stride of zeros
+        final_chunk_pad = torch.zeros(1, PARAMS['stride'], PARAMS['feature_size'], dtype=torch.float32, requires_grad=False)
+        padded_input = torch.cat((padded_input, final_chunk_pad),dim=1)
+
+        model_output = model(padded_input, (hidden_in, cell_in))
+
+        probs, (hidden_out, cell_out) = model_output
+        probs = to_numpy(probs)
+        int_labels = max_decode(probs[0], blank=39)
+        predictions = preproc.decode(int_labels)
+
+        validation_tests.update({audio_file: {"logits": probs[0].tolist(), "maxDecodePhonemes": predictions}})
+        logging.info(f"probs dimension: {probs.shape}")
+        logging.info(f"prediction len: {len(predictions)}")
+
+    return validation_tests
 
 
-
-    # make predictions
+def validate_all_models(torch_model, onnx_fn, coreml_model, preproc, audio_dir, model_name, num_frames)->None:
+    BLANK_INDEX=39
+    stream_test_name = "Speak-out.wav"
     predictions_dict= {}
 
-    stream_test_name = "Speak_5_out"
-    BLANK_INDEX=39
+    for audio_file in os.listdir(audio_dir):
+        test_h = np.zeros((5, 1, 512)).astype(np.float32)
+        test_c = np.zeros((5, 1, 512)).astype(np.float32)
 
-    for name, data in data_dct.items():
-        print(f"\n~~~~~~~~~~~~~~~~~~{name}~~~~~~~~~~~~~~~~~~~~~~\n")
-        test_x, test_h, test_c = data
+        audio_path = os.path.join(audio_dir, audio_file)
+        log_spec = log_specgram_from_file(audio_path)
+        features = normalize(preproc, log_spec)
+        features = features[:num_frames,:]
+        test_x = np.expand_dims(features, 0)
+        logging.debug(f"\n~~~~~~~~~~~~~~~~~~{audio_file}~~~~~~~~~~~~~~~~~~~~~~\n")
 
-        trained_output = trained_model(torch.from_numpy(test_x),(torch.from_numpy(test_h), torch.from_numpy(test_c))) 
-        trained_probs, trained_h, trained_c = to_numpy(trained_output[0]), to_numpy(trained_output[1][0]), to_numpy(trained_output[1][1])
-        trained_max_decoder = max_decode(trained_probs[0], blank=BLANK_INDEX)
-        trained_ctc_decoder = ctc_decode(trained_probs[0], beam_size=50, blank=BLANK_INDEX)
-
-
-        #torch_output = CTCNet_model(torch.from_numpy(test_x), torch.from_numpy(test_h), torch.from_numpy(test_c)) 
-        #torch_probs, torch_h, torch_c = [to_numpy(tensor) for tensor in torch_output]
-        #torch_output = [to_numpy(tensor) for tensor in torch_output]
+        torch_output = torch_model(torch.from_numpy(test_x),(torch.from_numpy(test_h), torch.from_numpy(test_c))) 
+        torch_probs, torch_h, torch_c = to_numpy(torch_output[0]), to_numpy(torch_output[1][0]), to_numpy(torch_output[1][1])
+        torch_max_decoder = max_decode(torch_probs[0], blank=BLANK_INDEX)
+        torch_ctc_decoder = ctc_decode(torch_probs[0], beam_size=50, blank=BLANK_INDEX)
        
-        ort_session = onnxruntime.InferenceSession(ONNX_FN)
+        ort_session = onnxruntime.InferenceSession(onnx_fn)
         ort_inputs = {
-        ort_session.get_inputs()[0].name: test_x,
-        ort_session.get_inputs()[1].name: test_h,
-        ort_session.get_inputs()[2].name: test_c}
+            ort_session.get_inputs()[0].name: test_x,
+            ort_session.get_inputs()[1].name: test_h,
+            ort_session.get_inputs()[2].name: test_c
+        }
         ort_output = ort_session.run(None, ort_inputs)
         onnx_probs, onnx_h, onnx_c = [np.array(array) for array in ort_output]
-        #onnx_output = [np.array(array) for array in ort_output]
-        print("onnxruntime prediction complete") 
+        logging.debug("onnxruntime prediction complete") 
 
         coreml_input = {'input': test_x, 'hidden_prev': test_h, 'cell_prev': test_c}
         coreml_output = coreml_model.predict(coreml_input, useCPUOnly=True)
@@ -135,84 +205,68 @@ def main(model_name, num_frames):
         coreml_c = np.array(coreml_output['cell'])
         coreml_max_decoder = max_decode(coreml_probs[0], blank=BLANK_INDEX)
         coreml_ctc_decoder = ctc_decode(coreml_probs[0], beam_size=50,blank=BLANK_INDEX)
-        #coreml_output = [coreml_probs, coreml_h, coreml_c]
-        print("coreml prediction completed")
+        logging.debug("coreml prediction completed")
 
-        if name == stream_test_name:
+        if audio_file == stream_test_name:
             stream_test_x = test_x
             stream_test_h = test_h
             stream_test_c = test_c
-            stream_test_probs = trained_probs
-            stream_test_h_out = trained_h
-            stream_test_c_out = trained_c
-            stream_test_max_decoder = trained_max_decoder
-            stream_test_ctc_decoder = trained_ctc_decoder
+            stream_test_probs = torch_probs
+            stream_test_h_out = torch_h
+            stream_test_c_out = torch_c
+            stream_test_max_decoder = torch_max_decoder
+            stream_test_ctc_decoder = torch_ctc_decoder
 
-        time_slice = 0 #math.floor(time_dim/2) - 1
-        trained_probs_sample = trained_probs[0,time_slice,:]
-        trained_h_sample = trained_h[0,0,0:25]
-        trained_c_sample = trained_c[0,0,0:25]
-        trained_max_decoder_char = ints_to_phonemes(PREPROC_FN, trained_max_decoder)
-        trained_ctc_decoder_char = ints_to_phonemes(PREPROC_FN, trained_ctc_decoder[0])
+        time_slice = 0 #num_frames//2 - 1
+        torch_probs_sample = torch_probs[0,time_slice,:]
+        torch_h_sample = torch_h[0,0,0:25]
+        torch_c_sample = torch_c[0,0,0:25]
+        torch_max_decoder_char = preproc.decode(torch_max_decoder)
+        torch_ctc_decoder_char = preproc.decode(torch_ctc_decoder[0])
 
-        print("\n-----Torch Output-----")
-        print(f"output {np.shape(trained_probs)}: \n{trained_probs_sample}")
-        print(f"hidden {np.shape(trained_h)}: \n{trained_h_sample}")
-        print(f"cell {np.shape(trained_c)}: \n{trained_c_sample}")
-        print(f"max decode: {trained_max_decoder_char}")
-        print(f"ctc decode: {trained_ctc_decoder_char}")
+        logging.debug("\n-----Torch Output-----")
+        logging.debug(f"output {np.shape(torch_probs)}: \n{torch_probs_sample}")
+        logging.debug(f"hidden {np.shape(torch_h)}: \n{torch_h_sample}")
+        logging.debug(f"cell {np.shape(torch_c)}: \n{torch_c_sample}")
+        logging.debug(f"max decode: {torch_max_decoder_char}")
+        logging.debug(f"ctc decode: {torch_ctc_decoder_char}")
 
-        output_dict = {"torch_probs_(time_dim/2-1)":trained_probs_sample.tolist(), "torch_h_sample":trained_h_sample.tolist(), 
-                        "torch_c_sample": trained_c_sample.tolist(), "torch_max_decoder":trained_max_decoder_char, 
-                        "torch_ctc_decoder_beam=50":trained_ctc_decoder_char}
+        output_dict = {"torch_probs_(num_frames/2-1)":torch_probs_sample.tolist(), "torch_h_sample":torch_h_sample.tolist(), 
+                        "torch_c_sample": torch_c_sample.tolist(), "torch_max_decoder":torch_max_decoder_char, 
+                        "torch_ctc_decoder_beam=50":torch_ctc_decoder_char}
 
-        predictions_dict.update({name: output_dict})
+        predictions_dict.update({audio_file: output_dict})
 
-        print("\n-----Coreml Output-----")
-        print(f"output {coreml_probs.shape}: \n{coreml_probs[0,time_slice,:]}")
-        print(f"hidden {coreml_h.shape}: \n{coreml_h[0,0,0:25]}")
-        print(f"cell {coreml_c.shape}: \n{coreml_c[0,0,0:25]}")
-        print(f"max decode: {coreml_max_decoder}")
-        print(f"ctc decode: {coreml_ctc_decoder}")
+        logging.debug("\n-----Coreml Output-----")
+        logging.debug(f"output {coreml_probs.shape}: \n{coreml_probs[0,time_slice,:]}")
+        logging.debug(f"hidden {coreml_h.shape}: \n{coreml_h[0,0,0:25]}")
+        logging.debug(f"cell {coreml_c.shape}: \n{coreml_c[0,0,0:25]}")
+        logging.debug(f"max decode: {coreml_max_decoder}")
+        logging.debug(f"ctc decode: {coreml_ctc_decoder}")
 
-        # Compare Trained and Coreml predictions
-        np.testing.assert_allclose(coreml_probs, trained_probs, rtol=1e-03, atol=1e-05)
-        np.testing.assert_allclose(coreml_h, trained_h, rtol=1e-03, atol=1e-05)
-        np.testing.assert_allclose(coreml_c, trained_c, rtol=1e-03, atol=1e-05)
-        #assert(trained_max_decoder==coreml_max_decoder), "max decoder doesn't match"
-        #assert(trained_ctc_decoder[0]==coreml_ctc_decoder[0]), "ctc decoder labels don't match"
-        #np.testing.assert_almost_equal(trained_ctc_decoder[1], coreml_ctc_decoder[1], decimal=3)
-        print("\nTrained and Coreml probs, hidden, cell, decoder states match, all good!")
-
-        # Compare Trained and Torch predictions
-        #np.testing.assert_allclose(torch_probs, trained_probs, rtol=1e-03, atol=1e-05)
-        #np.testing.assert_allclose(torch_h, trained_h, rtol=1e-03, atol=1e-05)
-        #np.testing.assert_allclose(torch_c, trained_c, rtol=1e-03, atol=1e-05)
-        #print("\nTorch and Trained probs, hidden, cell states match, all good!")  
+        # Compare torch and Coreml predictions
+        np.testing.assert_allclose(coreml_probs, torch_probs, rtol=1e-03, atol=1e-05)
+        np.testing.assert_allclose(coreml_h, torch_h, rtol=1e-03, atol=1e-05)
+        np.testing.assert_allclose(coreml_c, torch_c, rtol=1e-03, atol=1e-05)
+        #assert(torch_max_decoder==coreml_max_decoder), "max decoder doesn't match"
+        #assert(torch_ctc_decoder[0]==coreml_ctc_decoder[0]), "ctc decoder labels don't match"
+        #np.testing.assert_almost_equal(torch_ctc_decoder[1], coreml_ctc_decoder[1], decimal=3)
+        logging.debug("\ntorch and Coreml probs, hidden, cell, decoder states match, all good!")
 
         # Compare Torch and ONNX predictions
-        np.testing.assert_allclose(trained_probs, onnx_probs, rtol=1e-03, atol=1e-05)
-        np.testing.assert_allclose(trained_h, onnx_h, rtol=1e-03, atol=1e-05)
-        np.testing.assert_allclose(trained_c, onnx_c, rtol=1e-03, atol=1e-05)
-        print("\nTrained and ONNX probs, hidden, cell states match, all good!")  
+        np.testing.assert_allclose(torch_probs, onnx_probs, rtol=1e-03, atol=1e-05)
+        np.testing.assert_allclose(torch_h, onnx_h, rtol=1e-03, atol=1e-05)
+        np.testing.assert_allclose(torch_c, onnx_c, rtol=1e-03, atol=1e-05)
+        logging.debug("\ntorch and ONNX probs, hidden, cell states match, all good!")  
 
         # Compare ONNX and CoreML predictions
         np.testing.assert_allclose(onnx_probs, coreml_probs, rtol=1e-03, atol=1e-05)
         np.testing.assert_allclose(onnx_h, coreml_h, rtol=1e-03, atol=1e-05)
         np.testing.assert_allclose(onnx_c, coreml_c, rtol=1e-03, atol=1e-05)
-        print("\nONNX and CoreML probs, hidden, cell states match, all good!")
-
-        # Compare Torch and CoreML predictions
-        #np.testing.assert_allclose(torch_probs, coreml_probs, rtol=1e-03, atol=1e-05)
-        #np.testing.assert_allclose(torch_h, coreml_h, rtol=1e-03, atol=1e-05)
-        #np.testing.assert_allclose(torch_c, coreml_c, rtol=1e-03, atol=1e-05)
-        #print("\nTorch and CoreML probs, hidden, cell states match, all good!")
-
+        logging.debug("\nONNX and CoreML probs, hidden, cell states match, all good!")
 
     
     dict_to_json(predictions_dict, "./output/"+model_name+"_output.json")
-
-
 
 
 def dict_to_json(input_dict, json_path):
@@ -221,29 +275,18 @@ def dict_to_json(input_dict, json_path):
         json.dump(input_dict, fid)
 
 
-def preprocess(PREPROC_FN, inputs):
-    with open(PREPROC_FN, 'rb') as fid:
-        preproc = pickle.load(fid)
-        return (inputs - preproc.mean) / preproc.std
-
-def ints_to_phonemes(PREPROC_FN, int_list):
-    with open(PREPROC_FN, 'rb') as fid:
-        preproc = pickle.load(fid)
-        return preproc.decode(int_list)
-
-
-def gen_test_data(preproc_path, time_dim, freq_dim):
-    test_x_zeros = np.zeros((1, time_dim, freq_dim)).astype(np.float32)
+def gen_test_data(preproc, num_frames, freq_dim):
+    test_x_zeros = np.zeros((1, num_frames, freq_dim)).astype(np.float32)
     test_h_zeros = np.zeros((5, 1, 512)).astype(np.float32)
     test_c_zeros = np.zeros((5, 1, 512)).astype(np.float32)
     test_zeros = [test_x_zeros, test_h_zeros, test_c_zeros]
 
-    test_x_randn = np.random.randn(1, time_dim, freq_dim).astype(np.float32)
+    test_x_randn = np.random.randn(1, num_frames, freq_dim).astype(np.float32)
     test_h_randn = np.random.randn(5, 1, 512).astype(np.float32)
     test_c_randn = np.random.randn(5, 1, 512).astype(np.float32)
     test_randn = [test_x_randn, test_h_randn, test_c_randn]
 
-    test_names = ["Speak_5_out", "DZ-5-drz-test-20191202", "DZ-5-plane-noise", 
+    test_names = ["Speak_5_out", "Dustin-5-drz-test-20191202", "Dustin-5-plane-noise", 
                 "LibSp_777-126732-0003", "LibSp_84-121123-0001", 
                 "Speak_1_4ysq5X0Mvxaq1ArAntCWC2YkWHc2-1574725037", 
                 "Speak_2_58cynYij95TbB9Nlz3TrKBbkg643-1574725017", 
@@ -251,12 +294,12 @@ def gen_test_data(preproc_path, time_dim, freq_dim):
                 "Speak_4_OVrsxD1n9Wbh0Hh6thej8FIBIOE2-1574725033", 
                 "Speak_6_R3SdlQCwoYQkost3snFxzXS5vam2-1574726165"]
     
-    test_fns = ["ST-out.wav", "DZ-5-drz-test-20191202.wv", "DZ-5-plane-noise.wv", "LS-777-126732-0003.wav", 
-                "LS-84-121123-0001.wav", "ST-4ysq5X0Mvxaq1ArAntCWC2YkWHc2-1574725037.wv",
-                "ST-58cynYij95TbB9Nlz3TrKBbkg643-1574725017.wv", "ST-CcSEvcOEineimGwKOk1c8P2eU0q1-1574725123.wv", 
-                "ST-OVrsxD1n9Wbh0Hh6thej8FIBIOE2-1574725033.wv", "ST-R3SdlQCwoYQkost3snFxzXS5vam2-1574726165.wv"]
+    test_fns = ["Speak-out.wav", "Dustin-5-drz-test-20191202.wav", "Dustin-5-plane-noise.wav", "Librispeech-777-126732-0003.wav", 
+                "Librispeech-84-121123-0001.wav", "Speak-4ysq5X0Mvxaq1ArAntCWC2YkWHc2-1574725037.wav",
+                "Speak-58cynYij95TbB9Nlz3TrKBbkg643-1574725017.wav", "Speak-CcSEvcOEineimGwKOk1c8P2eU0q1-1574725123.wav", 
+                "Speak-OVrsxD1n9Wbh0Hh6thej8FIBIOE2-1574725033.wav", "Speak-R3SdlQCwoYQkost3snFxzXS5vam2-1574726165.wav"]
 
-    unused_names = ["DZ-5-drz-test-20191202", "DZ-5-plane-noise", 
+    unused_names = ["Dustin-5-drz-test-20191202", "Dustin-5-plane-noise", 
                 "LibSp_777-126732-0003", "LibSp_84-121123-0001", 
                 "Speak_1_4ysq5X0Mvxaq1ArAntCWC2YkWHc2-1574725037", 
                 "Speak_2_58cynYij95TbB9Nlz3TrKBbkg643-1574725017", 
@@ -264,136 +307,28 @@ def gen_test_data(preproc_path, time_dim, freq_dim):
                 "Speak_4_OVrsxD1n9Wbh0Hh6thej8FIBIOE2-1574725033", 
                 "Speak_6_R3SdlQCwoYQkost3snFxzXS5vam2-1574726165"]
 
-    used_fns =["DZ-5-drz-test-20191202.wv", "DZ-5-plane-noise.wv", "LS-777-126732-0003.wav", 
-                "LS-84-121123-0001.wav", "ST-4ysq5X0Mvxaq1ArAntCWC2YkWHc2-1574725037.wv",
-                "ST-58cynYij95TbB9Nlz3TrKBbkg643-1574725017.wv", "ST-CcSEvcOEineimGwKOk1c8P2eU0q1-1574725123.wv", 
-                "ST-OVrsxD1n9Wbh0Hh6thej8FIBIOE2-1574725033.wv", "ST-R3SdlQCwoYQkost3snFxzXS5vam2-1574726165.wv"]
+    used_fns =["Dustin-5-drz-test-20191202.wav", "Dustin-5-plane-noise.wav", "Librispeech-777-126732-0003.wav", 
+                "Librispeech-84-121123-0001.wav", "Speak-4ysq5X0Mvxaq1ArAntCWC2YkWHc2-1574725037.wav",
+                "Speak-58cynYij95TbB9Nlz3TrKBbkg643-1574725017.wav", "Speak-CcSEvcOEineimGwKOk1c8P2eU0q1-1574725123.wav", 
+                "Speak-OVrsxD1n9Wbh0Hh6thej8FIBIOE2-1574725033.wav", "Speak-R3SdlQCwoYQkost3snFxzXS5vam2-1574726165.wav"]
                           
     base_path = './audio_files/'
-    audio_dct = load_audio(preproc_path, test_names, test_fns, base_path, test_h_zeros, test_c_zeros, time_dim)
+    audio_dct = load_audio(preproc, test_names, test_fns, base_path, test_h_zeros, test_c_zeros, num_frames)
     test_dct = {'test_zeros': test_zeros, 'test_randn_seed-2020': test_randn}
     test_dct.update(audio_dct)
 
     return test_dct
 
 
-def load_audio(preproc_path, test_names, test_fns, base_path, test_h, test_c, time_dim):
+def load_audio(preproc, test_names, test_fns, base_path, test_h, test_c, num_frames):
     dct = {}
     for test_name, test_fn in zip(test_names, test_fns):
 
-        audio_data = preprocess(preproc_path, log_specgram_from_file(base_path+test_fn))
-        audio_data = audio_data[:time_dim,:]
+        audio_data = normalize(preproc, log_specgram_from_file(base_path+test_fn))
+        audio_data = audio_data[:num_frames,:]
         audio_data = np.expand_dims(audio_data, 0)
         dct.update({test_name : [audio_data, test_h, test_c]})
     return dct
-
-
-class CTC(nn.Module):
-    def __init__(self, freq_dim, time_dim, output_dim, config):
-        super().__init__()
-        
-        encoder_cfg = config["encoder"]
-        conv_cfg = encoder_cfg["conv"]
-
-        convs = []
-        in_c = 1
-        for out_c, h, w, s1, s2, p1, p2 in conv_cfg:
-            conv = nn.Conv2d(in_channels=in_c, 
-                             out_channels=out_c, 
-                             kernel_size=(h, w),
-                             stride=(s1, s2), 
-                             padding=(p1, p2))
-            batch_norm =  nn.BatchNorm2d(out_c)
-            convs.extend([conv, batch_norm, nn.ReLU()])
-            if config["dropout"] != 0:
-                convs.append(nn.Dropout(p=config["dropout"]))
-            in_c = out_c
-
-        self.conv = nn.Sequential(*convs)
-        conv_out = out_c * self.conv_out_size(freq_dim, 1)
-        
-        assert conv_out > 0, \
-          "Convolutional output frequency dimension is negative."
-
-        #print(f"conv_out: {conv_out}")
-        rnn_cfg = encoder_cfg["rnn"]
-
-        assert rnn_cfg["type"] == "GRU" or rnn_cfg["type"] == "LSTM", "RNN type in config not supported"
-
-
-        self.rnn = eval("nn."+rnn_cfg["type"])(
-                        input_size=conv_out,
-                        hidden_size=rnn_cfg["dim"],
-                        num_layers=rnn_cfg["layers"],
-                        batch_first=True, dropout=config["dropout"],
-                        bidirectional=rnn_cfg["bidirectional"])
-
-        
-        
-        _encoder_dim = rnn_cfg["dim"]
-        self.volatile = False
-
-
-        # include the blank token
-        #print(f"fc _encoder_dim {_encoder_dim}, output_dim {output_dim}")
-        self.fc = LinearND(_encoder_dim, output_dim + 1)
-
-    def conv_out_size(self, n, dim):
-        for c in self.conv.children():
-            if type(c) == nn.Conv2d:
-                # assuming a valid convolution meaning no padding
-                k = c.kernel_size[dim]
-                s = c.stride[dim]
-                p = c.padding[dim]
-                n = (n - k + 1 + 2*p) / s
-                n = int(math.ceil(n))
-        return n
-
-    def forward(self, x, h_prev, c_prev):
-
-        x = x.unsqueeze(1)
-
-        # conv first
-        x = self.conv(x)
-
-        # reshape for rnn
-        x = torch.transpose(x, 1, 2).contiguous()
-        b, t, f, c = x.data.size()
-        x = x.view((b, t, f*c))
-        
-        # rnn
-        x, (h, c) = self.rnn(x, (h_prev, c_prev))
-
-        # fc
-        x = self.fc(x)
-
-        # softmax for final output
-        x = torch.nn.functional.softmax(x, dim=2)
-        return x, h, c
-
-
-class LinearND(nn.Module):
-
-    def __init__(self, *args):
-        """
-        A torch.nn.Linear layer modified to accept ND arrays.
-        The function treats the last dimension of the input
-        as the hidden dimension.
-        """
-        super(LinearND, self).__init__()
-        self.fc = nn.Linear(*args)
-
-    def forward(self, x):
-        size = x.size()
-        n = int(np.prod(size[:-1]))
-        out = x.contiguous().view(n, size[-1])
-        out = self.fc(out)
-        size = list(size)
-        size[-1] = out.size()[-1]
-        return out.view(size)
-
-def to_numpy(tensor):
-        return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
 
 
 def max_decode(output, blank=39):
@@ -405,8 +340,6 @@ def max_decode(output, blank=39):
             seq.append(p)
         prev = p
     return seq
-
-
 
 
 
