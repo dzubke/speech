@@ -17,7 +17,6 @@ class Model(nn.Module):
             list of list that define the parameters of the convolutions with format [out_c, h, w, s] 
             where out_c is the size of the output channel, h and w specify the height and width of the kernel or filter, 
             and s is the stride of the kernel and the stride is symmetric
-
         """
         
         super().__init__()

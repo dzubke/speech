@@ -31,7 +31,7 @@ def main(target_dir, tar_path, sample_rate, min_duration, max_duration, use_phon
         #wget.download(TED_LIUM_V2_DL_URL, target_dl_dir)
         target_file = os.path.join(target_dl_dir, "TEDLIUM_release-3.tgz")
 
-    if not os.path.exists(target_unpacked_dir):π
+    if not os.path.exists(target_unpacked_dir):
         print("Unpacking corpus...")
         tar = tarfile.open(target_file)
         tar.close()
@@ -57,7 +57,7 @@ def prepare_dir(ted_dir, use_phonemes, no_segment):
     """
         processed the audio and labels
         Arguments:
-            ted_dir (str): path to the directory with the dataset
+            ted_dir - str: path to the directory with the dataset
             use_phonemes (bool): if true, phoneme labels will be used
             segment_audio (bool): if true, the original audio will be segmented
     """

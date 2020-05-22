@@ -19,7 +19,7 @@ def pytorch_onnx_paths(model_name):
     config_path = os.path.join(ROOT, "config", model_name+"_config.json")
     
     assert os.path.exists(torch_path), "pytorch_onnx_paths: torch path doesn't exist"
-    assert os.path.exists(onnx_path), "pytorch_onnx_paths: onnx_path doesn't exist"
+    #assert os.path.exists(onnx_path), "pytorch_onnx_paths: onnx_path doesn't exist"
     assert os.path.exists(config_path), "pytorch_onnx_paths: config path doesn't exist"
 
     return torch_path, config_path, onnx_path
