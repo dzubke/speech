@@ -2,6 +2,7 @@
 import argparse
 from collections import defaultdict
 import csv
+from datetime import date
 import glob
 import io
 import json
@@ -447,8 +448,8 @@ def unique_unknown_words(dataset_dir:str):
 
     unknown_set = filter_set(unknown_set)
     unknown_list = list(unknown_set)
-
-    write_path = os.path.join(dataset_dir, "unk_word_stats","all_unk_words.txt")
+    filename = "all_unk_words_{}.txt".format(str(date.today()))
+    write_path = os.path.join(dataset_dir, "unk_word_stats",)
     with open(write_path, 'w') as fid:
         fid.write('\n'.join(unknown_list))
     logging.info(f"number of filtered unknown words: {len(unknown_list)}")
