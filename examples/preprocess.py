@@ -46,6 +46,11 @@ class DataPreprocessor(object):
     def collect_audio_transcripts(self):
         raise NotImplementedError
     
+    def clear_audio_trans(self):
+        # this method needs to be called between iterations of train/dev/test sets
+        # otherwise, the samples will accumulate with sucessive iteration calls
+        self.audio_trans = list()
+
     def write_json(self, save_path:str):
         """
         this method converts the audio files to wav format, filters out the 
@@ -127,6 +132,7 @@ class CommonvoicePreprocessor(DataPreprocessor):
 
     def process_datasets(self):
         for set_name, label_name in self.dataset_dict.items():
+            self.clear_audio_trans()    # clears the audio_transcript buffer
             label_path = os.path.join(self.dataset_dir, label_name)
             logging.info(f"label_path: {label_path}")
             self.collect_audio_transcripts(label_path)
@@ -170,6 +176,7 @@ class TedliumPreprocessor(DataPreprocessor):
 
     def process_datasets(self):
         for set_name, label_name in self.dataset_dict.items():
+            self.clear_audio_trans()    # clears the audio_transcript buffer
             data_path = os.path.join(self.dataset_dir, label_name)
             self.collect_audio_transcripts(data_path)
             json_path = os.path.join(self.dataset_dir, "{}.json".format(set_name))
@@ -269,6 +276,7 @@ class VoxforgePreprocessor(DataPreprocessor):
 
     def process_datasets(self):
         for set_name, label_name in self.dataset_dict.items():
+            self.clear_audio_trans()    # clears the audio_transcript buffer
             data_path = os.path.join(self.dataset_dir, label_name)
             self.collect_audio_transcripts(data_path)
             json_path = os.path.join(self.dataset_dir, "all.json")
@@ -349,6 +357,7 @@ class TatoebaPreprocessor(DataPreprocessor):
     def process_datasets(self):
         logging.info("In Tatoeba process_datasets")
         for set_name, label_fn in self.dataset_dict.items():
+            self.clear_audio_trans()    # clears the audio_transcript buffer
             label_path = os.path.join(self.dataset_dir, label_fn)
             self.collect_audio_transcripts(label_path)
             root, ext = os.path.splitext(label_path)
@@ -449,7 +458,7 @@ def unique_unknown_words(dataset_dir:str):
     unknown_set = filter_set(unknown_set)
     unknown_list = list(unknown_set)
     filename = "all_unk_words_{}.txt".format(str(date.today()))
-    write_path = os.path.join(dataset_dir, "unk_word_stats",)
+    write_path = os.path.join(dataset_dir, "unk_word_stats",filename)
     with open(write_path, 'w') as fid:
         fid.write('\n'.join(unknown_list))
     logging.info(f"number of filtered unknown words: {len(unknown_list)}")
