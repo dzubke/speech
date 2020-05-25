@@ -158,7 +158,7 @@ class CommonvoicePreprocessor(DataPreprocessor):
 class TedliumPreprocessor(DataPreprocessor):
     def __init__(self, dataset_dir, dataset_name, lexicon_path,
                         force_convert, min_duration, max_duration):
-        super(VoxforgePreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
+        super(TedliumPreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
             force_convert, min_duration, max_duration)
 
         # legacy means the data are in the format of previous version. 
@@ -425,7 +425,8 @@ class UnknownWords():
         stats_dir = os.path.join(dir_path, "unk_word_stats")
         if not os.path.exists(stats_dir):
             os.makedirs(stats_dir)
-        stats_dict_fn = os.path.join(stats_dir, base+"_unk-words-stats.json")
+        unk_words_filename = "{}_unk-words-stats_{}.json".format(base, str(date.today()))
+        stats_dict_fn = os.path.join(stats_dir, )
         with open(stats_dict_fn, 'w') as fid:
             json.dump(stats_dict, fid)
         
