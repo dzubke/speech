@@ -74,7 +74,7 @@ class DataPreprocessor(object):
                         continue
                 dur = wave.wav_duration(wav_path)
                 if self.min_duration <= dur <= self.max_duration:
-                    text = self.process_text(transcript, self.lex_dict, unknown_words, wav_path)
+                    text = self.process_text(transcript, unknown_words, wav_path, self.lex_dict)
                     # if transcript has an unknown word, skip it
                     if unknown_words.has_unknown: 
                         continue
@@ -86,8 +86,7 @@ class DataPreprocessor(object):
     
         unknown_words.process_save(save_path)
     
-    def process_text(self, transcript:str, lex_dict:dict=None, 
-                        unknown_words:UnknownWords, audio_path:str)->list:
+    def process_text(self, transcript:str, unknown_words, audio_path:str, lex_dict:dict=None,):
         """
         this method removed unwanted puncutation marks split the text into a list of words
         or list of phonemes if a lexicon_dict exists
@@ -158,7 +157,7 @@ class CommonvoicePreprocessor(DataPreprocessor):
 class TedliumPreprocessor(DataPreprocessor):
     def __init__(self, dataset_dir, dataset_name, lexicon_path,
                         force_convert, min_duration, max_duration):
-        super(VoxforgePreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
+        super(TedliumPreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
             force_convert, min_duration, max_duration)
 
         # legacy means the data are in the format of previous version. 
@@ -188,16 +187,16 @@ class TedliumPreprocessor(DataPreprocessor):
 
         ted_talks = os.listdir(os.path.join(data_path, "sph"))
 
-        for sph_file in tqdm(ted_talks, total=len(ted_talks)):
+        for sph_file in tqdm.tqdm(ted_talks, total=len(ted_talks)):
             
             speaker_name = os.path.splitext(sph_file)[0]
             sph_file_full = os.path.join(data_path, "sph", sph_file)
             stm_file_full = os.path.join(data_path, "stm", "{}.stm".format(speaker_name))
-            assert os.path.exists(sph_file_full) and os.path.exists(stm_file_full),
+            assert os.path.exists(sph_file_full) and os.path.exists(stm_file_full),\
                 f"source files {sph_file_full}, {stm_file_full} don't exist"
             
             all_utterances = self.get_utterances_from_stm(stm_file_full)
-            all_utterances = filter(filter_utterances(min_duration=self.min_duration), all_utterances)
+            all_utterances = filter(self.filter_utterances, all_utterances)
             
             for utterance_id, utterance in enumerate(all_utterances):
                 target_fn = "{}_{}.wav".format(utterance["filename"], str(utterance_id))
@@ -211,7 +210,7 @@ class TedliumPreprocessor(DataPreprocessor):
                     logging.info(f"Error in cutting utterance: {target_wav_file}")
                 
                 # audio_path is corrupted and is skipped
-                if data_helpers.skip_file(target_wav_file):
+                if data_helpers.skip_file("tedlium", target_wav_file):
                     continue
                 
                 transcript = self.remove_unk_token(utterance["transcript"])
@@ -250,7 +249,7 @@ class TedliumPreprocessor(DataPreprocessor):
                 
             return res
 
-    def filter_utterances(self, utterance_info, min_duration=1.0, max_duration=30.0)->bool:
+    def filter_utterances(self, utterance_info, min_duration=1.0, max_duration=20.0)->bool:
         if (utterance_info["end_time"] - utterance_info["start_time"]) > min_duration:
             if (utterance_info["end_time"] - utterance_info["start_time"]) < max_duration:
                 return True
