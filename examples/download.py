@@ -1,10 +1,15 @@
 # standard libraries
 import argparse
+import glob
 import os
+from shutil import copyfile
 import tarfile
 import urllib.request
+from zipfile import ZipFile
 # third party libraries
 import tqdm
+# project libraries
+from speech.utils.convert import to_wave
 
 
 
@@ -14,6 +19,7 @@ class Downloader(object):
         self.output_dir = output_dir
         self.dataset_name = dataset_name.lower()
         self.download_dict = dict()
+
 
     def download_dataset(self):
         save_dir = self.download_extract()
@@ -47,6 +53,89 @@ class Downloader(object):
         """
         pass
     
+
+class DemandDownloader(Downloader):
+
+    def __init__(self, output_dir, dataset_name):
+        super(DemandDownloader, self).__init__(output_dir, dataset_name)
+        self.download_dict = {}
+        self.data_dirname = "demand"
+        self.feed_model_dir = "/home/dzubke/awni_speech/data/noise/feed_to_model"
+        self.load_download_dict()
+
+
+    def load_download_dict(self):
+        """
+        Loads the download dictionary with download links and dataset names
+
+        Assumptions: 
+            Download links will still work in the future
+        """
+
+        noise_filenames = ["TMETRO_16k.zip", "TCAR_16k.zip", "SPSQUARE_16k.zip", "SCAFE_48k.zip",
+                            "PSTATION_16k.zip", "PRESTO_16k.zip", "OMEETING_16k.zip", "OHALLWAY_16k.zip",
+                            "NRIVER_16k.zip", "NPARK_16k.zip", "NFIELD_16k.zip", "DWASHING_16k.zip", 
+                            "DLIVING_16k.zip", "DKITCHEN_16k.zip"]
+        
+        download_link = "https://zenodo.org/record/1227121/files/{}?download=1"
+        
+        for filename in noise_filenames:
+            basename = os.path.splitext(filename)[0]
+            self.download_dict.update({basename: download_link.format(filename)})
+
+
+    def download_extract(self):
+        """
+        This method was overwritten because the download files were in zip format
+        instead of tar format as in the base downloader class. 
+        
+        Limitations: 
+            - this method is not idempotent as it will re-download and extract
+                the files again if it is called again
+        """
+        save_dir = os.path.join(self.output_dir, self.dataset_name)
+        if not os.path.exists(save_dir):
+            os.mkdir(save_dir)
+        for name, url in self.download_dict.items():
+            save_path = os.path.join(save_dir, name + ".zip")
+            print(f"Downloading: {name}...")
+            urllib.request.urlretrieve(url, filename=save_path)
+            print(f"Extracting: {name}...")
+            with Zipfile(save_path) as zipefile:
+                zipfile.extractall(path=save_dir)
+            os.remove(save_path)
+            print(f"Processed: {name}")
+        return save_dir
+
+
+    def extract_samples(save_dir:str, noise_dir:str):
+        """
+        Extracts the wav files from the directories and copies them into the noise_dir.
+        The audio files in the "SCAFE_48k" data subset are in 48 kHz and should be converted
+        to 16 kHz. The if-statement in the for-loop does this conversion.
+
+        Assumptions: 
+            - The directory structure of the zip files will not change
+            - 
+        """
+        pattern = "*/*.wav"
+        high_res_audio = {"SCAFE"}
+        sample_dir = os.path.join(save_dir, self.data_dirname)
+        all_wav_paths = glob.glob(os.path.join(sample_dir, pattern))
+
+        print("Extracting and removing sample files...")
+        for wav_path in tqdm(all_wav_paths):
+            filename = os.path.basename(wav_path)
+            dirname = os.path.basename(os.path.dirname(wav_path))
+            dst_filename = "{}_{}".format(dirname, filename)
+            dst_wav_path = os.path.join(self.feed_model_dir, dst_filename)
+            # if the wavs are high resolution, down-convert to 16kHz
+            if dirname in high_res_audio:
+                to_wave(wav_path, dst_wav_path)
+            # if not, just copy
+            else: 
+                copyfile(wav_path, new_path)
+
 
 class VoxforgeDownloader(Downloader):
 
