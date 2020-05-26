@@ -441,7 +441,7 @@ class UnknownWords():
         
 
 def unique_unknown_words(dataset_dir:str):
-    """
+    """ 
     Creates a set of the total number of unknown words across all segments in a dataset assuming a
     unk-words-stats.json file from process_unknown_words() has been created for each part of the dataset. 
     Arguments:
