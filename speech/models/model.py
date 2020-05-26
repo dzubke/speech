@@ -56,9 +56,6 @@ class Model(nn.Module):
                         bidirectional=rnn_cfg["bidirectional"])
         self._encoder_dim = rnn_cfg["dim"]
 
-        self.volatile = False
-        self.convert_model = config["convert_model"]
-
     def conv_out_size(self, n, dim):
         for c in self.conv.children():
             if type(c) == nn.Conv2d:

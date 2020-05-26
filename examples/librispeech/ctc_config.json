@@ -1,15 +1,15 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200526/",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200527/",
     "data" : {
-         "train_set" : "/home/dzubke/awni_speech/data/ted-cv/train_ted-cv-VAL_20200526.json",
+         "train_set" : "/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json",
         "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
         "start_and_end" : false
     },
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-05-26_ted-cv-VAL.log"
+        "log_file": "logs/2020-05-27_lib-ted-cv-VAL.log"
     },
     "preproc":{
         "preprocessor": "log_spec",
