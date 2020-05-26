@@ -18,7 +18,7 @@
         "normalize": true,
         "use_spec_augment": true,
         "inject_noise": true,
-        "noise_directory": "/home/dzubke/awni_speech/data/background_noise/",
+        "noise_directory": "/home/dzubke/awni_speech/data/noise/feed_to_model/",
         "noise_prob": 0.7,
         "noise_levels": [0,0.6], 
         "speed_vol_perturb":false, 
@@ -37,17 +37,11 @@
     },
 
     "model" : {
-        "class" : "CTC",
+        "class" : "this value is no longer used as train.py is hardcorded to use CTC_train",
         "dropout" : 0.4,
-        "convert_model": false,
         "load_trained": true,
-        "trained_path": "examples/librispeech/models/ctc_models/20200422/20200427/best_model", 
-        "remove_layers": ["rnn.weight_ih_l0", "rnn.weight_hh_l0", "rnn.bias_ih_l0", 
-            "rnn.bias_hh_l0", "rnn.weight_ih_l1", "rnn.weight_hh_l1", "rnn.bias_ih_l1", 
-            "rnn.bias_hh_l1", "rnn.weight_ih_l2", "rnn.weight_hh_l2", "rnn.bias_ih_l2", 
-            "rnn.bias_hh_l2", "rnn.weight_ih_l3", "rnn.weight_hh_l3", "rnn.bias_ih_l3", 
-            "rnn.bias_hh_l3", "rnn.weight_ih_l4", "rnn.weight_hh_l4", "rnn.bias_ih_l4", 
-            "rnn.bias_hh_l4", "fc.fc.weight", "fc.fc.bias"],
+        "trained_path": "examples/librispeech/models/ctc_models/20200428/20200428/best_model", 
+        "remove_layers": [],
         "encoder" : {
             "conv" : [
 			[32, 11, 41, 1, 2, 0, 20],

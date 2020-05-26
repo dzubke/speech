@@ -1,44 +1,56 @@
 # standard libary
-import os
-import json
-from collections import defaultdict
 import argparse
-import glob
-import subprocess
+from collections import defaultdict
 import csv
+from datetime import date
+import glob
+import io
+import json
+import logging
+import os
 import re
+import subprocess
+import unicodedata
 # third party libraries
 import tqdm
 # project libraries
 from speech.utils import data_helpers, wave, convert
 
+logging.basicConfig(filename=None, level=10)
 
-class Preprocessor(object):
+class DataPreprocessor(object):
     
     def __init__(self, dataset_dir:str, dataset_name:str, lexicon_path:str,
                         force_convert:bool, min_duration:float, max_duration:float):
 
         self.dataset_dir = dataset_dir
-        self.lex_dict = data_helpers.lexicon_to_dict(lexicon_path, dataset_name.lower())\
-             if lexicon_path !='' else None
+        if lexicon_path !='':
+            self.lex_dict = data_helpers.lexicon_to_dict(lexicon_path, dataset_name.lower())
+        else: 
+            self.lex_dict = None
         # list of tuples of audio_path and transcripts
         self.audio_trans=list()
+        # if true, all audio wav files will be overwritten if they exists
         self.force_convert = force_convert
         self.min_duration = min_duration
         self.max_duration = max_duration
 
     def process_datasets(self):
         """
-        This function is usually written to iterate through the datasets in dataset_dict
-        and call collect_audio_transcrtips which stores the audio_path and string transcripts
-        ini the self.audio_trans object. Then, self.write_json writes the audio and transcripts
-        to a file.
+        This function iterates through the datasets in dataset_dict and calls the self.collect_audio_transcripts()
+        which stores the audio_path and string transcripts in the self.audio_trans object. 
+        Then, this function calls self.write_json() writes the audio and transcripts to a file.
         """
         raise NotImplementedError
 
     def collect_audio_transcripts(self):
         raise NotImplementedError
     
+    def clear_audio_trans(self):
+        # this method needs to be called between iterations of train/dev/test sets
+        # otherwise, the samples will accumulate with sucessive iteration calls
+        self.audio_trans = list()
+
     def write_json(self, save_path:str):
         """
         this method converts the audio files to wav format, filters out the 
@@ -48,38 +60,38 @@ class Preprocessor(object):
         # filter the entries by the duration bounds and write file
         unknown_words = UnknownWords()
         with open(save_path, 'w') as fid:
-            print("Writing files to label json")
-            for sample in tqdm.tqdm(self.audio_trans):
-                audio_path, transcript = sample
+            logging.info("Writing files to label json")
+            for audio_path, transcript in tqdm.tqdm(self.audio_trans):
+                # skip the audio file if it doesn't exist
                 if not os.path.exists(audio_path):
-                    print(f"file {audio_path} does not exists")
-                else:
-                    base, raw_ext = os.path.splitext(audio_path)
-                    # using ".wv" extension so that original .wav files can be converteds
-                    wav_path = base + os.path.extsep + "wv"
-                    # if the wave file doesn't exist or it should be re-converted, convert to wave
-                    if not os.path.exists(wav_path) or self.force_convert:
-                        try:
-                            convert.to_wave(audio_path, wav_path)
-                        except subprocess.CalledProcessError:
-                            # if the file can't be converted, skip the file by continuing
-                            print(f"Error converting file: {audio_path}")
-                            continue
-                    dur = wave.wav_duration(wav_path)
-                    if self.min_duration <= dur <= self.max_duration:
-                        text = self.process_text(transcript, self.lex_dict, unknown_words, wav_path)
-                        # if transcript has an unknown word, skip it
-                        if unknown_words.has_unknown: 
-                            continue
-                        datum = {'text' : text,
-                                'duration' : dur,
-                                'audio' : wav_path}
-                        json.dump(datum, fid)
-                        fid.write("\n")
+                    logging.info(f"file {audio_path} does not exists")
+                    continue
+                base, raw_ext = os.path.splitext(audio_path)
+                # using ".wv" extension so that original .wav files can be converted
+                wav_path = base + os.path.extsep + "wv"
+                # if the wave file doesn't exist or it should be re-converted, convert to wave
+                if not os.path.exists(wav_path) or self.force_convert:
+                    try:
+                        convert.to_wave(audio_path, wav_path)
+                    except subprocess.CalledProcessError:
+                        # if the file can't be converted, skip the file by continuing
+                        logging.info(f"Process Error converting file: {audio_path}")
+                        continue
+                dur = wave.wav_duration(wav_path)
+                if self.min_duration <= dur <= self.max_duration:
+                    text = self.process_text(transcript, unknown_words, wav_path, self.lex_dict)
+                    # if transcript has an unknown word, skip it
+                    if unknown_words.has_unknown: 
+                        continue
+                    datum = {'text' : text,
+                            'duration' : dur,
+                            'audio' : wav_path}
+                    json.dump(datum, fid)
+                    fid.write("\n")
     
         unknown_words.process_save(save_path)
     
-    def process_text(self, transcript:str, lex_dict:dict, unknown_words, audio_path:str)->list:
+    def process_text(self, transcript:str, unknown_words, audio_path:str, lex_dict:dict=None,):
         """
         this method removed unwanted puncutation marks split the text into a list of words
         or list of phonemes if a lexicon_dict exists
@@ -90,11 +102,11 @@ class Preprocessor(object):
         try:
             transcript = re.sub(accepted_char, '', transcript).lower()
         except TypeError:
-            print(f"Type Error with: {transcript}")
+            logging.info(f"Type Error with: {transcript}")
         # check that all punctuation (minus apostrophe) has been removed 
         punct_noapost = '!"#$%&()*+,-./:;<=>?@[\]^_`{|}~'
         for p in punct_noapost:
-            if p in transcript: raise ValueError(f"unwanted punctuation: {p} in transcript")
+            if p in transcript: raise ValueError(f"unwanted punctuation {p} in transcript")
         #assert any([p in transcript for p in punct_noapost]), "unwanted punctuation in transcript"
         transcript = transcript.split()
         # if there is a pronunciation dict, convert to phonemes
@@ -109,7 +121,7 @@ class Preprocessor(object):
         return transcript
 
     
-class CommonvoicePreprocessor(Preprocessor):
+class CommonvoicePreprocessor(DataPreprocessor):
     def __init__(self, dataset_dir, dataset_name, lexicon_path,
                         force_convert, min_duration, max_duration):
         super(CommonvoicePreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
@@ -120,10 +132,11 @@ class CommonvoicePreprocessor(Preprocessor):
 
     def process_datasets(self):
         for set_name, label_name in self.dataset_dict.items():
+            self.clear_audio_trans()    # clears the audio_transcript buffer
             label_path = os.path.join(self.dataset_dir, label_name)
-            print(f"label_path: {label_path}")
+            logging.info(f"label_path: {label_path}")
             self.collect_audio_transcripts(label_path)
-            print(f"len of auddio_trans: {len(self.audio_trans)}")
+            logging.info(f"len of auddio_trans: {len(self.audio_trans)}")
             root, ext = os.path.splitext(label_path)
             json_path = root + os.path.extsep + "json"
             self.write_json(json_path)
@@ -133,7 +146,7 @@ class CommonvoicePreprocessor(Preprocessor):
         
         # open the file and select only entries with desired accents
         accents = ['us', 'canada']
-        print(f"Filtering files by accents: {accents}")
+        logging.info(f"Filtering files by accents: {accents}")
         dir_path = os.path.dirname(label_path)
         with open(label_path) as fid: 
             reader = csv.reader(fid, delimiter='\t')
@@ -147,8 +160,115 @@ class CommonvoicePreprocessor(Preprocessor):
                     transcript = line[2]
                     self.audio_trans.append((audio_path, transcript))
 
+class TedliumPreprocessor(DataPreprocessor):
+    def __init__(self, dataset_dir, dataset_name, lexicon_path,
+                        force_convert, min_duration, max_duration):
+        super(TedliumPreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
+            force_convert, min_duration, max_duration)
 
-class VoxforgePreprocessor(Preprocessor):
+        # legacy means the data are in the format of previous version. 
+        # legacy contains all the data in tedlium v3
+        train_dir = os.path.join("legacy", "train")
+        dev_dir = os.path.join("legacy", "dev")
+        test_dir = os.path.join("legacy", "test")
+        self.dataset_dict = {"train":train_dir, "dev": dev_dir, "test": test_dir}
+
+
+    def process_datasets(self):
+        for set_name, label_name in self.dataset_dict.items():
+            self.clear_audio_trans()    # clears the audio_transcript buffer
+            data_path = os.path.join(self.dataset_dir, label_name)
+            self.collect_audio_transcripts(data_path)
+            json_path = os.path.join(self.dataset_dir, "{}.json".format(set_name))
+            self.write_json(json_path)
+        unique_unknown_words(self.dataset_dir)
+    
+    def collect_audio_transcripts(self, data_path:str):
+        """
+        """
+        # create directory to store converted wav files 
+        converted_dir = os.path.join(data_path, "converted")
+        wav_dir = os.path.join(converted_dir, "wav")
+        if not os.path.exists(wav_dir):
+            os.makedirs(wav_dir)
+
+        ted_talks = os.listdir(os.path.join(data_path, "sph"))
+
+        for sph_file in tqdm.tqdm(ted_talks, total=len(ted_talks)):
+            
+            speaker_name = os.path.splitext(sph_file)[0]
+            sph_file_full = os.path.join(data_path, "sph", sph_file)
+            stm_file_full = os.path.join(data_path, "stm", "{}.stm".format(speaker_name))
+            assert os.path.exists(sph_file_full) and os.path.exists(stm_file_full),\
+                f"source files {sph_file_full}, {stm_file_full} don't exist"
+            
+            all_utterances = self.get_utterances_from_stm(stm_file_full)
+            all_utterances = filter(self.filter_utterances, all_utterances)
+            
+            for utterance_id, utterance in enumerate(all_utterances):
+                target_fn = "{}_{}.wav".format(utterance["filename"], str(utterance_id))
+                target_wav_file = os.path.join(wav_dir, target_fn)
+                if not os.path.exists(target_wav_file) or self.force_convert:
+                    # segment the ted_talks into individual utterances
+                    try:
+                        # cuts and writes the utterance
+                        self.cut_utterance(sph_file_full, target_wav_file, 
+                            utterance["start_time"], utterance["end_time"])
+                    except: 
+                        logging.info(f"Error in cutting utterance: {target_wav_file}")
+                
+                # audio_path is corrupted and is skipped
+                if data_helpers.skip_file("tedlium", target_wav_file):
+                    continue
+                
+                transcript = self.remove_unk_token(utterance["transcript"])
+                audio_path = target_wav_file
+                self.audio_trans.append((audio_path, transcript))
+
+    def remove_unk_token(self, transcript:str):
+        """
+        removes the <unk> token from the transcript
+        """
+        unk_token = "<unk>"
+        return transcript.replace(unk_token, "").strip()
+
+
+    def get_utterances_from_stm(self, stm_file:str):
+        """
+        Return list of entries containing phrase and its start/end timings
+        :param stm_file:
+        :return:
+        """
+        res = []
+        with io.open(stm_file, "r", encoding='utf-8') as f:
+            for stm_line in f:
+                tokens = stm_line.split()
+                start_time = float(tokens[3])
+                end_time = float(tokens[4])
+                filename = tokens[0]
+                transcript = unicodedata.normalize("NFKD",
+                                                " ".join(t for t in tokens[6:]).strip()). \
+                    encode("utf-8", "ignore").decode("utf-8", "ignore")
+                if transcript != "ignore_time_segment_in_scoring":
+                    res.append({
+                        "start_time": start_time, "end_time": end_time,
+                        "filename": filename, "transcript": transcript
+                    })
+                
+            return res
+
+    def filter_utterances(self, utterance_info, min_duration=1.0, max_duration=20.0)->bool:
+        if (utterance_info["end_time"] - utterance_info["start_time"]) > min_duration:
+            if (utterance_info["end_time"] - utterance_info["start_time"]) < max_duration:
+                return True
+        return False
+
+    def cut_utterance(self, src_sph_file, target_wav_file, start_time, end_time, sample_rate=16000):
+        cmd="sox {}  -r {} -b 16 -c 1 {} trim {} ={}".\
+            format(src_sph_file, str(sample_rate), target_wav_file, start_time, end_time)
+        subprocess.call([cmd], shell=True)
+           
+class VoxforgePreprocessor(DataPreprocessor):
     def __init__(self, dataset_dir, dataset_name, lexicon_path,
                         force_convert, min_duration, max_duration):
         super(VoxforgePreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
@@ -157,6 +277,7 @@ class VoxforgePreprocessor(Preprocessor):
 
     def process_datasets(self):
         for set_name, label_name in self.dataset_dict.items():
+            self.clear_audio_trans()    # clears the audio_transcript buffer
             data_path = os.path.join(self.dataset_dir, label_name)
             self.collect_audio_transcripts(data_path)
             json_path = os.path.join(self.dataset_dir, "all.json")
@@ -174,7 +295,7 @@ class VoxforgePreprocessor(Preprocessor):
         possible_text_fns = ["prompts-original", "PROMPTS", "Transcriptions.txt",  
                                 "prompt.txt", "prompts.txt", "therainbowpassage.prompt", 
                                 "cc.prompts", "a13.text"]
-        print("Processing the dataset directories...")
+        logging.info("Processing the dataset directories...")
         for sample_dir in tqdm.tqdm(list_sample_dirs):
             text_dir = os.path.join(sample_dir, "etc")
             # find the frist filename that exists in the directory
@@ -224,10 +345,10 @@ class VoxforgePreprocessor(Preprocessor):
                 break
         if not found: 
             audio_path = None
-            print(f"dir: {sample_dir} and name: {audio_name} not found")
+            logging.info(f"dir: {sample_dir} and name: {audio_name} not found")
         return audio_path
         
-class TatoebaPreprocessor(Preprocessor):
+class TatoebaPreprocessor(DataPreprocessor):
     def __init__(self, dataset_dir, dataset_name, lexicon_path,
                         force_convert, min_duration, max_duration):
         super(TatoebaPreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
@@ -235,8 +356,9 @@ class TatoebaPreprocessor(Preprocessor):
         self.dataset_dict = {"all":"sentences_with_audio.csv"}
 
     def process_datasets(self):
-        print("In Tatoeba process_datasets")
+        logging.info("In Tatoeba process_datasets")
         for set_name, label_fn in self.dataset_dict.items():
+            self.clear_audio_trans()    # clears the audio_transcript buffer
             label_path = os.path.join(self.dataset_dir, label_fn)
             self.collect_audio_transcripts(label_path)
             root, ext = os.path.splitext(label_path)
@@ -248,7 +370,7 @@ class TatoebaPreprocessor(Preprocessor):
     def collect_audio_transcripts(self, label_path:str):
         # open the file and select only entries with desired accents
         speakers = ["CK", "Delian", "pencil", "Susan1430"]  # these speakers have north american accents
-        print(f"Filtering files by speakers: {speakers}")
+        logging.info(f"Filtering files by speakers: {speakers}")
         error_files = {"CK": {"min":6122903, "max": 6123834}} # files in this range are often corrupted
         dir_path = os.path.dirname(label_path)
         with open(label_path) as fid: 
@@ -266,7 +388,7 @@ class TatoebaPreprocessor(Preprocessor):
                         audio_path = os.path.join(dir_path, "audio", line[1], line[0]+".mp3")
                         transcript = " ".join(line[2:])
                         if data_helpers.skip_file(audio_path):
-                            print(f"skipping {audio_path}")
+                            logging.info(f"skipping {audio_path}")
                             continue
                         self.audio_trans.append((audio_path, transcript))
 
@@ -279,15 +401,16 @@ class UnknownWords():
         self.word_count:int = 0
         self.has_unknown= False
 
-    def check_transcript(self, filename:str, text, word_phoneme_dict:dict):
-
+    def check_transcript(self, filename:str, text:str, word_phoneme_dict:dict):
+        
         if type(text) == str: text = text.split()
         elif type(text) == list: pass
         else: raise(TypeError("input text is not string or list type"))
+
         self.line_count += 1
         self.word_count += len(text) - 1
         line_unk = [word for word in text if word_phoneme_dict[word]==data_helpers.UNK_WORD_TOKEN]
-        #if line_unk is empty, has_unk is False
+        #if line_unk is empty, has_unknown is False
         self.has_unknown = bool(line_unk)
         if self.has_unknown:
             self.word_set.update(line_unk)
@@ -311,13 +434,14 @@ class UnknownWords():
         stats_dir = os.path.join(dir_path, "unk_word_stats")
         if not os.path.exists(stats_dir):
             os.makedirs(stats_dir)
-        stats_dict_fn = os.path.join(stats_dir, base+"_unk-words-stats.json")
+        unk_words_filename = "{}_unk-words-stats_{}.json".format(base, str(date.today()))
+        stats_dict_fn = os.path.join(stats_dir, unk_words_filename)
         with open(stats_dict_fn, 'w') as fid:
             json.dump(stats_dict, fid)
         
 
 def unique_unknown_words(dataset_dir:str):
-    """
+    """ 
     Creates a set of the total number of unknown words across all segments in a dataset assuming a
     unk-words-stats.json file from process_unknown_words() has been created for each part of the dataset. 
     Arguments:
@@ -330,24 +454,25 @@ def unique_unknown_words(dataset_dir:str):
         with open(data_fn, 'r') as fid: 
             unk_words_dict = json.load(fid)
             unknown_set.update(unk_words_dict['unknown_words_set'])
-            print(len(unk_words_dict['unknown_words_set']))
+            logging.info(len(unk_words_dict['unknown_words_set']))
 
     unknown_set = filter_set(unknown_set)
     unknown_list = list(unknown_set)
-
-    write_path = os.path.join(dataset_dir, "unk_word_stats","all_unk_words.txt")
+    filename = "all_unk_words_{}.txt".format(str(date.today()))
+    write_path = os.path.join(dataset_dir, "unk_word_stats", filename)
     with open(write_path, 'w') as fid:
         fid.write('\n'.join(unknown_list))
-    print(f"number of filtered unknown words: {len(unknown_list)}")
+    logging.info(f"number of filtered unknown words: {len(unknown_list)}")
 
 
 def filter_set(unknown_set:set):
     """
-    filters the set based on the length and presence of digits.
+    currently no filtering is being done
+    #filters the set based on the length and presence of digits.
     """
-    unk_filter = filter(lambda x: len(x)<30, unknown_set)
-    search_pattern = r'[0-9!#$%&()*+,\-./:;<=>?@\[\\\]^_{|}~]'
-    unknown_set = set(filter(lambda x: not re.search(search_pattern, x), unk_filter))
+    # unk_filter = filter(lambda x: len(x)<30, unknown_set)
+    # search_pattern = r'[0-9!#$%&()*+,\-./:;<=>?@\[\\\]^_{|}~]'
+    # unknown_set = set(filter(lambda x: not re.search(search_pattern, x), unk_filter))
     return unknown_set
 
 

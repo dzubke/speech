@@ -110,6 +110,7 @@ def spec_augment(mel_spectrogram, time_warping_para=5, frequency_masking_para=50
     # Step 1 : Time warping
     warped_mel_spectrogram = time_warp(mel_spectrogram, W=time_warping_para, logger=logger)
     if use_log: logger.info(f"finished time_warp")
+    #warped_mel_spectrogram = mel_spectrogram
 
     # Step 2 : Frequency masking
     for i in range(frequency_mask_num):

@@ -1,10 +1,9 @@
+# standard libraries
 import os
 import glob
 from tempfile import NamedTemporaryFile
-
 # third-party libraries
 import numpy as np
-
 # project libraries
 from speech.utils.wave import wav_duration, array_from_wave
 
@@ -55,9 +54,10 @@ def inject_noise_sample(data, sample_rate:int, noise_path:str, noise_level:float
         return data.astype('int16')
 
 
-def audio_with_sox(path, sample_rate, start_time, end_time):
+def audio_with_sox(path:str, sample_rate:int, start_time:float, end_time:float)->np.ndarray:
     """
     crop and resample the recording with sox and loads it.
+    If the output file cannot be found, an array of zeros of the desired length will be returned.
     """
     with NamedTemporaryFile(suffix=".wav") as tar_file:
         tar_filename = tar_file.name
@@ -65,7 +65,14 @@ def audio_with_sox(path, sample_rate, start_time, end_time):
                                                                                                tar_filename, start_time,
                                                                                                end_time)
         os.system(sox_params)
-        noise_data, samp_rate = array_from_wave(tar_filename)
+        
+        if os.path.exists(tar_filename):
+            noise_data, samp_rate = array_from_wave(tar_filename)
+        else:
+            noise_len = round((end_time - start_time)/sample_rate)
+            noise_data = np.zeros((noise_len,))
+        
+        assert isinstance(noise_data, np.ndarray), "not numpy array returned"
         return noise_data
 
 def same_size(data:np.ndarray, noise_dst:np.ndarray) -> np.ndarray:

@@ -18,7 +18,7 @@ import pickle
 import itertools
 import speech
 import speech.loader as loader
-import speech.models as models
+from speech.models.ctc_model_train import CTC_train
 
 # TODO, (awni) why does putting this above crash..
 import tensorboard_logger as tb
@@ -88,7 +88,7 @@ def eval_dev(model, ldr, preproc,  logger):
     losses = []; all_preds = []; all_labels = []
         
     model.set_eval()
-    preproc.set_eval()
+    #preproc.set_eval()  # turning this off to make dev data similar to speak_test
     use_log = (logger is not None)
     if use_log: logger.info(f" set_eval ")
 
@@ -112,7 +112,7 @@ def eval_dev(model, ldr, preproc,  logger):
             if use_log: logger.info(f"labels: {temp_batch[1]}")
 
     model.set_train()
-    preproc.set_train()        
+    # preproc.set_train()    see set_eval() comment
     if use_log: logger.info(f"set_train")
 
     loss = sum(losses) / len(losses)
@@ -159,8 +159,7 @@ def run(config):
                         preproc, batch_size)
 
     # Model
-    model_class = eval("models." + model_cfg["class"])
-    model = model_class(preproc.input_dim,
+    model = CTC_train(preproc.input_dim,
                         preproc.vocab_size,
                         model_cfg)
     if model_cfg["load_trained"]:
@@ -277,7 +276,6 @@ def log_conv_grads(model, logger):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
             description="Train a speech model.")
-
     parser.add_argument("config",
         help="A json file with the training configuration.")
     parser.add_argument("--deterministic", default=False,
