@@ -1,15 +1,15 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200427/",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200520/",
     "data" : {
-         "train_set" : "/home/dzubke/awni_speech/data/lib-ted-cv-tat/train_lib-ted-cv-tat.json",
-        "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-combo.json",
+         "train_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
+        "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
         "start_and_end" : false
     },
 
     "logger":{
-        "use_log": true,
-        "log_file": "logs/2020-04-27_lib-ted-cv-tat.log"
+        "use_log": false,
+        "log_file": "logs/2020-05-20_test.log"
     },
     "preproc":{
         "preprocessor": "log_spec",
@@ -20,7 +20,7 @@
         "inject_noise": true,
         "noise_directory": "/home/dzubke/awni_speech/data/noise/feed_to_model/",
         "noise_prob": 0.7,
-        "noise_levels": [0,0.6], 
+        "noise_levels": [0,0.7], 
         "speed_vol_perturb":false, 
         "tempo_range": [0.85, 1.15],
         "gain_range":[1.0,1.0]
@@ -29,10 +29,10 @@
     "optimizer": {
         "batch_size" : 8,
         "epochs" : 100,
-        "learning_rate" : 1e-3,
-        "momentum" : 0.95, 
+        "learning_rate" : 8e-4,
+        "momentum" : 0.9, 
         "dampening": 0.98,
-        "sched_gamma": 0.96, 
+        "sched_gamma": 0.90, 
         "sched_step": 1
     },
 
@@ -50,7 +50,7 @@
              ],
             "rnn" : {
                 "type": "LSTM",
-                "dim" : 1024,
+                "dim" : 512,
                 "bidirectional" : false,
                 "layers" : 5
             }
