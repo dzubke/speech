@@ -23,6 +23,7 @@ class Downloader(object):
 
     def download_dataset(self):
         save_dir = self.download_extract()
+        print(f"Data saved and extracted to: {save_dir}")
         self.extract_samples(save_dir)
 
     def download_extract(self):
@@ -57,9 +58,12 @@ class Downloader(object):
 class DemandDownloader(Downloader):
 
     def __init__(self, output_dir, dataset_name):
+        """
+        Limitations: 
+            - feed_model_dir, the directory where the noise is fed to the model, is hard-coded
+        """
         super(DemandDownloader, self).__init__(output_dir, dataset_name)
         self.download_dict = {}
-        self.data_dirname = "demand"
         self.feed_model_dir = "/home/dzubke/awni_speech/data/noise/feed_to_model"
         self.load_download_dict()
 
@@ -108,7 +112,7 @@ class DemandDownloader(Downloader):
         return save_dir
 
 
-    def extract_samples(save_dir:str, noise_dir:str):
+    def extract_samples(self, save_dir:str):
         """
         Extracts the wav files from the directories and copies them into the noise_dir.
         The audio files in the "SCAFE_48k" data subset are in 48 kHz and should be converted
@@ -120,21 +124,23 @@ class DemandDownloader(Downloader):
         """
         pattern = "*/*.wav"
         high_res_audio = {"SCAFE"}
-        sample_dir = os.path.join(save_dir, self.data_dirname)
-        all_wav_paths = glob.glob(os.path.join(sample_dir, pattern))
+        all_wav_paths = glob.glob(os.path.join(save_dir, pattern))
 
         print("Extracting and removing sample files...")
-        for wav_path in tqdm(all_wav_paths):
+        for wav_path in tqdm.tqdm(all_wav_paths):
             filename = os.path.basename(wav_path)
             dirname = os.path.basename(os.path.dirname(wav_path))
             dst_filename = "{}_{}".format(dirname, filename)
             dst_wav_path = os.path.join(self.feed_model_dir, dst_filename)
-            # if the wavs are high resolution, down-convert to 16kHz
-            if dirname in high_res_audio:
-                to_wave(wav_path, dst_wav_path)
-            # if not, just copy
-            else: 
-                copyfile(wav_path, new_path)
+            if os.path.exists(dst_wav_path):
+                continue
+            else:
+                # if the wavs are high resolution, down-convert to 16kHz
+                if dirname in high_res_audio:
+                    to_wave(wav_path, dst_wav_path)
+                # if not high-res, just copy
+                else: 
+                    copyfile(wav_path, new_path)
 
 
 class VoxforgeDownloader(Downloader):
