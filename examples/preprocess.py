@@ -208,13 +208,14 @@ class TedliumPreprocessor(DataPreprocessor):
             for utterance_id, utterance in enumerate(all_utterances):
                 target_fn = "{}_{}.wav".format(utterance["filename"], str(utterance_id))
                 target_wav_file = os.path.join(wav_dir, target_fn)
-                # segment the ted_talks into individual utterances
-                try:
-                    # cuts and writes the utterance
-                    self.cut_utterance(sph_file_full, target_wav_file, 
-                        utterance["start_time"], utterance["end_time"])
-                except: 
-                    logging.info(f"Error in cutting utterance: {target_wav_file}")
+                if not os.path.exists(target_wav_file) or self.force_convert:
+                    # segment the ted_talks into individual utterances
+                    try:
+                        # cuts and writes the utterance
+                        self.cut_utterance(sph_file_full, target_wav_file, 
+                            utterance["start_time"], utterance["end_time"])
+                    except: 
+                        logging.info(f"Error in cutting utterance: {target_wav_file}")
                 
                 # audio_path is corrupted and is skipped
                 if data_helpers.skip_file("tedlium", target_wav_file):
@@ -434,13 +435,13 @@ class UnknownWords():
         if not os.path.exists(stats_dir):
             os.makedirs(stats_dir)
         unk_words_filename = "{}_unk-words-stats_{}.json".format(base, str(date.today()))
-        stats_dict_fn = os.path.join(stats_dir, )
+        stats_dict_fn = os.path.join(stats_dir, unk_words_filename)
         with open(stats_dict_fn, 'w') as fid:
             json.dump(stats_dict, fid)
         
 
 def unique_unknown_words(dataset_dir:str):
-    """
+    """ 
     Creates a set of the total number of unknown words across all segments in a dataset assuming a
     unk-words-stats.json file from process_unknown_words() has been created for each part of the dataset. 
     Arguments:
