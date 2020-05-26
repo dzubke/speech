@@ -58,6 +58,10 @@ class Downloader(object):
 class DemandDownloader(Downloader):
 
     def __init__(self, output_dir, dataset_name):
+        """
+        Limitations: 
+            - feed_model_dir, the directory where the noise is fed to the model, is hard-coded
+        """
         super(DemandDownloader, self).__init__(output_dir, dataset_name)
         self.download_dict = {}
         self.feed_model_dir = "/home/dzubke/awni_speech/data/noise/feed_to_model"
@@ -134,7 +138,7 @@ class DemandDownloader(Downloader):
                 # if the wavs are high resolution, down-convert to 16kHz
                 if dirname in high_res_audio:
                     to_wave(wav_path, dst_wav_path)
-                # if not, just copy
+                # if not high-res, just copy
                 else: 
                     copyfile(wav_path, dst_wav_path)
 
