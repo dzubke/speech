@@ -67,7 +67,6 @@ class DemandDownloader(Downloader):
         self.feed_model_dir = "/home/dzubke/awni_speech/data/noise/feed_to_model"
         self.load_download_dict()
 
-
     def load_download_dict(self):
         """
         Loads the download dictionary with download links and dataset names
@@ -105,7 +104,7 @@ class DemandDownloader(Downloader):
             print(f"Downloading: {name}...")
             urllib.request.urlretrieve(url, filename=save_path)
             print(f"Extracting: {name}...")
-            with Zipfile(save_path) as zipefile:
+            with ZipFile(save_path) as zipfile:
                 zipfile.extractall(path=save_dir)
             os.remove(save_path)
             print(f"Processed: {name}")
@@ -133,6 +132,7 @@ class DemandDownloader(Downloader):
             dst_filename = "{}_{}".format(dirname, filename)
             dst_wav_path = os.path.join(self.feed_model_dir, dst_filename)
             if os.path.exists(dst_wav_path):
+                print(f"{dst_wav_path} exists. Skipping...")
                 continue
             else:
                 # if the wavs are high resolution, down-convert to 16kHz
@@ -140,7 +140,7 @@ class DemandDownloader(Downloader):
                     to_wave(wav_path, dst_wav_path)
                 # if not high-res, just copy
                 else: 
-                    copyfile(wav_path, new_path)
+                    copyfile(wav_path, dst_wav_path)
 
 
 class VoxforgeDownloader(Downloader):
@@ -180,7 +180,7 @@ class TatoebaDownloader(Downloader):
         self.data_dirname = "audio"
 
 
-      def download_extract(self):
+    def download_extract(self):
         """
         Standards method to download and extract zip file
         """

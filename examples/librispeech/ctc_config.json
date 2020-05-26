@@ -18,7 +18,7 @@
         "normalize": true,
         "use_spec_augment": true,
         "inject_noise": true,
-        "noise_directory": "/home/dzubke/awni_speech/data/background_noise/",
+        "noise_directory": "/home/dzubke/awni_speech/data/noise/feed_to_model/",
         "noise_prob": 0.7,
         "noise_levels": [0,0.7], 
         "speed_vol_perturb":false, 

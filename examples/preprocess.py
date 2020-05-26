@@ -459,7 +459,7 @@ def unique_unknown_words(dataset_dir:str):
     unknown_set = filter_set(unknown_set)
     unknown_list = list(unknown_set)
     filename = "all_unk_words_{}.txt".format(str(date.today()))
-    write_path = os.path.join(dataset_dir, "unk_word_stats",filename)
+    write_path = os.path.join(dataset_dir, "unk_word_stats", filename)
     with open(write_path, 'w') as fid:
         fid.write('\n'.join(unknown_list))
     logging.info(f"number of filtered unknown words: {len(unknown_list)}")
