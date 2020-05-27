@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 import argparse
+import os
 import json
 # third-party libraries
 import torch
@@ -25,8 +26,7 @@ def eval_loop(model, ldr):
     return list(zip(all_labels, all_preds)) #, all_preds_dist
 
 
-def run(model_path, dataset_json, batch_size=1, 
-        tag="best", add_filename:bool, out_file=None):
+def run(model_path, dataset_json, batch_size=1, tag="best", add_filename=False, out_file=None):
     """
     calculates the  distance between the predictions from
     the model in model_path and the labels in dataset_json
@@ -57,7 +57,7 @@ def run(model_path, dataset_json, batch_size=1,
     #                for pred, prob in example_dist]
     results = [(preproc.decode(label), preproc.decode(pred))
                for label, pred in results]
-    cer = speech.compute_cer(results)
+    cer = speech.compute_cer(results, verbose=True)
 
     print("PER {:.3f}".format(cer))
 
@@ -70,9 +70,11 @@ def run(model_path, dataset_json, batch_size=1,
             for label, pred in results:
                 if add_filename:
                     filename = match_filename(label, dataset_json)
+                    PER = speech.compute_cer([(label,pred)], verbose=False)
                     res = {'filename': filename,
                         'prediction' : pred,
-                        'label' : label}
+                        'label' : label,
+                        'PER': round(PER, 3)}
                 else:   
                     res = {'prediction' : pred,
                         'label' : label}
@@ -114,4 +116,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     run(args.model, args.dataset, tag=None if args.last else "best", 
-        args.filename, out_file=args.save)
+        add_filename=args.filename, out_file=args.save)

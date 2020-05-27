@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import editdistance
 
-def compute_cer(results):
+def compute_cer(results, verbose=True):
     """
     Arguments:
         results (list): list of 2 elements tuples made of lists of the ground truth labels
@@ -20,5 +20,5 @@ def compute_cer(results):
     dist = sum(editdistance.eval(label, pred)
                 for label, pred in results)
     total = sum(len(label) for label, _ in results)
-    print(f"dist:{dist}, total: {total}")
+    if verbose: print(f"dist:{dist}, total: {total}")
     return dist / total

@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import python_speech_features
 # project libraries
 from speech.utils import wave, spec_augment
-from speech.utls.io import read_data_json
+from speech.utils.io import read_data_json
 from speech.utils.noise_injector import inject_noise
 from speech.utils.speed_vol_perturb import speed_vol_perturb
 
