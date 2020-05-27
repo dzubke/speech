@@ -26,16 +26,16 @@ def eval_loop(model, ldr):
     return list(zip(all_labels, all_preds)) #, all_preds_dist
 
 
-def run(model_path, dataset_json, batch_size=1, tag="best", add_filename=False, out_file=None):
+def run(model_path, dataset_json, batch_size=1, tag="best", 
+    add_filename=False, add_maxdecode=False, out_file=None):
     """
     calculates the  distance between the predictions from
     the model in model_path and the labels in dataset_json
 
     Arguments:
-        added_filename - bool: if true, the filename is added
-            to the output json
-        tag - str: if best,  the "best_model" is used 
-            if not, "model" is used. 
+        tag - str: if best,  the "best_model" is used. if not, "model" is used. 
+        add_filename - bool: if true, the filename is added to the output json
+        add_maxdecode - bool: if true, predictions from the max decoder will be added
     """
 
     use_cuda = torch.cuda.is_available()
@@ -56,6 +56,8 @@ def run(model_path, dataset_json, batch_size=1, tag="best", add_filename=False, 
     #                for example_dist in results_dist
     #                for pred, prob in example_dist]
     results = [(preproc.decode(label), preproc.decode(pred))
+               for label, pred in results]
+    maxdecode_results = [(preproc.decode(label), preproc.decode(pred))
                for label, pred in results]
     cer = speech.compute_cer(results, verbose=True)
 
@@ -116,9 +118,11 @@ if __name__ == "__main__":
         help="Last saved model instead of best on dev set.")
     parser.add_argument("--save",
         help="Optional file to save predicted results.")
+    parser.add_argument("--maxdecode", action="store_true", default=False,
+        help="Include the filename for each sample in the json output.")
     parser.add_argument("--filename", action="store_true", default=False,
         help="Include the filename for each sample in the json output.")
     args = parser.parse_args()
 
     run(args.model, args.dataset, tag=None if args.last else "best", 
-        add_filename=args.filename, out_file=args.save)
+        add_filename=args.filename, add_maxdecode=args.maxdecode, out_file=args.save)
