@@ -6,7 +6,6 @@ from __future__ import print_function
 import json
 import numpy as np
 import random
-
 # third-party libraries
 import scipy.signal
 import torch
@@ -14,9 +13,9 @@ import torch.autograd as autograd
 import torch.utils.data as tud
 import matplotlib.pyplot as plt
 import python_speech_features
-
 # project libraries
 from speech.utils import wave, spec_augment
+from speech.utls.io import read_data_json
 from speech.utils.noise_injector import inject_noise
 from speech.utils.speed_vol_perturb import speed_vol_perturb
 
@@ -434,9 +433,7 @@ def plot_spectrogram(f, t, Sxx):
     plt.xlabel('Time [sec]')
     plt.show()
 
-def read_data_json(data_json):
-    with open(data_json) as fid:
-        return [json.loads(l) for l in fid]
+
 
 
 def apply_spec_augment(inputs, logger):
