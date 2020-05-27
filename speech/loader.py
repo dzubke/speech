@@ -107,10 +107,10 @@ class Preprocessor():
 
     def preprocess(self, wave_file, text):
         
-        if self.speed_vol_perturb:
-            audio_data, samp_rate = speed_vol_perturb(wave_file, tempo_range=self.tempo_range)
-        else:
-            audio_data, samp_rate = wave.array_from_wave(wave_file)
+        #if self.speed_vol_perturb:
+        #    audio_data, samp_rate = speed_vol_perturb(wave_file, tempo_range=self.tempo_range)
+        #else:
+        audio_data, samp_rate = wave.array_from_wave(wave_file)
         if self.use_log: self.logger.info(f"preproc: audio_data read: {wave_file}")
         
         if self.inject_noise:
