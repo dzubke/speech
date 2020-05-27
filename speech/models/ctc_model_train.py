@@ -10,6 +10,7 @@ import torch.nn as nn
 
 import functions.ctc as ctc #awni hannun's ctc bindings
 from speech.models import ctc_model
+from speech.models import model
 from .ctc_decoder import decode
 from .ctc_decoder_dist import decode_dist
 
@@ -59,9 +60,6 @@ class CTC_train(ctc_model.CTC):
         y = torch.IntTensor([l for label in labels for l in label])
         batch = [x, y, x_lens, y_lens]
 
-        if self.volatile:
-            for v in batch:
-                v.volatile = True
         return batch
     
     def infer(self, batch):
