@@ -61,24 +61,29 @@ def run(model_path, dataset_json, batch_size=1, tag="best", add_filename=False, 
 
     print("PER {:.3f}".format(cer))
 
+    output_results = []
     if out_file is not None:
+        for label, pred in results: 
+            if add_filename:
+                filename = match_filename(label, dataset_json)
+                PER = speech.compute_cer([(label,pred)], verbose=False)
+                res = {'filename': filename,
+                    'prediction' : pred,
+                    'label' : label,
+                    'PER': round(PER, 3)}
+            else:   
+                res = {'prediction' : pred,
+                    'label' : label}
+            output_results.append(res)
+        
         # if including filename, add the suffix "_fn" before extension
         if add_filename: 
             out_file, ext = os.path.splitext(out_file)
             out_file = out_file + "_fn" + ext
+            output_results = sorted(output_results, key=lambda x: x['PER'], reverse=True) 
         with open(out_file, 'w') as fid:
-            for label, pred in results:
-                if add_filename:
-                    filename = match_filename(label, dataset_json)
-                    PER = speech.compute_cer([(label,pred)], verbose=False)
-                    res = {'filename': filename,
-                        'prediction' : pred,
-                        'label' : label,
-                        'PER': round(PER, 3)}
-                else:   
-                    res = {'prediction' : pred,
-                        'label' : label}
-                json.dump(res, fid)
+            for sample in output_results:
+                json.dump(sample, fid)
                 fid.write("\n") 
 
 def match_filename(label:list, dataset_json:str) -> str:
