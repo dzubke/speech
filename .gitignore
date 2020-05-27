@@ -134,7 +134,7 @@ examples/librispeech/models/ctc_models/20200203/20200218/*model
 examples/librispeech/models/ctc_models/20200427/*/*model
 examples/librispeech/models/ctc_models/20200427/*model
 
-model_conve/torch_models/
+model_convert/torch_models/
 model_convert/onnx_models/
 model_convert/coreml_models/
 model_convert/validation_scripts/*.onnx
