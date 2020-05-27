@@ -1,3 +1,4 @@
+import json
 import os
 import pickle
 import torch
@@ -36,4 +37,6 @@ def export_state_dict(model_in_path, params_out_path):
     model = torch.load(model_in_path, map_location=torch.device('cpu'))
     pythtorch.save(model.state_dict(), params_out_path)
 
-
+def read_data_json(data_json):
+    with open(data_json) as fid:
+        return [json.loads(l) for l in fid]
