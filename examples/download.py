@@ -54,6 +54,11 @@ class Downloader(object):
         """
         pass
     
+class Chime1Downloader(Downloader):
+
+    def __init__(self, output_dir, dataset_name):
+        super(Chime1Downloader, self).__init__(output_dir, dataset_name)
+        # original dataset is in 2-channel. 
 
 class DemandDownloader(Downloader):
 
