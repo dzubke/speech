@@ -19,6 +19,8 @@ def compute_cer(results, verbose=True, dist_len=False):
     ### total = 4
     >>>compute_cer(results) = 0.25      #dist/total = 1/4
     """
+    if len(results[0]) == 3:
+        results = [(label, pred) for label, pred, conf in results]
     dist = sum(editdistance.eval(label, pred)
                 for label, pred in results)
     total = sum(len(label) for label, _ in results)

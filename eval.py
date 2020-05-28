@@ -15,15 +15,17 @@ from speech.utils.io import read_data_json
 
 def eval_loop(model, ldr):
     all_preds = []; all_labels = []; all_preds_dist=[]
+    all_confidence = []
     with torch.no_grad():
         for batch in tqdm.tqdm(ldr):
             temp_batch = list(batch)
-            preds = model.infer(temp_batch)
+            preds, confidence = model.infer_confidence(temp_batch)
             #preds_dist, prob_dist = model.infer_distribution(temp_batch, 5)
             all_preds.extend(preds)
+            all_confidence.extend(confidence)
             all_labels.extend(temp_batch[1])
             #all_preds_dist.extend(((preds_dist, temp_batch[1]),prob_dist))
-    return list(zip(all_labels, all_preds)) #, all_preds_dist
+    return list(zip(all_labels, all_preds, all_confidence)) #, all_preds_dist
 
 
 def run(model_path, dataset_json, batch_size=1, tag="best", 
@@ -55,8 +57,8 @@ def run(model_path, dataset_json, batch_size=1, tag="best",
     #results_dist = [[(preproc.decode(pred[0]), preproc.decode(pred[1]), prob)] 
     #                for example_dist in results_dist
     #                for pred, prob in example_dist]
-    results = [(preproc.decode(label), preproc.decode(pred))
-               for label, pred in results]
+    results = [(preproc.decode(label), preproc.decode(pred), conf)
+               for label, pred, conf in results]
     #maxdecode_results = [(preproc.decode(label), preproc.decode(pred))
     #           for label, pred in results]
     cer = speech.compute_cer(results, verbose=True)
@@ -80,26 +82,26 @@ def format_save(results, dataset_json, out_file):
     print(f"file saved to: {out_file}")
     with open(out_file, 'w') as fid:
         write_list = list()
-        for label, pred in results:
+        for label, pred, conf in results:
             filepath, order = match_filename(label, dataset_json, return_order=True)
             filename = os.path.splitext(os.path.split(filepath)[1])[0]
             PER, (dist, length) = speech.compute_cer([(label,pred)], verbose=False, dist_len=True)
             write_list.append({"order":order, "filename":filename, "label":label, "preds":pred,
-            "metrics":{"PER":round(PER,3), "dist":dist, "len":length}})
+            "metrics":{"PER":round(PER,3), "dist":dist, "len":length, "confidence":round(conf, 3)}})
         write_list = sorted(write_list, key=lambda x: x['order'])
             
         for write_dict in write_list: 
             fid.write(f"{write_dict['filename']}\n") 
-            fid.write(f"label: {write_dict['label']}\n") 
-            fid.write(f"preds: {write_dict['preds']}\n")
+            fid.write(f"label: {' '.join(write_dict['label'])}\n") 
+            fid.write(f"preds: {' '.join(write_dict['preds'])}\n")
             PER, dist = write_dict['metrics']['PER'], write_dict['metrics']['dist'] 
-            length = write_dict['metrics']['len'] 
-            fid.write(f"metrics: PER: {PER}, dist: {dist}, len: {length}\n")
+            length, conf = write_dict['metrics']['len'], write_dict['metrics']['confidence']
+            fid.write(f"metrics: PER: {PER}, dist: {dist}, len: {length}, conf: {conf}\n")
             fid.write("\n") 
 
 def json_save(results, dataset_json, out_file, add_filename):
     output_results = []
-    for label, pred in results: 
+    for label, pred, conf in results: 
         if add_filename:
             filename = match_filename(label, dataset_json)
             PER = speech.compute_cer([(label,pred)], verbose=False)
