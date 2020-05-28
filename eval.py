@@ -62,31 +62,45 @@ def run(model_path, dataset_json, batch_size=1, tag="best",
     cer = speech.compute_cer(results, verbose=True)
 
     print("PER {:.3f}".format(cer))
-
-    output_results = []
+    
     if out_file is not None:
-        for label, pred in results: 
-            if add_filename:
-                filename = match_filename(label, dataset_json)
-                PER = speech.compute_cer([(label,pred)], verbose=False)
-                res = {'filename': filename,
-                    'prediction' : pred,
-                    'label' : label,
-                    'PER': round(PER, 3)}
-            else:   
-                res = {'prediction' : pred,
-                    'label' : label}
-            output_results.append(res)
+        compile_save(results, datset_json, out_file, add_filename)
+        # add formatted in argsparse
+
+def compile_save(results, dataset_json, output_file, formatted=False, add_filename=False):
+    output_results = []
+    if formatted:
+        format_save(results, dataset_json)
+    else: 
+        json_save(results, dataset_json, out_file, add_filename)
         
-        # if including filename, add the suffix "_fn" before extension
-        if add_filename: 
-            out_file, ext = os.path.splitext(out_file)
-            out_file = out_file + "_fn" + ext
-            output_results = sorted(output_results, key=lambda x: x['PER'], reverse=True) 
-        with open(out_file, 'w') as fid:
-            for sample in output_results:
-                json.dump(sample, fid)
-                fid.write("\n") 
+
+def format_save(results, dataset_json, out_file):
+    pass
+
+def json_save(results, dataset_json, output_file, add_filename)
+    for label, pred in results: 
+        if add_filename:
+            filename = match_filename(label, dataset_json)
+            PER = speech.compute_cer([(label,pred)], verbose=False)
+            res = {'filename': filename,
+                'prediction' : pred,
+                'label' : label,
+                'PER': round(PER, 3)}
+        else:   
+            res = {'prediction' : pred,
+                'label' : label}
+        output_results.append(res)
+
+    # if including filename, add the suffix "_fn" before extension
+    if add_filename: 
+        out_file, ext = os.path.splitext(out_file)
+        out_file = out_file + "_fn" + ext
+        output_results = sorted(output_results, key=lambda x: x['PER'], reverse=True) 
+    with open(out_file, 'w') as fid:
+        for sample in output_results:
+            json.dump(sample, fid)
+            fid.write("\n") 
 
 def match_filename(label:list, dataset_json:str) -> str:
     """
@@ -103,7 +117,6 @@ def match_filename(label:list, dataset_json:str) -> str:
     assert len(matches) >0, f"no matches found for {label}"
     match = matches[0]
     return match
-        
 
 
 if __name__ == "__main__":
