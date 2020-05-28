@@ -27,7 +27,7 @@ def eval_loop(model, ldr):
 
 
 def run(model_path, dataset_json, batch_size=1, tag="best", 
-    add_filename=False, add_maxdecode=False, out_file=None):
+    add_filename=False, add_maxdecode=False, formatted=False, out_file=None):
     """
     calculates the  distance between the predictions from
     the model in model_path and the labels in dataset_json
@@ -57,28 +57,48 @@ def run(model_path, dataset_json, batch_size=1, tag="best",
     #                for pred, prob in example_dist]
     results = [(preproc.decode(label), preproc.decode(pred))
                for label, pred in results]
-    maxdecode_results = [(preproc.decode(label), preproc.decode(pred))
-               for label, pred in results]
+    #maxdecode_results = [(preproc.decode(label), preproc.decode(pred))
+    #           for label, pred in results]
     cer = speech.compute_cer(results, verbose=True)
 
     print("PER {:.3f}".format(cer))
     
     if out_file is not None:
-        compile_save(results, datset_json, out_file, add_filename)
-        # add formatted in argsparse
+        compile_save(results, dataset_json, out_file, formatted, add_filename)
 
-def compile_save(results, dataset_json, output_file, formatted=False, add_filename=False):
+
+def compile_save(results, dataset_json, out_file, formatted=False, add_filename=False):
     output_results = []
     if formatted:
-        format_save(results, dataset_json)
+        format_save(results, dataset_json, out_file)
     else: 
         json_save(results, dataset_json, out_file, add_filename)
         
 
 def format_save(results, dataset_json, out_file):
-    pass
+    out_file = create_filename(out_file, "compare", "txt") 
+    print(f"file saved to: {out_file}")
+    with open(out_file, 'w') as fid:
+        write_list = list()
+        for label, pred in results:
+            filepath, order = match_filename(label, dataset_json, return_order=True)
+            filename = os.path.splitext(os.path.split(filepath)[1])[0]
+            PER, (dist, length) = speech.compute_cer([(label,pred)], verbose=False, dist_len=True)
+            write_list.append({"order":order, "filename":filename, "label":label, "preds":pred,
+            "metrics":{"PER":round(PER,3), "dist":dist, "len":length}})
+        write_list = sorted(write_list, key=lambda x: x['order'])
+            
+        for write_dict in write_list: 
+            fid.write(f"{write_dict['filename']}\n") 
+            fid.write(f"label: {write_dict['label']}\n") 
+            fid.write(f"preds: {write_dict['preds']}\n")
+            PER, dist = write_dict['metrics']['PER'], write_dict['metrics']['dist'] 
+            length = write_dict['metrics']['len'] 
+            fid.write(f"metrics: PER: {PER}, dist: {dist}, len: {length}\n")
+            fid.write("\n") 
 
-def json_save(results, dataset_json, output_file, add_filename)
+def json_save(results, dataset_json, out_file, add_filename):
+    output_results = []
     for label, pred in results: 
         if add_filename:
             filename = match_filename(label, dataset_json)
@@ -94,29 +114,40 @@ def json_save(results, dataset_json, output_file, add_filename)
 
     # if including filename, add the suffix "_fn" before extension
     if add_filename: 
-        out_file, ext = os.path.splitext(out_file)
-        out_file = out_file + "_fn" + ext
+        out_file = create_filename(out_file, "pred-fn", "json")
         output_results = sorted(output_results, key=lambda x: x['PER'], reverse=True) 
+    else: 
+        out_file = create_filename(out_file, "pred", "json")
+    print(f"file saved to: {out_file}") 
     with open(out_file, 'w') as fid:
         for sample in output_results:
             json.dump(sample, fid)
             fid.write("\n") 
 
-def match_filename(label:list, dataset_json:str) -> str:
+def match_filename(label:list, dataset_json:str, return_order=False) -> str:
     """
     returns the filename in dataset_json that matches
     the phonemes in label
     """
     dataset = read_data_json(dataset_json)
     matches = []
-    for sample in dataset:
+    for i, sample in enumerate(dataset):
         if sample['text'] == label:
             matches.append(sample["audio"])
+            order = i
     
     assert len(matches) < 2, f"multiple matches found {matches} for label {label}"
     assert len(matches) >0, f"no matches found for {label}"
-    match = matches[0]
-    return match
+    if return_order:
+        output = (matches[0], order)
+    else:
+        output = matches[0]
+    return output
+
+def create_filename(base_fn, suffix, ext):
+    if "." in ext:
+        ext = ext.replace(".", "")
+    return base_fn + "_" + suffix + os.path.extsep + ext  
 
 
 if __name__ == "__main__":
@@ -135,7 +166,10 @@ if __name__ == "__main__":
         help="Include the filename for each sample in the json output.")
     parser.add_argument("--filename", action="store_true", default=False,
         help="Include the filename for each sample in the json output.")
+    parser.add_argument("--formatted", action="store_true", default=False,
+        help="Output will be written to file in a cleaner format.")
     args = parser.parse_args()
 
     run(args.model, args.dataset, tag=None if args.last else "best", 
-        add_filename=args.filename, add_maxdecode=args.maxdecode, out_file=args.save)
+        add_filename=args.filename, add_maxdecode=args.maxdecode, 
+        formatted=args.formatted, out_file=args.save)
