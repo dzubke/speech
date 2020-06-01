@@ -92,8 +92,8 @@ def format_save(results, dataset_json, out_file):
             
         for write_dict in write_list: 
             fid.write(f"{write_dict['filename']}\n") 
-            fid.write(f"label: {' '.join(write_dict['label'])}\n") 
-            fid.write(f"preds: {' '.join(write_dict['preds'])}\n")
+            fid.write(f"label: {' '.join(write_dict['label']).upper()}\n") 
+            fid.write(f"preds: {' '.join(write_dict['preds']).upper()}\n")
             PER, dist = write_dict['metrics']['PER'], write_dict['metrics']['dist'] 
             length, conf = write_dict['metrics']['len'], write_dict['metrics']['confidence']
             fid.write(f"metrics: PER: {PER}, dist: {dist}, len: {length}, conf: {conf}\n")
