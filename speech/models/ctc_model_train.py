@@ -72,18 +72,6 @@ class CTC_train(ctc_model.CTC):
         return [decode(p, beam_size=3, blank=self.blank)[0]
                     for p in probs]
         
-    def infer_confidence(self, batch):
-        """
-        returns the confidence value was well as the prediction
-        as a tuple
-        """
-        x, y, x_lens, y_lens = self.collate(*batch)
-        probs, rnn_args = self.forward_impl(x, softmax=True)
-        # convert the torch tensor into a numpy array
-        probs = probs.data.cpu().numpy()
-        return [decode(p, beam_size=3, blank=self.blank)
-                    for p in probs]
-
     def infer_maxdecode(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
         probs, rnn_args = self.forward_impl(x, softmax=True)
