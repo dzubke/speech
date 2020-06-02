@@ -53,6 +53,7 @@ class Preprocessor():
         self.preprocessor = preproc_cfg['preprocessor']
         self.window_size = preproc_cfg['window_size']
         self.step_size = preproc_cfg['step_size']
+        self.normalize =  preproc_cfg['normalize']
         self.SPEC_AUGMENT_STATIC = preproc_cfg['use_spec_augment']
         self.spec_augment = preproc_cfg['use_spec_augment']
         self.INJECT_NOISE_STATIC = preproc_cfg['inject_noise']
@@ -100,9 +101,16 @@ class Preprocessor():
             e = text.index(self.END)
         return text[s:e]
 
-    def normalize(self, np_arr:np.ndarray):
+    def batch_normalize(self, np_arr:np.ndarray):
         output = (np_arr - self.mean) / self.std
         return output.astype(np.float32)
+    
+    def sample_normalize(self, inputs:np.ndarray):
+        mean = inputs.mean()
+        std = inputs.std()
+        inputs -= mean
+        inputs /= std
+        return inputs
 
     def preprocess(self, wave_file, text):
         
@@ -126,7 +134,13 @@ class Preprocessor():
         else: 
            raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
         
-        inputs = self.normalize(inputs)
+        if self.normalize == "batch_normalize":
+            inputs = self.batch_normalize(inputs)
+        elif self.normalize == "sample_normalize":
+            inputs = self.sample_normalize(inputs)
+        else: 
+           raise ValueError("preproc config normalize value must be: 'batch_normalize' or 'sample_normalize'")
+
         if self.use_log: self.logger.info(f"preproc: normalized")
 
         if self.spec_augment:

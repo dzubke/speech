@@ -47,7 +47,6 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         loss.backward()
         if use_log: logger.info(f" Backward run ")
 
-
         grad_norm = nn.utils.clip_grad_norm_(model.parameters(), 200)
         if use_log: logger.info(f" Grad_norm clipped ")
 
