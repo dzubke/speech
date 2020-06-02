@@ -88,7 +88,7 @@ def eval_dev(model, ldr, preproc,  logger):
     losses = []; all_preds = []; all_labels = []
         
     model.set_eval()
-    #preproc.set_eval()  # turning this off to make dev data similar to speak_test
+    preproc.set_eval()  # this turns off dataset augmentation
     use_log = (logger is not None)
     if use_log: logger.info(f" set_eval ")
 
@@ -112,7 +112,7 @@ def eval_dev(model, ldr, preproc,  logger):
             if use_log: logger.info(f"labels: {temp_batch[1]}")
 
     model.set_train()
-    # preproc.set_train()    see set_eval() comment
+    preproc.set_train()
     if use_log: logger.info(f"set_train")
 
     loss = sum(losses) / len(losses)
@@ -218,7 +218,6 @@ def run(config):
             speech.save(model, preproc,
                     config["save_path"], tag="best")
         if use_log: preproc.logger = logger
-               
 
 def load_from_trained(model, model_cfg):
     """
