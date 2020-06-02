@@ -47,7 +47,6 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         loss.backward()
         if use_log: logger.info(f" Backward run ")
 
-
         grad_norm = nn.utils.clip_grad_norm_(model.parameters(), 200)
         if use_log: logger.info(f" Grad_norm clipped ")
 
@@ -88,7 +87,7 @@ def eval_dev(model, ldr, preproc,  logger):
     losses = []; all_preds = []; all_labels = []
         
     model.set_eval()
-    #preproc.set_eval()  # turning this off to make dev data similar to speak_test
+    preproc.set_eval()  # turning this off to make dev data similar to speak_test
     use_log = (logger is not None)
     if use_log: logger.info(f" set_eval ")
 
@@ -112,7 +111,7 @@ def eval_dev(model, ldr, preproc,  logger):
             if use_log: logger.info(f"labels: {temp_batch[1]}")
 
     model.set_train()
-    # preproc.set_train()    see set_eval() comment
+    preproc.set_train()    see set_eval() comment
     if use_log: logger.info(f"set_train")
 
     loss = sum(losses) / len(losses)
