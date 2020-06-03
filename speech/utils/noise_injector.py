@@ -40,7 +40,11 @@ def inject_noise_sample(data, sample_rate:int, noise_path:str, noise_level:float
         if use_log: logger.info(f"noise_inj: noise_start: {noise_start}")
         noise_end = noise_start + data_len
         if use_log: logger.info(f"noise_inj: noise_end: {noise_end}")
-        noise_dst = audio_with_sox(noise_path, sample_rate, noise_start, noise_end)
+        try:
+            noise_dst = audio_with_sox(noise_path, sample_rate, noise_start, noise_end)
+        except FileNotFoundError:
+            if use_log: logger.info(f"file not found error in: audio_with_sox")
+            return data
         noise_dst = same_size(data, noise_dst)
         # convert to float to avoid value integer overflow in .dot() operation
         noise_dst = noise_dst.astype('float64')
