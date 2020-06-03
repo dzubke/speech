@@ -37,6 +37,15 @@ def export_state_dict(model_in_path, params_out_path):
     model = torch.load(model_in_path, map_location=torch.device('cpu'))
     pythtorch.save(model.state_dict(), params_out_path)
 
-def read_data_json(data_json):
-    with open(data_json) as fid:
+def read_data_json(data_path):
+    with open(data_path) as fid:
         return [json.loads(l) for l in fid]
+
+def write_data_json(dataset:list, write_path:str):
+    """
+    Writes a list of dictionaries in json format to the write_path
+    """
+    with open(write_path, 'w') as fid:
+        for example in dataset:
+            json.dump(example, fid)
+            fid.write("\n")
