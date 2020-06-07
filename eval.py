@@ -29,7 +29,8 @@ def eval_loop(model, ldr):
 
 
 def run(model_path, dataset_json, batch_size=1, tag="best", 
-    add_filename=False, add_maxdecode=False, formatted=False, out_file=None):
+    add_filename=False, add_maxdecode=False, formatted=False, 
+    config_path = None, out_file=None):
     """
     calculates the  distance between the predictions from
     the model in model_path and the labels in dataset_json
@@ -42,6 +43,21 @@ def run(model_path, dataset_json, batch_size=1, tag="best",
 
     use_cuda = torch.cuda.is_available()
     model, preproc = speech.load(model_path, tag=tag)
+    if not hasattr(preproc, "speed_vol_perturb"):
+        preproc.speed_vol_perturb = False
+    if not hasattr(preproc, "normalize"):
+        preproc.normalize = "batch_normalize"
+    if config_path is not None:
+        with open(config_path, 'r') as fid:
+            config = json.load(fid)
+        new_preproc = loader.Preprocessor(dataset_json, config["preproc"], start_and_end=config["data"]["start_and_end"])
+        new_preproc.mean, new_preproc.std = preproc.mean, preproc.std
+        new_preproc.int_to_char, new_preproc.char_to_int = preproc.int_to_char, preproc.char_to_int
+        print(f"preproc attr: {preproc}")
+        print(f"preproc sum of mean, std: {preproc.mean.shape},{preproc.std.shape}")
+        print(f"new_preproc sum of mean, std: {new_preproc.mean.sum()},{new_preproc.std.sum()}")
+        print(f"new preproc attr: {new_preproc}")
+        preproc = new_preproc
     ldr =  loader.make_loader(dataset_json,
             preproc, batch_size)
     model.cuda() if use_cuda else model.cpu()
@@ -170,8 +186,10 @@ if __name__ == "__main__":
         help="Include the filename for each sample in the json output.")
     parser.add_argument("--formatted", action="store_true", default=False,
         help="Output will be written to file in a cleaner format.")
+    parser.add_argument("--config-path", type=str, default=None,
+        help="Replace the preproc from model path a  preproc copy using the config file.")
     args = parser.parse_args()
 
     run(args.model, args.dataset, tag=None if args.last else "best", 
         add_filename=args.filename, add_maxdecode=args.maxdecode, 
-        formatted=args.formatted, out_file=args.save)
+        formatted=args.formatted, config_path=args.config_path, out_file=args.save)

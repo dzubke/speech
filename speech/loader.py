@@ -114,23 +114,23 @@ class Preprocessor():
             e = text.index(self.END)
         return text[s:e]
 
-    def batch_normalize(self, np_arr:np.ndarray):
+    def batch_normalize(self, np_arr:np.ndarray)->np.ndarray:
         output = (np_arr - self.mean) / self.std
         return output.astype(np.float32)
     
-    def sample_normalize(self, inputs:np.ndarray):
+    def sample_normalize(self, inputs:np.ndarray)->np.ndarray:
         mean = inputs.mean()
         std = inputs.std()
         inputs -= mean
         inputs /= std
-        return inputs
+        return inputs.astype(np.float32)
 
     def preprocess(self, wave_file, text):
         
-        #if self.speed_vol_perturb:
-        #    audio_data, samp_rate = speed_vol_perturb(wave_file, tempo_range=self.tempo_range)
-        #else:
-        audio_data, samp_rate = wave.array_from_wave(wave_file)
+        if self.speed_vol_perturb:
+            audio_data, samp_rate = speed_vol_perturb(wave_file, tempo_range=self.tempo_range)
+        else:
+            audio_data, samp_rate = wave.array_from_wave(wave_file)
         if self.use_log: self.logger.info(f"preproc: audio_data read: {wave_file}")
 
         # pitch perturb
