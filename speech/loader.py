@@ -3,21 +3,23 @@ from __future__ import division
 from __future__ import print_function
 
 # standard libraries
+from collections import namedtuples
 import json
-import numpy as np
 import random
 # third-party libraries
+import matplotlib.pyplot as plt
+import numpy as np
+import python_speech_features
 import scipy.signal
 import torch
 import torch.autograd as autograd
 import torch.utils.data as tud
-import matplotlib.pyplot as plt
-import python_speech_features
 # project libraries
 from speech.utils import wave, spec_augment
 from speech.utils.io import read_data_json
 from speech.utils.noise_injector import inject_noise
 from speech.utils.speed_vol_perturb import speed_vol_perturb
+from speech.utils.pitch_perturb import apply_pitch_perturb
 
 
 
@@ -49,21 +51,32 @@ class Preprocessor():
         audio_files = [d['audio'] for d in data]
         random.shuffle(audio_files)
 
+        Status = namedtuple("Status", ["initial", "current"])
 
         self.preprocessor = preproc_cfg['preprocessor']
         self.window_size = preproc_cfg['window_size']
         self.step_size = preproc_cfg['step_size']
         self.normalize =  preproc_cfg['normalize']
+        
         self.SPEC_AUGMENT_STATIC = preproc_cfg['use_spec_augment']
-        self.spec_augment = preproc_cfg['use_spec_augment']
+        self.spec_augment = Status(initial=preproc_cfg['use_spec_augment'],
+                                    current=preproc_cfg['use_spec_augment'])
         self.INJECT_NOISE_STATIC = preproc_cfg['inject_noise']
-        self.inject_noise = preproc_cfg['inject_noise']
+        self.inject_noise = Status(initial=preproc_cfg['inject_noise'],
+                                    current=preproc_cfg['inject_noise'])
+
+
         self.noise_dir = preproc_cfg['noise_directory']
         self.noise_prob = preproc_cfg['noise_prob']
         self.noise_levels = preproc_cfg['noise_levels']
-        self.speed_vol_perturb = preproc_cfg['speed_vol_perturb']
+        self.speed_vol_perturb = Status(initial=preproc_cfg['speed_vol_perturb'],
+                                        current=preproc_cfg['speed_vol_perturb'])
+
         self.tempo_range = preproc_cfg['tempo_range']
         self.gain_range = preproc_cfg['gain_range']
+        self.pitch_perturb =  {"initial": preproc_cfg['pitch_perturb'],
+                            "current": preproc_cfg['pitch_perturb']}
+        self.pitch_lower, self.pitch_upper = preproc_cfg['pitch_range']
 
         self.mean, self.std = compute_mean_std(audio_files[:max_samples], 
                                                 preprocessor = self.preprocessor,
@@ -119,13 +132,22 @@ class Preprocessor():
         #else:
         audio_data, samp_rate = wave.array_from_wave(wave_file)
         if self.use_log: self.logger.info(f"preproc: audio_data read: {wave_file}")
+
+        # pitch perturb
+        if self.pitch_perturb: 
+            audio_data = apply_pitch_perturb(audio_data, 
+                                            samp_rate, 
+                                            lower_range=self.pitch_lower, 
+                                            upper_range=self.pitch_upper)
         
+        # noise injection
         if self.inject_noise:
             add_noise = np.random.binomial(1, self.noise_prob)
             if add_noise:
                 audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, self.logger, self.noise_levels) 
             if self.use_log: self.logger.info(f"preproc: noise injected")
 
+        # processing method
         if self.preprocessor == "log_spec":
             inputs = log_specgram_from_data(audio_data, samp_rate, self.window_size, self.step_size)
             if self.use_log: self.logger.info(f"preproc: log_spec calculated")
@@ -134,19 +156,21 @@ class Preprocessor():
         else: 
            raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
         
+        # normalization
         if self.normalize == "batch_normalize":
             inputs = self.batch_normalize(inputs)
         elif self.normalize == "sample_normalize":
             inputs = self.sample_normalize(inputs)
         else: 
            raise ValueError("preproc config normalize value must be: 'batch_normalize' or 'sample_normalize'")
-
         if self.use_log: self.logger.info(f"preproc: normalized")
 
+        # spec-augment
         if self.spec_augment:
             inputs = apply_spec_augment(inputs, self.logger)
             if self.use_log: self.logger.info(f"preproc: spec_aug applied")
 
+        # target encoding
         targets = self.encode(text)
         if self.use_log: self.logger.info(f"preproc: text encoded")
 
@@ -157,20 +181,20 @@ class Preprocessor():
         """
             turns off the data augmentation for evaluation
         """
-        if self.SPEC_AUGMENT_STATIC:
-            self.spec_augment = False
-        if self.INJECT_NOISE_STATIC:
-            self.inject_noise = False
+        if self.spec_augment.initial:
+            self.spec_augment.current = False
+        if self.inject_noise.initial:
+            self.inject_noise.current = False
 
 
     def set_train(self):
         """
             turns on data augmentation for training
         """
-        if self.SPEC_AUGMENT_STATIC:
-            self.spec_augment = True
-        if self.INJECT_NOISE_STATIC:
-            self.inject_noise = True
+        if self.spec_augment.initial:
+            self.spec_augment.current = True
+        if self.inject_noise.initial:
+            self.inject_noise.current = True
 
 
     @property

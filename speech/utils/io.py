@@ -1,4 +1,4 @@
-import json
+import json 
 import os
 import pickle
 import torch
@@ -49,3 +49,5 @@ def write_data_json(dataset:list, write_path:str):
         for example in dataset:
             json.dump(example, fid)
             fid.write("\n")
+
+            
