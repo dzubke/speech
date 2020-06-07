@@ -23,7 +23,9 @@
         "noise_levels": [0,0.5], 
         "speed_vol_perturb":true, 
         "tempo_range": [0.85, 1.15],
-        "gain_range":[-3,4]
+        "gain_range":[-3,4],
+        "pitch_perturb": true,
+        "pitch_range": [-8, 8]
     },
 
     "optimizer": {
