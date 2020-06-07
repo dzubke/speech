@@ -3,7 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 # standard libraries
-from collections import namedtuples
+from collections import namedtuple
 import json
 import random
 # third-party libraries
@@ -74,8 +74,8 @@ class Preprocessor():
 
         self.tempo_range = preproc_cfg['tempo_range']
         self.gain_range = preproc_cfg['gain_range']
-        self.pitch_perturb =  {"initial": preproc_cfg['pitch_perturb'],
-                            "current": preproc_cfg['pitch_perturb']}
+        self.pitch_perturb =  Status(initial=preproc_cfg['pitch_perturb'],
+                                        current=preproc_cfg['pitch_perturb'])
         self.pitch_lower, self.pitch_upper = preproc_cfg['pitch_range']
 
         self.mean, self.std = compute_mean_std(audio_files[:max_samples], 
@@ -127,21 +127,21 @@ class Preprocessor():
 
     def preprocess(self, wave_file, text):
         
-        if self.speed_vol_perturb:
+        if self.speed_vol_perturb.current:
             audio_data, samp_rate = speed_vol_perturb(wave_file, tempo_range=self.tempo_range)
         else:
             audio_data, samp_rate = wave.array_from_wave(wave_file)
         if self.use_log: self.logger.info(f"preproc: audio_data read: {wave_file}")
 
         # pitch perturb
-        if self.pitch_perturb: 
+        if self.pitch_perturb.current: 
             audio_data = apply_pitch_perturb(audio_data, 
                                             samp_rate, 
                                             lower_range=self.pitch_lower, 
                                             upper_range=self.pitch_upper)
         
         # noise injection
-        if self.inject_noise:
+        if self.inject_noise.current:
             add_noise = np.random.binomial(1, self.noise_prob)
             if add_noise:
                 audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, self.logger, self.noise_levels) 
@@ -166,7 +166,7 @@ class Preprocessor():
         if self.use_log: self.logger.info(f"preproc: normalized")
 
         # spec-augment
-        if self.spec_augment:
+        if self.spec_augment.current:
             inputs = apply_spec_augment(inputs, self.logger)
             if self.use_log: self.logger.info(f"preproc: spec_aug applied")
 
