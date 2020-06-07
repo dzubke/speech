@@ -14,42 +14,51 @@ def main(dataset_path:str, write_path: str, subset_size:int, use_internal:bool):
     """
 
     if not use_internal:
-        subsetor = DataSubsetor(dataset_path)
-        write_subset(subsetor.data_json, write_path, subset_size)
+        subsetor = DataSubsetor(dataset_path, int(subset_size))
+        subsetor.write_subset(write_path)
     else: 
         data_name_path= {
-            "cv_dev": "/home/dzubke/awni_speech/data/common-voice/dev.json",
-            "libsp_dev": "/home/dzubke/awni_speech/data/LibriSpeech/dev-combo.json",
-            "ted_dev": "/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/dev.json",
+            "cv-dev": "/home/dzubke/awni_speech/data/common-voice/dev.json",
+            "libsp-dev": "/home/dzubke/awni_speech/data/LibriSpeech/dev-combo.json",
+            "ted-dev": "/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/dev.json",
         }
         subset_size = 100
         today_date = str(date.today())
         write_path_str = "/home/dzubke/awni_speech/data/subsets/20200603/{name}_{size}_{date}.json"
+        mix_write_path_str = "/home/dzubke/awni_speech/data/subsets/20200603/speak_{name}_{size}_{date}.json" 
 
-        # samples from only one dataset
-        for data_name, data_path in data_name_path:
-            subsetor = DataSubsetor(data_path)
-            write_path = write_path_str.format(data_name, subset_size, today_date)
-            write_subset(subsetor.get_data_list(), subset_size, write_path)
+        for data_name, data_path in data_name_path.items():
+            # samples from only one dataset
+            subsetor = DataSubsetor(data_path, subset_size)
+            write_path = write_path_str.format(name=data_name, size=subset_size, date=today_date)
+            subsetor.write_subset(write_path)
 
-        
+            # samples from datasets mixed with speak tests data
+            speak_path = "/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json"
+            speak_subsetor = DataSubsetor(speak_path, 91)            
+            mix_write_path = mix_write_path_str.format(name=data_name, size=subset_size, date=today_date)
+            write_mixed_subset(subsetor.get_subset(), speak_subsetor.get_subset(), mix_write_path)
 
 class DataSubsetor():
-    def __init__(self, dataset_path:str):
+    def __init__(self, dataset_path:str, subset_size:int):
         self.dataset_path = dataset_path
         self.data_json = read_data_json(dataset_path)
+        self.subset = random.sample(self.data_json, k=subset_size)        
     
-    def get_data_list(self):
+    def get_full_dataset(self):
         return self.data_json
 
-    
-def write_subset(data_json:list, subset_size:int=100, write_path:str):
-        subset = random.sample(data_json, k=subset_size)
-        write_data_json(subset, write_path)
+    def get_subset(self):
+        return self.subset
 
+    def write_subset(self, write_path:str):
+        write_data_json(self.subset, write_path)
 
+def write_mixed_subset(subset_1:list, subset_2:list,  write_path:str):
+    subset_size = len(subset_1)
+    mixed_subset = subset_1[:subset_size//2] + subset_2[:subset_size//2]        
+    write_data_json(mixed_subset, write_path)
 
-# def mix_data_subsets(subsetor_1:DataSubsetor, subsetor_2:DataSubsetor, subset_size:int, write_path:str):
 
 
 

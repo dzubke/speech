@@ -9,7 +9,7 @@
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-06-02_lib-ted-cv-VAL.log"
+        "log_file": "logs/2020-06-05_lib-ted-cv-VAL.log"
     },
     "preproc":{
         "preprocessor": "log_spec",
@@ -40,7 +40,7 @@
         "class" : "this value is no longer used as train.py is hardcorded to use CTC_train",
         "dropout" : 0.4,
         "load_trained": true,
-        "trained_path": "examples/librispeech/models/ctc_models/20200406/20200408/best_model", 
+        "trained_path": "examples/librispeech/models/ctc_models/20200601/20200605/best_model", 
         "remove_layers": [],
         "encoder" : {
             "conv" : [
