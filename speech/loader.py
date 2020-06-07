@@ -57,10 +57,11 @@ class Preprocessor():
         self.window_size = preproc_cfg['window_size']
         self.step_size = preproc_cfg['step_size']
         self.normalize =  preproc_cfg['normalize']
-        
+
         self.SPEC_AUGMENT_STATIC = preproc_cfg['use_spec_augment']
         self.spec_augment = Status(initial=preproc_cfg['use_spec_augment'],
                                     current=preproc_cfg['use_spec_augment'])
+
         self.INJECT_NOISE_STATIC = preproc_cfg['inject_noise']
         self.inject_noise = Status(initial=preproc_cfg['inject_noise'],
                                     current=preproc_cfg['inject_noise'])
@@ -181,20 +182,34 @@ class Preprocessor():
         """
             turns off the data augmentation for evaluation
         """
-        if self.spec_augment.initial:
-            self.spec_augment.current = False
-        if self.inject_noise.initial:
-            self.inject_noise.current = False
+        if type(self.spec_augment) == bool:
+            if self.SPEC_AUGMENT_STATIC:
+                self.spec_augment.current = False
+            if self.INJECT_NOISE_STATIC:
+                self.inject_noise.current = False
+
+        elif type(self.spec_augment) == Status:
+            if self.spec_augment.initial:
+                self.spec_augment.current = False
+            if self.inject_noise.initial:
+                self.inject_noise.current = False
 
 
     def set_train(self):
         """
             turns on data augmentation for training
         """
-        if self.spec_augment.initial:
-            self.spec_augment.current = True
-        if self.inject_noise.initial:
-            self.inject_noise.current = True
+        if type(self.spec_augment) == bool:
+            if self.SPEC_AUGMENT_STATIC:
+                self.spec_augment.current = True
+            if self.INJECT_NOISE_STATIC:
+                self.inject_noise.current = True
+
+        elif type(self.spec_augment) == Status:
+            if self.spec_augment.initial:
+                self.spec_augment.current = True
+            if self.inject_noise.initial:
+                self.inject_noise.current = True
 
 
     @property
