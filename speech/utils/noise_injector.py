@@ -17,9 +17,11 @@ def inject_noise(data, data_samp_rate, noise_dir, logger, noise_levels=(0, 0.5))
     pattern = os.path.join(noise_dir, "*.wav")
     noise_files = glob.glob(pattern)    
     noise_path = np.random.choice(noise_files)
-    if use_log: logger.info(f"noise_inj: noise_path: {noise_path}")
     noise_level = np.random.uniform(*noise_levels)
+
+    if use_log: logger.info(f"noise_inj: noise_path: {noise_path}")
     if use_log: logger.info(f"noise_inj: noise_level: {noise_level}")
+
     return inject_noise_sample(data, data_samp_rate, noise_path, noise_level, logger)
 
 
@@ -30,31 +32,37 @@ def inject_noise_sample(data, sample_rate:int, noise_path:str, noise_level:float
     """
     use_log = (logger is not None)
     noise_len = wav_duration(noise_path)
-    if use_log: logger.info(f"noise_inj: noise_len: {noise_len}")
     data_len = len(data) / sample_rate
+
+    if use_log: logger.info(f"noise_inj: noise_len: {noise_len}")
     if use_log: logger.info(f"noise_inj: data_len: {data_len}")
+
     if data_len > noise_len: # if the noise_file len is too small, skip it
         return data
     else:
         noise_start = np.random.rand() * (noise_len - data_len) 
-        if use_log: logger.info(f"noise_inj: noise_start: {noise_start}")
         noise_end = noise_start + data_len
-        if use_log: logger.info(f"noise_inj: noise_end: {noise_end}")
         try:
             noise_dst = audio_with_sox(noise_path, sample_rate, noise_start, noise_end)
         except FileNotFoundError:
             if use_log: logger.info(f"file not found error in: audio_with_sox")
             return data
+
         noise_dst = same_size(data, noise_dst)
         # convert to float to avoid value integer overflow in .dot() operation
         noise_dst = noise_dst.astype('float64')
         data = data.astype('float64')
         assert len(data) == len(noise_dst), f"data len: {len(data)}, noise len: {len(noise_dst)}, data size: {data.size}, noise size: {noise_dst.size}, noise_path: {noise_path}"
+        
         noise_energy = np.sqrt(noise_dst.dot(noise_dst) / noise_dst.size)
         # avoid dividing by zero
         if noise_energy != 0:
             data_energy = np.sqrt(np.abs(data.dot(data)) / data.size)
             data += noise_level * noise_dst * data_energy / noise_energy
+
+        if use_log: logger.info(f"noise_inj: noise_start: {noise_start}")
+        if use_log: logger.info(f"noise_inj: noise_end: {noise_end}")
+
         return data.astype('int16')
 
 

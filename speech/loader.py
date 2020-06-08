@@ -50,7 +50,9 @@ class Preprocessor():
         audio_files = [d['audio'] for d in data]
         random.shuffle(audio_files)
 
-
+        # if true, data augmentation will be applied
+        self.train_status = True
+        
         self.preprocessor = preproc_cfg['preprocessor']
         self.window_size = preproc_cfg['window_size']
         self.step_size = preproc_cfg['step_size']
@@ -73,6 +75,10 @@ class Preprocessor():
         self.PITCH_PERTURB_STATIC = preproc_cfg['pitch_perturb']
         self.pitch_perturb =  preproc_cfg['pitch_perturb']
         self.pitch_lower, self.pitch_upper = preproc_cfg['pitch_range']
+
+        self.rand_noise_add_std = preproc_cfg['rand_noise_add_std']
+        self.rand_noise_multi_std = preproc_cfg['rand_noise_multi_std']
+
 
         self.mean, self.std = compute_mean_std(audio_files[:max_samples], 
                                                 preprocessor = self.preprocessor,
@@ -123,21 +129,21 @@ class Preprocessor():
 
     def preprocess(self, wave_file, text):
         
-        if self.speed_vol_perturb:
+        if self.speed_vol_perturb and self.train_status:
             audio_data, samp_rate = speed_vol_perturb(wave_file, tempo_range=self.tempo_range)
         else:
             audio_data, samp_rate = wave.array_from_wave(wave_file)
         if self.use_log: self.logger.info(f"preproc: audio_data read: {wave_file}")
 
         # pitch perturb
-        if self.pitch_perturb: 
+        if self.pitch_perturb and self.train_status: 
             audio_data = apply_pitch_perturb(audio_data, 
                                             samp_rate, 
                                             lower_range=self.pitch_lower, 
                                             upper_range=self.pitch_upper)
         
         # noise injection
-        if self.inject_noise:
+        if self.inject_noise and self.train_status:
             add_noise = np.random.binomial(1, self.noise_prob)
             if add_noise:
                 audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, self.logger, self.noise_levels) 
@@ -161,8 +167,13 @@ class Preprocessor():
            raise ValueError("preproc config normalize value must be: 'batch_normalize' or 'sample_normalize'")
         if self.use_log: self.logger.info(f"preproc: normalized")
 
+        # gaussian noise augmentation
+        if self.train_status:
+            inputs = inputs * np.random.normal(loc=1, scale=self.rand_noise_multi_std, size=inputs.shape)     
+            inputs = inputs + np.random.normal(loc=0, scale=self.rand_noise_add_std, size=inputs.shape)     
+
         # spec-augment
-        if self.spec_augment:
+        if self.spec_augment and self.train_status:
             inputs = apply_spec_augment(inputs, self.logger)
             if self.use_log: self.logger.info(f"preproc: spec_aug applied")
 
@@ -191,19 +202,23 @@ class Preprocessor():
         """
             turns off the data augmentation for evaluation
         """
+        self.train_status = False
+
         if self.SPEC_AUGMENT_STATIC:
             self.spec_augment = False
         if self.INJECT_NOISE_STATIC:
             self.inject_noise = False
         if self.SPEED_VOL_PERTURB_STATIC:
             self.speed_vol_perturb = False
-        if self.PITCH_PERTURB_STATIC:
+        if self.PITCH_PERTURB_STATIC:s
             self.pitch_perturb = False
 
     def set_train(self):
         """
             turns on data augmentation for training
         """
+        self.train_status = True
+        
         if self.SPEC_AUGMENT_STATIC:
             self.spec_augment = True
         if self.INJECT_NOISE_STATIC:
@@ -422,9 +437,9 @@ def log_specgram(audio, sample_rate, window_size=20,
 
 
 def compare_log_spec_from_file(audio_file_1: str, audio_file_2: str, plot=False):
-    """This function takes in two audio paths and calculates the difference between the spectrograms 
+    """
+    This function takes in two audio paths and calculates the difference between the spectrograms 
         by subtracting them. 
-
     """
     audio_1, sr_1 = wave.array_from_wave(audio_file_1)
     audio_2, sr_2 = wave.array_from_wave(audio_file_2)

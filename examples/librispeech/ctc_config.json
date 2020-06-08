@@ -25,7 +25,9 @@
         "tempo_range": [0.85, 1.15],
         "gain_range":[-3,4],
         "pitch_perturb": true,
-        "pitch_range": [-8, 8]
+        "pitch_range": [-8, 8],
+        "rand_noise_add_std":0.2, 
+        "rand_noise_multi_std":0.1
     },
 
     "optimizer": {
