@@ -43,6 +43,7 @@ def run(model_path, dataset_json, batch_size=1, tag="best",
 
     use_cuda = torch.cuda.is_available()
     model, preproc = speech.load(model_path, tag=tag)
+    preproc.update()
     if not hasattr(preproc, "speed_vol_perturb"):
         preproc.speed_vol_perturb = False
     if not hasattr(preproc, "normalize"):
