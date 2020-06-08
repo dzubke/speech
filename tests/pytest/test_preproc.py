@@ -6,19 +6,30 @@ from speech.utils.config import Config
 
 def test_main():
     config_json = "./cv-val_ctc-config.json"
-    run_preprocess(config_json)
+    config = Config(config_json)
+    data_json = config.data_cfg.get("dev_set")
+    print(config)
+    logger = None
+    preproc = Preprocessor(data_json, config.preproc_cfg, logger)
+    preproc.update()
+
+    check_empty_filename(preproc)
+    check_run_from_AudioDataset(preproc, data_json)
+
+def check_empty_filename(preproc):
+    wave_file = ""
+    text = ['ah']
+    with pytest.raises(RuntimeError) as execinfo:
+        preproc.preprocess(wave_file, text)
+        print(execinfo)
 
 
-def run_preprocess(config_json:str):
+
+def check_run_from_AudioDataset(preproc:Preprocessor, data_json:str):
     """
     Runs the preprocess methood in the Preprocessor object
     over the dataset specified in config_json
     """
-    config = Config(config_json)
-    data_json = config.data_cfg.get("train_set")
-    print(config)
-    logger = None
-    preproc = Preprocessor(data_json, config.preproc_cfg, logger)
     audio_dataset=AudioDataset(data_json, preproc, batch_size=8)
     
     index_count = 0

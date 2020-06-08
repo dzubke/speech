@@ -3,7 +3,6 @@ from __future__ import division
 from __future__ import print_function
 
 # standard libraries
-from collections import namedtuple
 import json
 import random
 # third-party libraries
@@ -51,7 +50,6 @@ class Preprocessor():
         audio_files = [d['audio'] for d in data]
         random.shuffle(audio_files)
 
-        Status = namedtuple("Status", ["initial", "current"])
 
         self.preprocessor = preproc_cfg['preprocessor']
         self.window_size = preproc_cfg['window_size']
@@ -59,24 +57,21 @@ class Preprocessor():
         self.normalize =  preproc_cfg['normalize']
 
         self.SPEC_AUGMENT_STATIC = preproc_cfg['use_spec_augment']
-        self.spec_augment = Status(initial=preproc_cfg['use_spec_augment'],
-                                    current=preproc_cfg['use_spec_augment'])
+        self.spec_augment = preproc_cfg['use_spec_augment']
 
         self.INJECT_NOISE_STATIC = preproc_cfg['inject_noise']
-        self.inject_noise = Status(initial=preproc_cfg['inject_noise'],
-                                    current=preproc_cfg['inject_noise'])
-
-
+        self.inject_noise = preproc_cfg['inject_noise']
         self.noise_dir = preproc_cfg['noise_directory']
         self.noise_prob = preproc_cfg['noise_prob']
-        self.noise_levels = preproc_cfg['noise_levels']
-        self.speed_vol_perturb = Status(initial=preproc_cfg['speed_vol_perturb'],
-                                        current=preproc_cfg['speed_vol_perturb'])
-
+        self.noise_levels = preproc_cfg['noise_levels']       
+        
+        self.SPEED_VOL_PERTURB_STATIC = preproc_cfg['speed_vol_perturb']
+        self.speed_vol_perturb = preproc_cfg['speed_vol_perturb']
         self.tempo_range = preproc_cfg['tempo_range']
         self.gain_range = preproc_cfg['gain_range']
-        self.pitch_perturb =  Status(initial=preproc_cfg['pitch_perturb'],
-                                        current=preproc_cfg['pitch_perturb'])
+        
+        self.PITCH_PERTURB_STATIC = preproc_cfg['pitch_perturb']
+        self.pitch_perturb =  preproc_cfg['pitch_perturb']
         self.pitch_lower, self.pitch_upper = preproc_cfg['pitch_range']
 
         self.mean, self.std = compute_mean_std(audio_files[:max_samples], 
@@ -128,21 +123,21 @@ class Preprocessor():
 
     def preprocess(self, wave_file, text):
         
-        if self.speed_vol_perturb.current:
+        if self.speed_vol_perturb:
             audio_data, samp_rate = speed_vol_perturb(wave_file, tempo_range=self.tempo_range)
         else:
             audio_data, samp_rate = wave.array_from_wave(wave_file)
         if self.use_log: self.logger.info(f"preproc: audio_data read: {wave_file}")
 
         # pitch perturb
-        if self.pitch_perturb.current: 
+        if self.pitch_perturb: 
             audio_data = apply_pitch_perturb(audio_data, 
                                             samp_rate, 
                                             lower_range=self.pitch_lower, 
                                             upper_range=self.pitch_upper)
         
         # noise injection
-        if self.inject_noise.current:
+        if self.inject_noise:
             add_noise = np.random.binomial(1, self.noise_prob)
             if add_noise:
                 audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, self.logger, self.noise_levels) 
@@ -167,7 +162,7 @@ class Preprocessor():
         if self.use_log: self.logger.info(f"preproc: normalized")
 
         # spec-augment
-        if self.spec_augment.current:
+        if self.spec_augment:
             inputs = apply_spec_augment(inputs, self.logger)
             if self.use_log: self.logger.info(f"preproc: spec_aug applied")
 
@@ -177,39 +172,46 @@ class Preprocessor():
 
         return inputs, targets
 
+    def update(self):
+        """
+        updates an instance with new attributes
+        """
+        if not hasattr(self, 'pitch_perturb'):
+            self.PITCH_PERTURB_STATIC = False
+            self.pitch_perturb = False
+        if not hasattr(self, 'speed_vol_perturb'):
+            self.SPEED_VOL_PERTURB_STATIC = False
+            self.speed_vol_perturb = False
+        else:
+            self.SPEED_VOL_PERTURB_STATIC = self.speed_vol_perturb
+
+
 
     def set_eval(self):
         """
             turns off the data augmentation for evaluation
         """
-        if type(self.spec_augment) == bool:
-            if self.SPEC_AUGMENT_STATIC:
-                self.spec_augment.current = False
-            if self.INJECT_NOISE_STATIC:
-                self.inject_noise.current = False
-
-        elif type(self.spec_augment) == Status:
-            if self.spec_augment.initial:
-                self.spec_augment.current = False
-            if self.inject_noise.initial:
-                self.inject_noise.current = False
-
+        if self.SPEC_AUGMENT_STATIC:
+            self.spec_augment = False
+        if self.INJECT_NOISE_STATIC:
+            self.inject_noise = False
+        if self.SPEED_VOL_PERTURB_STATIC:
+            self.speed_vol_perturb = False
+        if self.PITCH_PERTURB_STATIC:
+            self.pitch_perturb = False
 
     def set_train(self):
         """
             turns on data augmentation for training
         """
-        if type(self.spec_augment) == bool:
-            if self.SPEC_AUGMENT_STATIC:
-                self.spec_augment.current = True
-            if self.INJECT_NOISE_STATIC:
-                self.inject_noise.current = True
-
-        elif type(self.spec_augment) == Status:
-            if self.spec_augment.initial:
-                self.spec_augment.current = True
-            if self.inject_noise.initial:
-                self.inject_noise.current = True
+        if self.SPEC_AUGMENT_STATIC:
+            self.spec_augment = True
+        if self.INJECT_NOISE_STATIC:
+            self.inject_noise = True
+        if self.SPEED_VOL_PERTURB_STATIC:
+            self.speed_vol_perturb = True
+        if self.PITCH_PERTURB_STATIC:
+            self.pitch_perturb = True
 
 
     @property
