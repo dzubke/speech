@@ -195,8 +195,12 @@ class Preprocessor():
             self.speed_vol_perturb = False
         else:
             self.SPEED_VOL_PERTURB_STATIC = self.speed_vol_perturb
-
-
+        if not hasattr(self, 'train_status'):
+            self.train_status = True
+        if not hasattr(self, 'rand_noise_add_std'):
+            self.rand_noise_add_std = 0.0
+        if not hasattr(self, 'rand_noise_multi_std'):
+            self.rand_noise_multi_std = 0.0
 
     def set_eval(self):
         """
@@ -210,7 +214,7 @@ class Preprocessor():
             self.inject_noise = False
         if self.SPEED_VOL_PERTURB_STATIC:
             self.speed_vol_perturb = False
-        if self.PITCH_PERTURB_STATIC:s
+        if self.PITCH_PERTURB_STATIC:
             self.pitch_perturb = False
 
     def set_train(self):
