@@ -16,9 +16,7 @@ import torch.utils.data as tud
 # project libraries
 from speech.utils import wave, spec_augment
 from speech.utils.io import read_data_json
-from speech.utils.noise_injector import inject_noise
-from speech.utils.speed_vol_perturb import speed_vol_perturb
-from speech.utils.pitch_perturb import apply_pitch_perturb
+from speech.utils.signal_augment import apply_pitch_perturb, speed_vol_perturb, inject_noise
 
 
 
@@ -74,7 +72,7 @@ class Preprocessor():
         
         self.PITCH_PERTURB_STATIC = preproc_cfg['pitch_perturb']
         self.pitch_perturb =  preproc_cfg['pitch_perturb']
-        self.pitch_lower, self.pitch_upper = preproc_cfg['pitch_range']
+        self.pitch_range = preproc_cfg['pitch_range']
 
         self.rand_noise_add_std = preproc_cfg['rand_noise_add_std']
         self.rand_noise_multi_std = preproc_cfg['rand_noise_multi_std']
@@ -120,12 +118,7 @@ class Preprocessor():
         output = (np_arr - self.mean) / self.std
         return output.astype(np.float32)
     
-    def sample_normalize(self, inputs:np.ndarray)->np.ndarray:
-        mean = inputs.mean()
-        std = inputs.std()
-        inputs -= mean
-        inputs /= std
-        return inputs.astype(np.float32)
+ 
 
     def preprocess(self, wave_file, text):
         
@@ -137,10 +130,7 @@ class Preprocessor():
 
         # pitch perturb
         if self.pitch_perturb and self.train_status: 
-            audio_data = apply_pitch_perturb(audio_data, 
-                                            samp_rate, 
-                                            lower_range=self.pitch_lower, 
-                                            upper_range=self.pitch_upper)
+            audio_data = apply_pitch_perturb(audio_data, samp_rate, pitch_range=self.pitch_range)
         
         # noise injection
         if self.inject_noise and self.train_status:
@@ -162,15 +152,15 @@ class Preprocessor():
         if self.normalize == "batch_normalize":
             inputs = self.batch_normalize(inputs)
         elif self.normalize == "sample_normalize":
-            inputs = self.sample_normalize(inputs)
+            inputs = sample_normalize(inputs)
         else: 
            raise ValueError("preproc config normalize value must be: 'batch_normalize' or 'sample_normalize'")
         if self.use_log: self.logger.info(f"preproc: normalized")
 
         # gaussian noise augmentation
         if self.train_status:
-            inputs = inputs * np.random.normal(loc=1, scale=self.rand_noise_multi_std, size=inputs.shape)     
-            inputs = inputs + np.random.normal(loc=0, scale=self.rand_noise_add_std, size=inputs.shape)     
+            inputs = inputs * np.random.normal(loc=1, scale=self.rand_noise_multi_std, size=inputs.shape)
+            inputs = inputs + np.random.normal(loc=0, scale=self.rand_noise_add_std, size=inputs.shape)
 
         # spec-augment
         if self.spec_augment and self.train_status:
@@ -342,6 +332,13 @@ def make_loader(dataset_json, preproc,
                 collate_fn=lambda batch : zip(*batch),
                 drop_last=True)
     return loader
+
+def sample_normalize(inputs:np.ndarray)->np.ndarray:
+    mean = inputs.mean()
+    std = inputs.std()
+    inputs -= mean
+    inputs /= std
+    return inputs.astype(np.float32)
 
 def mfcc_from_data(audio: np.ndarray, samp_rate:int, window_size=20, step_size=10):
     """Computes the Mel Frequency Cepstral Coefficients (MFCC) from an audio file path by calling the mfcc method
