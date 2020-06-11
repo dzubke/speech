@@ -1,7 +1,7 @@
 # third party libraries
 import pytest
 # project libraries
-from speech.utils import noise_injector, data_helpers
+from speech.utils import data_helpers
 from speech import dataset_info
 import utils
 

@@ -2,7 +2,9 @@
 import pytest
 import numpy as np
 # project libraries
-from speech.utils import noise_injector, data_helpers, wave
+from speech.utils import data_helpers
+from speech.utils.wave import array_from_wave
+from speech.utils.signal_augment import inject_noise_sample
 from speech import dataset_info
 import utils
 
@@ -24,7 +26,7 @@ def test_all_noise_audio():
             noise_file = np.random.choice(noise_files)
             noise_level = np.random.uniform(*noise_levels)
             try:
-                noise_injector.inject_noise_sample(audio_data, samp_rate, noise_file, noise_level,logger=None)
+                inject_noise_sample(audio_data, samp_rate, noise_file, noise_level,logger=None)
             except AssertionError:
                 raise AssertionError(f"audio: {audio_file}, noise: {noise_path}, noise_level: {noise_level}")
             except FileNotFoundError:

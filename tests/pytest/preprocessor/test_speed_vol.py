@@ -2,7 +2,7 @@
 # third party libraries
 import pytest
 # project libraries
-from speech.utils.speed_vol_perturb import speed_vol_perturb
+from speech.utils.signal_augment import speed_vol_perturb
 from speech.utils.wave import array_from_wave
 
 
