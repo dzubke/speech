@@ -1,7 +1,7 @@
+# compatibility libraries
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
 # standard libraries
 import json
 import random
@@ -14,10 +14,11 @@ import torch
 import torch.autograd as autograd
 import torch.utils.data as tud
 # project libraries
-from speech.utils import wave, spec_augment
+from speech.utils import wave
 from speech.utils.io import read_data_json
 from speech.utils.signal_augment import apply_pitch_perturb, speed_vol_perturb, inject_noise
 from speech.utils.signal_augment import synthetic_gaussian_noise_inject
+from speech.utils.feature_augment import apply_spec_augment
 
 
 
@@ -26,7 +27,7 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, preproc_cfg, logger=None, max_samples=100, start_and_end=True):
+    def __init__(self, data_json, preproc_cfg, logger=None, max_samples=10000, start_and_end=True):
         """
         Builds a preprocessor from a dataset.
         Arguments:
@@ -39,47 +40,38 @@ class Preprocessor():
             max_samples (int): The maximum number of examples to be used
                 in computing summary statistics.
             start_and_end (bool): Include start and end tokens in labels.
-
-        Note:if using mfcc processing is desired, change method log_specgram_from_file to mfcc_from_file
-
         """
         data = read_data_json(data_json)
 
         # Compute data mean, std from sample
-        audio_files = [d['audio'] for d in data]
+        audio_files = [sample['audio'] for sample in data]
         random.shuffle(audio_files)
 
         # if true, data augmentation will be applied
         self.train_status = True
         
+        assert preproc_cfg['preprocessor'] in ['mfcc', 'log_spectrogram'], "preprocessor string not accepted"
         self.preprocessor = preproc_cfg['preprocessor']
         self.window_size = preproc_cfg['window_size']
         self.step_size = preproc_cfg['step_size']
         self.normalize =  preproc_cfg['normalize']
 
-        self.SPEED_VOL_PERTURB_STATIC = preproc_cfg['speed_vol_perturb']
         self.speed_vol_perturb = preproc_cfg['speed_vol_perturb']
         self.tempo_range = preproc_cfg['tempo_range']
         self.gain_range = preproc_cfg['gain_range']
         
-        self.PITCH_PERTURB_STATIC = preproc_cfg['pitch_perturb']
         self.pitch_perturb =  preproc_cfg['pitch_perturb']
         self.pitch_range = preproc_cfg['pitch_range']
 
         self.synthetic_gaussian_noise = preproc_cfg['synthetic_gaussian_noise']
         self.signal_to_noise_range_db=preproc_cfg['signal_to_noise_range_db']
 
-        self.INJECT_NOISE_STATIC = preproc_cfg['inject_noise']
         self.inject_noise = preproc_cfg['inject_noise']
         self.noise_dir = preproc_cfg['noise_directory']
         self.noise_prob = preproc_cfg['noise_prob']
         self.noise_levels = preproc_cfg['noise_levels']       
         
-        self.SPEC_AUGMENT_STATIC = preproc_cfg['use_spec_augment']
         self.spec_augment = preproc_cfg['use_spec_augment']
-
-        self.rand_noise_add_std = preproc_cfg['rand_noise_add_std']
-        self.rand_noise_multi_std = preproc_cfg['rand_noise_multi_std']
 
 
         self.mean, self.std = compute_mean_std(audio_files[:max_samples], 
@@ -100,32 +92,43 @@ class Preprocessor():
         self.start_and_end = start_and_end
         self.int_to_char = dict(enumerate(chars))
         self.char_to_int = {v : k for k, v in self.int_to_char.items()}
-
-    def encode(self, text):
-        text = list(text)
-        if self.start_and_end:
-            text = [self.START] + text + [self.END]
-        return [self.char_to_int[t] for t in text]
-
-    def decode(self, seq):
-        text = [self.int_to_char[s] for s in seq]
-        if not self.start_and_end:
-            return text
-
-        s = text[0] == self.START
-        e = len(text)
-        if text[-1] == self.END:
-            e = text.index(self.END)
-        return text[s:e]
-
-    def batch_normalize(self, np_arr:np.ndarray)->np.ndarray:
-        output = (np_arr - self.mean) / self.std
-        return output.astype(np.float32)
     
- 
-
+    
     def preprocess(self, wave_file, text):
         
+        audio_data, samp_rate = self.signal_augmentations(wave_file)
+
+        # processing method
+        preprocessing_function = eval(self.preprocessor + "_from_data")
+        feature_data = preprocessing_function(audio_data, samp_rate, self.window_size, self.step_size)
+        
+        # normalization
+        if self.normalize == "batch_normalize":
+            feature_data = self.batch_normalize(feature_data)
+        elif self.normalize == "sample_normalize":
+            feature_data = self.feature_normalize(feature_data)
+        else: 
+           raise ValueError("preproc config normalize value must be: 'batch_normalize' or 'sample_normalize'")
+        if self.use_log: self.logger.info(f"preproc: normalized")
+        
+        feature_data = self.feature_augmentations(feature_data)
+
+        # target encoding
+        targets = self.encode(text)
+        if self.use_log: self.logger.info(f"preproc: text encoded")
+
+        return inputs, targets
+    
+    def signal_augmentations(self, wave_file:str)-> tuple:
+        """
+        Performs all of the augmtations to the raw audio signal. The audio data is in pcm16 format.
+        Arguments:
+            wave_file - str: the path to the audio sample
+        Returns:
+            audio_data - np.ndarray: augmented np-array
+            samp_rate - int: sample rate of the audio recording
+        """
+        # sox-based tempo, gain, pitch augmentations
         if self.speed_vol_perturb and self.train_status:
             audio_data, samp_rate = speed_vol_perturb(wave_file, tempo_range=self.tempo_range, gain_range=self.gain_range)
         else:
@@ -147,86 +150,64 @@ class Preprocessor():
             if add_noise:
                 audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, self.logger, self.noise_levels) 
             if self.use_log: self.logger.info(f"preproc: noise injected")
-
-        # processing method
-        if self.preprocessor == "log_spec":
-            inputs = log_specgram_from_data(audio_data, samp_rate, self.window_size, self.step_size)
-            if self.use_log: self.logger.info(f"preproc: log_spec calculated")
-        elif self.preprocessor == "mfcc":
-           inputs = mfcc_from_data(audio_data, samp_rate, self.window_size, self.step_size)
-        else: 
-           raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
         
-        # normalization
-        if self.normalize == "batch_normalize":
-            inputs = self.batch_normalize(inputs)
-        elif self.normalize == "sample_normalize":
-            inputs = sample_normalize(inputs)
-        else: 
-           raise ValueError("preproc config normalize value must be: 'batch_normalize' or 'sample_normalize'")
-        if self.use_log: self.logger.info(f"preproc: normalized")
+        return audio_data, samp_rate
 
-        # gaussian noise augmentation
-        if self.train_status:
-            inputs = inputs * np.random.normal(loc=1, scale=self.rand_noise_multi_std, size=inputs.shape)
-            inputs = inputs + np.random.normal(loc=0, scale=self.rand_noise_add_std, size=inputs.shape)
-
+    def feature_augmentations(self, feature:np.ndarray)->np.ndarray:
+        """
+        Performs feature augmentations to the 2d array of features
+        """
         # spec-augment
         if self.spec_augment and self.train_status:
-            inputs = apply_spec_augment(inputs, self.logger)
+            feature_data = apply_spec_augment(feature_data, self.logger)
             if self.use_log: self.logger.info(f"preproc: spec_aug applied")
 
-        # target encoding
-        targets = self.encode(text)
-        if self.use_log: self.logger.info(f"preproc: text encoded")
+        return feature_data
 
-        return inputs, targets
+
+    def batch_normalize(self, np_arr:np.ndarray)->np.ndarray:
+        output = (np_arr - self.mean) / self.std
+        return output.astype(np.float32)
+
+    def encode(self, text):
+        text = list(text)
+        if self.start_and_end:
+            text = [self.START] + text + [self.END]
+        return [self.char_to_int[t] for t in text]
+
+    def decode(self, seq):
+        text = [self.int_to_char[s] for s in seq]
+        if not self.start_and_end:
+            return text
+
+        s = text[0] == self.START
+        e = len(text)
+        if text[-1] == self.END:
+            e = text.index(self.END)
+        return text[s:e]
 
     def update(self):
         """
         updates an instance with new attributes
         """
         if not hasattr(self, 'pitch_perturb'):
-            self.PITCH_PERTURB_STATIC = False
             self.pitch_perturb = False
         if not hasattr(self, 'speed_vol_perturb'):
-            self.SPEED_VOL_PERTURB_STATIC = False
             self.speed_vol_perturb = False
-        else:
-            self.SPEED_VOL_PERTURB_STATIC = self.speed_vol_perturb
-
-
+        if not hasattr(self, 'train_status'):
+            self.train_status = True
 
     def set_eval(self):
         """
-            turns off the data augmentation for evaluation
+        turns off the data augmentation for evaluation
         """
         self.train_status = False
 
-        if self.SPEC_AUGMENT_STATIC:
-            self.spec_augment = False
-        if self.INJECT_NOISE_STATIC:
-            self.inject_noise = False
-        if self.SPEED_VOL_PERTURB_STATIC:
-            self.speed_vol_perturb = False
-        if self.PITCH_PERTURB_STATIC:
-            self.pitch_perturb = False
-
     def set_train(self):
         """
-            turns on data augmentation for training
+        turns on data augmentation for training
         """
         self.train_status = True
-        
-        if self.SPEC_AUGMENT_STATIC:
-            self.spec_augment = True
-        if self.INJECT_NOISE_STATIC:
-            self.inject_noise = True
-        if self.SPEED_VOL_PERTURB_STATIC:
-            self.speed_vol_perturb = True
-        if self.PITCH_PERTURB_STATIC:
-            self.pitch_perturb = True
-
 
     @property
     def input_dim(self):
@@ -252,19 +233,27 @@ class Preprocessor():
                 string += "\n" + name +": " + str(eval("self."+name))
             return string
 
+    @staticmethod
+    def feature_normalize(feature:np.ndarray)->np.ndarray:
+        """
+        Normalizes the features so that the entire 2d input array
+        has zero mean and unit (1) std deviation
+        """
+        mean = feature.mean()
+        std = feature.std()
+        feature -= mean
+        feature /= std
+        assert feature.dtype == np.float32, "feature is not float32"
+        return feature
+
+
 def compute_mean_std(audio_files, preprocessor, window_size, step_size):
+    assert preprocessor in ['mfcc', 'log_spectrogram'], "preprocessor string not accepted"
     samples = []
-    if preprocessor == "log_spec":
-        for audio_file in audio_files: 
-            data, samp_rate = wave.array_from_wave(audio_file)
-            samples.append(log_specgram_from_data(data, samp_rate, window_size, step_size))
-                    
-    elif preprocessor == "mfcc":
-        for audio_file in audio_files: 
-            data, samp_rate = wave.array_from_wave(audio_file)
-            samples.append(mfcc_from_data(data, samp_rate, window_size, step_size))
-    else: 
-        raise ValueError("preprocessing config preprocessor value must be 'log_spec' or 'mfcc'")
+    preproccessing_function  =  eval(preprocessor + "_from_data")
+    for audio_file in audio_files: 
+        data, samp_rate = wave.array_from_wave(audio_file)
+        samples.append(preprocessing_function(data, samp_rate, window_size, step_size))
      
     samples = np.vstack(samples)
     mean = np.mean(samples, axis=0)
@@ -272,37 +261,35 @@ def compute_mean_std(audio_files, preprocessor, window_size, step_size):
     return mean, std
 
 
-def sample_normalize(inputs:np.ndarray)->np.ndarray:
-    mean = inputs.mean()
-    std = inputs.std()
-    inputs -= mean
-    inputs /= std
-    return inputs.astype(np.float32)
-
-
 class AudioDataset(tud.Dataset):
 
     def __init__(self, data_json, preproc, batch_size):
+        """
+        this code sorts the samples in data based on the length of the transcript lables and the audio
+        sample duration. It does this by creating a number of buckets and sorting the samples
+        into different buckets based on the length of the labels. It then sorts the buckets based 
+        on the duration of the audio sample.
+        """
 
         data = read_data_json(data_json)        #loads the data_json into a list
         self.preproc = preproc                  # assign the preproc object
 
-        bucket_diff = 4                         # number of different buckets
+        bucket_diff = 4                             # number of different buckets
         max_len = max(len(x['text']) for x in data) # max number of phoneme labels in data
         num_buckets = max_len // bucket_diff        # the number of buckets
         buckets = [[] for _ in range(num_buckets)]  # creating an empy list for the buckets
-        for d in data:                          
-            bid = min(len(d['text']) // bucket_diff, num_buckets - 1)
-            buckets[bid].append(d)
+        for sample in data:                          
+            bucket_id = min(len(sample['text']) // bucket_diff, num_buckets - 1)
+            buckets[bucket_id].append(sample)
 
         # Sort by input length followed by output length
         sort_fn = lambda x : (round(x['duration'], 1),
                               len(x['text']))
-        for b in buckets:
-            b.sort(key=sort_fn)
+        for bucket in buckets:
+            bucket.sort(key=sort_fn)
         
         # unpack the data in the buckets into a list
-        data = [d for b in buckets for d in b]
+        data = [sample for bucket in buckets for sample in bucket]
         self.data = data
 
     def __len__(self):
@@ -352,17 +339,13 @@ def make_loader(dataset_json, preproc,
     return loader
 
 
-
 def mfcc_from_data(audio: np.ndarray, samp_rate:int, window_size=20, step_size=10):
-    """Computes the Mel Frequency Cepstral Coefficients (MFCC) from an audio file path by calling the mfcc method
-
-    Arguments
-    ----------
-    audio_file: str, the filename of the audio file
-
-    Returns
-    -------
-        np.ndarray, the transposed log of the spectrogram as returned by mfcc
+    """
+    Computes the Mel Frequency Cepstral Coefficients (MFCC) from an audio file path by calling the mfcc method
+    Arguments:
+        audio - np.ndarray: an array of audio data in pcm16 format
+    Returns:
+        np.ndarray: the transposed log of the spectrogram as returned by mfcc
     """
 
     if len(audio.shape)>1:     # there are multiple channels
@@ -410,12 +393,12 @@ def create_mfcc(audio, sample_rate: int, window_size, step_size, esp=1e-10):
     return out.astype(np.float32)
 
 
-def log_specgram_from_file(audio_path:str, window_size=32, step_size=16):
+def log_spectrogram_from_file(audio_path:str, window_size=32, step_size=16):
     
     audio_data, samp_rate = wave.array_from_wave(audio_path)
     return log_specgram_from_data(audio_data, samp_rate, window_size=window_size, step_size=step_size)
 
-def log_specgram_from_data(audio: np.ndarray, samp_rate:int, window_size=32, step_size=16, plot=False):
+def log_spectrogram_from_data(audio: np.ndarray, samp_rate:int, window_size=32, step_size=16, plot=False):
     """
     Computes the log of the spectrogram from from a input audio file string
     Arguments:
@@ -431,7 +414,7 @@ def log_specgram_from_data(audio: np.ndarray, samp_rate:int, window_size=32, ste
             audio = audio.mean(axis=1)  # multiple channels, average
     return log_specgram(audio, samp_rate, window_size, step_size, plot=plot)
 
-def log_specgram(audio, sample_rate, window_size=20,
+def log_spectrogram(audio, sample_rate, window_size=20,
                  step_size=10, eps=1e-10, plot=False):
     nperseg = int(window_size * sample_rate / 1e3)
     noverlap = int(step_size * sample_rate / 1e3)
@@ -514,52 +497,3 @@ def plot_spectrogram(f, t, Sxx):
     plt.show()
 
 
-
-
-def apply_spec_augment(inputs, logger):
-    """calls the spec_augment function on the normalized log_spec. A policy defined 
-        in the policy_dict will be chosen uniformly at random.
-    Arguments:
-        inputs (np.ndarray): normalized log_spec with dimensional order time x freq
-    Returns:
-        inputs (nd.ndarray): the modified log_spec array with order time x freq
-    """
-
-    use_log = (logger is not None)
-    assert type(inputs) == np.ndarray, "input is not numpy array"
-
-    policy_dict = {
-        0: {'time_warping_para':0, 'frequency_masking_para':0,
-            'time_masking_para':0, 'frequency_mask_num':0, 'time_mask_num':0}, 
-        1: {"time_warping_para":20, "frequency_masking_para":60,
-            "time_masking_para":60, "frequency_mask_num":1, "time_mask_num":1},
-        2: {"time_warping_para":20, "frequency_masking_para":30,
-            "time_masking_para":30, "frequency_mask_num":2, "time_mask_num":2},
-        3: {"time_warping_para":20, "frequency_masking_para":20,
-            "time_masking_para":20, "frequency_mask_num":3, "time_mask_num":3},
-            }
-    
-    policy_choice = np.random.randint(low=0, high=4)
-    if use_log: logger.info(f"app spec_aug: policy: {policy_choice}")
-
-    policy = policy_dict.get(policy_choice)
-
-    # the inputs need to be transposed and converted to torch tensor
-    # as spec_augment method expects tensor with freq x time dimensions
-    if use_log: logger.info(f"app s_a: input shape: {inputs.shape}")
-
-    inputs = torch.from_numpy(inputs.T)
-
-    inputs = spec_augment.spec_augment(inputs, 
-                    time_warping_para=policy.get('time_warping_para'), 
-                    frequency_masking_para=policy.get('frequency_masking_para'),
-                    time_masking_para=policy.get('time_masking_para'),
-                    frequency_mask_num=policy.get('frequency_mask_num'), 
-                    time_mask_num=policy.get('time_mask_num'), logger=logger)
-    
-    # convert the torch tensor back to numpy array and transpose back to time x freq
-    inputs = inputs.detach().cpu().numpy() if inputs.requires_grad else inputs.cpu().numpy()
-    inputs = inputs.T
-    assert type(inputs) == np.ndarray, "output is not numpy array"
-
-    return inputs

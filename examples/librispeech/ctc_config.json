@@ -1,6 +1,6 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200601/",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200609/",
     "data" : {
          "train_set" : "/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json",
         "dev_set" : "/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json",
@@ -9,10 +9,10 @@
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-06-05_lib-ted-cv-VAL.log"
+        "log_file": "logs/2020-06-09_lib-ted-cv-VAL.log"
     },
     "preproc":{
-        "preprocessor": "log_spec",
+        "preprocessor": "log_spectrogram",
         "window_size": 32,
         "step_size": 16,
         "normalize": "sample_normalize",
@@ -21,13 +21,11 @@
         "noise_directory": "/home/dzubke/awni_speech/data/noise/feed_to_model/",
         "noise_prob": 0.6,
         "noise_levels": [0,0.5], 
-        "speed_vol_perturb":true, 
+        "speed_vol_perturb":true,
         "tempo_range": [0.85, 1.15],
         "gain_range":[-3,4],
         "pitch_perturb": true,
         "pitch_range": [-8, 8],
-        "rand_noise_add_std":0.2, 
-        "rand_noise_multi_std":0.1, 
         "synthetic_gaussian_noise": true, 
         "signal_to_noise_range_db":[10,30]
     },
@@ -46,7 +44,7 @@
         "class" : "this value is no longer used as train.py is hardcorded to use CTC_train",
         "dropout" : 0.4,
         "load_trained": true,
-        "trained_path": "examples/librispeech/models/ctc_models/20200601/20200605/best_model", 
+        "trained_path": "examples/librispeech/models/ctc_models/20200601/20200607/best_model", 
         "remove_layers": [],
         "encoder" : {
             "conv" : [

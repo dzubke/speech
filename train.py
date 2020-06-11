@@ -1,21 +1,24 @@
+# compability methods
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
+# standard libraries
 import argparse
+from collections import OrderedDict
 from datetime import date
-import logging
+import itertools
 import json
+import logging
+import math
+import pickle
 import random
 import time
-import math
-from collections import OrderedDict
+# third-party libraries
 import torch
 import torch.nn as nn
 import torch.optim
 import tqdm
-import pickle
-import itertools
+# project libraries
 import speech
 import speech.loader as loader
 from speech.models.ctc_model_train import CTC_train
