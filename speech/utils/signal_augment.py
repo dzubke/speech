@@ -42,7 +42,7 @@ def apply_augmentation(audio_data:np.ndarray, sr:int, augment_name:str, args):
         return apply_pitch_perturb(audio_data, sr, pitch_range=(pitch_level, pitch_level))
     elif augment_name == "signal_noise_inject":
         snr_level = float(args)
-        return signal_noise_inject_v2(audio_data, snr_range=(snr_level, snr_level))
+        return signal_noise_inject(audio_data, snr_range=(snr_level, snr_level))
 
 
     
@@ -198,30 +198,7 @@ def same_size(data:np.ndarray, noise_dst:np.ndarray) -> np.ndarray:
         return np.concatenate((noise_dst, zero_diff), axis=0)
 
 
-# random noise injection 
-
 def signal_noise_inject(audio_data: np.ndarray, snr_range:tuple=(10,30)):
-    """
-    Applies random noise to an audio sample scaled to a uniformly selected
-    signal-to-noise ratio (snr) bounded by the snr_range
-
-    Arguments:
-        audio_data - np.ndarry: 1d array of audio amplitudes
-        snr_range - tuple: range of values the signal-to-noise ratio (snr) can take on
-    """
-    audio_data = audio_data.astype('float64')
-    std_norm_noise = np.random.normal(loc=0, scale=1, size=audio_data.size).astype('float64')
-    snr_level = np.random.uniform(*snr_range)
-    audio_power = audio_data.dot(audio_data) / audio_data.size
-    noise_power = std_norm_noise.dot(std_norm_noise) / std_norm_noise.size
-    power_ratio = int(audio_power/noise_power)
-    noise_adj_factor = power_ratio / 10**(snr_level/10)
-    print("v1 sqrt noise_adj", np.sqrt(noise_adj_factor))
-
-
-    return (audio_data + std_norm_noise * np.sqrt(noise_adj_factor)).astype('int16')
-
-def signal_noise_inject_v2(audio_data: np.ndarray, snr_range:tuple=(10,30)):
     """
     Applies random noise to an audio sample scaled to a uniformly selected
     signal-to-noise ratio (snr) bounded by the snr_range
