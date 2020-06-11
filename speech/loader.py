@@ -17,6 +17,7 @@ import torch.utils.data as tud
 from speech.utils import wave, spec_augment
 from speech.utils.io import read_data_json
 from speech.utils.signal_augment import apply_pitch_perturb, speed_vol_perturb, inject_noise
+from speech.utils.signal_augment import synthetic_gaussian_noise_inject
 
 
 
@@ -56,15 +57,6 @@ class Preprocessor():
         self.step_size = preproc_cfg['step_size']
         self.normalize =  preproc_cfg['normalize']
 
-        self.SPEC_AUGMENT_STATIC = preproc_cfg['use_spec_augment']
-        self.spec_augment = preproc_cfg['use_spec_augment']
-
-        self.INJECT_NOISE_STATIC = preproc_cfg['inject_noise']
-        self.inject_noise = preproc_cfg['inject_noise']
-        self.noise_dir = preproc_cfg['noise_directory']
-        self.noise_prob = preproc_cfg['noise_prob']
-        self.noise_levels = preproc_cfg['noise_levels']       
-        
         self.SPEED_VOL_PERTURB_STATIC = preproc_cfg['speed_vol_perturb']
         self.speed_vol_perturb = preproc_cfg['speed_vol_perturb']
         self.tempo_range = preproc_cfg['tempo_range']
@@ -73,6 +65,18 @@ class Preprocessor():
         self.PITCH_PERTURB_STATIC = preproc_cfg['pitch_perturb']
         self.pitch_perturb =  preproc_cfg['pitch_perturb']
         self.pitch_range = preproc_cfg['pitch_range']
+
+        self.synthetic_gaussian_noise = preproc_cfg['synthetic_gaussian_noise']
+        self.signal_to_noise_range_db=preproc_cfg['signal_to_noise_range_db']
+
+        self.INJECT_NOISE_STATIC = preproc_cfg['inject_noise']
+        self.inject_noise = preproc_cfg['inject_noise']
+        self.noise_dir = preproc_cfg['noise_directory']
+        self.noise_prob = preproc_cfg['noise_prob']
+        self.noise_levels = preproc_cfg['noise_levels']       
+        
+        self.SPEC_AUGMENT_STATIC = preproc_cfg['use_spec_augment']
+        self.spec_augment = preproc_cfg['use_spec_augment']
 
         self.rand_noise_add_std = preproc_cfg['rand_noise_add_std']
         self.rand_noise_multi_std = preproc_cfg['rand_noise_multi_std']
@@ -127,6 +131,11 @@ class Preprocessor():
         else:
             audio_data, samp_rate = wave.array_from_wave(wave_file)
         if self.use_log: self.logger.info(f"preproc: audio_data read: {wave_file}")
+
+        # synthetic gaussian noise
+        if self.synthetic_gaussian_noise and self.train_status:
+            audio_data = synthetic_gaussian_noise_inject(audio_data, self.signal_to_noise_range_db)
+            if self.use_log: self.logger.info(f"preproc: synthetic_gaussian_noise_inject")
 
         # pitch perturb
         if self.pitch_perturb and self.train_status: 
@@ -200,7 +209,7 @@ class Preprocessor():
             self.inject_noise = False
         if self.SPEED_VOL_PERTURB_STATIC:
             self.speed_vol_perturb = False
-        if self.PITCH_PERTURB_STATIC:s
+        if self.PITCH_PERTURB_STATIC:
             self.pitch_perturb = False
 
     def set_train(self):
