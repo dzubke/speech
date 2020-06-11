@@ -27,7 +27,9 @@
         "pitch_perturb": true,
         "pitch_range": [-8, 8],
         "rand_noise_add_std":0.2, 
-        "rand_noise_multi_std":0.1
+        "rand_noise_multi_std":0.1, 
+        "synthetic_gaussian_noise": true, 
+        "signal_to_noise_range_db":[10,30]
     },
 
     "optimizer": {

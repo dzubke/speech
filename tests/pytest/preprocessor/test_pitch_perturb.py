@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 # project libraries
 from speech.utils.wave import array_from_wave
-from speech.utils.pitch_perturb import apply_pitch_perturb
+from speech.utils.signal_augments import apply_pitch_perturb
 
 
 def test_no_change():

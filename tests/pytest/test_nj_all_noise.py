@@ -6,7 +6,7 @@ import tqdm
 # project libraries
 from speech import dataset_info
 from speech.utils.wave import array_from_wave
-from speech.utils.noise_injector import audio_with_sox
+from speech.utils.signal_augment import audio_with_sox
 import utils
 
 
