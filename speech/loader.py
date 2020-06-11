@@ -127,7 +127,7 @@ class Preprocessor():
     def preprocess(self, wave_file, text):
         
         if self.speed_vol_perturb and self.train_status:
-            audio_data, samp_rate = speed_vol_perturb(wave_file, tempo_range=self.tempo_range)
+            audio_data, samp_rate = speed_vol_perturb(wave_file, tempo_range=self.tempo_range, gain_range=self.gain_range)
         else:
             audio_data, samp_rate = wave.array_from_wave(wave_file)
         if self.use_log: self.logger.info(f"preproc: audio_data read: {wave_file}")
@@ -271,6 +271,15 @@ def compute_mean_std(audio_files, preprocessor, window_size, step_size):
     std = np.std(samples, axis=0)
     return mean, std
 
+
+def sample_normalize(inputs:np.ndarray)->np.ndarray:
+    mean = inputs.mean()
+    std = inputs.std()
+    inputs -= mean
+    inputs /= std
+    return inputs.astype(np.float32)
+
+
 class AudioDataset(tud.Dataset):
 
     def __init__(self, data_json, preproc, batch_size):
@@ -342,12 +351,7 @@ def make_loader(dataset_json, preproc,
                 drop_last=True)
     return loader
 
-def sample_normalize(inputs:np.ndarray)->np.ndarray:
-    mean = inputs.mean()
-    std = inputs.std()
-    inputs -= mean
-    inputs /= std
-    return inputs.astype(np.float32)
+
 
 def mfcc_from_data(audio: np.ndarray, samp_rate:int, window_size=20, step_size=10):
     """Computes the Mel Frequency Cepstral Coefficients (MFCC) from an audio file path by calling the mfcc method
