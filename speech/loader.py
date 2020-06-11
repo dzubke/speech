@@ -117,7 +117,7 @@ class Preprocessor():
         targets = self.encode(text)
         if self.use_log: self.logger.info(f"preproc: text encoded")
 
-        return inputs, targets
+        return feature_data, targets
     
     def signal_augmentations(self, wave_file:str)-> tuple:
         """
@@ -153,7 +153,7 @@ class Preprocessor():
         
         return audio_data, samp_rate
 
-    def feature_augmentations(self, feature:np.ndarray)->np.ndarray:
+    def feature_augmentations(self, feature_data:np.ndarray)->np.ndarray:
         """
         Performs feature augmentations to the 2d array of features
         """
@@ -250,7 +250,7 @@ class Preprocessor():
 def compute_mean_std(audio_files, preprocessor, window_size, step_size):
     assert preprocessor in ['mfcc', 'log_spectrogram'], "preprocessor string not accepted"
     samples = []
-    preproccessing_function  =  eval(preprocessor + "_from_data")
+    preprocessing_function  =  eval(preprocessor + "_from_data")
     for audio_file in audio_files: 
         data, samp_rate = wave.array_from_wave(audio_file)
         samples.append(preprocessing_function(data, samp_rate, window_size, step_size))
@@ -396,7 +396,7 @@ def create_mfcc(audio, sample_rate: int, window_size, step_size, esp=1e-10):
 def log_spectrogram_from_file(audio_path:str, window_size=32, step_size=16):
     
     audio_data, samp_rate = wave.array_from_wave(audio_path)
-    return log_specgram_from_data(audio_data, samp_rate, window_size=window_size, step_size=step_size)
+    return log_spectrogram_from_data(audio_data, samp_rate, window_size=window_size, step_size=step_size)
 
 def log_spectrogram_from_data(audio: np.ndarray, samp_rate:int, window_size=32, step_size=16, plot=False):
     """
@@ -412,7 +412,7 @@ def log_spectrogram_from_data(audio: np.ndarray, samp_rate:int, window_size=32, 
             audio = audio.squeeze()
         else:
             audio = audio.mean(axis=1)  # multiple channels, average
-    return log_specgram(audio, samp_rate, window_size, step_size, plot=plot)
+    return log_spectrogram(audio, samp_rate, window_size, step_size, plot=plot)
 
 def log_spectrogram(audio, sample_rate, window_size=20,
                  step_size=10, eps=1e-10, plot=False):
