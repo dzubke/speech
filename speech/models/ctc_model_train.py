@@ -36,8 +36,8 @@ class CTC_train(ctc_model.CTC):
         # conv.children are: [Conv2d, BatchNorm2d, ReLU, Dropout, Conv2d, 
         # BatchNorm2d, ReLU, Dropout, Conv2d, BatchNorm2d, ReLU, Dropout]
         pad = list(self.conv.children())[0].kernel_size[0]//2 + \
-            list(self.conv.children())[4].kernel_size[0]//2 + \
-            list(self.conv.children())[8].kernel_size[0]//2
+            list(self.conv.children())[3].kernel_size[0]//2 + \
+            list(self.conv.children())[6].kernel_size[0]//2
         x = nn.functional.pad(x, (0,0,pad,pad))
 
         x, rnn_args = self.encode(x, rnn_args)    
