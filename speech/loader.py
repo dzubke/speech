@@ -250,7 +250,7 @@ class Preprocessor():
 def compute_mean_std(audio_files, preprocessor, window_size, step_size):
     assert preprocessor in ['mfcc', 'log_spectrogram'], "preprocessor string not accepted"
     samples = []
-    preproccessing_function  =  eval(preprocessor + "_from_data")
+    preprocessing_function  =  eval(preprocessor + "_from_data")
     for audio_file in audio_files: 
         data, samp_rate = wave.array_from_wave(audio_file)
         samples.append(preprocessing_function(data, samp_rate, window_size, step_size))
