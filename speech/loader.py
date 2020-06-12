@@ -27,7 +27,7 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, preproc_cfg, logger=None, max_samples=10000, start_and_end=True):
+    def __init__(self, data_json, preproc_cfg, logger=None, max_samples=1000, start_and_end=True):
         """
         Builds a preprocessor from a dataset.
         Arguments:
@@ -196,6 +196,12 @@ class Preprocessor():
             self.speed_vol_perturb = False
         if not hasattr(self, 'train_status'):
             self.train_status = True
+        if not hasattr(self, 'synthetic_gaussian_noise'):
+            self.synthetic_gaussian_noise = False
+        if not hasattr(self, "signal_to_noise_range_db"):
+            self.signal_to_noise_range_db=(100, 100)
+        if self.preprocessor == "log_spec":
+            self.preprocessor = "log_spectrogram"
 
     def set_eval(self):
         """
