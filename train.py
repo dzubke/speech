@@ -22,9 +22,11 @@ import tqdm
 import speech
 import speech.loader as loader
 from speech.models.ctc_model_train import CTC_train
-
 # TODO, (awni) why does putting this above crash..
 import tensorboard_logger as tb
+
+# turn on the set_detect_anomly
+torch.autograd.set_detect_anomaly(True)
 
 
 def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
@@ -183,7 +185,11 @@ def run(config):
     if use_log: logger.info(f"preproc: {preproc}")
     if use_log: logger.info(f"optimizer: {optimizer}")
 
-
+    # printing to the output file
+    print(f"====== Model, loaders, optimimzer created =======")
+    print(f"model: {model}")
+    print(f"preproc: {preproc}")
+    print(f"optimizer: {optimizer}")
 
     run_state = (0, 0)
     best_so_far = float("inf")
