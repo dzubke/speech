@@ -1,21 +1,24 @@
+# compability methods
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
+# standard libraries
 import argparse
+from collections import OrderedDict
 from datetime import date
-import logging
+import itertools
 import json
+import logging
+import math
+import pickle
 import random
 import time
-import math
-from collections import OrderedDict
+# third-party libraries
 import torch
 import torch.nn as nn
 import torch.optim
 import tqdm
-import pickle
-import itertools
+# project libraries
 import speech
 import speech.loader as loader
 from speech.models.ctc_model_train import CTC_train
@@ -46,7 +49,6 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         #print(f"loss value 1: {loss.data[0]}")
         loss.backward()
         if use_log: logger.info(f" Backward run ")
-
 
         grad_norm = nn.utils.clip_grad_norm_(model.parameters(), 200)
         if use_log: logger.info(f" Grad_norm clipped ")
@@ -88,7 +90,7 @@ def eval_dev(model, ldr, preproc,  logger):
     losses = []; all_preds = []; all_labels = []
         
     model.set_eval()
-    #preproc.set_eval()  # turning this off to make dev data similar to speak_test
+    preproc.set_eval()  # this turns off dataset augmentation
     use_log = (logger is not None)
     if use_log: logger.info(f" set_eval ")
 
@@ -112,7 +114,7 @@ def eval_dev(model, ldr, preproc,  logger):
             if use_log: logger.info(f"labels: {temp_batch[1]}")
 
     model.set_train()
-    # preproc.set_train()    see set_eval() comment
+    preproc.set_train()
     if use_log: logger.info(f"set_train")
 
     loss = sum(losses) / len(losses)
@@ -218,7 +220,6 @@ def run(config):
             speech.save(model, preproc,
                     config["save_path"], tag="best")
         if use_log: preproc.logger = logger
-               
 
 def load_from_trained(model, model_cfg):
     """

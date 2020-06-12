@@ -31,13 +31,15 @@ class CTC_train(ctc_model.CTC):
     def forward_impl(self, x, rnn_args=None, softmax=False):
         if self.is_cuda:
             x = x.cuda()
+
         # padding is half the filters of the 3 conv layers. 
-        # conv.children is: [Conv2d, BatchNorm2d, ReLU, Dropout, Conv2d, 
+        # conv.children are: [Conv2d, BatchNorm2d, ReLU, Dropout, Conv2d, 
         # BatchNorm2d, ReLU, Dropout, Conv2d, BatchNorm2d, ReLU, Dropout]
         pad = list(self.conv.children())[0].kernel_size[0]//2 + \
             list(self.conv.children())[4].kernel_size[0]//2 + \
             list(self.conv.children())[8].kernel_size[0]//2
         x = nn.functional.pad(x, (0,0,pad,pad))
+
         x, rnn_args = self.encode(x, rnn_args)    
         x = self.fc(x)          
         if softmax:
@@ -69,6 +71,13 @@ class CTC_train(ctc_model.CTC):
         probs = probs.data.cpu().numpy()
         return [decode(p, beam_size=3, blank=self.blank)[0]
                     for p in probs]
+        
+    def infer_maxdecode(self, batch):
+        x, y, x_lens, y_lens = self.collate(*batch)
+        probs, rnn_args = self.forward_impl(x, softmax=True)
+        # convert the torch tensor into a numpy array
+        probs = probs.data.cpu().numpy()
+        return [decode(p, blank=self.blank) for p in probs]
     
     def infer_distribution(self, batch, num_results):
         x, y, x_lens, y_lens = self.collate(*batch)
