@@ -25,7 +25,7 @@ np.set_printoptions(linewidth=set_linewidth)
 torch.set_printoptions(linewidth=set_linewidth)
 
 log_filename = "logs_probs-hiddencell_2020-05-20.log"
-log_level = 20
+log_level = 30
 logging.basicConfig(filename=None, filemode='w', level=log_level)
 log_sample_len = 50     # number of data samples outputted to the log
 
@@ -247,18 +247,18 @@ def stream_infer(model, preproc, lstm_states, PARAMS:dict, ARGS)->tuple:
                         # ------------ logging ---------------
                 
                         # decoding every 20 time-steps
-                        if count%20 ==0 and count!=0:
-                            decoder_time_start = time.time()
-                            probs_steps = np.concatenate(probs_list, axis=1)
-                            int_labels = max_decode(probs_steps[0], blank=39)
-                            # int_labels, likelihood = ctc_decode(probs[0], beam_size=50, blank=39)
-                            predictions = preproc.decode(int_labels)
-                            decoder_time += time.time() - decoder_time_start
-                            decoder_count += 1
-                            
-                            # ------------ logging ---------------
-                            logging.warning(f"predictions: {predictions}")
-                            # ------------ logging ---------------
+                        #if count%20 ==0 and count!=0:
+                        decoder_time_start = time.time()
+                        probs_steps = np.concatenate(probs_list, axis=1)
+                        int_labels = max_decode(probs_steps[0], blank=39)
+                        # int_labels, likelihood = ctc_decode(probs[0], beam_size=50, blank=39)
+                        predictions = preproc.decode(int_labels)
+                        decoder_time += time.time() - decoder_time_start
+                        decoder_count += 1
+                        
+                        # ------------ logging ---------------
+                        logging.warning(f"predictions: {predictions}")
+                        # ------------ logging ---------------
                         
                     total_count += 1
    

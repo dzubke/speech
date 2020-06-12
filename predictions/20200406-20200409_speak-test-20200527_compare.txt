@@ -1,0 +1,455 @@
+8CfHS9ClgFfU4BgVy53ON5zE6yt2-1590015621
+label: AY F IH G Y ER AW HH AW T UW F IH K S DH AH F R AA B R AH M
+preds: AY R IH G ER AO L D HH AW T AH V F IH K S D AO F R AA B ER AH M
+metrics: PER: 0.417, dist: 10, len: 24, conf: 11.377
+
+L2bcFLFCWrYTy6HN3QJncSBoGIr2-1590015636
+label: W EH L IH T S N AA T V EH R IY P R IY P EH R D F AO R DH AH K L AE S
+preds: W EH L IH Z N AW T AH V EH R IY P R IH P EH R D F AO R DH AH K L AE T
+metrics: PER: 0.207, dist: 6, len: 29, conf: 55.52
+
+sBfQ09gvtPevWrrGqFR9AALMsGY2-1590015612
+label: AY G EH T D IY ER JH T UW G OW SH AA P IH NG
+preds: AY G EH T DH AH ER TH T AH G OW SH OW P IY
+metrics: PER: 0.412, dist: 7, len: 17, conf: 0.812
+
+RdibUUlrkcORELa1G8plCkHvyOx1-1590015722
+label: S AE L IY T UH K T UW T UH K T UW T UH K T UW G OW IH NG T UW B EH D L EY T
+preds: S OW IY F IH L T UW T UH K CH IH R T IH K IH B OY IH NG TH R UW B AE T
+metrics: PER: 0.613, dist: 19, len: 31, conf: 18.852
+
+6xn1mpBKlrcFWn7tC8UKtTwT8uv1-1590019201
+label: AY V AO L W EY Z W AO N T IH D T UW T R AE V AH L IH N ER AW N D IH N EY ZH AH
+preds: AY V AO L W EY Z W AA N T AH D T UW T R EH V AH L IH N AO R AW N D IH N EY SH AH
+metrics: PER: 0.188, dist: 6, len: 32, conf: 9.246
+
+WNUwIX1pF5PUAp2GxTjwJmZVWF53-1590019203
+label: AY K AE N M AE N AH JH T UW G EH T B AY AA N M AY S EY V IH NG
+preds: AH AH AH AH AH AH AH AH AH
+metrics: PER: 0.96, dist: 24, len: 25, conf: 129.952
+
+qybuiA6ESiZceJB655oJdR2RPhh2-1590019207
+label: D EY L AH K T IH T
+preds: AH T EH P AH L AH P D IH D
+metrics: PER: 1.0, dist: 8, len: 8, conf: 14.195
+
+27AeBm93qCb9VlcetD14VwUcDt73-1590019246
+label: AY N UW AH N D AY N UW D EY W UH D AH P EH N D AH P T AH G EH D ER
+preds: AH AH AH AH AH AH AH AH AH AH
+metrics: PER: 0.852, dist: 23, len: 27, conf: 108.957
+
+zvuOjKTQftbcFK6fC2B6OU3rS3G3-1590019216
+label: AY SH UH AH N T K IY P B AY IH NG N UW B EH G Z
+preds: AY SH UH D T AH K IY P B AY N UW B EH D Z
+metrics: PER: 0.316, dist: 6, len: 19, conf: 7.307
+
+9Y4itXV0slMkNTWKGp4CWfQQvHI2-1590022959
+label: D UW Y UW EH K S ER S AY Z
+preds: D UW Y UW AE S OW S AY D
+metrics: PER: 0.364, dist: 4, len: 11, conf: 12.391
+
+A5B1dCeih7hzZpb24xnsO1lHwZs1-1590022828
+label: N IY D T UW W AA CH M AY F IH G Y UH R AY N IY D T UW W AA CH M AY F IH G Y ER
+preds: AE F T AH W AO R D SH IY N AY IH NG F IH G ER D AY R IY K UW AA S IY M AY F IH G Y ER
+metrics: PER: 0.656, dist: 21, len: 32, conf: 25.751
+
+678KozXhNLY6WHiXQljwkepq3ly2-1590022807
+label: AY HH AE P L AE N Z T UW M AA R OW
+preds: AY HH AE V P L AE N Z T UW M AA R OW
+metrics: PER: 0.071, dist: 1, len: 14, conf: 24.621
+
+bnQFQnwzVxPK42A0pfOyl5q9qQE2-1590022900
+label: AY W AA Z R EY S D IH N S AE N F R AE N S IH S
+preds: AY W AA Z W ER S DH AH AE N S EH N P R EH S IH S B AH L
+metrics: PER: 0.6, dist: 12, len: 20, conf: 11.122
+
+4tgvlhTf4mZkHQ2SmkO82sK14e83-1590022811
+label: AY M HH AE V IH NG T R AH B AH L D IY S AY D IH NG W EH R T UW L IY V
+preds: AY M HH AE V IH NG T R AE V AH L D DH IY Z S AY T IY W EH R T UW L IY V
+metrics: PER: 0.25, dist: 7, len: 28, conf: 5.295
+
+VYTlqWtiibeLnMZ531GAf5VM70L2-1590026402
+label: DH EH R Z AH P R AA B L AH M W IH DH DH AH K AH M P Y UW T ER
+preds: DH EH R AA Z AH P R AA B AH L AH M W IH DH DH AH K AH M P Y UW T ER
+metrics: PER: 0.08, dist: 2, len: 25, conf: 5.311
+
+EZFyIJD7ePM2tTuJNxrx3v2A8102-1590026409
+label: AY IY T AW AY IY T AW EH V ER IY W AH N S D EY
+preds: AY IY DH AH HH AW AY D AH EH V IY W AH N S DH EY
+metrics: PER: 0.444, dist: 8, len: 18, conf: 34.909
+
+vJLrr6tOgxSPgL4tGPoWD34bDEi2-1590026406
+label: T AH N L EH F T AE T D AH IH N T AH S EH K SH AH N
+preds: AE N L EH F T AE T TH AO L IH N T AH V IH K SH AH N
+metrics: PER: 0.333, dist: 7, len: 21, conf: 11.782
+
+pdTIWepPgHOprA74Cik46H7TSph1-1590026403
+label: Y AA S D AE T W AA Z M IY
+preds: Y EH S DH AE T AH W AA Z M IY
+metrics: PER: 0.273, dist: 3, len: 11, conf: 3.284
+
+h8kXhsxbJmQ7Em1BL4eUoJXeSGc2-1590026409
+label: W AH T D IH D Y UW Y UW S T UW D UW F AO R F AH N IH N K AA L IH JH IY
+preds: W AH T DH IY D UW IH Z T UW L UW F AO R F AH N IH N K AA R IY T IY
+metrics: PER: 0.345, dist: 10, len: 29, conf: 8.75
+
+JGo8ZRENNrNKJF2drJ6DALLBmpn1-1590030104
+label: AY V HH AE D IH N AH F AH V G OW IH NG T UW AH K AE D AH M IY
+preds: AY V AH HH AE D DH IY N AW F AH V AO G OW IH NG T AH AH K AA
+metrics: PER: 0.458, dist: 11, len: 24, conf: 11.296
+
+cZSQ7qKJcvgakFanBAt8hrxD1Fu1-1590030009
+label: IH Z D AE T Y AO R IH S K Y UW S
+preds: DH AH S DH AE T HH IY R ER IH F K Y UW Z
+metrics: PER: 0.643, dist: 9, len: 14, conf: 8.206
+
+eZ1fvLv5VjOSK6ey9gu1rHwb5oz1-1590030084
+label: B IY K EH R F AH L N AA T T UW HH ER T Y ER S EH L
+preds: AH K EH R F AH L N AA T T UW HH AA R T EH R S AW L
+metrics: PER: 0.333, dist: 7, len: 21, conf: 11.485
+
+8c18EekCxMXtY0jb6L5024PT3W73-1590030004
+label: AY K EH N T G EH T IH N AH F AH B Y UW Z IH NG S P IY K
+preds: AY K AE N G EH T IH N AO F F AA Y UW TH IH NG S P IY K
+metrics: PER: 0.261, dist: 6, len: 23, conf: 4.161
+
+sfmTggTATAMPCQ0BXqsZVXbfKlg2-1590030009
+label: AY T OW L D Y UW N AA T T UW Y UW S D AE T K R EH D IH K AA R D
+preds: AY T OW SH AH N L AH P T UW Y UW Z T AH T K R EH D K AA R T
+metrics: PER: 0.444, dist: 12, len: 27, conf: 13.295
+
+3n6p4Cpx6xSVfXw7mqks0L6pURn1-1590033660
+label: AY M IH S P L EY IH NG T EH N IY S
+preds: AY M IY S P L EY IH NG T EH N IY S
+metrics: PER: 0.071, dist: 1, len: 14, conf: 3.94
+
+4k4F4Fz2CJcKcFfMvlS9PhH90K73-1590033604
+label: AY HH AE V IY N AH T OY S
+preds: AY HH AE P IH N AH S T AY S
+metrics: PER: 0.4, dist: 4, len: 10, conf: 2.471
+
+suYOpzKfFLNsKrTLuwwraDhRDiN2-1590033617
+label: Y EH S AY M T W EH N
+preds: Y EH S AY M
+metrics: PER: 0.444, dist: 4, len: 9, conf: 5.794
+
+y4CicK1yVua7f055EFKcgerlA1I2-1590033602
+label: W AH T D IH D Y UW B AY
+preds: AH AH W AH T D EY T UW B AY
+metrics: PER: 0.5, dist: 5, len: 10, conf: 32.275
+
+QGWUr53imLZRJF2kU7T9kd88uc22-1590033618
+label: AY K AE N T W EY T F AO DH AH S EH K AH N D K AO S
+preds: DH AE T W EY K F AO R DH AH S EH K AH N K AO S
+metrics: PER: 0.286, dist: 6, len: 21, conf: 4.241
+
+URLYpGYyYmfhtF4SKx3UgkPWc5m2-1590037224
+label: D UW Y UW L AY K IH T AE L Y AH F UH D
+preds: D UW Y UW N L AY K IH T AE L Y AH F ER D
+metrics: PER: 0.125, dist: 2, len: 16, conf: 6.999
+
+6hwrop2BwQgPVeKrFsBZOSN9d822-1590037302
+label: W IY HH AE F T UW M EY K AH P D AH L AO S T AY M
+preds: W IY HH AE V T UW M EY K AH P DH AH L AO S T AY M
+metrics: PER: 0.1, dist: 2, len: 20, conf: 1.811
+
+bCeh6vjovpYIl7QxJzZ8IhVdCMs2-1590037276
+label: AY G OW S AH F IH NG AO L D AH T AY
+preds: AY B OW TH S EH L F P IY IH NG AO R D AH T AY N
+metrics: PER: 0.571, dist: 8, len: 14, conf: 4.099
+
+MIRbxIO3CgXoqlD5wu0D3YLCZOy2-1590037209
+label: AY W UH D L AH B T UW AY M G OW IH NG T UW B IH Z IH T M AY F EH R AH N
+preds: AY W UH D R AA B T AH AY AE M G OW IH N T AH B IY D IH D M AY F EH R AH N
+metrics: PER: 0.31, dist: 9, len: 29, conf: 5.026
+
+bEA3NV9aCrMl3gFll1gED5JvZR43-1590037339
+label: AY W AO N IH D T UW CH EH K AW DH AH V AE T IH K AH N M Y UW Z IY AH M
+preds: AY W AA N T AH D T UW SH IH K G AW T DH AH V AE T IH K AH M IH Z IY AH M
+metrics: PER: 0.357, dist: 10, len: 28, conf: 8.962
+
+NWiRGEBgcYPkGrGIjUW0kWFsug53-1590040811
+label: AY M R IY S P AA N S AH B AH R F AO R G IH V IH NG IH N V EH S T M AH N T AH D V AY S T UW M AY K L AY AH N T S
+preds: AH N R AH F AA R V AH M ER P R AO N G IH V IY IH M D EH S M AH TH AH V DH AH V AY T F R AH M AY F AY ER N S
+metrics: PER: 0.638, dist: 30, len: 47, conf: 25.804
+
+8S9NgJTlO5Qo2wdTsuMN7GjUTWf2-1590040805
+label: AY Y UW ZH AH W AH L IY G R AE B T EY K AW T IH N DH AH IY V N IH NG
+preds: AH Y UW Z W AH L IY G R AE T T EY K HH AW T IH N DH AH IY V N IH NG
+metrics: PER: 0.185, dist: 5, len: 27, conf: 11.91
+
+IBeKKpBzbhafxjxCeqmkUBrt6Rj1-1590040844
+label: IH T S IY M Z F R AE Z AH L AH N IH N K AA M P AE T ER T UW M OW S T EH P S
+preds: AH EY T S IY M Z F R EH Z AH L AE N D IH N K AA M P EH R T ER T AH M OW S EH P T
+metrics: PER: 0.312, dist: 10, len: 32, conf: 48.497
+
+5OlTST5QhHdZ5bB1TTuqjnZ43eq1-1590040840
+label: Y EH B AH T AY M HH AE V IH NG T R AH B AH L D IH S AY D IH NG W EH R T UW L IH V AE F T ER K AA L IH JH
+preds: Y EH F AH T AY M HH AE V IH NG T R AH B ER N DH AH S AY Z IH NG L IH R T AH L IY V EH V DH ER Z AY
+metrics: PER: 0.429, dist: 18, len: 42, conf: 23.978
+
+8TkBJp6OUnaiGegeBVrJI2aRTF12-1590040806
+label: D AE T IH Z AH R IH N
+preds: DH AE T D IH Z AH R IY N
+metrics: PER: 0.333, dist: 3, len: 9, conf: 7.054
+
+vDKl3NoosVSBpYh7PqtzwsWFUI73-1590044449
+label: S OW EH K S T R AH
+preds: S OW EH S T R AH
+metrics: PER: 0.125, dist: 1, len: 8, conf: 2.204
+
+WIgR6StWpiTSD2GK39ifaf7Qvkw2-1590044405
+label: B AH T IH Z D EH R W AO M AH N Z JH AE K AH T AA N S EY L
+preds: B AH T IH Z D EH R HH W AH M AA N S S EH K IH T AA N S EY D
+metrics: PER: 0.333, dist: 8, len: 24, conf: 24.691
+
+oytHesQQevO5wk5FJO1myNhkGLv2-1590044408
+label: AY HH AE P AH B IH T AH V HH OW M ER K
+preds: AY HH AE P AH B IH T OW V HH OW M ER K
+metrics: PER: 0.067, dist: 1, len: 15, conf: 5.197
+
+m4rPeAIn70N1El7NIcjm3xxhvwd2-1590044561
+label: IH Z DH EH R AH L AA L AY B R EH L IY
+preds: W IH DH AW T AO L L AA T M AY P R AA P AH T
+metrics: PER: 0.867, dist: 13, len: 15, conf: 15.056
+
+np1gNspzs9dFEhNlZatMvLhCY8e2-1590048004
+label: AY M EY D AH L AA T AH V M AH N IY F R AH M F R AH M S T AA K M AA R K IH T
+preds: AY M EY D AH L AA T AH V B AA N IY F R AH M F R AH M M DH AH S T AA P M AA K EY T
+metrics: PER: 0.25, dist: 8, len: 32, conf: 15.223
+
+hcwUsqijn0bKbmjI4sZ4UCZMT2W2-1590048005
+label: B AH T D AH W EH D ER W AA Z S OW K OW R D AH N D W EH T
+preds: W IH T DH AH W ER D ER W ER D AH S OW K AO R D AE N D W EH D
+metrics: PER: 0.417, dist: 10, len: 24, conf: 10.264
+
+SplaSVjyUIW2wLjLp6WQ1oBrTKy1-1590048116
+label: AY V AO R W EY Z B IH N AH K R IY EY T P ER S AH N
+preds: AY V AO L R EY S TH IY N AH K R EY T P ER S AH N
+metrics: PER: 0.286, dist: 6, len: 21, conf: 8.212
+
+cMukMopnNBRJsT2wnWD0hhEGcyz2-1590051606
+label: OW N OW AY F ER G AA T T UW B R IH NG D EH M
+preds: AY N OW AY F OW G AA T T AH B R IH NG DH AH M
+metrics: PER: 0.278, dist: 5, len: 18, conf: 6.715
+
+nAdGxq3dBGgGe6edNb9FQsKUlOj2-1590055285
+label: W AH T S D IH S
+preds: L AH S DH IH S
+metrics: PER: 0.429, dist: 3, len: 7, conf: 4.485
+
+fLkNwFqPc8XakYU6iflk9XK1kNh2-1590055207
+label: W EH N W AH Z AH Y AO R W AE D IH NG
+preds: HH W EH N W AA Z DH OW Y UW AY W EH IH NG
+metrics: PER: 0.533, dist: 8, len: 15, conf: 7.438
+
+4hhdaJGA0HZRqk2BhADaUjATtOB2-1590055266
+label: AY M HH AE V IH NG T R AA B AH L D IH S AY D IH NG W AH T T UW D UW
+preds: AY M HH AE V IH NG T R AH B AH L D D IH S AY D IH NG W AH T D UW
+metrics: PER: 0.148, dist: 4, len: 27, conf: 4.546
+
+iZwJzXEgWDab39pkPHrQxMEYvYx2-1590055208
+label: AY G EH S D AE T S T R UW
+preds: AY G EH T S DH EH TH T R UW
+metrics: PER: 0.455, dist: 5, len: 11, conf: 4.339
+
+xo9FPWLf7ENRzZ2vMecgbwO9sIN2-1590058819
+label: M EH K SH UH R T UW
+preds: M EH K SH UH R T UW
+metrics: PER: 0.0, dist: 0, len: 8, conf: 4.119
+
+3iTx4ORucdSYoKsuGPhhVJbAa342-1590062422
+label: Y UW L UH K T AY ER D
+preds: D
+metrics: PER: 0.889, dist: 8, len: 9, conf: 2.303
+
+w64O8V1RuLRnIwJuFVCWZVzreFi1-1589929200
+label: HH AY K AE N Y UW F IH AH S IH N F IH T AH S IH N
+preds: P AY AH N K AE N Y UW F IY L S IY N F IY P AO L S L IY N
+metrics: PER: 0.6, dist: 12, len: 20, conf: 17.462
+
+AbLABxlDPyc8E82hfvFmoq0gVJv2-1589929203
+label: AY M L UH K IH NG F AO R AH D R EH S
+preds: AH N L UH K IH NG F AO R AH TH R EH S
+metrics: PER: 0.2, dist: 3, len: 15, conf: 4.189
+
+49lLRJqAMjhpW3KYbaKqyt5mtFl2-1589932868
+label: HH AW AA R Y UW IH T S B IH N AH W AY L
+preds: K L AE S HH AW AA R D Y UW IH Z B IH N AH W AY L
+metrics: PER: 0.438, dist: 7, len: 16, conf: 3.042
+
+ZZPJePUfRhTmy8dHrQt4LOoiDaB2-1589932878
+label: D IH D Y UW G OW AW T L AE DH N AY T
+preds: D IH D Y UW G UW AW T L AE F T N AW T
+metrics: PER: 0.267, dist: 4, len: 15, conf: 8.649
+
+hpbE8A0sCBY9K5S32QTAZhHtr5I3-1589936401
+label: DH AH B EH TH IH NG AH B AW T AY F OW N IH Z IH T S K AE M AH ER AH
+preds: DH AH B EH TH IH NG AH V AE AY F AO N IH Z HH IH Z K EH M AH
+metrics: PER: 0.385, dist: 10, len: 26, conf: 5.237
+
+ZkPAPIicAeeWoTXTM9vm0KewlJk1-1589936550
+label: AY SH UH D AH N T
+preds: AY SH UH D AH N
+metrics: PER: 0.143, dist: 1, len: 7, conf: 2.834
+
+KdMeE2IxfRhj1QCzCRRvdT03hoy2-1589936487
+label: W ER N AA T R EH D IY T UW AO R D ER Y EH T
+preds: HH IY N AA T R AH N IY T UW AO R D ER Y EH T
+metrics: PER: 0.222, dist: 4, len: 18, conf: 10.398
+
+5wAGhqUKJLZ41YkDdcbS1NPdTis2-1589936414
+label: N AA AW ER D AO R Z AA R B L UW
+preds: N AW AA R D AO R AH S AA R B L OW
+metrics: PER: 0.462, dist: 6, len: 13, conf: 5.224
+
+8vif8jCm2JbJxNtY0wSWxLD4koo2-1589940016
+label: IH T S AO L R EH D IY M AA R CH
+preds: IH N JH AO R AH N IY M ER CH
+metrics: PER: 0.538, dist: 7, len: 13, conf: 10.549
+
+WdQs3HNxHNPD5S7ODita9TFak7k2-1589940008
+label: AY AO L W EY Z HH AE V AH P IY S AH V T AO S T
+preds: EY OW L IH Z HH UW AH P IY S AH TH AH S T
+metrics: PER: 0.474, dist: 9, len: 19, conf: 14.914
+
+IOkih34mHkR2jyp8yWOVGqPXgKQ2-1589940070
+label: AY W AA N T T UW G EH T AW T AH V W ER K IH NG T AH M AA R OW
+preds: AY W AA N T T UW D DH EH T AW T OW V ER AE IH N T AH M AA R OW
+metrics: PER: 0.24, dist: 6, len: 25, conf: 9.287
+
+9xK1djiKknZcUcbpf9Xj46I3Fhw2-1589943657
+label: AY S AH M T AY M Z G OW T UW D AH JH IH M
+preds: AY S AH M T AY M F AO L T AH DH AH G IH M
+metrics: PER: 0.353, dist: 6, len: 17, conf: 5.258
+
+lH0PTSG7LRXUfOje8t9JTxpr24h1-1589943651
+label: IY V IH N AE T M IH D AH N AY T AY M W AY D AH W EY K
+preds: Y UW B AE N EY AE D B IH N AH N AY T AY M M AY T AH V EY K
+metrics: PER: 0.5, dist: 11, len: 22, conf: 9.151
+
+S23zMPxDRvZTCjiuTV65jzpEdwe2-1589943614
+label: AY HH ER T M AY F UH T R AY D IH NG M AY B AY S K ER
+preds: AY HH AA R D M AY F UH T R AY D IH NG M AY T B AY S K ER
+metrics: PER: 0.19, dist: 4, len: 21, conf: 1.983
+
+oSHQIHeRiHYWKQ8W7D9Thhhyp8F3-1589947227
+label: D AH HH AY S HH AE F T UW M EY K AH P
+preds: DH AH HH OW S HH AE P T M EY K G AA B
+metrics: PER: 0.467, dist: 7, len: 15, conf: 4.68
+
+FHjYLkVBnpOKtvcxM88RWEz3ssJ3-1589947265
+label: AY Y UW S D T UW D R IH NG K AH L AA T
+preds: AY Y UW F IH Z R IY P AH L AH V
+metrics: PER: 0.625, dist: 10, len: 16, conf: 5.474
+
+RHbj7tvTacbbwcx2XYcrx9jxWzq2-1589950812
+label: OW HH EY M AE K S
+preds: OW HH EY M AE K S
+metrics: PER: 0.0, dist: 0, len: 7, conf: 2.73
+
+NFkr6SOwUWhZ68CYsLDJ3aTvpiG2-1589954418
+label: AY V AO L W EY Z D R IY M D AH F W ER K IH NG AH B R OW D
+preds: AY W AO L W EY Z D R IY M D AH V W ER K IH NG OW B R OW D
+metrics: PER: 0.125, dist: 3, len: 24, conf: 7.3
+
+fnGtRByta9QLkqqHLUXwP3l53D93-1589958017
+label: AA IH Z SH IY AH T IY CH ER
+preds: IH Z SH IY AA R T IH K CH AA
+metrics: PER: 0.6, dist: 6, len: 10, conf: 7.021
+
+WW6QvxBeNeWXXn1oEJVLo2JpSwo2-1589958003
+label: AY AO R D ER Y ER S F R AY D CH IH K AH N
+preds: AY AO R D EH T IH R ER Z F AY DH AE T SH IY K IH T
+metrics: PER: 0.765, dist: 13, len: 17, conf: 7.678
+
+PAubN8Rf2OTDeoCGKYtzl9IHmwV2-1589961602
+label: Y UW R D R IH NG K S OW M AA CH
+preds: Y UW W AA T AH IH NG S OW M AH CH
+metrics: PER: 0.462, dist: 6, len: 13, conf: 7.493
+
+xiZbsUzVFchTQgpMBM6reqLqonD2-1589961609
+label: AY W EH N T HH OW M B AY T AE K S IY
+preds: AY W EH N T HH OW M B AY T AE K S T L IY
+metrics: PER: 0.133, dist: 2, len: 15, conf: 1.843
+
+puj9W11fAqOR6dN1vOC8dKzrGAf1-1589961601
+label: AY F IY L G R EY T
+preds: AY F IH R G R IH T
+metrics: PER: 0.375, dist: 3, len: 8, conf: 3.871
+
+Mojf6ZYtohbYYYUxQT5Y45zG7VW2-1589961603
+label: AY HH AE V IH N AH F M AA N IY
+preds: AY HH AE V Y UW N AH P M AH DH IY
+metrics: PER: 0.417, dist: 5, len: 12, conf: 8.305
+
+u6KW7l9lhrT6kLFDsyZDSMre2KC3-1589965206
+label: SH IY Z B AE P R IH D IY B IH G
+preds: B IY SH EY Z B EH R P AH T IH T IY P B IY T
+metrics: PER: 0.846, dist: 11, len: 13, conf: 41.512
+
+D4n2W6ooN6hzoHahOQAwsxBMJHp2-1589968809
+label: W EH L D AE S D AH P R AA B L AH M
+preds: W EH L DH AH S DH AA T P R AA B AH M
+metrics: PER: 0.4, dist: 6, len: 15, conf: 4.882
+
+ugS5HzlmzTcyCkBBANG5R1GIlaW2-1589968807
+label: IH W AA S AA N K R IH R AH N S
+preds: HH IY W AA Z AH N K R IY EH ER OW Z
+metrics: PER: 0.692, dist: 9, len: 13, conf: 13.029
+
+xUBvW5XEH9h82ad7sylVE9vTV3u2-1589968808
+label: AY L F OW R D AH M AY SH ER S AY F
+preds: AH AH AY L F AO R DH AH M AY SH AA R Z
+metrics: PER: 0.571, dist: 8, len: 14, conf: 21.087
+
+hFCvSgvcUafpQoYrJSPCDhwI4VN2-1589968801
+label: IH T S P R AA B AH B L IY AE T Y AO R L EH V EH L
+preds: IH N S P R AA B AH B L IY IY AE N D Y AO R L IH B AH L
+metrics: PER: 0.333, dist: 7, len: 21, conf: 6.96
+
+1z35JH69YbWc5NwBTVx108JJBsn2-1589972557
+label: HH EH L OW M AY N EY M IH Z K R IY S
+preds: AY L AO NG M AY N EY M IY Z K R EY S
+metrics: PER: 0.4, dist: 6, len: 15, conf: 4.495
+
+xiaDjrYhhXV7MRpNhW8vCcvL77J3-1589842816
+label: AY G R AE JH UW EY T IH D IH N Y UW S IY EH L EY IH N T W EH N IY
+preds: AY G R EH JH W EY T IH D IH N Y UW SH EH D EY IH N
+metrics: PER: 0.385, dist: 10, len: 26, conf: 6.994
+
+zt3gbw8QpiQkELpIS9u5waBqjHy1-1589846427
+label: K UH D Y UW T EH R M IY
+preds: K UH D Y UW R T ER M IY
+metrics: PER: 0.3, dist: 3, len: 10, conf: 1.426
+
+mgnDrkeVSxdhKwlVEgu5u6YYHOr1-1589868005
+label: D IH S JH AE K IH S AH L IH T ER T AY T ER AW N D M AY SH OW L D ER S
+preds: DH IY Z TH R AH K AH S AO L W EH DH ER T AY T AO R AW N D M AY F AO R D ER Z
+metrics: PER: 0.607, dist: 17, len: 28, conf: 13.836
+
+SIdkojaYxtSl1qhKK3I6p8nVXJ02-1589875223
+label: K UH D Y UW R IY M AY N M IY AH B AW T DH AH S EY ER K UH D Y UW R IY M AY N M IY AH B AW T DH AH
+preds: DH EY M EH M IY AH B AW T DH AH S EH R K R IH T AH D IY M AY M IY AH V
+metrics: PER: 0.564, dist: 22, len: 39, conf: 16.558
+
+zWIOAT1RyShF5C2JyUeIiMjMdzj1-1589882431
+label: AY HH AE V T UW K AH Z AH N S
+preds: AY HH AE V T UW K AO Z AA N DH AH S
+metrics: PER: 0.333, dist: 4, len: 12, conf: 3.662
+
+sZhbKcmCNXhkGzGaXR47zGexxpn1-1589882450
+label: W IH L P EY S EH P ER L IY
+preds: UW EH P EY S EH V AH L D IY
+metrics: PER: 0.545, dist: 6, len: 11, conf: 8.382
+
+vs6bCHeifnSSvBS5y4FGFFPg0an2-1589886001
+label: B AH T IH S N AA T R IH L IY HH EH R P IH NG
+preds: B AA DH IY Z M AW L IY ER N IY HH AA R P IY NG B
+metrics: PER: 0.722, dist: 13, len: 18, conf: 12.46
+
+HFd3BBoF95frI91I5AvBfpGA6s53-1589889601
+label: W IY L AH V Y UW B EH N W IY L AH
+preds: W IY L OW B AH Y UW B EH N Z
+metrics: PER: 0.5, dist: 7, len: 14, conf: 3.977
+
