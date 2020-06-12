@@ -44,10 +44,7 @@ def run(model_path, dataset_json, batch_size=1, tag="best",
     use_cuda = torch.cuda.is_available()
     model, preproc = speech.load(model_path, tag=tag)
     preproc.update()
-    if not hasattr(preproc, "speed_vol_perturb"):
-        preproc.speed_vol_perturb = False
-    if not hasattr(preproc, "normalize"):
-        preproc.normalize = "batch_normalize"
+
     if config_path is not None:
         with open(config_path, 'r') as fid:
             config = json.load(fid)
@@ -59,6 +56,7 @@ def run(model_path, dataset_json, batch_size=1, tag="best",
         print(f"new_preproc sum of mean, std: {new_preproc.mean.sum()},{new_preproc.std.sum()}")
         print(f"new preproc attr: {new_preproc}")
         preproc = new_preproc
+    
     ldr =  loader.make_loader(dataset_json,
             preproc, batch_size)
     model.cuda() if use_cuda else model.cpu()
