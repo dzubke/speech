@@ -1,9 +1,9 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200611/",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200612/",
     "data" : {
-         "train_set" : "/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json",
-        "dev_set" : "/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json",
+         "train_set" : "/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/old_datasets/train_20200305.json",
+        "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
         "start_and_end" : false
     },
 
