@@ -23,6 +23,7 @@ import tqdm
 import speech
 import speech.loader as loader
 from speech.models.ctc_model_train import CTC_train
+from speech.utils.model_debug import check_nan, log_conv_grads, plot_grad_flow_line, plot_grad_flow_bar
 # TODO, (awni) why does putting this above crash..
 import tensorboard_logger as tb
 
@@ -55,6 +56,8 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         #print(f"loss value 1: {loss.data[0]}")
         loss.backward()
         if use_log: logger.info(f" Backward run ")
+        #plot_grad_flow_line(model.named_parameters())
+        #plot_grad_flow_bar(model.named_parameters())
 
         grad_norm = nn.utils.clip_grad_norm_(model.parameters(), 200)
         if use_log: logger.info(f" Grad_norm clipped ")
@@ -292,26 +295,8 @@ def filter_state_dict(state_dict, remove_layers=[]):
         )
     return state_dict
 
-def check_nan(model):
-    """
-    checks an iterator of training inputs if any of them have nan values
-    """
-    for param in model.parameters():
-        if (param!=param).any():
-            return True
-    return False
 
-def log_conv_grads(model, logger):
-    """
-    records the gradient values for the weight values in model into
-    the logger
-    """
-    # layers with weights
-    weight_layer_types = [torch.nn.modules.conv.Conv2d, torch.nn.modules.batchnorm.BatchNorm2d]
-    # only iterating through conv layers in first elemment of model children
-    for layer in [*model.children()][0]:
-        if type(layer) in weight_layer_types:
-            logger.error(f"grad: {layer}: {layer.weight.grad}")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
