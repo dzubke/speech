@@ -22,7 +22,7 @@ import speech
 import speech.loader as loader
 from speech.models.ctc_model_train import CTC_train
 from speech.utils.model_debug import check_nan, log_conv_grads, plot_grad_flow_line, plot_grad_flow_bar
-from speech.utils.model_debug import save_batch_log_stats
+from speech.utils.model_debug import save_batch_log_stats, log_batchnorm_mean_std, log_layer_grad_norms
 # TODO, (awni) why does putting this above crash..
 import tensorboard_logger as tb
 
@@ -44,6 +44,8 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         temp_batch = list(batch)    # this was added as the batch generator was being exhausted when it was called
 
         if use_log: save_batch_log_stats(temp_batch, logger)
+        if use_log: log_batchnorm_mean_std(model.state_dict(), logger)
+        if use_log: log_layer_grad_norms(model.named_parameters(), logger)
  
         start_t = time.time()
         optimizer.zero_grad()

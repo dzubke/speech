@@ -56,18 +56,51 @@ def save_batch_log_stats(batch:tuple, logger):
 
     if logger is not None:
         # temp_batch is (inputs, labels) so temp_batch[0] is the inputs
-        batch_std = list(map(np.std, batch[0]))
-        batch_mean = list(map(np.mean, batch[0]))
-        batch_max = list(map(np.max, batch[0]))
-        batch_min = list(map(np.min, batch[0]))
-        inputs_length = list(map(lambda x: x.shape[0], batch[0]))
-        labels_length = list(map(len, batch[1]))
-        logger.info(f"batch_stats: batch_length: {len(batch[0])}, inputs_length: {inputs_length}, labels_length: {labels_length}")
+        batch_sample_stds = list(map(np.std, batch[0]))
+        batch_sample_means = list(map(np.mean, batch[0]))
+        batch_sample_maxes = list(map(np.max, batch[0]))
+        batch_sample_mins = list(map(np.min, batch[0]))
+        input_sample_lengths = list(map(lambda x: x.shape[0], batch[0]))
+        label_sample_lengths = list(map(len, batch[1]))
+        stacked_batch = np.vstack(batch[0])
+        batch_mean = np.mean(stacked_batch)
+        batch_std = np.std(stacked_batch)
+
+        logger.info(f"batch_stats: batch_length: {len(batch[0])}, inputs_length: {input_sample_lengths}, labels_length: {label_sample_lengths}")
+        logger.info(f"batch_stats: batch_sample_mean: {batch_sample_means}")
+        logger.info(f"batch_stats: batch_sample_std: {batch_sample_stds}")
+        logger.info(f"batch_stats: batch_sample_max: {batch_sample_maxes}")
+        logger.info(f"batch_stats: batch_sample_min: {batch_sample_mins}")
         logger.info(f"batch_stats: batch_mean: {batch_mean}")
         logger.info(f"batch_stats: batch_std: {batch_std}")
-        logger.info(f"batch_stats: batch_max: {batch_max}")
-        logger.info(f"batch_stats: batch_min: {batch_min}")
 
+
+def log_batchnorm_mean_std(state_dict:dict, logger):
+    """
+    logs the running mean and variance of the batch_norm layers.
+    Both the running mean and variance have the word "running" in the name which is
+    how they are selected amongst the other layers in the state_dict.
+    Arguments:
+        state_dict - dict: the model's state_dict
+    """
+
+    for name, values in state_dict.items():
+        if "running" in name:
+            logger.info(f"batch_norm_layers: {name}: {values}")
+
+
+def log_layer_grad_norms(named_parameters:dict, logger):
+    """
+    Calculates the logs the norm of the gradients of the parameters
+    norm_type is hardcoded to 2.0
+    Arguments:
+        parameters - list: ouput from model.named_parameters()
+    """
+    norm_type = 2.0
+    for name, param in named_parameters:
+        if param.grad is not None:
+            logger.info(f"layer_norm: {name}: {torch.norm(param.grad.detach(), norm_type)}")
+        
 
 # plot_grad_flow comes from this post:
 # https://discuss.pytorch.org/t/check-gradient-flow-in-network/15063/7
@@ -99,59 +132,35 @@ def plot_grad_flow_bar(named_parameters):
     ave_grads = []
     max_grads= []
     layers = []
-    for n, p in named_parameters:
-        if(p.requires_grad) and ("bias" not in n):
-            layers.append(n)
-            ave_grads.append(p.grad.abs().mean())
-            max_grads.append(p.grad.abs().max())
+    for name, param in named_parameters:
+        if(param.requires_grad) and ("bias" not in name):
+            layers.append(name)
+            ave_grads.append(param.grad.abs().mean())
+            max_grads.append(param.grad.abs().max())
     fig, ax1 = plt.subplots()
-    ax1.bar(np.arange(len(max_grads)), max_grads, alpha=0.1, lw=1, color="c")
+    ax1_color = 'c'
+    ax2_color = 'b'
+    ax1.bar(np.arange(len(max_grads)), max_grads, alpha=0.4, lw=1, color=ax1_color)
+    ax1.tick_params(axis='y', labelcolor=ax1_color)
+    ax1.tick_params(axis='x', labelrotation=90)
     ax2 = ax1.twinx()
-    ax2.bar(np.arange(len(max_grads)), ave_grads, alpha=0.1, lw=1, color="b")
-    ax2.tick_params(axis='y', labelcolor=color)
+    ax2.bar(np.arange(len(max_grads)), ave_grads, alpha=0.4, lw=1, color=ax2_color)
+    ax2.tick_params(axis='y', labelcolor=ax2_color)
     plt.hlines(0, 0, len(ave_grads)+1, lw=2, color="k" )
     plt.xticks(range(0,len(ave_grads), 1), layers, rotation="vertical")
     plt.xlim(left=0, right=len(ave_grads))
-    plt.ylim(bottom = -0.001, top=1.0) # zoom in on the lower gradient regions
+    #plt.ylim(bottom = -0.001, top=1.0) # zoom in on the lower gradient regions
     plt.xlabel("Layers")
-    plt.ylabel("average gradient")
+    ax1.set_ylabel("max gradients", color=ax1_color)
+    ax2.set_ylabel("average gradients", color=ax2_color)
     plt.title("Gradient flow")
     plt.grid(True)
-    plt.legend([Line2D([0], [0], color="c", lw=4),
-                Line2D([0], [0], color="b", lw=4),
+    plt.legend([Line2D([0], [0], color=ax1_color, lw=4),
+                Line2D([0], [0], color=ax2_color, lw=4),
                 Line2D([0], [0], color="k", lw=4)], ['max-gradient', 'mean-gradient', 'zero-gradient'])
     save_path = "./plots/grad_flow_bar_{}.png".format(datetime.now().strftime("%Y-%m-%d_%Hhr"))
     plt.savefig(save_path, bbox_inches="tight")
 
-def plot_grad_flow_bar(named_parameters):
-    '''Plots the gradients flowing through different layers in the net during training.
-    Can be used for checking for possible gradient vanishing / exploding problems.
-    
-    Usage: Plug this function in Trainer class after loss.backwards() as 
-    "plot_grad_flow(self.model.named_parameters())" to visualize the gradient flow'''
-    ave_grads = []
-    max_grads= []
-    layers = []
-    for n, p in named_parameters:
-        if(p.requires_grad) and ("bias" not in n):
-            layers.append(n)
-            ave_grads.append(p.grad.abs().mean())
-            max_grads.append(p.grad.abs().max())
-    plt.bar(np.arange(len(max_grads)), max_grads, alpha=0.1, lw=1, color="c")
-    plt.bar(np.arange(len(max_grads)), ave_grads, alpha=0.1, lw=1, color="b")
-    plt.hlines(0, 0, len(ave_grads)+1, lw=2, color="k" )
-    plt.xticks(range(0,len(ave_grads), 1), layers, rotation="vertical")
-    plt.xlim(left=0, right=len(ave_grads))
-    plt.ylim(bottom = -0.001, top=1.0) # zoom in on the lower gradient regions
-    plt.xlabel("Layers")
-    plt.ylabel("average gradient")
-    plt.title("Gradient flow")
-    plt.grid(True)
-    plt.legend([Line2D([0], [0], color="c", lw=4),
-                Line2D([0], [0], color="b", lw=4),
-                Line2D([0], [0], color="k", lw=4)], ['max-gradient', 'mean-gradient', 'zero-gradient'])
-    save_path = "./plots/grad_flow_bar_{}.png".format(datetime.now().strftime("%Y-%m-%d_%Hhr"))
-    plt.savefig(save_path, bbox_inches="tight")
 
 # bad_grad_viz functions come from here:
 # https://gist.github.com/apaszke/f93a377244be9bfcb96d3547b9bc424d
