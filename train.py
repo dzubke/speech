@@ -14,6 +14,7 @@ import pickle
 import random
 import time
 # third-party libraries
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim
@@ -39,8 +40,11 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
     tq = tqdm.tqdm(train_ldr)
     for batch in tq:
         if use_log: logger.info(f"====== Inside run_epoch =======")
-
+        
         temp_batch = list(batch)    # this was added as the batch generator was being exhausted when it was called
+
+        if use_log: save_batch_log_stats(temp_batch, logger)
+ 
         start_t = time.time()
         optimizer.zero_grad()
         if use_log: logger.info(f" Optimizer zero_grad")
@@ -77,10 +81,14 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         tq.set_postfix(iter=it, loss=loss,
                 avg_loss=avg_loss, grad_norm=grad_norm,
                 model_time=model_t, data_time=data_t)
+        
+       
         if use_log: logger.info(f'loss is inf: {loss == float("inf")}')
         if use_log: logger.info(f"iter={it}, loss={round(loss,3)}, grad_norm={round(grad_norm,3)}")
         inputs, labels, input_lens, label_lens = model.collate(*temp_batch)
-
+        if use_log: logger.info(f"iter={it}, loss={round(loss,3)}, grad_norm={round(grad_norm,3)}")        
+        
+        
         if check_nan(model):
             if use_log: logger.error(f"labels: {[labels]}, label_lens: {label_lens} state_dict: {model.state_dict()}")
             if use_log: log_conv_grads(model, logger)
@@ -227,13 +235,38 @@ def run(config):
                     config["save_path"], tag="best")
         if use_log: preproc.logger = logger
 
+def save_batch_log_stats(batch:tuple, logger):
+    """
+    saves the batch to disk and logs a variety of information from a batch. 
+    Arguments:
+        batch - tuple(list(np.2darray), list(list)): a tuple of inputs and phoneme labels
+    """
+    today = str(date.today())
+    batch_save_path = "./current-batch_{}.pickle".format(today) 
+    with open(batch_save_path, 'wb') as fid: # save current batch to disk for debugging purposes
+        pickle.dump(batch, fid)
+
+    if logger is not None:
+        # temp_batch is (inputs, labels) so temp_batch[0] is the inputs
+        batch_std = list(map(np.std, batch[0]))
+        batch_mean = list(map(np.mean, batch[0]))
+        batch_max = list(map(np.max, batch[0]))
+        batch_min = list(map(np.min, batch[0]))
+        inputs_length = list(map(lambda x: x.shape[0], batch[0]))
+        labels_length = list(map(len, batch[1]))
+        logger.info(f"batch_stats: batch_length: {len(batch[0])}, batch_mean: {batch_mean}, batch_std: {batch_std}")
+        logger.info(f"batch_stats: batch_max: {batch_max}, batch_min: {batch_min}")
+        logger.info(f"batch_stats: inputs_length: {inputs_length}, labels_length: {labels_length}")
+
+
+
 def load_from_trained(model, model_cfg):
     """
-        loads the model with pretrained weights from the model in
-        model_cfg["trained_path"]
-        Arguments:
-            model (torch model)
-            model_cfg (dict)
+    loads the model with pretrained weights from the model in
+    model_cfg["trained_path"]
+    Arguments:
+        model (torch model)
+        model_cfg (dict)
     """
     trained_model = torch.load(model_cfg["trained_path"], map_location=torch.device('cpu'))
     trained_state_dict = trained_model.state_dict()
@@ -246,11 +279,11 @@ def load_from_trained(model, model_cfg):
 
 def filter_state_dict(state_dict, remove_layers=[]):
     """
-        filters the inputted state_dict by removing the layers specified
-        in remove_layers
-        Arguments:
-            state_dict (OrderedDict): state_dict of pytorch model
-            remove_layers (list(str)): list of layers to remove 
+    filters the inputted state_dict by removing the layers specified
+    in remove_layers
+    Arguments:
+        state_dict (OrderedDict): state_dict of pytorch model
+        remove_layers (list(str)): list of layers to remove 
     """
 
     state_dict = OrderedDict(
@@ -261,7 +294,7 @@ def filter_state_dict(state_dict, remove_layers=[]):
 
 def check_nan(model):
     """
-        checks an iterator of training inputs if any of them have nan values
+    checks an iterator of training inputs if any of them have nan values
     """
     for param in model.parameters():
         if (param!=param).any():
