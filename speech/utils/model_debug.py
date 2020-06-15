@@ -4,7 +4,8 @@
 # Date: 2020-06-12
 
 # standard libraries
-from datetime import datetime
+from datetime import datetime, date
+import pickle
 # third-party libraries
 from graphviz import Digraph
 from matplotlib.lines import Line2D
@@ -17,11 +18,14 @@ from torch.autograd import Variable, Function
 
 def check_nan(model:torch.nn.Module):
     """
-    checks an iterator of training inputs if any of them have nan values
+    checks an iterator of model parameters and gradients if any of them have nan values
     """
     for param in model.parameters():
         if (param!=param).any():
             return True
+        if param.requires_grad:
+            if (param.grad != param.grad).any():
+                return True
     return False
 
 
@@ -37,6 +41,32 @@ def log_conv_grads(model:torch.nn.Module, logger):
     for layer in [*model.children()][0]:
         if type(layer) in weight_layer_types:
             logger.error(f"grad: {layer}: {layer.weight.grad}")
+
+
+def save_batch_log_stats(batch:tuple, logger):
+    """
+    saves the batch to disk and logs a variety of information from a batch. 
+    Arguments:
+        batch - tuple(list(np.2darray), list(list)): a tuple of inputs and phoneme labels
+    """
+    today = str(date.today())
+    batch_save_path = "./current-batch_{}.pickle".format(today)
+    with open(batch_save_path, 'wb') as fid: # save current batch to disk for debugging purposes
+        pickle.dump(batch, fid)
+
+    if logger is not None:
+        # temp_batch is (inputs, labels) so temp_batch[0] is the inputs
+        batch_std = list(map(np.std, batch[0]))
+        batch_mean = list(map(np.mean, batch[0]))
+        batch_max = list(map(np.max, batch[0]))
+        batch_min = list(map(np.min, batch[0]))
+        inputs_length = list(map(lambda x: x.shape[0], batch[0]))
+        labels_length = list(map(len, batch[1]))
+        logger.info(f"batch_stats: batch_length: {len(batch[0])}, inputs_length: {inputs_length}, labels_length: {labels_length}")
+        logger.info(f"batch_stats: batch_mean: {batch_mean}")
+        logger.info(f"batch_stats: batch_std: {batch_std}")
+        logger.info(f"batch_stats: batch_max: {batch_max}")
+        logger.info(f"batch_stats: batch_min: {batch_min}")
 
 
 # plot_grad_flow comes from this post:

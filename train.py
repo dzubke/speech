@@ -5,12 +5,10 @@ from __future__ import print_function
 # standard libraries
 import argparse
 from collections import OrderedDict
-from datetime import date
 import itertools
 import json
 import logging
 import math
-import pickle
 import random
 import time
 # third-party libraries
@@ -24,6 +22,7 @@ import speech
 import speech.loader as loader
 from speech.models.ctc_model_train import CTC_train
 from speech.utils.model_debug import check_nan, log_conv_grads, plot_grad_flow_line, plot_grad_flow_bar
+from speech.utils.model_debug import save_batch_log_stats
 # TODO, (awni) why does putting this above crash..
 import tensorboard_logger as tb
 
@@ -40,7 +39,7 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
     end_t = time.time()
     tq = tqdm.tqdm(train_ldr)
     for batch in tq:
-        if use_log: logger.info(f"====== Inside run_epoch =======")
+        if use_log: logger.info(f"train: ====== Inside run_epoch =======")
         
         temp_batch = list(batch)    # this was added as the batch generator was being exhausted when it was called
 
@@ -48,52 +47,50 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
  
         start_t = time.time()
         optimizer.zero_grad()
-        if use_log: logger.info(f" Optimizer zero_grad")
+        if use_log: logger.info(f"train: Optimizer zero_grad")
 
         loss = model.loss(temp_batch)
-        if use_log: logger.info(f" Loss calculated")
+        if use_log: logger.info(f"train: Loss calculated")
 
         #print(f"loss value 1: {loss.data[0]}")
         loss.backward()
-        if use_log: logger.info(f" Backward run ")
+        if use_log: logger.info(f"train: Backward run ")
         #plot_grad_flow_line(model.named_parameters())
-        #plot_grad_flow_bar(model.named_parameters())
+        plot_grad_flow_bar(model.named_parameters())
 
         grad_norm = nn.utils.clip_grad_norm_(model.parameters(), 200)
-        if use_log: logger.info(f" Grad_norm clipped ")
+        if use_log: logger.info(f"train: Grad_norm clipped ")
 
         loss = loss.item()
-        if use_log: logger.info(f" loss reassigned ")
+        if use_log: logger.info(f"train: loss reassigned ")
 
         #loss = loss.data[0]
 
         optimizer.step()
-        if use_log: logger.info(f" Grad_norm clipped ")
+        if use_log: logger.info(f"train: Grad_norm clipped ")
 
         prev_end_t = end_t
         end_t = time.time()
         model_t += end_t - start_t
         data_t += start_t - prev_end_t
-        if use_log: logger.info(f" time calculated ")
+        if use_log: logger.info(f"train: time calculated ")
 
 
         exp_w = 0.99
         avg_loss = exp_w * avg_loss + (1 - exp_w) * loss
-        if use_log: logger.info(f"Avg loss: {loss}")
+        if use_log: logger.info(f"train: Avg loss: {loss}")
         tb.log_value('train_loss', loss, it)
         tq.set_postfix(iter=it, loss=loss,
                 avg_loss=avg_loss, grad_norm=grad_norm,
                 model_time=model_t, data_time=data_t)
         
        
-        if use_log: logger.info(f'loss is inf: {loss == float("inf")}')
-        if use_log: logger.info(f"iter={it}, loss={round(loss,3)}, grad_norm={round(grad_norm,3)}")
+        if use_log: logger.info(f'train: loss is inf: {loss == float("inf")}')
+        if use_log: logger.info(f"train: iter={it}, loss={round(loss,3)}, grad_norm={round(grad_norm,3)}")
         inputs, labels, input_lens, label_lens = model.collate(*temp_batch)
-        if use_log: logger.info(f"iter={it}, loss={round(loss,3)}, grad_norm={round(grad_norm,3)}")        
-        
         
         if check_nan(model):
-            if use_log: logger.error(f"labels: {[labels]}, label_lens: {label_lens} state_dict: {model.state_dict()}")
+            if use_log: logger.error(f"train: labels: {[labels]}, label_lens: {label_lens} state_dict: {model.state_dict()}")
             if use_log: log_conv_grads(model, logger)
         it += 1
 
@@ -105,37 +102,37 @@ def eval_dev(model, ldr, preproc,  logger):
     model.set_eval()
     preproc.set_eval()  # this turns off dataset augmentation
     use_log = (logger is not None)
-    if use_log: logger.info(f" set_eval ")
+    if use_log: logger.info(f"eval_dev: set_eval ")
 
 
     with torch.no_grad():
         for batch in tqdm.tqdm(ldr):
-            if use_log: logger.info(f"=====Inside batch loop=====")
+            if use_log: logger.info(f"eval_dev: =====Inside batch loop=====")
             temp_batch = list(batch)
-            if use_log: logger.info(f"batch converted")
+            if use_log: logger.info(f"eval_dev: batch converted")
             preds = model.infer(temp_batch)
-            if use_log: logger.info(f"infer call")
+            if use_log: logger.info(f"eval_dev: infer call")
             loss = model.loss(temp_batch)
-            if use_log: logger.info(f"loss calculated as: {loss.item():0.3f}")
-            if use_log: logger.info(f"loss is nan: {math.isnan(loss.item())}")
+            if use_log: logger.info(f"eval_dev: loss calculated as: {loss.item():0.3f}")
+            if use_log: logger.info(f"eval_dev: loss is nan: {math.isnan(loss.item())}")
             losses.append(loss.item())
-            if use_log: logger.info(f"loss appended")
+            if use_log: logger.info(f"eval_dev: loss appended")
             #losses.append(loss.data[0])
             all_preds.extend(preds)
-            if use_log: logger.info(f"preds: {preds}")
+            if use_log: logger.info(f"eval_dev: preds: {preds}")
             all_labels.extend(temp_batch[1])        #add the labels in the batch object
-            if use_log: logger.info(f"labels: {temp_batch[1]}")
+            if use_log: logger.info(f"eval_dev: labels: {temp_batch[1]}")
 
     model.set_train()
     preproc.set_train()
-    if use_log: logger.info(f"set_train")
+    if use_log: logger.info(f"eval_dev: set_train")
 
     loss = sum(losses) / len(losses)
-    if use_log: logger.info(f"Avg loss: {loss}")
+    if use_log: logger.info(f"eval_dev: Avg loss: {loss}")
 
     results = [(preproc.decode(l), preproc.decode(p))              # decodes back to phoneme labels
                for l, p in zip(all_labels, all_preds)]
-    if use_log: logger.info(f"results {results}")
+    if use_log: logger.info(f"eval_dev: results {results}")
     cer = speech.compute_cer(results)
     print("Dev: Loss {:.3f}, CER {:.3f}".format(loss, cer))
     if use_log: logger.info(f"CER: {cer}")
@@ -169,9 +166,9 @@ def run(config):
     preproc = loader.Preprocessor(data_cfg["train_set"], preproc_cfg, logger, 
                   start_and_end=data_cfg["start_and_end"])
     train_ldr = loader.make_loader(data_cfg["train_set"],
-                        preproc, batch_size)
+                        preproc, batch_size, num_workers=data_cfg["num_workers"])
     dev_ldr = loader.make_loader(data_cfg["dev_set"],
-                        preproc, batch_size)
+                        preproc, batch_size, num_workers=data_cfg["num_workers"])
 
     # Model
     model = CTC_train(preproc.input_dim,
@@ -191,10 +188,10 @@ def run(config):
         step_size=opt_cfg["sched_step"], 
         gamma=opt_cfg["sched_gamma"])
 
-    if use_log: logger.info(f"====== Model, loaders, optimimzer created =======")
-    if use_log: logger.info(f"model: {model}")
-    if use_log: logger.info(f"preproc: {preproc}")
-    if use_log: logger.info(f"optimizer: {optimizer}")
+    if use_log: logger.info(f"train: ====== Model, loaders, optimimzer created =======")
+    if use_log: logger.info(f"train: model: {model}")
+    if use_log: logger.info(f"train: preproc: {preproc}")
+    if use_log: logger.info(f"train: optimizer: {optimizer}")
 
     # printing to the output file
     print(f"====== Model, loaders, optimimzer created =======")
@@ -211,8 +208,8 @@ def run(config):
             print(f'learning rate: {g["lr"]}')
         
         run_state = run_epoch(model, optimizer, train_ldr, logger, *run_state)
-        if use_log: logger.info(f"====== Run_state finished =======") 
-        if use_log: logger.info(f"preproc type: {type(preproc)}")
+        if use_log: logger.info(f"train: ====== Run_state finished =======") 
+        if use_log: logger.info(f"train: preproc type: {type(preproc)}")
 
         msg = "Epoch {} completed in {:.2f} (s)."
         print(msg.format(e, time.time() - start))
@@ -220,11 +217,11 @@ def run(config):
 
         if use_log: preproc.logger = None
         speech.save(model, preproc, config["save_path"])
-        if use_log: logger.info(f"====== model saved =======")
+        if use_log: logger.info(f"train: ====== model saved =======")
         if use_log: preproc.logger = logger
 
         dev_loss, dev_cer = eval_dev(model, dev_ldr, preproc, logger)
-        if use_log: logger.info(f"====== eval_dev finished =======")
+        if use_log: logger.info(f"train: ====== eval_dev finished =======")
 
         # Log for tensorboard
         tb.log_value("dev_loss", dev_loss, e)
@@ -237,30 +234,6 @@ def run(config):
             speech.save(model, preproc,
                     config["save_path"], tag="best")
         if use_log: preproc.logger = logger
-
-def save_batch_log_stats(batch:tuple, logger):
-    """
-    saves the batch to disk and logs a variety of information from a batch. 
-    Arguments:
-        batch - tuple(list(np.2darray), list(list)): a tuple of inputs and phoneme labels
-    """
-    today = str(date.today())
-    batch_save_path = "./current-batch_{}.pickle".format(today) 
-    with open(batch_save_path, 'wb') as fid: # save current batch to disk for debugging purposes
-        pickle.dump(batch, fid)
-
-    if logger is not None:
-        # temp_batch is (inputs, labels) so temp_batch[0] is the inputs
-        batch_std = list(map(np.std, batch[0]))
-        batch_mean = list(map(np.mean, batch[0]))
-        batch_max = list(map(np.max, batch[0]))
-        batch_min = list(map(np.min, batch[0]))
-        inputs_length = list(map(lambda x: x.shape[0], batch[0]))
-        labels_length = list(map(len, batch[1]))
-        logger.info(f"batch_stats: batch_length: {len(batch[0])}, batch_mean: {batch_mean}, batch_std: {batch_std}")
-        logger.info(f"batch_stats: batch_max: {batch_max}, batch_min: {batch_min}")
-        logger.info(f"batch_stats: inputs_length: {inputs_length}, labels_length: {labels_length}")
-
 
 
 def load_from_trained(model, model_cfg):

@@ -40,13 +40,13 @@ def apply_spec_augment(inputs, logger):
             }
     
     policy_choice = np.random.randint(low=0, high=4)
-    if use_log: logger.info(f"app spec_aug: policy: {policy_choice}")
+    if use_log: logger.info(f"spec_aug: policy: {policy_choice}")
 
     policy = policy_dict.get(policy_choice)
 
     # the inputs need to be transposed and converted to torch tensor
     # as spec_augment method expects tensor with freq x time dimensions
-    if use_log: logger.info(f"app s_a: input shape: {inputs.shape}")
+    if use_log: logger.info(f"spec_aug: input shape: {inputs.shape}")
 
     inputs = torch.from_numpy(inputs.T)
 
@@ -126,11 +126,11 @@ def spec_augment(mel_spectrogram, time_warping_para=5, frequency_masking_para=50
     v = mel_spectrogram.shape[1]
     tau = mel_spectrogram.shape[2]
     if use_log: logger.info(f"spec_aug: nu is: {v}")
-    if use_log: logger.info(f"tau is: {tau}")
+    if use_log: logger.info(f"spec_aug: tau is: {tau}")
 
     # Step 1 : Time warping
     warped_mel_spectrogram = time_warp(mel_spectrogram, W=time_warping_para, logger=logger)
-    if use_log: logger.info(f"finished time_warp")
+    if use_log: logger.info(f"spec_aug: finished time_warp")
     #warped_mel_spectrogram = mel_spectrogram
 
     # Step 2 : Frequency masking
