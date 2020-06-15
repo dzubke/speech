@@ -35,9 +35,11 @@ class CTC_train(ctc_model.CTC):
         # padding is half the filters of the 3 conv layers. 
         # conv.children are: [Conv2d, BatchNorm2d, ReLU, Dropout, Conv2d, 
         # BatchNorm2d, ReLU, Dropout, Conv2d, BatchNorm2d, ReLU, Dropout]
+        # conv indicies with batch norm: 0, 4, 8
+        # conv layer indicies without batch norm: 0, 3, 6
         pad = list(self.conv.children())[0].kernel_size[0]//2 + \
-            list(self.conv.children())[3].kernel_size[0]//2 + \
-            list(self.conv.children())[6].kernel_size[0]//2
+            list(self.conv.children())[4].kernel_size[0]//2 + \
+            list(self.conv.children())[8].kernel_size[0]//2
         x = nn.functional.pad(x, (0,0,pad,pad))
 
         x, rnn_args = self.encode(x, rnn_args)    
