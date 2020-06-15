@@ -9,7 +9,7 @@
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-06-12_noBatchNorm_lib-ted-cv-VAL.log"
+        "log_file": "logs/2020-06-15_withBatchNorm_lib-ted-cv-VAL.log"
     },
     "preproc":{
         "preprocessor": "log_spectrogram",
@@ -45,7 +45,7 @@
         "dropout" : 0.4,
         "load_trained": true,
         "trained_path": "examples/librispeech/models/ctc_models/20200601/20200607/best_model", 
-        "remove_layers": ["conv.9.weight", "conv.9.bias", "conv.9.running_mean", "conv.9.running_var", "conv.9.num_batches_tracked", "conv.1.weight", "conv.1.bias", "conv.1.running_mean", "conv.1.running_var", "conv.1.num_batches_tracked", "conv.4.weight", "conv.4.bias", "conv.5.weight", "conv.5.bias", "conv.5.running_mean", "conv.5.running_var", "conv.5.num_batches_tracked", "conv.8.weight", "conv.8.bias"],
+        "remove_layers": [],
         "encoder" : {
             "conv" : [
 			[32, 11, 41, 1, 2, 0, 20],
