@@ -108,7 +108,7 @@ class Preprocessor():
         elif self.normalize == "sample_normalize":
             feature_data = self.feature_normalize(feature_data)
         else: 
-           raise ValueError("preproc config normalize value must be: 'batch_normalize' or 'sample_normalize'")
+            raise ValueError("preproc config normalize value must be: 'batch_normalize' or 'sample_normalize'")
         if self.use_log: self.logger.info(f"preproc: normalized")
         
         feature_data = self.feature_augmentations(feature_data)
@@ -118,7 +118,8 @@ class Preprocessor():
         if self.use_log: self.logger.info(f"preproc: text encoded")
 
         return feature_data, targets
-    
+
+
     def signal_augmentations(self, wave_file:str)-> tuple:
         """
         Performs all of the augmtations to the raw audio signal. The audio data is in pcm16 format.
