@@ -12,6 +12,7 @@ import math
 import random
 import time
 # third-party libraries
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn as nn
@@ -209,7 +210,10 @@ def run(config):
         for g in optimizer.param_groups:
             print(f'learning rate: {g["lr"]}')
         
-        run_state = run_epoch(model, optimizer, train_ldr, logger, *run_state)
+        try:
+            run_state = run_epoch(model, optimizer, train_ldr, logger, *run_state)
+        finally: # used to ensure that plots are closed even if exception raised
+            plt.close('all')
         if use_log: logger.info(f"train: ====== Run_state finished =======") 
         if use_log: logger.info(f"train: preproc type: {type(preproc)}")
 
