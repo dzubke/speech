@@ -22,7 +22,7 @@ import tqdm
 import speech
 import speech.loader as loader
 from speech.models.ctc_model_train import CTC_train
-from speech.utils.model_debug import check_nan, log_conv_grads, plot_grad_flow_line, plot_grad_flow_bar
+from speech.utils.model_debug import check_nan, log_model_grads, plot_grad_flow_line, plot_grad_flow_bar
 from speech.utils.model_debug import save_batch_log_stats, log_batchnorm_mean_std, log_layer_grad_norms
 # TODO, (awni) why does putting this above crash..
 import tensorboard_logger as tb
@@ -92,9 +92,9 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         if use_log: logger.info(f"train: iter={it}, loss={round(loss,3)}, grad_norm={round(grad_norm,3)}")
         inputs, labels, input_lens, label_lens = model.collate(*temp_batch)
         
-        if check_nan(model):
+        if check_nan(model.parameters()):
             if use_log: logger.error(f"train: labels: {[labels]}, label_lens: {label_lens} state_dict: {model.state_dict()}")
-            if use_log: log_conv_grads(model, logger)
+            if use_log: log_model_grads(model.named_parameters(), logger)
         it += 1
 
     return it, avg_loss
@@ -214,6 +214,10 @@ def run(config):
             run_state = run_epoch(model, optimizer, train_ldr, logger, *run_state)
         finally: # used to ensure that plots are closed even if exception raised
             plt.close('all')
+            if use_log: logger.error(f"train: ====In finally block====")
+            if use_log: logger.error(f"train: state_dict: {model.state_dict()}")
+            if use_log: log_model_grads(model.named_parameters(), logger)
+        
         if use_log: logger.info(f"train: ====== Run_state finished =======") 
         if use_log: logger.info(f"train: preproc type: {type(preproc)}")
 
