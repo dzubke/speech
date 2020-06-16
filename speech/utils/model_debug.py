@@ -86,7 +86,7 @@ def log_batchnorm_mean_std(state_dict:dict, logger):
 
     for name, values in state_dict.items():
         if "running" in name:
-            logger.info(f"batch_norm_layers: {name}: {values}")
+            logger.info(f"batch_norm_mean_var: {name}: {values}")
 
 
 def log_layer_grad_norms(named_parameters:dict, logger):
@@ -99,7 +99,7 @@ def log_layer_grad_norms(named_parameters:dict, logger):
     norm_type = 2.0
     for name, param in named_parameters:
         if param.grad is not None:
-            logger.info(f"layer_norm: {name}: {torch.norm(param.grad.detach(), norm_type)}")
+            logger.info(f"layer_grad_norm: {name}: {torch.norm(param.grad.detach(), norm_type)}")
         
 
 # plot_grad_flow comes from this post:
