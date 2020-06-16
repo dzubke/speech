@@ -6,6 +6,7 @@
 # standard libraries
 from datetime import datetime, date
 import pickle
+from typing import Generator
 # third-party libraries
 from graphviz import Digraph
 from matplotlib.lines import Line2D
@@ -16,11 +17,13 @@ from torch.autograd import Variable, Function
 # project libraries
 
 
-def check_nan(model:torch.nn.Module):
+def check_nan(model_params:Generator[torch.nn.parameter.Parameter]):
     """
     checks an iterator of model parameters and gradients if any of them have nan values
+    Arguments:
+        model_params - Generator[torch.nn.parameter.Parameter]: output of model.parameters()
     """
-    for param in model.parameters():
+    for param in model_params:
         if (param!=param).any():
             return True
         if param.requires_grad:
@@ -30,17 +33,16 @@ def check_nan(model:torch.nn.Module):
 
 
 
-def log_conv_grads(model:torch.nn.Module, logger):
+def log_model_grads(named_params:Generator, logger):
     """
-    records the gradient values for the weight values in model into
-    the logger
+    records the gradient values of the parameters in the model
+    Arguments:
+        named_params - Generator[str, torch.nn.parameter.Parameter]: 
+            output of model.named_parameters()
     """
-    # layers with weights
-    weight_layer_types = [torch.nn.modules.conv.Conv2d, torch.nn.modules.batchnorm.BatchNorm2d]
-    # only iterating through conv layers in first elemment of model children
-    for layer in [*model.children()][0]:
-        if type(layer) in weight_layer_types:
-            logger.error(f"grad: {layer}: {layer.weight.grad}")
+    for name, params in named_params:
+        if params.requires_grad:
+            logger.error(f"log_model_grads: {name}: {params.grad}")
 
 
 def save_batch_log_stats(batch:tuple, logger):
