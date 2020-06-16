@@ -127,7 +127,7 @@ class CommonvoicePreprocessor(DataPreprocessor):
         super(CommonvoicePreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
             force_convert, min_duration, max_duration)
         self.dataset_dict = {
-                            "dev": "dev.tsv"
+                            "validated-25-max-repeat": "validated-25-maxrepeat.tsv"
         }
 
     def process_datasets(self):
