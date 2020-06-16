@@ -37,8 +37,7 @@ def log_model_grads(named_params:Generator, logger):
     """
     records the gradient values of the parameters in the model
     Arguments:
-        named_params - Generator[str, torch.nn.parameter.Parameter]: 
-            output of model.named_parameters()
+        named_params - Generator[str, torch.nn.parameter.Parameter]: output of model.named_parameters()
     """
     for name, params in named_params:
         if params.requires_grad:
@@ -91,18 +90,26 @@ def log_batchnorm_mean_std(state_dict:dict, logger):
             logger.info(f"batch_norm_mean_var: {name}: {values}")
 
 
-def log_layer_grad_norms(named_parameters:dict, logger):
+def log_layer_grad_norms(named_parameters:Generator, logger):
     """
-    Calculates the logs the norm of the gradients of the parameters
-    norm_type is hardcoded to 2.0
+    Calculates and logs the norm of the gradients of the parameters
+    and the norm of all the gradients together.
+    Note: norm_type is hardcoded to 2.0
     Arguments:
-        parameters - list: ouput from model.named_parameters()
+        named_params - Generator[str, torch.nn.parameter.Parameter]: output of model.named_parameters()
     """
     norm_type = 2.0
+    total_norm = 0.0
     for name, param in named_parameters:
         if param.grad is not None:
-            logger.info(f"layer_grad_norm: {name}: {torch.norm(param.grad.detach(), norm_type)}")
+            param_norm = param.grad.data.norm(norm_type)
+            logger.info(f"layer_grad_norm: {name}: {param_norm}")
+            total_norm += param_norm.item() ** norm_type
+    total_norm = total_norm ** (1. / norm_type)
+    logger.info(f"layer_grad_norm: total_norm: {total_norm}")
+            
         
+
 
 # plot_grad_flow comes from this post:
 # https://discuss.pytorch.org/t/check-gradient-flow-in-network/15063/7

@@ -70,7 +70,7 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         #loss = loss.data[0]
 
         optimizer.step()
-        if use_log: logger.info(f"train: Grad_norm clipped ")
+        if use_log: logger.info(f"train: Optimizer step taken")
 
         prev_end_t = end_t
         end_t = time.time()
@@ -81,7 +81,7 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
 
         exp_w = 0.99
         avg_loss = exp_w * avg_loss + (1 - exp_w) * loss
-        if use_log: logger.info(f"train: Avg loss: {loss}")
+        if use_log: logger.info(f"train: Avg loss: {avg_loss}")
         tb.log_value('train_loss', loss, it)
         tq.set_postfix(iter=it, loss=loss,
                 avg_loss=avg_loss, grad_norm=grad_norm,
