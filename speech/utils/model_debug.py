@@ -17,7 +17,7 @@ from torch.autograd import Variable, Function
 # project libraries
 
 
-def check_nan(model_params:Generator[torch.nn.parameter.Parameter]):
+def check_nan(model_params:Generator):
     """
     checks an iterator of model parameters and gradients if any of them have nan values
     Arguments:
@@ -99,15 +99,20 @@ def log_layer_grad_norms(named_parameters:Generator, logger):
         named_params - Generator[str, torch.nn.parameter.Parameter]: output of model.named_parameters()
     """
     norm_type = 2.0
-    total_norm = 0.0
+    total_norm_data = 0.0
+    total_norm_detach = 0.0
     for name, param in named_parameters:
         if param.grad is not None:
-            param_norm = param.grad.data.norm(norm_type)
-            logger.info(f"layer_grad_norm: {name}: {param_norm}")
-            total_norm += param_norm.item() ** norm_type
-    total_norm = total_norm ** (1. / norm_type)
-    logger.info(f"layer_grad_norm: total_norm: {total_norm}")
-            
+            param_norm_data = param.grad.data.norm(norm_type)
+            param_norm_detach = param.grad.detach().norm(norm_type)
+            logger.info(f"layer_grad_norm: data: {name}: {param_norm_data}")
+            logger.info(f"layer_grad_norm: detach: {name}: {param_norm_detach}")
+            total_norm_data += param_norm_data.item() ** norm_type
+            total_norm_detach += param_norm_detach.item() ** norm_type
+    total_norm_data = total_norm_data ** (1. / norm_type)
+    total_norm_detach = total_norm_detach ** (1. / norm_type)
+    logger.info(f"layer_grad_norm: total_norm_data: {total_norm_data}")
+    logger.info(f"layer_grad_norm: total_norm_detach: {total_norm_detach}")        
         
 
 

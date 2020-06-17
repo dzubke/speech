@@ -10,7 +10,7 @@
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-06-16_v2_withBatchNorm_lib-ted-cv-VAL.log"
+        "log_file": "logs/2020-06-16_v3_withBatchNorm_lib-ted-cv-VAL.log"
     },
     "preproc":{
         "preprocessor": "log_spectrogram",
