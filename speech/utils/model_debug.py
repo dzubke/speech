@@ -115,7 +115,9 @@ def get_logger_filename(logger)->str:
     """
     Returns the filename of the logger
     """
-    return logger.handlers[0].baseFilename
+    basename, filename = os.path.split(logger.handlers[0].baseFilename)
+    filename, ext = os.path.splitext(filename)
+    return filename
 
 # plot_grad_flow comes from this post:
 # https://discuss.pytorch.org/t/check-gradient-flow-in-network/15063/7
