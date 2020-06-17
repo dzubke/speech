@@ -48,7 +48,7 @@ def apply_augmentation(audio_data:np.ndarray, sr:int, augment_name:str, args):
 
     
 
-def apply_pitch_perturb(audio_data:np.ndarray, samp_rate:int=16000, pitch_range:tuple=(-8,8)):
+def apply_pitch_perturb(audio_data:np.ndarray, samp_rate:int=16000, pitch_range:tuple=(-8,8), logger=None):
     """
     Adjusts the pitch of the input audio_data by selecting a random value between the lower
     and upper ranges and adjusting the pitch based on the chosen number of quarter steps
@@ -60,7 +60,9 @@ def apply_pitch_perturb(audio_data:np.ndarray, samp_rate:int=16000, pitch_range:
         augment_data - np.ndarrray: array of audio amplitudes with raised pitch
     """
     assert audio_data.size >= 2, "input data must be 2 or more long"
+    use_log = (logger is not None)
     random_steps = random.randint(*pitch_range)
+    if use_log: logger.info(f"pitch_perturb: random_steps: {random_steps}")
     audio_data = pcm2float(audio_data)
     augment_data = librosa.effects.pitch_shift(audio_data, samp_rate, n_steps=random_steps, bins_per_octave=24)
     augment_data = float2pcm(augment_data)
@@ -73,15 +75,22 @@ def apply_pitch_perturb(audio_data:np.ndarray, samp_rate:int=16000, pitch_range:
 # https://github.com/SeanNaren/deepspeech.pytorch/blob/master/data/data_loader.py
 
 def speed_vol_perturb(path, sample_rate=16000, tempo_range=(0.85, 1.15),
-                                  gain_range=(-6, 8))->tuple:
+                                  gain_range=(-6, 8), logger=None)->tuple:
     """
     Picks tempo and gain uniformly, applies it to the utterance by using sox utility.
     Returns the augmented utterance.
     """
+    use_log = (logger is not None)
+    if use_log: logger.info(f"speed_vol_perturb: audio_file: {path}")
+    
     low_tempo, high_tempo = tempo_range
     tempo_value = np.random.uniform(low=low_tempo, high=high_tempo)
+    if use_log: logger.info(f"speed_vol_perturb: tempo_value: {tempo_value}")
+    
     low_gain, high_gain = gain_range
     gain_value = np.random.uniform(low=low_gain, high=high_gain)
+    if use_log: logger.info(f"speed_vol_perturb: gain_value: {gain_value}")
+    
     audio, samp_rate = augment_audio_with_sox(path=path, sample_rate=sample_rate,
                                    tempo=tempo_value, gain=gain_value)
     return audio, samp_rate 
@@ -200,7 +209,8 @@ def same_size(data:np.ndarray, noise_dst:np.ndarray) -> np.ndarray:
 
 
 # synthetic gaussian noise injection 
-def synthetic_gaussian_noise_inject(audio_data: np.ndarray, snr_range:tuple=(10,30)):
+def synthetic_gaussian_noise_inject(audio_data: np.ndarray, snr_range:tuple=(10,30),
+                                    logger=None):
     """
     Applies random noise to an audio sample scaled to a uniformly selected
     signal-to-noise ratio (snr) bounded by the snr_range
@@ -211,13 +221,19 @@ def synthetic_gaussian_noise_inject(audio_data: np.ndarray, snr_range:tuple=(10,
 
     Note: Power = Amplitude^2 and here we are dealing with amplitudes = RMS
     """
+    use_log = (logger is not None)
     snr_level = np.random.uniform(*snr_range)
     audio_rms = audioop.rms(audio_data, 2) 
     # 20 is in the exponent because we are dealing in amplitudes
     noise_rms = audio_rms / 10**(snr_level/20)
     gaussian_noise = np.random.normal(loc=0, scale=noise_rms, size=audio_data.size).astype('int16')
     augmented_data = audio_data + gaussian_noise
+    
+    if use_log: logger.info(f"syn_gaussian_noise: snr_level: {snr_level}")
+    if use_log: logger.info(f"syn_gaussian_noise: audio_rms: {audio_rms}")
+    if use_log: logger.info(f"syn_gaussian_noise: noise_rms: {noise_rms}")
     assert augmented_data.dtype == "int16"
+    
     return augmented_data
 
 

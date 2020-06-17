@@ -95,7 +95,10 @@ class Preprocessor():
     
     
     def preprocess(self, wave_file, text):
-        
+        if self.use_log: self.logger.info(f"preproc: ======= Entering preprocess =====")
+        if self.use_log: self.logger.info(f"preproc: wave_file: {wave_file}")
+        if self.use_log: self.logger.info(f"preproc: text: {text}") 
+
         audio_data, samp_rate = self.signal_augmentations(wave_file)
 
         # processing method
@@ -116,6 +119,7 @@ class Preprocessor():
         # target encoding
         targets = self.encode(text)
         if self.use_log: self.logger.info(f"preproc: text encoded")
+        if self.use_log: self.logger.info(f"preproc: ======= Exiting preprocess =====")
 
         return feature_data, targets
     
@@ -129,26 +133,30 @@ class Preprocessor():
             samp_rate - int: sample rate of the audio recording
         """
         # sox-based tempo, gain, pitch augmentations
+        if self.use_log: self.logger.info(f"preproc: audio_data read: {wave_file}")
         if self.speed_vol_perturb and self.train_status:
-            audio_data, samp_rate = speed_vol_perturb(wave_file, tempo_range=self.tempo_range, gain_range=self.gain_range)
+            audio_data, samp_rate = speed_vol_perturb(wave_file, tempo_range=self.tempo_range, 
+                                            gain_range=self.gain_range, logger=self.logger)
         else:
             audio_data, samp_rate = wave.array_from_wave(wave_file)
-        if self.use_log: self.logger.info(f"preproc: audio_data read: {wave_file}")
 
         # synthetic gaussian noise
         if self.synthetic_gaussian_noise and self.train_status:
-            audio_data = synthetic_gaussian_noise_inject(audio_data, self.signal_to_noise_range_db)
             if self.use_log: self.logger.info(f"preproc: synthetic_gaussian_noise_inject")
+            audio_data = synthetic_gaussian_noise_inject(audio_data, 
+                                self.signal_to_noise_range_db, logger=self.logger)
 
         # pitch perturb
         if self.pitch_perturb and self.train_status: 
-            audio_data = apply_pitch_perturb(audio_data, samp_rate, pitch_range=self.pitch_range)
+            audio_data = apply_pitch_perturb(audio_data, samp_rate, 
+                            pitch_range=self.pitch_range, logger=self.logger)
         
         # noise injection
         if self.inject_noise and self.train_status:
             add_noise = np.random.binomial(1, self.noise_prob)
             if add_noise:
-                audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, self.logger, self.noise_levels) 
+                audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, 
+                                    self.logger, self.noise_levels) 
             if self.use_log: self.logger.info(f"preproc: noise injected")
         
         return audio_data, samp_rate
