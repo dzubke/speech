@@ -5,13 +5,14 @@ import glob
 import os
 import random
 from tempfile import NamedTemporaryFile
+from typing import Tuple
 # third-party libraries
 import librosa
 import numpy as np
 # project libraries
 from speech.utils.wave import array_from_wave, array_to_wave, wav_duration
 from speech.utils.convert import pcm2float, float2pcm
-
+from speech.utils.data_structs import AugmentRange
 
 
 def main(audio_path: str, out_path:str, augment_name:str, ARGS):
@@ -48,7 +49,7 @@ def apply_augmentation(audio_data:np.ndarray, sr:int, augment_name:str, args):
 
     
 
-def apply_pitch_perturb(audio_data:np.ndarray, samp_rate:int=16000, pitch_range:tuple=(-8,8), logger=None):
+def apply_pitch_perturb(audio_data:np.ndarray, samp_rate:int=16000, pitch_range:AugmentRange=(-8.0,8.0), logger=None):
     """
     Adjusts the pitch of the input audio_data by selecting a random value between the lower
     and upper ranges and adjusting the pitch based on the chosen number of quarter steps
@@ -74,28 +75,33 @@ def apply_pitch_perturb(audio_data:np.ndarray, samp_rate:int=16000, pitch_range:
 # Sean Naren's Deepspeech implementation at:
 # https://github.com/SeanNaren/deepspeech.pytorch/blob/master/data/data_loader.py
 
-def speed_vol_perturb(path, sample_rate=16000, tempo_range=(0.85, 1.15),
-                                  gain_range=(-6, 8), logger=None)->tuple:
+def speed_vol_perturb(audio_path:str, sample_rate:int=16000, tempo_range:AugmentRange=(0.85, 1.15),
+                        gain_range:AugmentRange=(-6.0, 8.0), logger=None)->Tuple[np.ndarray, int]:
     """
     Picks tempo and gain uniformly, applies it to the utterance by using sox utility.
-    Returns the augmented utterance.
+    Returns:
+        tuple(np.ndarray, int) - the augmente audio data and the sample_rate
     """
     use_log = (logger is not None)
-    if use_log: logger.info(f"speed_vol_perturb: audio_file: {path}")
+    if use_log: logger.info(f"speed_vol_perturb: audio_file: {audio_path}")
     
-    low_tempo, high_tempo = tempo_range
-    tempo_value = np.random.uniform(low=low_tempo, high=high_tempo)
+    tempo_value = np.random.uniform(*tempo_range)
     if use_log: logger.info(f"speed_vol_perturb: tempo_value: {tempo_value}")
     
-    low_gain, high_gain = gain_range
-    gain_value = np.random.uniform(low=low_gain, high=high_gain)
+    gain_value = np.random.uniform(*gain_range)
     if use_log: logger.info(f"speed_vol_perturb: gain_value: {gain_value}")
-    
-    audio, samp_rate = augment_audio_with_sox(path=path, sample_rate=sample_rate,
-                                   tempo=tempo_value, gain=gain_value)
-    return audio, samp_rate 
 
-def augment_audio_with_sox(path, sample_rate, tempo, gain)->tuple:
+    try:    
+        audio_data, samp_rate = augment_audio_with_sox(path=audio_path, sample_rate=sample_rate,
+                                                   tempo=tempo_value, gain=gain_value)
+    except RuntimeError as rterr:
+        if use_log: logger.error(f"speed_vol_perturb: RuntimeError: {rterr}")
+        audio_data, samp_rate = array_from_wave(audio_path)
+        
+    return audio_data, samp_rate 
+
+
+def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float)->Tuple[np.ndarray,int]:
     """
     Changes speed (tempo) and volume (gain) of the recording with sox and loads it.
     """
@@ -111,7 +117,6 @@ def augment_audio_with_sox(path, sample_rate, tempo, gain)->tuple:
 
 
 # Noise inject functions
-
 def inject_noise(data, data_samp_rate, noise_dir, logger, noise_levels=(0, 0.5)):
     """
     injects noise from files in noise_dir into the input data. These

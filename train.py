@@ -23,7 +23,8 @@ import speech
 import speech.loader as loader
 from speech.models.ctc_model_train import CTC_train
 from speech.utils.model_debug import check_nan, log_model_grads, plot_grad_flow_line, plot_grad_flow_bar
-from speech.utils.model_debug import save_batch_log_stats, log_batchnorm_mean_std, log_layer_grad_norms
+from speech.utils.model_debug import save_batch_log_stats, log_batchnorm_mean_std, log_param_grad_norms
+from speech.utils.model_debug import get_logger_filename
 # TODO, (awni) why does putting this above crash..
 import tensorboard_logger as tb
 
@@ -57,9 +58,9 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         #print(f"loss value 1: {loss.data[0]}")
         loss.backward()
         if use_log: logger.info(f"train: Backward run ")
-        #plot_grad_flow_line(model.named_parameters())
-        plot_grad_flow_bar(model.named_parameters())
-        if use_log: log_layer_grad_norms(model.named_parameters(), logger)
+        #if use_log: plot_grad_flow_line(model.named_parameters())
+        if use_log: plot_grad_flow_bar(model.named_parameters(),  get_logger_filename(logger))
+        if use_log: log_param_grad_norms(model.named_parameters(), logger)
 
         grad_norm = nn.utils.clip_grad_norm_(model.parameters(), 200)
         if use_log: logger.info(f"train: Grad_norm clipped ")

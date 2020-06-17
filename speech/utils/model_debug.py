@@ -5,8 +5,9 @@
 
 # standard libraries
 from datetime import datetime, date
+import os
 import pickle
-from typing import Generator
+from typing import Generator, Iterable, Tuple
 # third-party libraries
 from graphviz import Digraph
 from matplotlib.lines import Line2D
@@ -15,6 +16,7 @@ import numpy as np
 import torch
 from torch.autograd import Variable, Function
 # project libraries
+from speech.utils.data_structs import NamedParams
 
 
 def check_nan(model_params:Generator):
@@ -50,8 +52,8 @@ def save_batch_log_stats(batch:tuple, logger):
     Arguments:
         batch - tuple(list(np.2darray), list(list)): a tuple of inputs and phoneme labels
     """
-    today = str(date.today())
-    batch_save_path = "./current-batch_{}.pickle".format(today)
+    filename = get_logger_filename(logger) + "_batch.pickle"
+    batch_save_path = os.path.join("./saved_batch", filename)
     with open(batch_save_path, 'wb') as fid: # save current batch to disk for debugging purposes
         pickle.dump(batch, fid)
 
@@ -90,7 +92,7 @@ def log_batchnorm_mean_std(state_dict:dict, logger):
             logger.info(f"batch_norm_mean_var: {name}: {values}")
 
 
-def log_layer_grad_norms(named_parameters:Generator, logger):
+def log_param_grad_norms(named_parameters:NamedParams, logger)->None:
     """
     Calculates and logs the norm of the gradients of the parameters
     and the norm of all the gradients together.
@@ -99,22 +101,21 @@ def log_layer_grad_norms(named_parameters:Generator, logger):
         named_params - Generator[str, torch.nn.parameter.Parameter]: output of model.named_parameters()
     """
     norm_type = 2.0
-    total_norm_data = 0.0
-    total_norm_detach = 0.0
+    total_norm = 0.0
     for name, param in named_parameters:
         if param.grad is not None:
-            param_norm_data = param.grad.data.norm(norm_type)
-            param_norm_detach = param.grad.detach().norm(norm_type)
-            logger.info(f"layer_grad_norm: data: {name}: {param_norm_data}")
-            logger.info(f"layer_grad_norm: detach: {name}: {param_norm_detach}")
-            total_norm_data += param_norm_data.item() ** norm_type
-            total_norm_detach += param_norm_detach.item() ** norm_type
-    total_norm_data = total_norm_data ** (1. / norm_type)
-    total_norm_detach = total_norm_detach ** (1. / norm_type)
-    logger.info(f"layer_grad_norm: total_norm_data: {total_norm_data}")
-    logger.info(f"layer_grad_norm: total_norm_detach: {total_norm_detach}")        
+            param_norm = param.grad.detach().norm(norm_type)
+            logger.info(f"param_grad_norm: {name}: {param_norm}")
+            total_norm += param_norm.item() ** norm_type
+    total_norm = total_norm ** (1. / norm_type)
+    logger.info(f"param_grad_norm: total_norm: {total_norm}")        
         
 
+def get_logger_filename(logger)->str:
+    """
+    Returns the filename of the logger
+    """
+    return logger.handlers[0].baseFilename
 
 # plot_grad_flow comes from this post:
 # https://discuss.pytorch.org/t/check-gradient-flow-in-network/15063/7
@@ -137,7 +138,7 @@ def plot_grad_flow_line(named_parameters):
     save_path = "./plots/grad_flow_line_{}.png".format(datetime.now().strftime("%Y-%m-%d_%Hhr"))
     plt.savefig(save_path, bbox_inches="tight")
 
-def plot_grad_flow_bar(named_parameters):
+def plot_grad_flow_bar(named_parameters:NamedParams, filename:str="grad_flow_bar.png"):
     '''Plots the gradients flowing through different layers in the net during training.
     Can be used for checking for possible gradient vanishing / exploding problems.
     
@@ -172,7 +173,9 @@ def plot_grad_flow_bar(named_parameters):
     plt.legend([Line2D([0], [0], color=ax1_color, lw=4),
                 Line2D([0], [0], color=ax2_color, lw=4),
                 Line2D([0], [0], color="k", lw=4)], ['max-gradient', 'mean-gradient', 'zero-gradient'])
-    save_path = "./plots/grad_flow_bar_{}.png".format(datetime.now().strftime("%Y-%m-%d_%Hhr"))
+    # formatted_date-hour = datetime.now().strftime("%Y-%m-%d_%Hhr")
+    filename = filename + "_bar.png"
+    save_path = os.path.join("./plots", filename)
     plt.savefig(save_path, bbox_inches="tight")
 
 
