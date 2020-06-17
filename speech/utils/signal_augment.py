@@ -88,7 +88,7 @@ def speed_vol_perturb(path, sample_rate=16000, tempo_range=(0.85, 1.15),
     if use_log: logger.info(f"speed_vol_perturb: tempo_value: {tempo_value}")
     
     low_gain, high_gain = gain_range
-    gain_value = np.random.uniformc(low=low_gain, high=high_gain)
+    gain_value = np.random.uniform(low=low_gain, high=high_gain)
     if use_log: logger.info(f"speed_vol_perturb: gain_value: {gain_value}")
     
     audio, samp_rate = augment_audio_with_sox(path=path, sample_rate=sample_rate,
