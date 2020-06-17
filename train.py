@@ -22,7 +22,7 @@ import tqdm
 import speech
 import speech.loader as loader
 from speech.models.ctc_model_train import CTC_train
-from speech.utils.model_debug import check_nan, log_conv_grads, plot_grad_flow_line, plot_grad_flow_bar
+from speech.utils.model_debug import check_nan, log_model_grads, plot_grad_flow_line, plot_grad_flow_bar
 from speech.utils.model_debug import save_batch_log_stats, log_batchnorm_mean_std, log_layer_grad_norms
 # TODO, (awni) why does putting this above crash..
 import tensorboard_logger as tb
@@ -46,7 +46,6 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
 
         if use_log: save_batch_log_stats(temp_batch, logger)
         if use_log: log_batchnorm_mean_std(model.state_dict(), logger)
-        if use_log: log_layer_grad_norms(model.named_parameters(), logger)
  
         start_t = time.time()
         optimizer.zero_grad()
@@ -60,6 +59,7 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         if use_log: logger.info(f"train: Backward run ")
         #plot_grad_flow_line(model.named_parameters())
         plot_grad_flow_bar(model.named_parameters())
+        if use_log: log_layer_grad_norms(model.named_parameters(), logger)
 
         grad_norm = nn.utils.clip_grad_norm_(model.parameters(), 200)
         if use_log: logger.info(f"train: Grad_norm clipped ")
@@ -70,7 +70,7 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         #loss = loss.data[0]
 
         optimizer.step()
-        if use_log: logger.info(f"train: Grad_norm clipped ")
+        if use_log: logger.info(f"train: Optimizer step taken")
 
         prev_end_t = end_t
         end_t = time.time()
@@ -81,7 +81,7 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
 
         exp_w = 0.99
         avg_loss = exp_w * avg_loss + (1 - exp_w) * loss
-        if use_log: logger.info(f"train: Avg loss: {loss}")
+        if use_log: logger.info(f"train: Avg loss: {avg_loss}")
         tb.log_value('train_loss', loss, it)
         tq.set_postfix(iter=it, loss=loss,
                 avg_loss=avg_loss, grad_norm=grad_norm,
@@ -92,9 +92,9 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         if use_log: logger.info(f"train: iter={it}, loss={round(loss,3)}, grad_norm={round(grad_norm,3)}")
         inputs, labels, input_lens, label_lens = model.collate(*temp_batch)
         
-        if check_nan(model):
+        if check_nan(model.parameters()):
             if use_log: logger.error(f"train: labels: {[labels]}, label_lens: {label_lens} state_dict: {model.state_dict()}")
-            if use_log: log_conv_grads(model, logger)
+            if use_log: log_model_grads(model.named_parameters(), logger)
         it += 1
 
     return it, avg_loss
@@ -214,6 +214,10 @@ def run(config):
             run_state = run_epoch(model, optimizer, train_ldr, logger, *run_state)
         finally: # used to ensure that plots are closed even if exception raised
             plt.close('all')
+            if use_log: logger.error(f"train: ====In finally block====")
+            if use_log: logger.error(f"train: state_dict: {model.state_dict()}")
+            if use_log: log_model_grads(model.named_parameters(), logger)
+        
         if use_log: logger.info(f"train: ====== Run_state finished =======") 
         if use_log: logger.info(f"train: preproc type: {type(preproc)}")
 
