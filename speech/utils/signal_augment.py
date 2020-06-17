@@ -4,6 +4,7 @@ import audioop
 import glob
 import os
 import random
+import subprocess
 from tempfile import NamedTemporaryFile
 from typing import Tuple
 # third-party libraries
@@ -93,7 +94,7 @@ def speed_vol_perturb(audio_path:str, sample_rate:int=16000, tempo_range:Augment
 
     try:    
         audio_data, samp_rate = augment_audio_with_sox(path=audio_path, sample_rate=sample_rate,
-                                                   tempo=tempo_value, gain=gain_value)
+                                                   tempo=tempo_value, gain=gain_value, logger=logger)
     except RuntimeError as rterr:
         if use_log: logger.error(f"speed_vol_perturb: RuntimeError: {rterr}")
         audio_data, samp_rate = array_from_wave(audio_path)
@@ -101,17 +102,23 @@ def speed_vol_perturb(audio_path:str, sample_rate:int=16000, tempo_range:Augment
     return audio_data, samp_rate 
 
 
-def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float)->Tuple[np.ndarray,int]:
+def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float, logger=None)\
+                                                            ->Tuple[np.ndarray,int]:
     """
     Changes speed (tempo) and volume (gain) of the recording with sox and loads it.
     """
+    use_log = (logger is not None)
     with NamedTemporaryFile(suffix=".wav") as augmented_file:
         augmented_filename = augmented_file.name
         sox_augment_params = ["tempo", "{:.3f}".format(tempo), "gain", "{:.3f}".format(gain)]
-        sox_params = "sox \"{}\" -r {} -c 1 -b 16 -e si {} {} >/dev/null 2>&1".format(path, sample_rate,
-                                                                                      augmented_filename,
-                                                                                      " ".join(sox_augment_params))
-        os.system(sox_params)
+        sox_cmd = "sox {} -r {} -c 1 -b 16 -e si {} {}".format(path, sample_rate, augmented_filename,
+                                                                    " ".join(sox_augment_params))
+        sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True) 
+        
+        if use_log: logger.info(f"aug_audio_sox: tmpfile exists: {os.path.exists(augmented_filename)}")
+        if use_log: logger.info(f"aug_audio_sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
+        if use_log: logger.info(f"aug_audio_sox: sox stderr: {sox_result.stderr.decode('utf-8')}")
+        
         data, samp_rate = array_from_wave(augmented_filename)
         return data, samp_rate
 
@@ -153,9 +160,9 @@ def inject_noise_sample(data, sample_rate:int, noise_path:str, noise_level:float
         noise_start = np.random.rand() * (noise_len - data_len) 
         noise_end = noise_start + data_len
         try:
-            noise_dst = audio_with_sox(noise_path, sample_rate, noise_start, noise_end)
-        except FileNotFoundError:
-            if use_log: logger.info(f"file not found error in: audio_with_sox")
+            noise_dst = audio_with_sox(noise_path, sample_rate, noise_start, noise_end, logger)
+        except FileNotFoundError as fnf_err:
+            if use_log: logger.info(f"noise_inject: FileNotFoundError: {fnf_err}")
             return data
 
         noise_dst = same_size(data, noise_dst)
@@ -176,18 +183,24 @@ def inject_noise_sample(data, sample_rate:int, noise_path:str, noise_level:float
         return data.astype('int16')
 
 
-def audio_with_sox(path:str, sample_rate:int, start_time:float, end_time:float)->np.ndarray:
+def audio_with_sox(path:str, sample_rate:int, start_time:float, end_time:float, logger=None)\
+                                                                                    ->np.ndarray:
     """
     crop and resample the recording with sox and loads it.
     If the output file cannot be found, an array of zeros of the desired length will be returned.
     """
+    use_log = (logger is not None)
     with NamedTemporaryFile(suffix=".wav") as tar_file:
         tar_filename = tar_file.name
-        sox_params = "sox \"{}\" -r {} -c 1 -b 16 -e si {} trim {} ={} >/dev/null 2>&1".format(path, sample_rate,
-                                                                                               tar_filename, start_time,
-                                                                                               end_time)
-        os.system(sox_params)
-        
+        sox_cmd = "sox \"{}\" -r {} -c 1 -b 16 -e si {} trim {} ={}".format(path, sample_rate, 
+                                                                        tar_filename, start_time,
+                                                                        end_time)
+        sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+
+        if use_log: logger.info(f"noise_inj_sox: tmpfile exists: {os.path.exists(tar_filename)}")
+        if use_log: logger.info(f"noise_inj_sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
+        if use_log: logger.info(f"noise_inj_sox: sox stderr: {sox_result.stderr.decode('utf-8')}")
+
         if os.path.exists(tar_filename):
             noise_data, samp_rate = array_from_wave(tar_filename)
         else:
