@@ -120,7 +120,6 @@ def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float, l
                     augmented_filename, 
                     'tempo', f'{tempo:.3f}', 
                     'gain', f'{gain:.3f}']
-        print(sox_cmd)
         sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
         
         if use_log: logger.info(f"aug_audio_sox: tmpfile exists: {os.path.exists(augmented_filename)}")
