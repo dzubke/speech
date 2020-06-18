@@ -111,9 +111,17 @@ def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float, l
     with NamedTemporaryFile(suffix=".wav") as augmented_file:
         augmented_filename = augmented_file.name
         sox_augment_params = ["tempo", "{:.3f}".format(tempo), "gain", "{:.3f}".format(gain)]
-        sox_cmd = "sox {} -r {} -c 1 -b 16 -e si {} {}".format(path, sample_rate, augmented_filename,
-                                                                    " ".join(sox_augment_params))
-        sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True) 
+        sox_cmd = ['sox', 
+                    path, 
+                    '-r', f'{sample_rate}', 
+                    '-c', '1', 
+                    '-b', '16',
+                    '-e', 'si',   
+                    augmented_filename, 
+                    'tempo', f'{tempo:.3f}', 
+                    'gain', f'{gain:.3f}']
+        print(sox_cmd)
+        sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
         
         if use_log: logger.info(f"aug_audio_sox: tmpfile exists: {os.path.exists(augmented_filename)}")
         if use_log: logger.info(f"aug_audio_sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
@@ -192,10 +200,15 @@ def audio_with_sox(path:str, sample_rate:int, start_time:float, end_time:float, 
     use_log = (logger is not None)
     with NamedTemporaryFile(suffix=".wav") as tar_file:
         tar_filename = tar_file.name
-        sox_cmd = "sox \"{}\" -r {} -c 1 -b 16 -e si {} trim {} ={}".format(path, sample_rate, 
-                                                                        tar_filename, start_time,
-                                                                        end_time)
-        sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        sox_cmd = ['sox',
+                    path,
+                    '-r', f'{sample_rate}',
+                    '-c', '1', 
+                    '-b', '16',
+                    '-e', 'si',
+                    tar_filename,
+                     'trim', f'{start_time}', '='+f'{end_time}']
+        sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         if use_log: logger.info(f"noise_inj_sox: tmpfile exists: {os.path.exists(tar_filename)}")
         if use_log: logger.info(f"noise_inj_sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
