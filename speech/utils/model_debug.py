@@ -13,6 +13,7 @@ from graphviz import Digraph
 from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
 import numpy as np
+import psutil
 import torch
 from torch.autograd import Variable, Function
 # project libraries
@@ -119,6 +120,57 @@ def get_logger_filename(logger)->str:
     filename, ext = os.path.splitext(filename)
     return filename
 
+
+
+def format_bytes(bytes, suffix="B"):
+    """
+    Scale bytes to its proper format
+    e.g:
+        1253656 => '1.20MB'
+        1253656678 => '1.17GB'
+    Code from: https://www.thepythoncode.com/article/get-hardware-system-information-python
+    """
+    factor = 1024
+    for unit in ["", "K", "M", "G", "T", "P"]:
+        if bytes < factor:
+            return f"{bytes:.2f}{unit}{suffix}"
+        bytes /= factor
+
+def log_cpu_mem_disk_usage(logger)->None:
+    """
+    Logs the certain metrics on the current  cpu, memory, disk usage
+
+    Code adapted from: https://www.thepythoncode.com/article/get-hardware-system-information-python
+    """
+    
+    logger.info(f"{'='*10} VM stats begin {'='*10}")
+    # CPU metrics
+    logger.info(f"log_vm_stats: Total CPU Usage: {psutil.cpu_percent()}%")
+    # memory metrics
+    svmem = psutil.virtual_memory() 
+    logger.info(f"log_vm_stats: Total Memory: {format_bytes(svmem.total)}")
+    logger.info(f"log_vm_stats: Memory Available: {format_bytes(svmem.available)}")
+    logger.info(f"log_vm_stats: Memory Used: {format_bytes(svmem.used)}")
+    logger.info(f"log_vm_stats: Memory Used Percentage: {svmem.percent}%")
+    # disk metrics
+    partitions = psutil.disk_partitions()
+    for partition in partitions:
+        logger.info(f"--- Disk Device: {partition.device} ---")
+        try:
+            partition_usage = psutil.disk_usage(partition.mountpoint)
+        except PermissionError as perm_error:
+            # this can be catched due to the disk that
+            # isn't ready
+            logger.info(f"log_vm_stats: PermissionError for disk {perm_error}")
+            continue
+        logger.info(f"log_vm_stats: Total Size: {format_bytes(partition_usage.total)}")
+        logger.info(f"log_vm_stats: Used: {format_bytes(partition_usage.used)}")
+        logger.info(f"log_vm_stats: Free: {format_bytes(partition_usage.free)}")
+        logger.info(f"log_vm_stats: Percentage: {partition_usage.percent}%")
+    logger.info(f"{'='*10} VM stats end {'='*10}")
+
+
+
 # plot_grad_flow comes from this post:
 # https://discuss.pytorch.org/t/check-gradient-flow-in-network/15063/7
 
@@ -139,13 +191,21 @@ def plot_grad_flow_line(named_parameters):
     plt.grid(True)
     save_path = "./plots/grad_flow_line_{}.png".format(datetime.now().strftime("%Y-%m-%d_%Hhr"))
     plt.savefig(save_path, bbox_inches="tight")
+    # clears and closes the figure so memory doesn't overfill
+    plt.close('all')
 
 def plot_grad_flow_bar(named_parameters:NamedParams, filename:str="grad_flow_bar.png"):
-    '''Plots the gradients flowing through different layers in the net during training.
+    '''
+    Plots the gradients flowing through different layers in the net during training.
     Can be used for checking for possible gradient vanishing / exploding problems.
     
     Usage: Plug this function in Trainer class after loss.backwards() as 
-    "plot_grad_flow(self.model.named_parameters())" to visualize the gradient flow'''
+    plot_grad_flow(self.model.named_parameters()) to visualize the gradient flow
+    Note: currently this function creates and closes a new figure for each batch.
+        If cumulative information across batches is desired without making new figures
+        one could create a figure object outside of this function and pass that figure
+        to this function for cumulative plots. 
+    '''
     ave_grads = []
     max_grads= []
     layers = []
@@ -179,7 +239,9 @@ def plot_grad_flow_bar(named_parameters:NamedParams, filename:str="grad_flow_bar
     filename = filename + "_bar.png"
     save_path = os.path.join("./plots", filename)
     plt.savefig(save_path, bbox_inches="tight")
-
+    # clears and closes the figure so memory doesn't overfill
+    fig.clear()
+    plt.close(fig)
 
 # bad_grad_viz functions come from here:
 # https://gist.github.com/apaszke/f93a377244be9bfcb96d3547b9bc424d
