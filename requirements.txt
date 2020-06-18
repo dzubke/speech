@@ -17,3 +17,4 @@ PyYAML==3.12
 six==1.11.0
 tqdm==4.19.4
 wget==1.19.5
+psutil

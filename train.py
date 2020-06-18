@@ -24,7 +24,7 @@ import speech.loader as loader
 from speech.models.ctc_model_train import CTC_train
 from speech.utils.model_debug import check_nan, log_model_grads, plot_grad_flow_line, plot_grad_flow_bar
 from speech.utils.model_debug import save_batch_log_stats, log_batchnorm_mean_std, log_param_grad_norms
-from speech.utils.model_debug import get_logger_filename
+from speech.utils.model_debug import get_logger_filename, log_cpu_mem_disk_usage
 # TODO, (awni) why does putting this above crash..
 import tensorboard_logger as tb
 
@@ -32,16 +32,19 @@ import tensorboard_logger as tb
 torch.autograd.set_detect_anomaly(True)
 
 
-def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
+def run_epoch(model, optimizer, train_ldr, logger, iter_count, avg_loss):
     """
     Performs a forwards and backward pass through the model
+    Arguments
+        iter_count - int: count of iterations
     """
     use_log = (logger is not None)
     model_t = 0.0; data_t = 0.0
     end_t = time.time()
     tq = tqdm.tqdm(train_ldr)
+    log_modulus = 5  # limits certain logging function to only log every "log_modulus" iterations
     for batch in tq:
-        if use_log: logger.info(f"train: ====== Inside run_epoch =======")
+        if use_log: logger.info(f"train: ====== Iteration: {iter_count} in run_epoch =======")
         
         temp_batch = list(batch)    # this was added as the batch generator was being exhausted when it was called
 
@@ -83,22 +86,25 @@ def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
         exp_w = 0.99
         avg_loss = exp_w * avg_loss + (1 - exp_w) * loss
         if use_log: logger.info(f"train: Avg loss: {avg_loss}")
-        tb.log_value('train_loss', loss, it)
-        tq.set_postfix(iter=it, loss=loss,
+        tb.log_value('train_loss', loss, iter_count)
+        tq.set_postfix(iter=iter_count, loss=loss, 
                 avg_loss=avg_loss, grad_norm=grad_norm,
                 model_time=model_t, data_time=data_t)
         
-       
         if use_log: logger.info(f'train: loss is inf: {loss == float("inf")}')
-        if use_log: logger.info(f"train: iter={it}, loss={round(loss,3)}, grad_norm={round(grad_norm,3)}")
+        if use_log: logger.info(f"train: iter={iter_count}, loss={round(loss,3)}, grad_norm={round(grad_norm,3)}")
         inputs, labels, input_lens, label_lens = model.collate(*temp_batch)
         
         if check_nan(model.parameters()):
             if use_log: logger.error(f"train: labels: {[labels]}, label_lens: {label_lens} state_dict: {model.state_dict()}")
             if use_log: log_model_grads(model.named_parameters(), logger)
-        it += 1
 
-    return it, avg_loss
+        if iter_count % log_modulus == 0:
+            if use_log: log_cpu_mem_disk_usage(logger)
+        
+        iter_count += 1
+
+    return iter_count, avg_loss
 
 def eval_dev(model, ldr, preproc,  logger):
     losses = []; all_preds = []; all_labels = []
