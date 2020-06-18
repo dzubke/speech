@@ -14,7 +14,7 @@ import torch
 import torch.autograd as autograd
 import torch.utils.data as tud
 # project libraries
-from speech.utils import wave
+from speech.utils.wave import array_from_wave
 from speech.utils.io import read_data_json
 from speech.utils.signal_augment import apply_pitch_perturb, speed_vol_perturb, inject_noise
 from speech.utils.signal_augment import synthetic_gaussian_noise_inject
@@ -95,7 +95,10 @@ class Preprocessor():
     
     
     def preprocess(self, wave_file, text):
-        
+        if self.use_log: self.logger.info(f"preproc: ======= Entering preprocess =====")
+        if self.use_log: self.logger.info(f"preproc: wave_file: {wave_file}")
+        if self.use_log: self.logger.info(f"preproc: text: {text}") 
+
         audio_data, samp_rate = self.signal_augmentations(wave_file)
 
         # processing method
@@ -116,6 +119,7 @@ class Preprocessor():
         # target encoding
         targets = self.encode(text)
         if self.use_log: self.logger.info(f"preproc: text encoded")
+        if self.use_log: self.logger.info(f"preproc: ======= Exiting preprocess =====")
 
         return feature_data, targets
     
@@ -129,26 +133,30 @@ class Preprocessor():
             samp_rate - int: sample rate of the audio recording
         """
         # sox-based tempo, gain, pitch augmentations
-        if self.speed_vol_perturb and self.train_status:
-            audio_data, samp_rate = speed_vol_perturb(wave_file, tempo_range=self.tempo_range, gain_range=self.gain_range)
-        else:
-            audio_data, samp_rate = wave.array_from_wave(wave_file)
         if self.use_log: self.logger.info(f"preproc: audio_data read: {wave_file}")
+        if self.speed_vol_perturb and self.train_status:
+            audio_data, samp_rate = speed_vol_perturb(wave_file, tempo_range=self.tempo_range, 
+                                            gain_range=self.gain_range, logger=self.logger)
+        else:
+            audio_data, samp_rate = array_from_wave(wave_file)
 
         # synthetic gaussian noise
         if self.synthetic_gaussian_noise and self.train_status:
-            audio_data = synthetic_gaussian_noise_inject(audio_data, self.signal_to_noise_range_db)
             if self.use_log: self.logger.info(f"preproc: synthetic_gaussian_noise_inject")
+            audio_data = synthetic_gaussian_noise_inject(audio_data, 
+                                self.signal_to_noise_range_db, logger=self.logger)
 
         # pitch perturb
         if self.pitch_perturb and self.train_status: 
-            audio_data = apply_pitch_perturb(audio_data, samp_rate, pitch_range=self.pitch_range)
+            audio_data = apply_pitch_perturb(audio_data, samp_rate, 
+                            pitch_range=self.pitch_range, logger=self.logger)
         
         # noise injection
         if self.inject_noise and self.train_status:
             add_noise = np.random.binomial(1, self.noise_prob)
             if add_noise:
-                audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, self.logger, self.noise_levels) 
+                audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, 
+                                    self.logger, self.noise_levels) 
             if self.use_log: self.logger.info(f"preproc: noise injected")
         
         return audio_data, samp_rate
@@ -258,7 +266,7 @@ def compute_mean_std(audio_files, preprocessor, window_size, step_size):
     samples = []
     preprocessing_function  =  eval(preprocessor + "_from_data")
     for audio_file in audio_files: 
-        data, samp_rate = wave.array_from_wave(audio_file)
+        data, samp_rate = array_from_wave(audio_file)
         samples.append(preprocessing_function(data, samp_rate, window_size, step_size))
      
     samples = np.vstack(samples)
@@ -401,7 +409,7 @@ def create_mfcc(audio, sample_rate: int, window_size, step_size, esp=1e-10):
 
 def log_spectrogram_from_file(audio_path:str, window_size=32, step_size=16):
     
-    audio_data, samp_rate = wave.array_from_wave(audio_path)
+    audio_data, samp_rate = array_from_wave(audio_path)
     return log_spectrogram_from_data(audio_data, samp_rate, window_size=window_size, step_size=step_size)
 
 def log_spectrogram_from_data(audio: np.ndarray, samp_rate:int, window_size=32, step_size=16, plot=False):
@@ -440,8 +448,8 @@ def compare_log_spec_from_file(audio_file_1: str, audio_file_2: str, plot=False)
     This function takes in two audio paths and calculates the difference between the spectrograms 
         by subtracting them. 
     """
-    audio_1, sr_1 = wave.array_from_wave(audio_file_1)
-    audio_2, sr_2 = wave.array_from_wave(audio_file_2)
+    audio_1, sr_1 = array_from_wave(audio_file_1)
+    audio_2, sr_2 = array_from_wave(audio_file_2)
 
     if len(audio_1.shape)>1:
         audio_1 = audio_1[:,0]  # take the first channel
