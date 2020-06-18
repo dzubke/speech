@@ -4,14 +4,16 @@ import audioop
 import glob
 import os
 import random
+import subprocess
 from tempfile import NamedTemporaryFile
+from typing import Tuple
 # third-party libraries
 import librosa
 import numpy as np
 # project libraries
 from speech.utils.wave import array_from_wave, array_to_wave, wav_duration
 from speech.utils.convert import pcm2float, float2pcm
-
+from speech.utils.data_structs import AugmentRange
 
 
 def main(audio_path: str, out_path:str, augment_name:str, ARGS):
@@ -48,7 +50,7 @@ def apply_augmentation(audio_data:np.ndarray, sr:int, augment_name:str, args):
 
     
 
-def apply_pitch_perturb(audio_data:np.ndarray, samp_rate:int=16000, pitch_range:tuple=(-8,8)):
+def apply_pitch_perturb(audio_data:np.ndarray, samp_rate:int=16000, pitch_range:AugmentRange=(-8.0,8.0), logger=None):
     """
     Adjusts the pitch of the input audio_data by selecting a random value between the lower
     and upper ranges and adjusting the pitch based on the chosen number of quarter steps
@@ -60,7 +62,9 @@ def apply_pitch_perturb(audio_data:np.ndarray, samp_rate:int=16000, pitch_range:
         augment_data - np.ndarrray: array of audio amplitudes with raised pitch
     """
     assert audio_data.size >= 2, "input data must be 2 or more long"
+    use_log = (logger is not None)
     random_steps = random.randint(*pitch_range)
+    if use_log: logger.info(f"pitch_perturb: random_steps: {random_steps}")
     audio_data = pcm2float(audio_data)
     augment_data = librosa.effects.pitch_shift(audio_data, samp_rate, n_steps=random_steps, bins_per_octave=24)
     augment_data = float2pcm(augment_data)
@@ -72,37 +76,61 @@ def apply_pitch_perturb(audio_data:np.ndarray, samp_rate:int=16000, pitch_range:
 # Sean Naren's Deepspeech implementation at:
 # https://github.com/SeanNaren/deepspeech.pytorch/blob/master/data/data_loader.py
 
-def speed_vol_perturb(path, sample_rate=16000, tempo_range=(0.85, 1.15),
-                                  gain_range=(-6, 8))->tuple:
+def speed_vol_perturb(audio_path:str, sample_rate:int=16000, tempo_range:AugmentRange=(0.85, 1.15),
+                        gain_range:AugmentRange=(-6.0, 8.0), logger=None)->Tuple[np.ndarray, int]:
     """
     Picks tempo and gain uniformly, applies it to the utterance by using sox utility.
-    Returns the augmented utterance.
+    Returns:
+        tuple(np.ndarray, int) - the augmente audio data and the sample_rate
     """
-    low_tempo, high_tempo = tempo_range
-    tempo_value = np.random.uniform(low=low_tempo, high=high_tempo)
-    low_gain, high_gain = gain_range
-    gain_value = np.random.uniform(low=low_gain, high=high_gain)
-    audio, samp_rate = augment_audio_with_sox(path=path, sample_rate=sample_rate,
-                                   tempo=tempo_value, gain=gain_value)
-    return audio, samp_rate 
+    use_log = (logger is not None)
+    if use_log: logger.info(f"speed_vol_perturb: audio_file: {audio_path}")
+    
+    tempo_value = np.random.uniform(*tempo_range)
+    if use_log: logger.info(f"speed_vol_perturb: tempo_value: {tempo_value}")
+    
+    gain_value = np.random.uniform(*gain_range)
+    if use_log: logger.info(f"speed_vol_perturb: gain_value: {gain_value}")
 
-def augment_audio_with_sox(path, sample_rate, tempo, gain)->tuple:
+    try:    
+        audio_data, samp_rate = augment_audio_with_sox(path=audio_path, sample_rate=sample_rate,
+                                                   tempo=tempo_value, gain=gain_value, logger=logger)
+    except RuntimeError as rterr:
+        if use_log: logger.error(f"speed_vol_perturb: RuntimeError: {rterr}")
+        audio_data, samp_rate = array_from_wave(audio_path)
+        
+    return audio_data, samp_rate 
+
+
+def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float, logger=None)\
+                                                            ->Tuple[np.ndarray,int]:
     """
     Changes speed (tempo) and volume (gain) of the recording with sox and loads it.
     """
+    use_log = (logger is not None)
     with NamedTemporaryFile(suffix=".wav") as augmented_file:
         augmented_filename = augmented_file.name
         sox_augment_params = ["tempo", "{:.3f}".format(tempo), "gain", "{:.3f}".format(gain)]
-        sox_params = "sox \"{}\" -r {} -c 1 -b 16 -e si {} {} >/dev/null 2>&1".format(path, sample_rate,
-                                                                                      augmented_filename,
-                                                                                      " ".join(sox_augment_params))
-        os.system(sox_params)
+        sox_cmd = ['sox', 
+                    path, 
+                    '-r', f'{sample_rate}', 
+                    '-c', '1', 
+                    '-b', '16',
+                    '-e', 'si',   
+                    augmented_filename, 
+                    'tempo', f'{tempo:.3f}', 
+                    'gain', f'{gain:.3f}']
+        sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
+        
+        if use_log: logger.info(f"aug_audio_sox: tmpfile exists: {os.path.exists(augmented_filename)}")
+        if use_log: logger.info(f"aug_audio_sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
+        if use_log: logger.info(f"aug_audio_sox: sox stderr: {sox_result.stderr.decode('utf-8')}")
+        
         data, samp_rate = array_from_wave(augmented_filename)
         return data, samp_rate
 
 
 # Noise inject functions
-
 def inject_noise(data, data_samp_rate, noise_dir, logger, noise_levels=(0, 0.5)):
     """
     injects noise from files in noise_dir into the input data. These
@@ -139,9 +167,9 @@ def inject_noise_sample(data, sample_rate:int, noise_path:str, noise_level:float
         noise_start = np.random.rand() * (noise_len - data_len) 
         noise_end = noise_start + data_len
         try:
-            noise_dst = audio_with_sox(noise_path, sample_rate, noise_start, noise_end)
-        except FileNotFoundError:
-            if use_log: logger.info(f"file not found error in: audio_with_sox")
+            noise_dst = audio_with_sox(noise_path, sample_rate, noise_start, noise_end, logger)
+        except FileNotFoundError as fnf_err:
+            if use_log: logger.info(f"noise_inject: FileNotFoundError: {fnf_err}")
             return data
 
         noise_dst = same_size(data, noise_dst)
@@ -162,18 +190,29 @@ def inject_noise_sample(data, sample_rate:int, noise_path:str, noise_level:float
         return data.astype('int16')
 
 
-def audio_with_sox(path:str, sample_rate:int, start_time:float, end_time:float)->np.ndarray:
+def audio_with_sox(path:str, sample_rate:int, start_time:float, end_time:float, logger=None)\
+                                                                                    ->np.ndarray:
     """
     crop and resample the recording with sox and loads it.
     If the output file cannot be found, an array of zeros of the desired length will be returned.
     """
+    use_log = (logger is not None)
     with NamedTemporaryFile(suffix=".wav") as tar_file:
         tar_filename = tar_file.name
-        sox_params = "sox \"{}\" -r {} -c 1 -b 16 -e si {} trim {} ={} >/dev/null 2>&1".format(path, sample_rate,
-                                                                                               tar_filename, start_time,
-                                                                                               end_time)
-        os.system(sox_params)
-        
+        sox_cmd = ['sox',
+                    path,
+                    '-r', f'{sample_rate}',
+                    '-c', '1', 
+                    '-b', '16',
+                    '-e', 'si',
+                    tar_filename,
+                     'trim', f'{start_time}', '='+f'{end_time}']
+        sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        if use_log: logger.info(f"noise_inj_sox: tmpfile exists: {os.path.exists(tar_filename)}")
+        if use_log: logger.info(f"noise_inj_sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
+        if use_log: logger.info(f"noise_inj_sox: sox stderr: {sox_result.stderr.decode('utf-8')}")
+
         if os.path.exists(tar_filename):
             noise_data, samp_rate = array_from_wave(tar_filename)
         else:
@@ -200,7 +239,8 @@ def same_size(data:np.ndarray, noise_dst:np.ndarray) -> np.ndarray:
 
 
 # synthetic gaussian noise injection 
-def synthetic_gaussian_noise_inject(audio_data: np.ndarray, snr_range:tuple=(10,30)):
+def synthetic_gaussian_noise_inject(audio_data: np.ndarray, snr_range:tuple=(10,30),
+                                    logger=None):
     """
     Applies random noise to an audio sample scaled to a uniformly selected
     signal-to-noise ratio (snr) bounded by the snr_range
@@ -211,13 +251,19 @@ def synthetic_gaussian_noise_inject(audio_data: np.ndarray, snr_range:tuple=(10,
 
     Note: Power = Amplitude^2 and here we are dealing with amplitudes = RMS
     """
+    use_log = (logger is not None)
     snr_level = np.random.uniform(*snr_range)
     audio_rms = audioop.rms(audio_data, 2) 
     # 20 is in the exponent because we are dealing in amplitudes
     noise_rms = audio_rms / 10**(snr_level/20)
     gaussian_noise = np.random.normal(loc=0, scale=noise_rms, size=audio_data.size).astype('int16')
     augmented_data = audio_data + gaussian_noise
+    
+    if use_log: logger.info(f"syn_gaussian_noise: snr_level: {snr_level}")
+    if use_log: logger.info(f"syn_gaussian_noise: audio_rms: {audio_rms}")
+    if use_log: logger.info(f"syn_gaussian_noise: noise_rms: {noise_rms}")
     assert augmented_data.dtype == "int16"
+    
     return augmented_data
 
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# commmand structure bash eval.sh <model_start_date> <model_checkpoint_date> <--last (opt)> 
+# commmand structure bash eval.sh <model_start_date> <model_checkpoint_date> <--last (optional)> 
 # --last flag passed to evel.sh 
 
 mkdir ./examples/librispeech/models/ctc_models/$1/$2
