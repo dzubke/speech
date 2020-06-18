@@ -57,8 +57,10 @@ coverage.xml
 *.mo
 *.pot
 
-# Django stuff:
-*.log
+# Djiango stuff:
+/logs/*
+#*.log
+    
 local_settings.py
 
 # Flask stuff:
@@ -114,7 +116,8 @@ examples/librispeech/models/deepspeech_pretrained/librispeech_pretrained_v2.pth
 onnx/examples
 
 # nohup.out files
-*.out
+./*.out
+./nohup_files/
 
 #alexnet is tooo big
 alexnet*

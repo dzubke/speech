@@ -29,6 +29,103 @@ import tensorboard_logger as tb
 # turn on the set_detect_anomly
 torch.autograd.set_detect_anomaly(True)
 
+def run(config):
+
+    data_cfg = config["data"]
+    log_cfg = config["logger"]
+    preproc_cfg = config["preproc"]
+    opt_cfg = config["optimizer"]
+    model_cfg = config["model"]
+    
+    use_log = log_cfg["use_log"]
+    if use_log:
+        # create logger
+        logger = logging.getLogger("train_log")
+        logger.setLevel(logging.DEBUG)
+        # create file handler which logs even debug messages
+        fh = logging.FileHandler(log_cfg["log_file"])
+        fh.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
+        fh.setFormatter(formatter)
+        logger.addHandler(fh)
+    else:
+        logger = None
+
+    # Loaders
+    batch_size = opt_cfg["batch_size"]
+    preproc = loader.Preprocessor(data_cfg["train_set"], preproc_cfg, logger, 
+                  start_and_end=data_cfg["start_and_end"])
+    train_ldr = loader.make_loader(data_cfg["train_set"],
+                        preproc, batch_size, num_workers=data_cfg["num_workers"])
+    dev_ldr = loader.make_loader(data_cfg["dev_set"],
+                        preproc, batch_size, num_workers=data_cfg["num_workers"])
+
+    # Model
+    model = CTC_train(preproc.input_dim,
+                        preproc.vocab_size,
+                        model_cfg)
+    if model_cfg["load_trained"]:
+        model = load_from_trained(model, model_cfg)
+        print("Succesfully loaded weights from trained model")
+    model.cuda() if use_cuda else model.cpu()
+
+    # Optimizer
+    optimizer = torch.optim.SGD(model.parameters(),
+                    lr=opt_cfg["learning_rate"],
+                    momentum=opt_cfg["momentum"],
+                    dampening=opt_cfg["dampening"])
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 
+        step_size=opt_cfg["sched_step"], 
+        gamma=opt_cfg["sched_gamma"])
+
+    if use_log: logger.info(f"train: ====== Model, loaders, optimimzer created =======")
+    if use_log: logger.info(f"train: model: {model}")
+    if use_log: logger.info(f"train: preproc: {preproc}")
+    if use_log: logger.info(f"train: optimizer: {optimizer}")
+
+    # printing to the output file
+    print(f"====== Model, loaders, optimimzer created =======")
+    print(f"model: {model}")
+    print(f"preproc: {preproc}")
+    print(f"optimizer: {optimizer}")
+
+    run_state = (0, 0)
+    best_so_far = float("inf")
+    for e in range(opt_cfg["epochs"]):
+        start = time.time()
+        scheduler.step()
+        for g in optimizer.param_groups:
+            print(f'learning rate: {g["lr"]}')
+        
+        run_state = run_epoch(model, optimizer, train_ldr, logger, *run_state)
+        if use_log: logger.info(f"train: ====== Run_state finished =======") 
+        if use_log: logger.info(f"train: preproc type: {type(preproc)}")
+
+        msg = "Epoch {} completed in {:.2f} (s)."
+        print(msg.format(e, time.time() - start))
+        if use_log: logger.info(msg.format(e, time.time() - start))
+
+        if use_log: preproc.logger = None
+        speech.save(model, preproc, config["save_path"])
+        if use_log: logger.info(f"train: ====== model saved =======")
+        if use_log: preproc.logger = logger
+
+        dev_loss, dev_cer = eval_dev(model, dev_ldr, preproc, logger)
+        if use_log: logger.info(f"train: ====== eval_dev finished =======")
+
+        # Log for tensorboard
+        tb.log_value("dev_loss", dev_loss, e)
+        tb.log_value("dev_cer", dev_cer, e)
+           
+        if use_log: preproc.logger = None 
+        # Save the best model on the dev set
+        if dev_cer < best_so_far:
+            best_so_far = dev_cer
+            speech.save(model, preproc,
+                    config["save_path"], tag="best")
+        if use_log: preproc.logger = logger
+
+
 
 def run_epoch(model, optimizer, train_ldr, logger, it, avg_loss):
     """
@@ -141,101 +238,6 @@ def eval_dev(model, ldr, preproc,  logger):
 
     return loss, cer
 
-def run(config):
-
-    data_cfg = config["data"]
-    log_cfg = config["logger"]
-    preproc_cfg = config["preproc"]
-    opt_cfg = config["optimizer"]
-    model_cfg = config["model"]
-    
-    use_log = log_cfg["use_log"]
-    if use_log:
-        # create logger
-        logger = logging.getLogger("train_log")
-        logger.setLevel(logging.DEBUG)
-        # create file handler which logs even debug messages
-        fh = logging.FileHandler(log_cfg["log_file"])
-        fh.setLevel(logging.DEBUG)
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
-        fh.setFormatter(formatter)
-        logger.addHandler(fh)
-    else:
-        logger = None
-
-    # Loaders
-    batch_size = opt_cfg["batch_size"]
-    preproc = loader.Preprocessor(data_cfg["train_set"], preproc_cfg, logger, 
-                  start_and_end=data_cfg["start_and_end"])
-    train_ldr = loader.make_loader(data_cfg["train_set"],
-                        preproc, batch_size, num_workers=data_cfg["num_workers"])
-    dev_ldr = loader.make_loader(data_cfg["dev_set"],
-                        preproc, batch_size, num_workers=data_cfg["num_workers"])
-
-    # Model
-    model = CTC_train(preproc.input_dim,
-                        preproc.vocab_size,
-                        model_cfg)
-    if model_cfg["load_trained"]:
-        model = load_from_trained(model, model_cfg)
-        print("Succesfully loaded weights from trained model")
-    model.cuda() if use_cuda else model.cpu()
-
-    # Optimizer
-    optimizer = torch.optim.SGD(model.parameters(),
-                    lr=opt_cfg["learning_rate"],
-                    momentum=opt_cfg["momentum"],
-                    dampening=opt_cfg["dampening"])
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 
-        step_size=opt_cfg["sched_step"], 
-        gamma=opt_cfg["sched_gamma"])
-
-    if use_log: logger.info(f"train: ====== Model, loaders, optimimzer created =======")
-    if use_log: logger.info(f"train: model: {model}")
-    if use_log: logger.info(f"train: preproc: {preproc}")
-    if use_log: logger.info(f"train: optimizer: {optimizer}")
-
-    # printing to the output file
-    print(f"====== Model, loaders, optimimzer created =======")
-    print(f"model: {model}")
-    print(f"preproc: {preproc}")
-    print(f"optimizer: {optimizer}")
-
-    run_state = (0, 0)
-    best_so_far = float("inf")
-    for e in range(opt_cfg["epochs"]):
-        start = time.time()
-        scheduler.step()
-        for g in optimizer.param_groups:
-            print(f'learning rate: {g["lr"]}')
-        
-        run_state = run_epoch(model, optimizer, train_ldr, logger, *run_state)
-        if use_log: logger.info(f"train: ====== Run_state finished =======") 
-        if use_log: logger.info(f"train: preproc type: {type(preproc)}")
-
-        msg = "Epoch {} completed in {:.2f} (s)."
-        print(msg.format(e, time.time() - start))
-        if use_log: logger.info(msg.format(e, time.time() - start))
-
-        if use_log: preproc.logger = None
-        speech.save(model, preproc, config["save_path"])
-        if use_log: logger.info(f"train: ====== model saved =======")
-        if use_log: preproc.logger = logger
-
-        dev_loss, dev_cer = eval_dev(model, dev_ldr, preproc, logger)
-        if use_log: logger.info(f"train: ====== eval_dev finished =======")
-
-        # Log for tensorboard
-        tb.log_value("dev_loss", dev_loss, e)
-        tb.log_value("dev_cer", dev_cer, e)
-           
-        if use_log: preproc.logger = None 
-        # Save the best model on the dev set
-        if dev_cer < best_so_far:
-            best_so_far = dev_cer
-            speech.save(model, preproc,
-                    config["save_path"], tag="best")
-        if use_log: preproc.logger = logger
 
 
 def load_from_trained(model, model_cfg):
