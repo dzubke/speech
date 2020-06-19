@@ -2,20 +2,19 @@
 import json
 import os
 import argparse
-
+from collections import defaultdict
 # project libraries
 from speech.utils import data_helpers
 
 def main(corpus1_lex_fn:str, corpus2_lex_fn:str):
     """
-        performs a variety of methods comparing the lexicon pronounciation
-         dictionaries of corpus1 and corpus2
-        
-        Arguments:
-            corpus1_lex_fn (str): the pathname to the pronunciation
-             lexicon for corpus 1
-            corpus2_lex_fn (str): the pathname to the pronunciation
-             lexicon for corpus 2
+    performs a variety of methods comparing the lexicon pronounciation
+    dictionaries of corpus1 and corpus2
+    Arguments:
+        corpus1_lex_fn (str): the pathname to the pronunciation
+            lexicon for corpus 1
+        corpus2_lex_fn (str): the pathname to the pronunciation
+            lexicon for corpus 2
     """
 
 
@@ -29,7 +28,7 @@ def main(corpus1_lex_fn:str, corpus2_lex_fn:str):
 
 def process_name(corpus_lex_fn:str):
     """
-        extracts the corpus name from the lexicon dict filename
+    extracts the corpus name from the lexicon dict filename
     """
     corpus_name = os.path.basename(corpus_lex_fn)
     if '-' in corpus_name: 
@@ -43,8 +42,8 @@ def process_name(corpus_lex_fn:str):
 
 def compare_phones(corpus1_lex:str, corpus1_name:str,  corpus2_lex:str, corpus2_name:str):
     """
-        compares the phonemes in lexicons of corpus1 and corpus2 and
-         creates
+    compares the phonemes in lexicons of corpus1 and corpus2 and
+    creates
     """
 
     corpus1_phones, corpus1_words = export_phones(corpus1_lex, export=False)
@@ -59,11 +58,10 @@ def compare_phones(corpus1_lex:str, corpus1_name:str,  corpus2_lex:str, corpus2_
 
 def export_phones(lex_dict:dict, export:bool=False):
     """
-        exports all words and phones in lex_dict into two separate txt files
-
-        Arguments:
-            lex_dict (dict[str:list]): the pronuncation dictionary that maps words to a list of phoneme labels
-            export (bool): a boolean that if True will export the list of phoneme labels to a txt file. 
+    exports all words and phones in lex_dict into two separate txt files
+    Arguments:
+        lex_dict (dict[str:list]): the pronuncation dictionary that maps words to a list of phoneme labels
+        export (bool): a boolean that if True will export the list of phoneme labels to a txt file. 
     """
 
     phone_set = set()
@@ -91,10 +89,10 @@ def export_phones(lex_dict:dict, export:bool=False):
 
 
 def check_phones():
-    """This function compares the phonemes in the librispeech corpus with the phoneme labels in the 39-phonemes
+    """
+    This function compares the phonemes in the librispeech corpus with the phoneme labels in the 39-phonemes
     in the timit dataset outlined here: 
     https://www.semanticscholar.org/paper/Speaker-independent-phone-recognition-using-hidden-Lee-Hon/3034afcd45fc190ed71982828b77f6e4154bdc5c
-    
     Discrepencies in the CMU-39 and timit-39 phoneme sets and the librispeech phonemes: 
      - included in CMU-39 but not timit-39:  ao, zh, 
      - included timit-39 but not CMU-39: dx, sil
