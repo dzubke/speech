@@ -5,17 +5,15 @@ import argparse
 import subprocess
 import io
 import json
-
+import unicodedata
+import tarfile
 # third-party libraries
 #import wget
-import tarfile
-import unicodedata
-#from utils import create_manifest
 from tqdm import tqdm
-
 #project libraries
+#from utils import create_manifest
 from speech.utils import data_helpers
-from speech.utils import wave
+from speech.utils import wave 
 
 
 def main(target_dir, tar_path, sample_rate, min_duration, max_duration, use_phonemes, no_segment):
@@ -39,7 +37,9 @@ def main(target_dir, tar_path, sample_rate, min_duration, max_duration, use_phon
     else:
         print("Found TEDLIUM directory, skipping unpacking of tar files")
 
-    train_ted_dir = os.path.join(target_unpacked_dir, "data")
+    # legacy means the data are in the format of previous version. 
+    # legacy contains all the data in tedlium v3
+    train_ted_dir = os.path.join(target_unpacked_dir, "legacy", "train")
     val_ted_dir = os.path.join(target_unpacked_dir, "legacy", "dev")
     test_ted_dir = os.path.join(target_unpacked_dir, "legacy", "test")
 
@@ -57,7 +57,7 @@ def prepare_dir(ted_dir, use_phonemes, no_segment):
     """
         processed the audio and labels
         Arguments:
-            ted_dir (str): path to the directory with the dataset
+            ted_dir - str: path to the directory with the dataset
             use_phonemes (bool): if true, phoneme labels will be used
             segment_audio (bool): if true, the original audio will be segmented
     """
