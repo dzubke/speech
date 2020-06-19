@@ -6,17 +6,10 @@ import numpy as np
 import torch
 import torch.autograd as autograd
 
-import functions.ctc as ctc #awni hannun's ctc bindings
-#from warpctc_pytorch import CTCLoss  #sean naren's ctc bindings
 from . import model
 from .ctc_decoder import decode
 from .ctc_decoder_dist import decode_dist
 
-"""
-two different ctc loss functions can be used for this model: awni hannun and sean naren's pytorch bindings
-to baidu's warp-ctc. To change them, change the commented out code in the import statements above
- and in self.loss() below
-"""
 
 class CTC(model.Model):
     def __init__(self, freq_dim, output_dim, config):
@@ -40,15 +33,7 @@ class CTC(model.Model):
         return x, rnn_args
 
     def loss(self, batch):
-        x, y, x_lens, y_lens = self.collate(*batch)
-        out, rnn_args = self.forward_impl(x)
-        
-        loss_fn = ctc.CTCLoss()         # awni's ctc loss call
-        #loss_fn = CTCLoss(size_average=True)    # 1. naren's ctc loss call
-        #out = out.permute(1,0,2).float().requires_grad_(True) # 2. naren ctc loss
-        
-        loss = loss_fn(out, y, x_lens, y_lens)
-        return loss
+        pass
 
     def collate(self, inputs, labels):
         max_t = max(i.shape[0] for i in inputs)
@@ -71,6 +56,20 @@ class CTC(model.Model):
         probs = probs.data.cpu().numpy()
         return [decode(p, beam_size=3, blank=self.blank)[0]
                     for p in probs]
+    def infer_confidence(self, batch):
+        """
+        returns the confidence value was well as the prediction
+        as a tuple
+        """
+        x, y, x_lens, y_lens = self.collate(*batch)
+        probs, rnn_args = self.forward_impl(x, softmax=True)
+        # convert the torch tensor into a numpy array
+        probs = probs.data.cpu().numpy()
+        preds_confidence = [decode(p, beam_size=3, blank=self.blank)
+                    for p in probs]
+        preds = [x[0] for x in preds_confidence]
+        confidence = [x[1] for x in preds_confidence]
+        return preds, confidence    
     
     def infer_distribution(self, batch, num_results):
         x, y, x_lens, y_lens = self.collate(*batch)

@@ -3,18 +3,7 @@ import argparse
 import json
 import editdistance
 
-def load_phone_map():
-    with open("phones.60-48-39.map", 'r') as fid:
-        lines = (l.strip().split() for l in fid)
-        lines = [l for l in lines if len(l) == 3]
-    m60_48 = {l[0] : l[1] for l in lines}
-    m48_39 = {l[1] : l[2] for l in lines}
-    return m60_48, m48_39
 
-def remap48_39(data):
-    _, m48_39 = load_phone_map()
-    data = [m48_39[p] for p in data]
-    return data
 
 def consolidate_score(score_path: str, test_path: str, cons_path:str):
     """this function takes in the score_path with the distance metrics and the test_path
