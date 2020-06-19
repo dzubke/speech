@@ -112,14 +112,14 @@ def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float, l
         augmented_filename = augmented_file.name
         sox_augment_params = ["tempo", "{:.3f}".format(tempo), "gain", "{:.3f}".format(gain)]
         sox_cmd = ['sox', 
-                    path, 
-                    '-r', f'{sample_rate}', 
-                    '-c', '1', 
-                    '-b', '16',
-                    '-e', 'si',   
-                    augmented_filename, 
-                    'tempo', f'{tempo:.3f}', 
-                    'gain', f'{gain:.3f}']
+                    path,                       # file to augment
+                    '-r', f'{sample_rate}',     # sample rate
+                    '-c', '1',                  # single-channel audio
+                    '-b', '16',                 # bitrate = 16
+                    '-e', 'si',                 # encoding = signed-integer
+                    augmented_filename,         # output temp-filename
+                    'tempo', f'{tempo:.3f}',    # augment tempo
+                    'gain', f'{gain:.3f}']      # augment gain (in db)
         sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
         
         if use_log: logger.info(f"aug_audio_sox: tmpfile exists: {os.path.exists(augmented_filename)}")
@@ -200,13 +200,13 @@ def audio_with_sox(path:str, sample_rate:int, start_time:float, end_time:float, 
     with NamedTemporaryFile(suffix=".wav") as tar_file:
         tar_filename = tar_file.name
         sox_cmd = ['sox',
-                    path,
-                    '-r', f'{sample_rate}',
-                    '-c', '1', 
-                    '-b', '16',
-                    '-e', 'si',
-                    tar_filename,
-                     'trim', f'{start_time}', '='+f'{end_time}']
+                    path,                       # noise filename
+                    '-r', f'{sample_rate}',     # sample rate
+                    '-c', '1',                  # output is single-channel audio
+                    '-b', '16',                 # bitrate = 16
+                    '-e', 'si',                 # encoding = signed-integer
+                    tar_filename,               # output temp-filename
+                     'trim', f'{start_time}', '='+f'{end_time}']    # trim to start and end time
         sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         if use_log: logger.info(f"noise_inj_sox: tmpfile exists: {os.path.exists(tar_filename)}")

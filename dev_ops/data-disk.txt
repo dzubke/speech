@@ -1,0 +1,108 @@
+# this file will serve as a record of the commands necessary to manage training from a single data disk. 
+# I will use comments to distinguish commemnts from commands, through this file is not meant to be run as an .sh
+# file. Hence, the .txt extension. 
+
+#   1. There are a few general things to know. On GCP, you can only mount a disk to multiple VM's if it is in `read-only` mode.
+#       You can't have any of the VM's in `read-write` mode, if the disk is attached to multiple VM.
+#   2. Because of this, if you want to edit the data on the data-disk, you need to detach it from all the VM's, and then
+#       attach it to a VM in `read-write` mode.
+#   3. Also worth noting is that you not only need to attach the data-disk to a VM, but you also need to mount
+#       the disk to the filesystem. This is what the `mount` command does. 
+#   4. This is a good link for attaching and mounting a disk on GCP: https://cloud.google.com/compute/docs/disks/add-persistent-disk#formatting
+
+
+# CREATING A DATA-DISK
+# The steps below outline how to create a data-disk and use the data-disk
+#   1. Create snapshot of the disk from the VM with the most current data
+#   2. Make a new disk from that snapshot
+#   3. Attach the data-disk to a VM in `read-write` mode
+#   4. Mount the data-disk to a filesystem in `read-write` mode
+#   5. Edit all of the pathnames in the `dataset.json` files
+#   6. Unmount the disk from the filesystem
+#   7. Detach the data-disk from the VM
+#   8. Re-attach data-disk to the VM in `read-only` mode
+#   9. Re-mount the data-disk to the filesystem in `read-only` mode
+#   10. Attach and mount the data-disk to another other VM's in `read-only` mode
+#   11. To automatically mount the data-disk on VM boot, update the `/etc/fstab` file
+
+
+# this command will show you the disks available. Note the `device` of the disk are the sub-tree items
+# in the lsblk. Initially, I was using `sdb` for the device name, but  that didn't work. Using `sdb1` should be used. 
+# Example output:
+# NAME    MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+# sdb       8:16   0   750G  0 disk 
+# ├─sdb15   8:31   0   106M  0 part /boot/efi
+# ├─sdb1    8:17   0 749.9G  0 part /mnt/disks/data_disk
+# └─sdb14   8:30   0     4M  0 part 
+# sda       8:0    0   500G  0 disk 
+# ├─sda14   8:14   0     4M  0 part 
+# ├─sda15   8:15   0   106M  0 part 
+# └─sda1    8:1    0 499.9G  0 part /
+lsblk
+
+
+# STEP 3 & 7, 8: ATTACH AND DETACH THE DISK
+# this is how to attach a disk to the VM, note the `ro` (read-only) mode
+
+gcloud compute instances attach-disk phoneme-4 \
+    --disk data-disk-readonly-2020-06-19 --mode=ro --zone=us-central1-c
+
+# this is how to detach a disk from a VM.
+
+gcloud compute instances detach-disk phoneme-4 \
+    --disk data-disk-readonly-2020-06-19 --zone=us-central1-c   
+
+
+# STEP 4 & 9: MOUNT AND UNMOUNT THE DISK TO THE FILESYSTEM
+# this command is used to mount the data disk for details on the mount command see here:
+# https://manpages.ubuntu.com/manpages/xenial/man8/mount.8.html
+# the `ro` option is the most crtical is it means `read-only`. For `read-write` use the `rw` option.
+# the options `discard,suid,dev,exec,auto,nouser,async` are all part of the `defaults` on the manpage.
+# the `noload` option seems necessary. Not sure exaclty what that does. 
+
+sudo mount -o ro,discard,suid,dev,exec,auto,nouser,async,noload /dev/sdb1 /mnt/disks/data_disk
+
+# this command will unmount the data disk
+
+sudo umount /dev/sdb1
+
+# to see all the mounted filesystems use the command below
+
+mount -l
+ 
+
+# STEP 5: RENAME THE FILPATHS
+# Once the disk is attached and mounted in `read-write` mode,
+# navigate to the data directory on the data-disk with the `cd` command
+# the `sed` command will replace all occurances of "/home" with "/mnt/disks/data_disk/home"
+# the `-i` option will edit the file inplace
+# the `s` at the beginng of the string is how to replace with sed
+# the `g` at the end of the string will make the replacement "global" 
+# the `*/*.json` will find all .json files in the next directory
+# Note: this won't replace all dataset.json files as not all dataset.json files will match
+# the "*/*.json" pattern. You need to go into each directory in `/data/` to ensure the changes are made.
+
+cd /mnt/disks/data_disk/home/dzubke/awni_speech/data
+
+sed -i 's#/home#/mnt/disks/data_disk/home#g' */*.json
+
+
+# STEP 11: UPDATE THE /etc/fstab FILE TO MOUNT ON VM BOOT
+# When the VM boots, it won't re-mount the data-disk unless you modify the `/etc/fstab` file. The commands below do this. 
+# backs up the `/etc/fstab` file
+sudo cp /etc/fstab /etc/fstab.backup
+
+# this command will add the code that will automatically mount the data-disk when the VM boots
+
+echo UUID=`sudo blkid -s UUID -o value /dev/sdb1` /mnt/disks/data_disk ext4 ro,discard,suid,dev,exec,auto,nouser,async,nofail,noload 0 2 | sudo tee -a /etc/fstab
+
+# You can run this command to verify the fstab entry is correct
+
+cat /etc/fstab
+
+
+
+
+
+
+

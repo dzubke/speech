@@ -5,6 +5,7 @@ from __future__ import print_function
 # standard libraries
 import json
 import random
+from typing import List, Tuple
 # third-party libraries
 import matplotlib.pyplot as plt
 import numpy as np
@@ -247,31 +248,80 @@ class Preprocessor():
                 string += "\n" + name +": " + str(eval("self."+name))
             return string
 
-    @staticmethod
-    def feature_normalize(feature:np.ndarray)->np.ndarray:
-        """
-        Normalizes the features so that the entire 2d input array
-        has zero mean and unit (1) std deviation
-        """
-        mean = feature.mean()
-        std = feature.std()
-        feature -= mean
-        feature /= std
-        assert feature.dtype == np.float32, "feature is not float32"
-        return feature
 
 
-def compute_mean_std(audio_files, preprocessor, window_size, step_size):
+def feature_normalize(feature:np.ndarray, eps=1e-7)->np.ndarray:
+    """
+    Normalizes the features so that the entire 2d input array
+    has zero mean and unit (1) std deviation
+    The first assert checks std is not zero. If it is zero, will get NaN
+    """
+    mean = feature.mean()
+    std = feature.std()
+    assert std != 0, "feature_normalize: std dev is zero, will get NaN"
+    feature -= mean
+    feature /= (std + eps)
+    assert feature.dtype == np.float32, "feature is not float32"
+    return feature
+
+
+def compute_mean_std(audio_files:List[str], preprocessor:str, window_size:int, step_size:int)\
+                                                                ->Tuple[np.ndarray, np.ndarray]:
+    """
+    Compute the mean and std deviation of all of the feature bins (frequency bins if log_spec
+    preprocessor). Does not first normalize the audio samples 
+    (in contrast to compute_mean_std_with_feature_normalize).
+    Arguments:
+        audio_files - list[str]: a list of shuffled audio files. len = max_samples
+        preprocessor - str: specifies the kind of preprocessor
+        window_size - int: window_size of preprocessor
+        step_size - int: step_size of preprocessor
+    Returns:
+        mean - np.ndarray: the mean of the feature bins - shape = (# feature bins,)
+        std  - np.ndarray: the std deviation of the feature bins - shape = (# bins,)
+    """
     assert preprocessor in ['mfcc', 'log_spectrogram'], "preprocessor string not accepted"
     samples = []
     preprocessing_function  =  eval(preprocessor + "_from_data")
     for audio_file in audio_files: 
         data, samp_rate = array_from_wave(audio_file)
         samples.append(preprocessing_function(data, samp_rate, window_size, step_size))
-     
-    samples = np.vstack(samples)
-    mean = np.mean(samples, axis=0)
+    # compute mean and std dev of the feature bins (along axis=0)
+    # feature arrays aka samples are time x feature bin
+    samples = np.vstack(samples) # stacks along time axis: shape = (all_time, feature bin)
+    mean = np.mean(samples, axis=0) # computes mean along time axis: shape = (feature bin,)
     std = np.std(samples, axis=0)
+    return mean, std
+
+
+def compute_mean_std_with_feature_normalize(audio_files:List[str], preprocessor:str, 
+                                                    window_size:int, step_size:int)\
+                                                    ->Tuple[np.ndarray, np.ndarray]:
+    """
+    First, normalizes the features from the input audio_files (in contrast to compute_mean_std).
+    Then compute the mean and std deviation of all of the feature bins.      
+    Arguments:
+        audio_files - list[str]: a list of shuffled audio files. len = max_samples
+        preprocessor - str: specifies the kind of preprocessor
+        window_size - int: window_size of preprocessor
+        step_size - int: step_size of preprocessor
+    Returns:
+        mean - np.ndarray: the mean of normalized feature bins - shape = (# feature bins,)
+        std  - np.ndarray: the std dev of normalized feature bins - shape = (# feature bins,)
+    """
+    assert preprocessor in ['mfcc', 'log_spectrogram'], "preprocessor string not accepted"
+    samples = []
+    preprocessing_function  =  eval(preprocessor + "_from_data")
+    for audio_file in audio_files: 
+        data, samp_rate = array_from_wave(audio_file)
+        feature_array = preprocessing_function(data, samp_rate, window_size, step_size)
+        feature_array = feature_normalize(feature_array)   # normalize the feature
+        samples.append(feature_array)
+    # compute mean and std dev of the feature bins (along axis=0)
+    # feature arrays are time x feature bin
+    samples = np.vstack(samples)    # stacks along time axis: shape = (all_time, feature bin)
+    mean = np.mean(samples, axis=0) # computes mean along time axis: shape = (feature bin, )
+    std = np.std(samples, axis=0)   # same as mean: shape = (feature bin,)
     return mean, std
 
 
@@ -356,6 +406,7 @@ def make_loader(dataset_json, preproc,
 def mfcc_from_data(audio: np.ndarray, samp_rate:int, window_size=20, step_size=10):
     """
     Computes the Mel Frequency Cepstral Coefficients (MFCC) from an audio file path by calling the mfcc method
+    Dimensions of output are time x mfcc bin
     Arguments:
         audio - np.ndarray: an array of audio data in pcm16 format
     Returns:
@@ -414,11 +465,12 @@ def log_spectrogram_from_file(audio_path:str, window_size=32, step_size=16):
 
 def log_spectrogram_from_data(audio: np.ndarray, samp_rate:int, window_size=32, step_size=16, plot=False):
     """
-    Computes the log of the spectrogram from from a input audio file string
+    Computes the log of the spectrogram for input audio. Dimensions are time x freq
     Arguments:
         audio_data (np.ndarray)
-    `Returns:
-        np.ndarray, the transposed log of the spectrogram as returned by log_specgram
+    Returns:
+        np.ndarray: log of the spectrogram as returned by log_specgram
+            transposed so dimensions are time x frequency
     """
     
     if len(audio.shape)>1:     # there are multiple channels
