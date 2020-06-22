@@ -1,0 +1,50 @@
+# Once you accept the invitation to the project, you can either shh to the VM from the GCP browser window
+# by going to Compute Enginer>VM Instances and clicking the SHH button next to instance-9 
+# Or you can install the GCP SDK here: https://cloud.google.com/sdk/docs/quickstarts
+# and create an SHH terminal from your local terminal
+
+# If you are using your local terminal, once the SDK is installed your terminal, run: 
+gcloud compute ssh --project speak-labs --zone us-central1-a  dzubke@instance-9
+
+# 3. Once your succesfully connected to the VM, run the commands: 
+cd /home/dzubke/awni_speech/speech
+
+# the speak test data along with my test data is at /home/dzubke/awni_speech/data/
+
+# if you want to re-process the data yourself,run the commands to remove existing processed files and run the test_process.py file
+cd /home/dzubke/awni_speech/data/speak_test_data/
+# removing all of the processed .wv audio files
+rm *.wv                 
+# removing the json for evaluation
+rm speak_test.json
+
+# now run the preprocessing test_preprocess.py file
+cd /home/dzubke/awni_speech/speech/examples/speak_test/       
+# the command structure is >>python test_preprocess.py <path_to_test_directory> 
+python test_preprocess.py /home/dzubke/awni_speech/data/speak_test_data/
+
+# if you want you can check the .wv files and json have been created
+cd /home/dzubke/awni_speech/data/speak_test_data/
+ls
+
+# now run the eval.py file on the speak_test.json - this will output a CER, but it is based on 48 phoneme labels, which isn't what were are evaluating on
+cd /home/dzubke/awni_speech/speech/
+# the command structure is >>python eval.py <path_to_model> <path_to_json> --save <predictions.json_name>
+python eval.py ./examples/timit/models/20191121 /home/dzubke/awni_speech/data/speak_test_data/ --save speak_predictions_20191203.json
+
+# finally, run the score.py on the predictions - this will output a CER based on 39-phonemes, which is what we want
+cd /home/dzubke/awni_speech/speech/examples/timit
+# the command structure is >>python score.py <path_to_predictions.json_name>
+python score.py /home/dzubke/awni_speech/speech/speak_predictions_20191203.json
+
+# the score.py script will create another json with "_dist_39" appended to the end of the filename
+# this file has the predictions using the 39-phoneme labels as well as the distance metrics and CER for each example
+
+# if you have installed the GCP SDK and you want to copy this file to your local computer, in a separate shell, run
+gcloud compute scp --zone us-central1-a instance-9:<path_on_server> <your_local_path> 
+
+# To copy files from your local computer onto the server, open a separate local shell (not the SHH terminal - you can't run this commend on the GCP VM) and run: 
+gcloud compute scp <local_path> --zone us-central1-a instance-9:<path_on_server>
+
+# To copy a folder, add the --recurse option (again, in a shell outside the SHH terminal)
+gcloud compute scp --recurse <local_path_to_directory> --zone us-central1-a instance-9:<path_to_directory>

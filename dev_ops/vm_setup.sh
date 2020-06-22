@@ -2,30 +2,9 @@
 
 
 
-# 1. create VM - example 
-gcloud compute instances create gpu-instance-1 \
-    --machine-type n1-standard-2 --zone us-east1-d \
-    --accelerator type=nvidia-tesla-k80,count=1 \
-    --image-family ubuntu-1604-lts --image-project ubuntu-os-cloud \
-    --maintenance-policy TERMINATE --restart-on-failure
+: <<'END'
+END
 
-
-# attached read-only disk
-gcloud compute instances attach-disk INSTANCE_NAME \
-    --disk DISK_NAME \
-    --mode ro # look into setting disk name for mounting
-
-# format and mount data disk, again the name of the disk is hardcoded to 'sdb' and this may not always be the name of the new disk
-# if 'sdb' is not the name of the disk, you can find the name using this command: sudo lsblk
-## reference: https://cloud.google.com/compute/docs/disks/add-persistent-disk
-yes | sudo mkfs.ext4 -m 0 -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb
-sudo mkdir -p /mnt/disks/data   
-sudo mount -o discard,defaults /dev/sdb /mnt/disks/data
-sudo chmod a+w /mnt/disks/data  
-
-# add the disk to etc/fstab to mount on restart
-sudo cp /etc/fstab /etc/fstab.backup
-sudo blkid /dev/DEVICE_ID
 
 # 2. update the vm
 sudo apt-get update
@@ -55,7 +34,7 @@ pip install onnx onnxruntime coremltools onnx-coreml
     # location of CUDA archive - http://developer.download.nvidia.com/compute/cuda/repos/
     # source for below: https://developer.nvidia.com/cuda-92-download-archive?target_os=Linux&target_arch=x86_64&target_distro=Ubuntu&target_version=1604&target_type=debnetwork & https://cloud.google.com/compute/docs/gpus/add-gpus#install-gpu-driver
 
-Cuda 10
+#Cuda 10
 curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_10.0.130-1_amd64.deb
 sudo dpkg -i cuda-repo-ubuntu1604_10.0.130-1_amd64.deb
 sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
@@ -69,3 +48,18 @@ sudo apt-get install ffmpeg
 sudo apt-get install vim
 
 
+# 13. install pytorch
+conda install pytorch=0.4.1 cuda92 -c pytorch
+conda install pytorch==1.0.0 torchvision==0.2.1 cuda100 -c pytorch
+#latest, 1.3
+conda install pytorch torchvision cudatoolkit=10.1 -c pytorch 
+#for mac, pytoch 1.3
+conda install pytorch torchvision -c pytorch
+
+# 14. run the makefile
+cd ~/awni_speech/speech/
+sudo apt-get install make
+sudo apt-get install cmake
+make
+
+cmake ../ && make; cd ../pytorch_binding; python build.py
