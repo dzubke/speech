@@ -1,0 +1,103 @@
+ - SSH passphrase: pinkmartini
+
+
+# see tensorboard events file
+conda install tensorboard
+# copy log files to local
+gcloud compute scp --recurse dzubke@instance-9:~/awni_speech/speech/examples/timit/models/ctc_best/ /Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/timit/models/GCP_ctc_best
+tensorboard --logdir ./  --port=8080
+
+
+# eval command on my computer
+python test_preprocess.py ~/CS/consulting/firstlayerai/data/dustin_test_data/20191202_clean/ 
+python eval.py ./examples/timit/models/GCP_ctc_best/20191215_seq2seq  ~/CS/consulting/firstlayerai/data/timit/test.json --save ./predictions/seq2seq_predictions_20191216.json
+python score.py /Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/drz_predictions_20191202.json
+
+### Notes
+###
+# 1. If there is an import error where `GLIBCXX_3.4.21' not found
+# run the command: conda install -c msarahan libgcc
+# which will install libgcc=5.2.0 from https://anaconda.org/msarahan/libgcc which has 
+
+
+Get info and transfer layers
+cd ~/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/speech/utils 
+python model_transfer.py ~/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/examples/librispeech/models/deepspeech_pretrained/librispeech_pretrained_v2.pth
+
+
+
+# eval the model on phoneme-2
+echo 'examples/librispeech/models/ctc_models/20200203/20200218/*model' >> .gitignore
+mkdir ./examples/librispeech/models/ctc_models/20200226/20200228
+cp ./examples/librispeech/models/ctc_models/20200226/* ./examples/librispeech/models/ctc_models/20200226/20200228
+python eval.py ./examples/librispeech/models/ctc_models/20200226/20200228 ~/awni_speech/data/LibriSpeech/test-combo.json --save ./predictions/20200226-0228_libsp-test-combo_predictions.json
+python eval.py ./examples/librispeech/models/ctc_models/20200226/20200302 ~/awni_speech/data/speak_test_data/speak_test.json --save ./predictions/20200226-20200302_speak_test_predictions.json
+python eval.py ./examples/librispeech/models/ctc_models/20200226/20200228 ~/awni_speech/data/dustin_test_data/20191202_clean/drz_test.json --save ./predictions/20200226-0228_1202_predictions.json
+python eval.py ./examples/librispeech/models/ctc_models/20200226/20200228 ~/awni_speech/data/dustin_test_data/20191118_plane/simple/drz_test.json --save ./predictions/20200226-0228_1118-simple_predictions.json
+
+python eval.py ./examples/librispeech/models/ctc_models/20200211/20200212 ~/awni_speech/data/LibriSpeech/test-clean.json --save ./predictions/20200211-0212_libsp-test_predictions.json
+
+# move files to onnx_coreml for processing
+
+In [76]: xub = x.unbind(dim=2)     
+In [77]: xcat = torch.cat(xub, dim=2)  
+
+x = torch.split(x,1, dim=2) 
+x = torch.cat(x, dim=3)
+x = x.squeeze(2)
+
+
+input = torch.randn(5, 3, 10)
+h0 = torch.randn(layer_count * 2, 3, 20)
+c0 = torch.randn(layer_count * 2, 3, 20)
+output, (hn, cn) = model(input, (h0, c0))
+
+
+#steps for different model size
+
+torch_to_onnx
+X) change freq_dim in model.CTC
+
+Validation.py
+X) change model.CTC freq_dim
+X) change log_spec in loader.py
+
+"train_set" : "/home/dzubke/awni_speech/data/lib-ted-cv-vox-tat/train_lib-ted-cv-vox-tat.json",
+"dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-combo.json",
+
+# Noise inject debug 
+ffmpeg -y -i -ar 16000 -f wa
+
+# dataset sizes
+# phoneme-2
+77482556        common-voice
+29653068        voxforge
+26505924        tatoeba
+175808468       LibriSpeech
+52123796        tedlium/
+
+#phoneme-3
+77456124        common-voice/
+29652736        voxforge
+26499336        tatoeba
+
+python download.py --output-dir /home/dzubke/awni_speech/data/noise --dataset-name Demand
+python preprocess.py --dataset-dir /home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3 --dataset-name Tedlium --lexicon-path /home/dzubke/awni_speech/speech/examples/tedlium/TEDLIUM.162k.dic --min-duration 1 --max-duration 20
+
+# remove layers for retraining RNN
+ ["rnn.weight_ih_l0", "rnn.weight_hh_l0", "rnn.bias_ih_l0",
+            "rnn.bias_hh_l0", "rnn.weight_ih_l1", "rnn.weight_hh_l1", "rnn.bias_ih_l1",
+            "rnn.bias_hh_l1", "rnn.weight_ih_l2", "rnn.weight_hh_l2", "rnn.bias_ih_l2",
+            "rnn.bias_hh_l2", "rnn.weight_ih_l3", "rnn.weight_hh_l3", "rnn.bias_ih_l3",
+            "rnn.bias_hh_l3", "rnn.weight_ih_l4", "rnn.weight_hh_l4", "rnn.bias_ih_l4",
+            "rnn.bias_hh_l4", "fc.fc.weight", "fc.fc.bias"]
+
+# github password
+9!l2&YQCydRAkhr1f6%x
+
+# logging info
+logging.basicConfig(filename=None, filemode='w', level=10)
+logger = logging.getLogger("train_log")
+
+# data-disk prefix
+/mnt/disks/data_disk/

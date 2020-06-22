@@ -1,15 +1,17 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/null/",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200616/",
     "data" : {
-         "train_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json",
-        "dev_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json",
-        "start_and_end" : false
+         "train_set" : "/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json",
+        "dev_set" : "/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
+        "start_and_end" : false,
+        "num_workers":0
     },
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/null.log"
+        "log_file": "logs/2020-06-17_v2_ph3_withBatchNorm_lib-ted-cv.log",
+        "debug_mode":true
     },
     "preproc":{
         "preprocessor": "log_spectrogram",
@@ -18,14 +20,13 @@
         "normalize": "batch_normalize",
         "use_spec_augment": true,
         "inject_noise": true,
-        "noise_directory": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/",
+        "noise_directory": "/home/dzubke/awni_speech/data/noise/feed_to_model/",
         "noise_prob": 0.6,
         "noise_levels": [0,0.5], 
-        "speed_vol_perturb":true,
+        "tempo_gain_pitch_perturb":true,
         "tempo_range": [0.85, 1.15],
-        "gain_range":[-3,4],
-        "pitch_perturb": true,
-        "pitch_range": [-8, 8],
+        "gain_range":[-6,6],
+        "pitch_range":[-400,400],
         "synthetic_gaussian_noise": true, 
         "signal_to_noise_range_db":[10,30]
     },
@@ -43,7 +44,7 @@
     "model" : {
         "class" : "this value is no longer used as train.py is hardcorded to use CTC_train",
         "dropout" : 0.4,
-        "load_trained": true,
+        "load_trained": false,
         "trained_path": "examples/librispeech/models/ctc_models/20200601/20200607/best_model", 
         "remove_layers": [],
         "encoder" : {
