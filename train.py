@@ -46,8 +46,10 @@ def run_epoch(model, optimizer, train_ldr, logger, debug_mode, iter_count, avg_l
         
         temp_batch = list(batch)    # this was added as the batch generator was being exhausted when it was called
 
-        if use_log: if debug_mode:  save_batch_log_stats(temp_batch, logger)
-        if use_log: if debug_mode: log_batchnorm_mean_std(model.state_dict(), logger)
+        if use_log: 
+            if debug_mode:  
+                save_batch_log_stats(temp_batch, logger)
+                log_batchnorm_mean_std(model.state_dict(), logger)
  
         start_t = time.time()
         optimizer.zero_grad()
@@ -60,8 +62,10 @@ def run_epoch(model, optimizer, train_ldr, logger, debug_mode, iter_count, avg_l
         loss.backward()
         if use_log: logger.info(f"train: Backward run ")
         #if use_log: plot_grad_flow_line(model.named_parameters())
-        if use_log: if debug_mode: plot_grad_flow_bar(model.named_parameters(),  get_logger_filename(logger))
-        if use_log: if debug_mode: log_param_grad_norms(model.named_parameters(), logger)
+        if use_log: 
+            if debug_mode: 
+                plot_grad_flow_bar(model.named_parameters(),  get_logger_filename(logger))
+                log_param_grad_norms(model.named_parameters(), logger)
 
         grad_norm = nn.utils.clip_grad_norm_(model.parameters(), 200)
         if use_log: logger.info(f"train: Grad_norm clipped ")
