@@ -35,6 +35,7 @@ class Model(nn.Module):
                              padding=(p_h, p_w))
             batch_norm =  nn.BatchNorm2d(out_c)
             convs.extend([conv, batch_norm, nn.ReLU()])
+            #convs.extend([conv, nn.ReLU()])
             if config["dropout"] != 0:
                 convs.append(nn.Dropout(p=config["dropout"]))
             in_c = out_c

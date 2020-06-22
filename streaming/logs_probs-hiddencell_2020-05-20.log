@@ -1,0 +1,2386 @@
+WARNING:root:PARAMS dict: {'padded_frames_length': 277, 'chunk_size': 46, 'n_context': 15, 'feature_window': 512, 'feature_step': 256, 'feature_size': 257, 'stride': 16, 'remainder': 7, 'final_padding': 9}
+WARNING:root:--- starting stream_infer  ---
+WARNING:root:Namespace(beam_width=500, config='../examples/librispeech/models/ctc_models/20200406/20200409/ctc_config.json', device=None, file='/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/model_convert/audio_files/ST-out.wav', model='../examples/librispeech/models/ctc_models/20200406/20200409', rate=16000, savewav=None)
+WARNING:root:CTC_pyt14(
+  (conv): Sequential(
+    (0): Conv2d(1, 32, kernel_size=(11, 41), stride=(1, 2), padding=(0, 20))
+    (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): ReLU()
+    (3): Dropout(p=0.4, inplace=False)
+    (4): Conv2d(32, 32, kernel_size=(11, 21), stride=(1, 2), padding=(0, 10))
+    (5): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (6): ReLU()
+    (7): Dropout(p=0.4, inplace=False)
+    (8): Conv2d(32, 96, kernel_size=(11, 21), stride=(1, 1), padding=(0, 10))
+    (9): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (10): ReLU()
+    (11): Dropout(p=0.4, inplace=False)
+  )
+  (rnn): LSTM(6240, 512, num_layers=5, batch_first=True, dropout=0.4)
+  (fc): LinearND(
+    (fc): Linear(in_features=512, out_features=40, bias=True)
+  )
+)
+WARNING:root:Showing up-to-date attributes
+preprocessor: log_spec
+window_size: 32
+step_size: 16
+SPEC_AUGMENT_STATIC: True
+spec_augment: True
+INJECT_NOISE_STATIC: False
+inject_noise: False
+noise_dir: /home/dzubke/awni_speech/data/background_noise/
+noise_prob: 0.5
+noise_levels: [0, 0.8]
+_input_dim: 257
+start_and_end: False
+int_to_char: {0: 'g', 1: 'aw', 2: 'n', 3: 'p', 4: 'ch', 5: 'uh', 6: 'k', 7: 'ay', 8: 'ey', 9: 'uw', 10: 'er', 11: 't', 12: 'd', 13: 'ng', 14: 'm', 15: 'ae', 16: 'hh', 17: 's', 18: 'b', 19: 'th', 20: 'r', 21: 'ih', 22: 'eh', 23: 'ao', 24: 'ah', 25: 'oy', 26: 'jh', 27: 'zh', 28: 'f', 29: 'sh', 30: 'dh', 31: 'aa', 32: 'w', 33: 'y', 34: 'ow', 35: 'l', 36: 'iy', 37: 'z', 38: 'v'}
+char_to_int: {'g': 0, 'aw': 1, 'n': 2, 'p': 3, 'ch': 4, 'uh': 5, 'k': 6, 'ay': 7, 'ey': 8, 'uw': 9, 'er': 10, 't': 11, 'd': 12, 'ng': 13, 'm': 14, 'ae': 15, 'hh': 16, 's': 17, 'b': 18, 'th': 19, 'r': 20, 'ih': 21, 'eh': 22, 'ao': 23, 'ah': 24, 'oy': 25, 'jh': 26, 'zh': 27, 'f': 28, 'sh': 29, 'dh': 30, 'aa': 31, 'w': 32, 'y': 33, 'ow': 34, 'l': 35, 'iy': 36, 'z': 37, 'v': 38}
+WARNING:root:audio_ring_buffer size: 2
+WARNING:root:feature_ring_buffer size: 46
+DEBUG:root:----------iteration 0------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 0
+DEBUG:root:----------iteration 1------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 1
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 15
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 2------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 16
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 3------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 17
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 4------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 18
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 5------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 19
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 6------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 20
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 7------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 21
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 8------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 22
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 9------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 23
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 10------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 24
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 11------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 25
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 12------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 26
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 13------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 27
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 14------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 28
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 15------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 29
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 16------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 30
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 17------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 31
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 18------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 32
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 19------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 33
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 20------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 34
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 21------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 35
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 22------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 36
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 23------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 37
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 24------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 38
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 25------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 39
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 26------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 40
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 27------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 41
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 28------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 42
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 29------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 43
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 30------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 44
+INFO:root:stride modulus: 0
+DEBUG:root:----------iteration 31------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 45
+INFO:root:stride modulus: 0
+DEBUG:root:iter 31: first 50 of input: (1, 46, 257)
+ [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+DEBUG:root:iter 31: first 50 of hidden_in first layer: torch.Size([5, 1, 512])
+ tensor([[0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]])
+DEBUG:root:iter 31: first 50 of cell_in first layer: torch.Size([5, 1, 512])
+ tensor([[0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]])
+DEBUG:root:iter 31: first 50 of prob output torch.Size([1, 16, 40]):
+ tensor([3.9351e-06, 2.2645e-06, 8.0318e-06, 5.2298e-06, 1.0506e-06, 2.5788e-06, 1.4432e-05, 2.4782e-06, 1.7126e-06, 1.9510e-06, 3.0090e-06, 1.5986e-05,
+        1.3179e-05, 9.9940e-07, 5.7731e-06, 6.3999e-06, 8.0012e-06, 9.5002e-06, 2.5997e-06, 3.1011e-06, 4.2427e-06, 1.7703e-05, 1.5264e-06, 1.7437e-06,
+        3.1247e-05, 1.7128e-06, 1.5312e-06, 8.1596e-07, 5.9953e-06, 2.1721e-06, 7.0492e-06, 1.5056e-06, 8.2523e-06, 1.0706e-06, 2.5259e-06, 4.6532e-06,
+        1.5448e-05, 4.4611e-06, 3.4511e-06, 9.9977e-01], grad_fn=<SliceBackward>)
+DEBUG:root:iter 31: first 50 of hidden_out first layer torch.Size([5, 1, 512]):
+ tensor([[-0.1558,  0.0364, -0.0323, -0.0182, -0.3002,  0.0108, -0.3073, -0.2527,  0.1320, -0.0128, -0.0893,  0.1359, -0.0083,  0.0580, -0.1451, -0.0826,
+         -0.0060,  0.1391, -0.1206,  0.1876, -0.0317, -0.0084,  0.0092,  0.0955, -0.0188,  0.2363,  0.0261,  0.0707,  0.0314,  0.0023,  0.1756, -0.0419,
+         -0.1699, -0.2790,  0.0601, -0.0914, -0.0485,  0.0589, -0.0308, -0.0595, -0.0544,  0.2363,  0.1689,  0.0682, -0.2083, -0.0627,  0.0187,  0.1736,
+         -0.1076,  0.2105]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 31: first 50 of cell_out first layer torch.Size([5, 1, 512]):
+ tensor([[-0.2674,  0.0706, -0.0358, -0.0753, -0.3910,  0.0218, -0.4603, -0.4165,  0.2366, -0.0203, -0.3031,  0.2998, -0.2123,  0.1201, -0.2416, -0.3003,
+         -0.0079,  0.2241, -0.2819,  0.3179, -0.2718, -0.0226,  0.0426,  0.2152, -0.0716,  0.4219,  0.2053,  0.9279,  0.0391,  0.0076,  0.3608, -0.0625,
+         -0.2902, -0.4621,  0.0853, -2.6086, -0.1820,  0.2451, -0.0376, -0.1087, -0.1263,  0.8846,  0.6239,  0.3180, -0.5005, -0.3444,  0.0557,  0.3458,
+         -0.3162,  0.7090]], grad_fn=<SliceBackward>)
+INFO:root:conv_context shape: (1, 46, 257)
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs_list len: 1
+DEBUG:root:----------iteration 32------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 1
+DEBUG:root:----------iteration 33------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 2
+DEBUG:root:----------iteration 34------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 3
+DEBUG:root:----------iteration 35------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 4
+DEBUG:root:----------iteration 36------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 5
+DEBUG:root:----------iteration 37------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 6
+DEBUG:root:----------iteration 38------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 7
+DEBUG:root:----------iteration 39------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 8
+DEBUG:root:----------iteration 40------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 9
+DEBUG:root:----------iteration 41------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 10
+DEBUG:root:----------iteration 42------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 11
+DEBUG:root:----------iteration 43------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 12
+DEBUG:root:----------iteration 44------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 13
+DEBUG:root:----------iteration 45------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 14
+DEBUG:root:----------iteration 46------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 15
+DEBUG:root:----------iteration 47------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 0
+DEBUG:root:iter 47: first 50 of input: (1, 46, 257)
+ [-4.5559807 -5.692414  -5.82581   -5.285746  -4.8817177 -4.903333  -4.845821  -4.762889  -4.803465  -4.7868423 -4.7227306 -4.700181  -4.631426  -4.603803
+ -4.572188  -4.5053988 -4.474843  -4.495391  -4.496109  -4.5051637 -4.5346007 -4.5899997 -4.62127   -4.6505384 -4.7047715 -4.794649  -4.885013  -4.9482656
+ -4.9724035 -4.9627156 -4.9265537 -4.9340997 -4.941504  -4.9550614 -4.935799  -4.9214463 -4.9109464 -4.8864603 -4.8255095 -4.7128744 -4.64165   -4.5676
+ -4.5502725 -4.7123337 -4.8246417 -4.645653  -4.3736215 -4.3229127 -4.3100896 -4.2995844]
+DEBUG:root:iter 47: first 50 of hidden_in first layer: torch.Size([5, 1, 512])
+ tensor([[-0.1558,  0.0364, -0.0323, -0.0182, -0.3002,  0.0108, -0.3073, -0.2527,  0.1320, -0.0128, -0.0893,  0.1359, -0.0083,  0.0580, -0.1451, -0.0826,
+         -0.0060,  0.1391, -0.1206,  0.1876, -0.0317, -0.0084,  0.0092,  0.0955, -0.0188,  0.2363,  0.0261,  0.0707,  0.0314,  0.0023,  0.1756, -0.0419,
+         -0.1699, -0.2790,  0.0601, -0.0914, -0.0485,  0.0589, -0.0308, -0.0595, -0.0544,  0.2363,  0.1689,  0.0682, -0.2083, -0.0627,  0.0187,  0.1736,
+         -0.1076,  0.2105]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 47: first 50 of cell_in first layer: torch.Size([5, 1, 512])
+ tensor([[-0.2674,  0.0706, -0.0358, -0.0753, -0.3910,  0.0218, -0.4603, -0.4165,  0.2366, -0.0203, -0.3031,  0.2998, -0.2123,  0.1201, -0.2416, -0.3003,
+         -0.0079,  0.2241, -0.2819,  0.3179, -0.2718, -0.0226,  0.0426,  0.2152, -0.0716,  0.4219,  0.2053,  0.9279,  0.0391,  0.0076,  0.3608, -0.0625,
+         -0.2902, -0.4621,  0.0853, -2.6086, -0.1820,  0.2451, -0.0376, -0.1087, -0.1263,  0.8846,  0.6239,  0.3180, -0.5005, -0.3444,  0.0557,  0.3458,
+         -0.3162,  0.7090]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 47: first 50 of prob output torch.Size([1, 16, 40]):
+ tensor([5.3139e-08, 3.5607e-07, 3.1724e-06, 3.1514e-07, 1.0758e-07, 2.2942e-08, 8.0981e-07, 1.4641e-06, 3.3758e-07, 2.8319e-07, 1.1008e-06, 4.0572e-06,
+        7.0919e-07, 3.0241e-07, 1.5743e-06, 3.0165e-06, 1.8598e-06, 3.7051e-06, 1.6090e-06, 8.4894e-07, 6.5345e-07, 1.7533e-06, 1.3025e-06, 3.7803e-07,
+        1.2337e-06, 3.5326e-08, 3.2749e-08, 9.0236e-09, 1.3421e-06, 1.3929e-07, 1.1447e-06, 8.5227e-07, 2.2327e-06, 1.3362e-07, 1.0211e-07, 9.8680e-07,
+        1.1240e-06, 9.9811e-08, 1.2929e-07, 9.9996e-01], grad_fn=<SliceBackward>)
+DEBUG:root:iter 47: first 50 of hidden_out first layer torch.Size([5, 1, 512]):
+ tensor([[ 0.1830,  0.0841, -0.4789,  0.0039,  0.2079, -0.0387,  0.0463,  0.3699, -0.1951,  0.2166,  0.1376,  0.6453,  0.0295,  0.0733, -0.0447, -0.0955,
+         -0.0717, -0.1464, -0.0550, -0.1300,  0.0101, -0.3418, -0.0053,  0.1031, -0.1263, -0.3180,  0.0506,  0.1581,  0.1378,  0.1080, -0.1609, -0.1909,
+          0.0223, -0.0143,  0.7425, -0.0649,  0.3766, -0.0419, -0.1754, -0.1629, -0.0863,  0.1213,  0.5335, -0.0646, -0.1901,  0.1094,  0.0444,  0.1930,
+         -0.2088, -0.3995]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 47: first 50 of cell_out first layer torch.Size([5, 1, 512]):
+ tensor([[ 0.2140,  0.2643, -0.7163,  0.0133,  0.2963, -0.0723,  0.0614,  1.5520, -0.2406,  0.2975,  0.5799,  1.1809,  0.1907,  0.1216, -0.0903, -0.3600,
+         -0.0809, -0.3295, -0.1156, -0.1907,  0.1128, -0.5968, -0.0138,  0.2460, -0.4445, -0.7400,  0.1713,  1.8114,  0.1420,  0.3962, -0.2159, -0.3715,
+          0.0750, -0.0560,  1.1876, -0.2336,  0.6808, -0.2122, -0.2091, -0.2827, -0.2201,  0.4200,  0.8382, -0.2178, -0.3273,  0.6854,  0.1517,  0.3080,
+         -0.2787, -0.4670]], grad_fn=<SliceBackward>)
+INFO:root:conv_context shape: (1, 46, 257)
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs_list len: 2
+DEBUG:root:----------iteration 48------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 1
+DEBUG:root:----------iteration 49------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 2
+DEBUG:root:----------iteration 50------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 3
+DEBUG:root:----------iteration 51------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 4
+DEBUG:root:----------iteration 52------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 5
+DEBUG:root:----------iteration 53------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 6
+DEBUG:root:----------iteration 54------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 7
+DEBUG:root:----------iteration 55------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 8
+DEBUG:root:----------iteration 56------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 9
+DEBUG:root:----------iteration 57------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 10
+DEBUG:root:----------iteration 58------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 11
+DEBUG:root:----------iteration 59------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 12
+DEBUG:root:----------iteration 60------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 13
+DEBUG:root:----------iteration 61------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 14
+DEBUG:root:----------iteration 62------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 15
+DEBUG:root:----------iteration 63------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 0
+DEBUG:root:iter 63: first 50 of input: (1, 46, 257)
+ [ 0.32831773  0.957048    1.1013956   0.38576192 -0.27177882 -0.36586878 -0.06025987  0.09722354  0.08817158 -0.13458769 -0.29929703 -0.16811903 -0.27800766
+ -0.29950753 -0.04562584 -0.2627992  -0.6642158  -0.7471505  -0.8267421  -0.47648758 -0.35562614 -0.42134795 -0.07274091 -0.07401034 -0.3061064  -0.1664152
+  0.1014636   0.18926634  0.27553013  0.29118392 -0.03703974  0.15696388  0.38701606  0.43587765  0.21487036  0.17372604  0.2643582  -0.09405939  0.26420003
+  0.17124413 -0.2625335   0.3554236   0.19727409 -0.12303549  0.21528217  0.22707753  0.06409599 -0.30585364 -0.779414   -0.18927997]
+DEBUG:root:iter 63: first 50 of hidden_in first layer: torch.Size([5, 1, 512])
+ tensor([[ 0.1830,  0.0841, -0.4789,  0.0039,  0.2079, -0.0387,  0.0463,  0.3699, -0.1951,  0.2166,  0.1376,  0.6453,  0.0295,  0.0733, -0.0447, -0.0955,
+         -0.0717, -0.1464, -0.0550, -0.1300,  0.0101, -0.3418, -0.0053,  0.1031, -0.1263, -0.3180,  0.0506,  0.1581,  0.1378,  0.1080, -0.1609, -0.1909,
+          0.0223, -0.0143,  0.7425, -0.0649,  0.3766, -0.0419, -0.1754, -0.1629, -0.0863,  0.1213,  0.5335, -0.0646, -0.1901,  0.1094,  0.0444,  0.1930,
+         -0.2088, -0.3995]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 63: first 50 of cell_in first layer: torch.Size([5, 1, 512])
+ tensor([[ 0.2140,  0.2643, -0.7163,  0.0133,  0.2963, -0.0723,  0.0614,  1.5520, -0.2406,  0.2975,  0.5799,  1.1809,  0.1907,  0.1216, -0.0903, -0.3600,
+         -0.0809, -0.3295, -0.1156, -0.1907,  0.1128, -0.5968, -0.0138,  0.2460, -0.4445, -0.7400,  0.1713,  1.8114,  0.1420,  0.3962, -0.2159, -0.3715,
+          0.0750, -0.0560,  1.1876, -0.2336,  0.6808, -0.2122, -0.2091, -0.2827, -0.2201,  0.4200,  0.8382, -0.2178, -0.3273,  0.6854,  0.1517,  0.3080,
+         -0.2787, -0.4670]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 63: first 50 of prob output torch.Size([1, 16, 40]):
+ tensor([8.9858e-06, 4.4497e-06, 1.3734e-05, 1.9041e-05, 1.6929e-06, 4.4710e-06, 2.6544e-05, 2.1783e-05, 1.0774e-05, 1.9474e-05, 9.4269e-06, 4.0140e-05,
+        4.3430e-05, 1.4165e-06, 2.6421e-05, 1.5176e-05, 9.2140e-06, 4.4496e-05, 2.9507e-05, 2.4891e-06, 2.1751e-05, 6.6546e-05, 1.6475e-05, 3.9045e-06,
+        9.9605e-05, 1.6416e-06, 1.3149e-06, 5.1923e-07, 5.4299e-06, 3.9337e-06, 8.9447e-05, 4.8351e-06, 1.6776e-05, 8.4110e-06, 9.2952e-06, 2.6907e-05,
+        1.0261e-05, 7.7536e-06, 1.0873e-05, 9.9924e-01], grad_fn=<SliceBackward>)
+DEBUG:root:iter 63: first 50 of hidden_out first layer torch.Size([5, 1, 512]):
+ tensor([[ 0.1158,  0.3741,  0.1962, -0.0313,  0.1601, -0.0236, -0.4362, -0.1957, -0.6069,  0.3346, -0.5431, -0.1073, -0.0041,  0.0464, -0.0323, -0.1939,
+         -0.0601, -0.0362,  0.2605,  0.6407, -0.3720, -0.0257,  0.4366, -0.2582,  0.6039, -0.7605, -0.0884,  0.0011,  0.2467,  0.0238,  0.1560, -0.1090,
+         -0.1841,  0.0841,  0.2185, -0.0081, -0.0954, -0.0102, -0.2384, -0.1886,  0.0058, -0.1184,  0.0369, -0.0263, -0.1070,  0.1300,  0.2657, -0.1605,
+         -0.3115,  0.8033]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 63: first 50 of cell_out first layer torch.Size([5, 1, 512]):
+ tensor([[ 0.4925,  0.6142,  0.2597, -0.1696,  0.1791, -0.0263, -0.5602, -0.3595, -0.9601,  0.4163, -0.7850, -0.7514, -0.1924,  0.1086, -0.0922, -0.3689,
+         -0.0919, -0.0728,  0.5598,  0.7840, -0.4468, -0.0705,  0.7788, -0.4412,  1.0167, -1.1913, -0.4069,  0.0769,  0.2593,  0.2015,  0.1620, -0.2415,
+         -0.3006,  0.1456,  0.3758, -0.2972, -0.2949, -0.0396, -0.2695, -0.2157,  0.0734, -0.9694,  0.5858, -0.0973, -0.2790,  1.2509,  0.5528, -0.7278,
+         -0.5566,  1.6567]], grad_fn=<SliceBackward>)
+INFO:root:conv_context shape: (1, 46, 257)
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs_list len: 3
+DEBUG:root:----------iteration 64------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 1
+DEBUG:root:----------iteration 65------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 2
+DEBUG:root:----------iteration 66------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 3
+DEBUG:root:----------iteration 67------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 4
+DEBUG:root:----------iteration 68------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 5
+DEBUG:root:----------iteration 69------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 6
+DEBUG:root:----------iteration 70------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 7
+DEBUG:root:----------iteration 71------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 8
+DEBUG:root:----------iteration 72------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 9
+DEBUG:root:----------iteration 73------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 10
+DEBUG:root:----------iteration 74------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 11
+DEBUG:root:----------iteration 75------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 12
+DEBUG:root:----------iteration 76------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 13
+DEBUG:root:----------iteration 77------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 14
+DEBUG:root:----------iteration 78------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 15
+DEBUG:root:----------iteration 79------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 0
+DEBUG:root:iter 79: first 50 of input: (1, 46, 257)
+ [ 0.19257247  0.93704236  1.1392747   0.39076957  0.01787031 -0.4889047  -0.0976878  -0.02755567  0.00285767  0.08395963  0.13126646  0.05811653  0.15792039
+  0.24996974 -0.6202387   0.05271849 -0.54518586 -0.21881407 -0.46154603 -0.07319508  0.123005    0.09217361  0.12578769  0.01083793  0.10211693  0.33888236
+  0.27883476  0.40968522  0.37249193  0.17792039 -0.01789222  0.24336724  0.19494998  0.14687607  0.46844453  0.46240643  0.11456504  0.25924826  0.27789935
+ -0.40900317  0.11503505 -0.12739082  0.44661215  0.7409582   0.49068257  0.3030181   0.47827026 -0.5748868   0.5582404   0.03740808]
+DEBUG:root:iter 79: first 50 of hidden_in first layer: torch.Size([5, 1, 512])
+ tensor([[ 0.1158,  0.3741,  0.1962, -0.0313,  0.1601, -0.0236, -0.4362, -0.1957, -0.6069,  0.3346, -0.5431, -0.1073, -0.0041,  0.0464, -0.0323, -0.1939,
+         -0.0601, -0.0362,  0.2605,  0.6407, -0.3720, -0.0257,  0.4366, -0.2582,  0.6039, -0.7605, -0.0884,  0.0011,  0.2467,  0.0238,  0.1560, -0.1090,
+         -0.1841,  0.0841,  0.2185, -0.0081, -0.0954, -0.0102, -0.2384, -0.1886,  0.0058, -0.1184,  0.0369, -0.0263, -0.1070,  0.1300,  0.2657, -0.1605,
+         -0.3115,  0.8033]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 79: first 50 of cell_in first layer: torch.Size([5, 1, 512])
+ tensor([[ 0.4925,  0.6142,  0.2597, -0.1696,  0.1791, -0.0263, -0.5602, -0.3595, -0.9601,  0.4163, -0.7850, -0.7514, -0.1924,  0.1086, -0.0922, -0.3689,
+         -0.0919, -0.0728,  0.5598,  0.7840, -0.4468, -0.0705,  0.7788, -0.4412,  1.0167, -1.1913, -0.4069,  0.0769,  0.2593,  0.2015,  0.1620, -0.2415,
+         -0.3006,  0.1456,  0.3758, -0.2972, -0.2949, -0.0396, -0.2695, -0.2157,  0.0734, -0.9694,  0.5858, -0.0973, -0.2790,  1.2509,  0.5528, -0.7278,
+         -0.5566,  1.6567]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 79: first 50 of prob output torch.Size([1, 16, 40]):
+ tensor([6.9216e-07, 1.0588e-06, 3.9960e-06, 4.1878e-05, 8.4359e-06, 3.7134e-05, 9.8886e-06, 7.6402e-07, 1.3583e-06, 2.7542e-05, 7.4278e-06, 5.2779e-06,
+        1.5596e-04, 1.7578e-07, 7.5449e-06, 6.0945e-07, 2.2843e-05, 1.8249e-05, 7.6026e-06, 3.9340e-06, 1.9736e-04, 2.2758e-06, 3.9290e-07, 5.9031e-07,
+        6.0283e-06, 1.0026e-07, 5.3072e-06, 8.9235e-07, 1.6989e-06, 2.2799e-06, 2.4146e-05, 4.1999e-07, 2.8880e-04, 2.9561e-04, 1.1127e-05, 1.4566e-04,
+        4.1510e-06, 4.4389e-06, 8.6729e-07, 9.9865e-01], grad_fn=<SliceBackward>)
+DEBUG:root:iter 79: first 50 of hidden_out first layer torch.Size([5, 1, 512]):
+ tensor([[-0.3181,  0.4574, -0.0172, -0.0052, -0.4303,  0.1222,  0.0098, -0.0598, -0.0804,  0.1026,  0.0194,  0.0998,  0.0410, -0.0802, -0.1170,  0.1114,
+         -0.0272, -0.0067, -0.0360, -0.1048,  0.2689, -0.0550,  0.6646,  0.2446, -0.6583, -0.1406, -0.0829, -0.2042,  0.3722,  0.1279, -0.6335, -0.2544,
+          0.4144,  0.1471,  0.1168, -0.0899, -0.0333, -0.0191, -0.1165, -0.2307,  0.0015, -0.1619,  0.3414, -0.0867,  0.1724, -0.0144,  0.0997,  0.0971,
+         -0.1785,  0.1515]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 79: first 50 of cell_out first layer torch.Size([5, 1, 512]):
+ tensor([[-0.4557,  0.5549, -0.0238, -0.0251, -0.6786,  0.3350,  0.0211, -0.1290, -0.1012,  0.3247,  0.1082,  0.2138,  0.3124, -0.1011, -0.2926,  0.2778,
+         -0.0515, -0.0254, -0.0675, -0.2770,  0.8442, -0.2257,  1.3217,  0.7223, -1.3203, -0.3264, -0.2488, -0.5222,  0.4273,  0.1891, -1.0705, -0.4610,
+          0.8651,  0.7434,  0.2183, -0.1277, -0.2739, -0.2758, -0.1709, -0.4473,  0.0185, -0.7972,  0.9243, -0.3120,  0.6115, -0.0654,  0.2314,  0.1663,
+         -0.3722,  0.2991]], grad_fn=<SliceBackward>)
+INFO:root:conv_context shape: (1, 46, 257)
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs_list len: 4
+DEBUG:root:----------iteration 80------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 1
+DEBUG:root:----------iteration 81------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 2
+DEBUG:root:----------iteration 82------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 3
+DEBUG:root:----------iteration 83------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 4
+DEBUG:root:----------iteration 84------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 5
+DEBUG:root:----------iteration 85------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 6
+DEBUG:root:----------iteration 86------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 7
+DEBUG:root:----------iteration 87------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 8
+DEBUG:root:----------iteration 88------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 9
+DEBUG:root:----------iteration 89------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 10
+DEBUG:root:----------iteration 90------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 11
+DEBUG:root:----------iteration 91------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 12
+DEBUG:root:----------iteration 92------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 13
+DEBUG:root:----------iteration 93------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 14
+DEBUG:root:----------iteration 94------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 15
+DEBUG:root:----------iteration 95------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 0
+DEBUG:root:iter 95: first 50 of input: (1, 46, 257)
+ [ 0.05684533  0.95339614  0.920544    0.4535283   0.22026117 -0.17994227 -0.03039433  0.09759422  0.4341002   1.0733992   1.6868782   1.6634133   1.2125854
+  1.0200124   0.4897206   0.00331809 -0.01827274 -0.94151175  0.02873186  0.366267    0.9610093   1.4127333   1.406475    0.62350386  0.6417581   0.31186563
+  0.33121336  0.52872354  0.46877283 -0.00454133  0.21569273  0.6941613   0.7402493   0.66359377  0.69856447  0.3662753   0.11660749 -0.45461598  0.22302459
+  0.3602221   0.28279555  0.16334802  0.43728688  0.5804521   0.30626717  0.05355908 -0.19361217 -0.16073336 -0.19441587  0.21525502]
+DEBUG:root:iter 95: first 50 of hidden_in first layer: torch.Size([5, 1, 512])
+ tensor([[-0.3181,  0.4574, -0.0172, -0.0052, -0.4303,  0.1222,  0.0098, -0.0598, -0.0804,  0.1026,  0.0194,  0.0998,  0.0410, -0.0802, -0.1170,  0.1114,
+         -0.0272, -0.0067, -0.0360, -0.1048,  0.2689, -0.0550,  0.6646,  0.2446, -0.6583, -0.1406, -0.0829, -0.2042,  0.3722,  0.1279, -0.6335, -0.2544,
+          0.4144,  0.1471,  0.1168, -0.0899, -0.0333, -0.0191, -0.1165, -0.2307,  0.0015, -0.1619,  0.3414, -0.0867,  0.1724, -0.0144,  0.0997,  0.0971,
+         -0.1785,  0.1515]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 95: first 50 of cell_in first layer: torch.Size([5, 1, 512])
+ tensor([[-0.4557,  0.5549, -0.0238, -0.0251, -0.6786,  0.3350,  0.0211, -0.1290, -0.1012,  0.3247,  0.1082,  0.2138,  0.3124, -0.1011, -0.2926,  0.2778,
+         -0.0515, -0.0254, -0.0675, -0.2770,  0.8442, -0.2257,  1.3217,  0.7223, -1.3203, -0.3264, -0.2488, -0.5222,  0.4273,  0.1891, -1.0705, -0.4610,
+          0.8651,  0.7434,  0.2183, -0.1277, -0.2739, -0.2758, -0.1709, -0.4473,  0.0185, -0.7972,  0.9243, -0.3120,  0.6115, -0.0654,  0.2314,  0.1663,
+         -0.3722,  0.2991]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 95: first 50 of prob output torch.Size([1, 16, 40]):
+ tensor([1.4546e-05, 1.7469e-05, 7.8439e-04, 5.9654e-05, 1.0571e-05, 3.4353e-05, 9.4783e-05, 2.5056e-05, 8.8610e-05, 4.3248e-05, 5.3167e-05, 1.9771e-03,
+        1.0120e-03, 4.7303e-05, 1.7666e-05, 5.3879e-05, 1.6299e-05, 3.0711e-05, 7.0349e-06, 1.1861e-05, 3.6619e-04, 3.5721e-04, 1.8323e-04, 4.6277e-06,
+        6.9999e-04, 1.0910e-05, 7.3332e-06, 1.5493e-06, 3.8978e-06, 1.0348e-05, 5.5277e-05, 4.3441e-05, 4.0388e-06, 2.0646e-06, 2.1504e-05, 4.1731e-04,
+        1.0286e-04, 8.6186e-05, 7.3170e-05, 9.9315e-01], grad_fn=<SliceBackward>)
+DEBUG:root:iter 95: first 50 of hidden_out first layer torch.Size([5, 1, 512]):
+ tensor([[-0.2325,  0.3796, -0.2135, -0.4409, -0.1988,  0.0435,  0.0401, -0.0513,  0.1511,  0.0439,  0.0344,  0.1732,  0.1500, -0.0833, -0.1465, -0.2142,
+         -0.0249, -0.0924, -0.3252, -0.0404, -0.0502, -0.0232,  0.8215,  0.4276, -0.4154, -0.1273,  0.6312, -0.0748,  0.4736,  0.1033, -0.5171, -0.0085,
+         -0.1473,  0.1119,  0.1576, -0.3079, -0.0382, -0.0125, -0.1133, -0.2004,  0.0238, -0.2537,  0.3991, -0.3479,  0.0936, -0.5659,  0.2189,  0.0698,
+         -0.0739,  0.3589]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 95: first 50 of cell_out first layer torch.Size([5, 1, 512]):
+ tensor([[-0.2894,  0.4502, -0.2633, -1.0487, -0.3630,  0.2270,  0.0747, -0.0768,  0.2208,  0.2128,  0.1567,  0.2946,  0.6637, -0.1322, -0.2913, -0.3239,
+         -0.0471, -0.2226, -0.6084, -0.1337, -0.1020, -0.1217,  2.0453,  0.9438, -0.6710, -0.2221,  1.9197, -0.2223,  0.5711,  0.5368, -0.6793, -0.0128,
+         -0.2304,  0.5420,  0.4023, -0.7254, -0.2023, -0.2309, -0.1508, -0.4432,  0.1052, -0.9021,  0.5294, -0.7844,  0.5307, -0.8351,  0.8064,  0.1582,
+         -0.3332,  0.5845]], grad_fn=<SliceBackward>)
+INFO:root:conv_context shape: (1, 46, 257)
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs_list len: 5
+DEBUG:root:----------iteration 96------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 1
+DEBUG:root:----------iteration 97------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 2
+DEBUG:root:----------iteration 98------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 3
+DEBUG:root:----------iteration 99------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 4
+DEBUG:root:----------iteration 100------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 5
+DEBUG:root:----------iteration 101------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 6
+DEBUG:root:----------iteration 102------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 7
+DEBUG:root:----------iteration 103------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 8
+DEBUG:root:----------iteration 104------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 9
+DEBUG:root:----------iteration 105------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 10
+DEBUG:root:----------iteration 106------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 11
+DEBUG:root:----------iteration 107------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 12
+DEBUG:root:----------iteration 108------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 13
+DEBUG:root:----------iteration 109------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 14
+DEBUG:root:----------iteration 110------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 15
+DEBUG:root:----------iteration 111------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 0
+DEBUG:root:iter 111: first 50 of input: (1, 46, 257)
+ [ 1.6925461   1.8071948   1.9589813   1.5057368   0.8649181   0.0392177   0.00372964 -0.00989284  1.0441779   1.4687892   1.1743056   0.7741408   0.23624462
+ -0.19460969 -0.8643069  -0.34955004  0.34665132  1.3195996   1.9086499   1.894871    1.1824329   0.47823784  0.41066352 -0.27332652  0.19124667 -0.17834552
+  0.6898638   1.3536727   1.3473777   0.7674229   0.63681316  0.25706348 -0.06632265  0.06776988  0.03832581  0.34372988  1.045528    1.1488352   0.84119225
+  0.18312325  0.35721672  0.36680496 -0.06515794  0.35825065 -0.01743002  0.9862223   1.154334    0.80297554  0.63931906  0.4303951 ]
+DEBUG:root:iter 111: first 50 of hidden_in first layer: torch.Size([5, 1, 512])
+ tensor([[-0.2325,  0.3796, -0.2135, -0.4409, -0.1988,  0.0435,  0.0401, -0.0513,  0.1511,  0.0439,  0.0344,  0.1732,  0.1500, -0.0833, -0.1465, -0.2142,
+         -0.0249, -0.0924, -0.3252, -0.0404, -0.0502, -0.0232,  0.8215,  0.4276, -0.4154, -0.1273,  0.6312, -0.0748,  0.4736,  0.1033, -0.5171, -0.0085,
+         -0.1473,  0.1119,  0.1576, -0.3079, -0.0382, -0.0125, -0.1133, -0.2004,  0.0238, -0.2537,  0.3991, -0.3479,  0.0936, -0.5659,  0.2189,  0.0698,
+         -0.0739,  0.3589]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 111: first 50 of cell_in first layer: torch.Size([5, 1, 512])
+ tensor([[-0.2894,  0.4502, -0.2633, -1.0487, -0.3630,  0.2270,  0.0747, -0.0768,  0.2208,  0.2128,  0.1567,  0.2946,  0.6637, -0.1322, -0.2913, -0.3239,
+         -0.0471, -0.2226, -0.6084, -0.1337, -0.1020, -0.1217,  2.0453,  0.9438, -0.6710, -0.2221,  1.9197, -0.2223,  0.5711,  0.5368, -0.6793, -0.0128,
+         -0.2304,  0.5420,  0.4023, -0.7254, -0.2023, -0.2309, -0.1508, -0.4432,  0.1052, -0.9021,  0.5294, -0.7844,  0.5307, -0.8351,  0.8064,  0.1582,
+         -0.3332,  0.5845]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 111: first 50 of prob output torch.Size([1, 16, 40]):
+ tensor([4.5990e-06, 9.1295e-06, 7.0205e-05, 2.3024e-05, 4.4364e-07, 5.2998e-06, 1.6027e-05, 5.6087e-05, 1.7955e-05, 2.3929e-05, 1.7203e-05, 5.0933e-05,
+        4.3632e-04, 3.7096e-06, 4.3112e-05, 6.5121e-06, 1.0016e-05, 1.0938e-04, 6.0339e-06, 4.5311e-06, 2.3665e-05, 4.4293e-05, 4.3146e-05, 5.8091e-06,
+        1.9904e-04, 2.2588e-06, 9.6708e-06, 4.9459e-07, 1.5693e-05, 3.2072e-06, 3.9491e-05, 8.6484e-06, 3.9215e-05, 2.8975e-05, 5.3217e-05, 1.0723e-04,
+        9.5765e-05, 1.2262e-04, 1.2560e-05, 9.9823e-01], grad_fn=<SliceBackward>)
+DEBUG:root:iter 111: first 50 of hidden_out first layer torch.Size([5, 1, 512]):
+ tensor([[-0.1374,  0.2635,  0.1195, -0.0582, -0.2145, -0.1224,  0.1230, -0.1568,  0.2797,  0.1166, -0.0291,  0.1472, -0.0113, -0.1156, -0.0650, -0.1369,
+         -0.0017, -0.0306,  0.0266,  0.2674, -0.5838, -0.1308,  0.1958,  0.2371, -0.0572, -0.2182, -0.1619,  0.1053,  0.4846,  0.0582,  0.4660,  0.2526,
+          0.4828,  0.2736,  0.0883, -0.0295, -0.0470, -0.0457, -0.1474, -0.1894, -0.0504, -0.3436,  0.2744,  0.0183,  0.1860, -0.0049,  0.0707,  0.0546,
+          0.1650,  0.5206]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 111: first 50 of cell_out first layer torch.Size([5, 1, 512]):
+ tensor([[-1.7739e-01,  3.2743e-01,  1.4571e-01, -2.1336e-01, -2.8804e-01, -1.8511e-01,  2.1606e-01, -2.8341e-01,  7.5111e-01,  2.5032e-01, -3.2303e-01,
+          5.3799e-01, -1.5001e-01, -1.7012e-01, -2.0427e-01, -4.1659e-01, -2.7314e-03, -4.3237e-02,  5.9858e-02,  3.2402e-01, -7.7248e-01, -3.1944e-01,
+          5.3387e-01,  5.8228e-01, -3.2110e-01, -2.7784e-01, -8.5028e-01,  4.3709e-01,  5.7957e-01,  2.0918e-01,  6.3345e-01,  5.1164e-01,  2.8663e+00,
+          6.0690e-01,  2.1868e-01, -3.3284e-01, -2.5045e-01, -1.5780e-01, -1.7898e-01, -3.0087e-01, -9.5480e-02, -1.6674e+00,  9.0605e-01,  1.0410e-01,
+          3.3583e-01, -5.7720e-02,  2.1050e-01,  1.3852e-01,  1.8711e-01,  1.0359e+00]], grad_fn=<SliceBackward>)
+INFO:root:conv_context shape: (1, 46, 257)
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs_list len: 6
+DEBUG:root:----------iteration 112------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 1
+DEBUG:root:----------iteration 113------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 2
+DEBUG:root:----------iteration 114------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 3
+DEBUG:root:----------iteration 115------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 4
+DEBUG:root:----------iteration 116------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 5
+DEBUG:root:----------iteration 117------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 6
+DEBUG:root:----------iteration 118------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 7
+DEBUG:root:----------iteration 119------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 8
+DEBUG:root:----------iteration 120------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 9
+DEBUG:root:----------iteration 121------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 10
+DEBUG:root:----------iteration 122------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 11
+DEBUG:root:----------iteration 123------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 12
+DEBUG:root:----------iteration 124------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 13
+DEBUG:root:----------iteration 125------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 14
+DEBUG:root:----------iteration 126------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 15
+DEBUG:root:----------iteration 127------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 0
+DEBUG:root:iter 127: first 50 of input: (1, 46, 257)
+ [ 0.70398515  0.98559767  1.000349    0.10548675 -0.5111466  -0.03362514 -0.13051721  1.0862286   1.2597988   0.7353753   0.22057666 -0.09724335 -0.3123862
+  0.01721246  0.53832245  1.0336658   0.8744693   0.03153248 -0.622821   -0.60922253 -0.13062006 -0.12780191  0.50476146  0.68946594  0.33751735  0.0990049
+  0.33246413  0.29656386  0.24188231  0.5299354   0.56856114  0.52443177 -0.35996193  0.2798258   0.18777446  0.05752374  0.05829519  0.03463741  0.46481627
+  0.46472263  0.2958584   0.2226657   0.01862716 -0.19339073 -0.4232692  -0.10691603 -0.20970874 -0.26685178  0.08991718 -0.1588689 ]
+DEBUG:root:iter 127: first 50 of hidden_in first layer: torch.Size([5, 1, 512])
+ tensor([[-0.1374,  0.2635,  0.1195, -0.0582, -0.2145, -0.1224,  0.1230, -0.1568,  0.2797,  0.1166, -0.0291,  0.1472, -0.0113, -0.1156, -0.0650, -0.1369,
+         -0.0017, -0.0306,  0.0266,  0.2674, -0.5838, -0.1308,  0.1958,  0.2371, -0.0572, -0.2182, -0.1619,  0.1053,  0.4846,  0.0582,  0.4660,  0.2526,
+          0.4828,  0.2736,  0.0883, -0.0295, -0.0470, -0.0457, -0.1474, -0.1894, -0.0504, -0.3436,  0.2744,  0.0183,  0.1860, -0.0049,  0.0707,  0.0546,
+          0.1650,  0.5206]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 127: first 50 of cell_in first layer: torch.Size([5, 1, 512])
+ tensor([[-1.7739e-01,  3.2743e-01,  1.4571e-01, -2.1336e-01, -2.8804e-01, -1.8511e-01,  2.1606e-01, -2.8341e-01,  7.5111e-01,  2.5032e-01, -3.2303e-01,
+          5.3799e-01, -1.5001e-01, -1.7012e-01, -2.0427e-01, -4.1659e-01, -2.7314e-03, -4.3237e-02,  5.9858e-02,  3.2402e-01, -7.7248e-01, -3.1944e-01,
+          5.3387e-01,  5.8228e-01, -3.2110e-01, -2.7784e-01, -8.5028e-01,  4.3709e-01,  5.7957e-01,  2.0918e-01,  6.3345e-01,  5.1164e-01,  2.8663e+00,
+          6.0690e-01,  2.1868e-01, -3.3284e-01, -2.5045e-01, -1.5780e-01, -1.7898e-01, -3.0087e-01, -9.5480e-02, -1.6674e+00,  9.0605e-01,  1.0410e-01,
+          3.3583e-01, -5.7720e-02,  2.1050e-01,  1.3852e-01,  1.8711e-01,  1.0359e+00]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 127: first 50 of prob output torch.Size([1, 16, 40]):
+ tensor([6.2410e-07, 1.3224e-08, 1.3446e-06, 3.9078e-07, 1.0959e-07, 8.7409e-09, 6.9498e-07, 6.3175e-07, 7.2796e-07, 5.1916e-07, 2.8735e-07, 4.7511e-06,
+        4.0726e-06, 3.7582e-07, 9.9542e-06, 3.3930e-08, 2.4840e-05, 3.2371e-06, 2.1631e-06, 2.8868e-07, 1.8425e-06, 8.0172e-08, 3.8824e-07, 4.1863e-08,
+        2.1096e-07, 3.4290e-09, 1.7325e-06, 1.0395e-07, 7.5728e-07, 9.1629e-07, 1.6782e-06, 2.2997e-08, 4.0528e-06, 5.6481e-05, 8.5605e-08, 2.9172e-06,
+        1.3118e-04, 1.7770e-06, 1.2550e-07, 9.9974e-01], grad_fn=<SliceBackward>)
+DEBUG:root:iter 127: first 50 of hidden_out first layer torch.Size([5, 1, 512]):
+ tensor([[-0.2080, -0.0723, -0.3987,  0.1363, -0.3235,  0.0900,  0.0094, -0.0764,  0.1343, -0.0033,  0.0016, -0.1229,  0.0247, -0.1791, -0.2205,  0.2116,
+         -0.0387,  0.0681, -0.0645, -0.2172,  0.2029, -0.2311, -0.1139,  0.0222, -0.1522,  0.2661,  0.0686,  0.0144,  0.4429,  0.1063, -0.0844, -0.3464,
+         -0.0819,  0.1078,  0.0967,  0.4581, -0.0508, -0.0199, -0.1936,  0.2415, -0.7788, -0.2700,  0.1432, -0.0346,  0.0531,  0.0455, -0.2820,  0.1113,
+          0.5083, -0.2821]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 127: first 50 of cell_out first layer torch.Size([5, 1, 512]):
+ tensor([[-0.4788, -0.3310, -0.5545,  1.3447, -0.7709,  0.7124,  0.0273, -0.1845,  0.5329, -0.0051,  0.0265, -0.2156,  0.4884, -0.1898, -0.3540,  0.3823,
+         -0.0415,  0.1649, -0.1381, -2.1705,  0.9085, -0.4345, -0.8982,  0.4144, -0.3801,  0.6461,  0.6387,  0.0287,  0.4957,  0.1492, -0.1020, -0.5690,
+         -0.0856,  0.2581,  0.2064,  0.5416, -0.2955, -0.1773, -0.2280,  0.4657, -1.2108, -0.4664,  0.8371, -0.2420,  0.3158,  0.3378, -0.4155,  0.1203,
+          0.6813, -0.6258]], grad_fn=<SliceBackward>)
+INFO:root:conv_context shape: (1, 46, 257)
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs_list len: 7
+DEBUG:root:----------iteration 128------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 1
+DEBUG:root:----------iteration 129------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 2
+DEBUG:root:----------iteration 130------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 3
+DEBUG:root:----------iteration 131------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 4
+DEBUG:root:----------iteration 132------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 5
+DEBUG:root:----------iteration 133------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 6
+DEBUG:root:----------iteration 134------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 7
+DEBUG:root:----------iteration 135------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 8
+DEBUG:root:----------iteration 136------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 9
+DEBUG:root:----------iteration 137------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 10
+DEBUG:root:----------iteration 138------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 11
+DEBUG:root:----------iteration 139------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 12
+DEBUG:root:----------iteration 140------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 13
+DEBUG:root:----------iteration 141------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 14
+DEBUG:root:----------iteration 142------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 15
+DEBUG:root:----------iteration 143------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 0
+DEBUG:root:iter 143: first 50 of input: (1, 46, 257)
+ [-0.01925716  0.74737066  0.90658146  0.48468402 -0.1398365   0.38141724  1.2015245   1.3359615   0.9774476  -0.12667125  0.07660987 -0.37537476  0.88306427
+  1.4113961   1.3606218   0.618026   -0.09285549 -0.14452176 -1.0492104  -0.0826314   0.55526507  0.5739928  -0.3381313  -0.48755142  0.01509182 -0.17413972
+  0.2771534   0.1512316   0.14828499  0.2504786   0.12070406 -0.02385757  0.10061843  0.84680986  0.83542943  0.29913878 -0.22137326  0.23668851  0.6117737
+  0.39229098  1.060564    0.81777817 -0.08361378 -0.03340176  0.04218065 -0.05620219 -0.37543133 -0.37455863 -1.0939943  -0.5950581 ]
+DEBUG:root:iter 143: first 50 of hidden_in first layer: torch.Size([5, 1, 512])
+ tensor([[-0.2080, -0.0723, -0.3987,  0.1363, -0.3235,  0.0900,  0.0094, -0.0764,  0.1343, -0.0033,  0.0016, -0.1229,  0.0247, -0.1791, -0.2205,  0.2116,
+         -0.0387,  0.0681, -0.0645, -0.2172,  0.2029, -0.2311, -0.1139,  0.0222, -0.1522,  0.2661,  0.0686,  0.0144,  0.4429,  0.1063, -0.0844, -0.3464,
+         -0.0819,  0.1078,  0.0967,  0.4581, -0.0508, -0.0199, -0.1936,  0.2415, -0.7788, -0.2700,  0.1432, -0.0346,  0.0531,  0.0455, -0.2820,  0.1113,
+          0.5083, -0.2821]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 143: first 50 of cell_in first layer: torch.Size([5, 1, 512])
+ tensor([[-0.4788, -0.3310, -0.5545,  1.3447, -0.7709,  0.7124,  0.0273, -0.1845,  0.5329, -0.0051,  0.0265, -0.2156,  0.4884, -0.1898, -0.3540,  0.3823,
+         -0.0415,  0.1649, -0.1381, -2.1705,  0.9085, -0.4345, -0.8982,  0.4144, -0.3801,  0.6461,  0.6387,  0.0287,  0.4957,  0.1492, -0.1020, -0.5690,
+         -0.0856,  0.2581,  0.2064,  0.5416, -0.2955, -0.1773, -0.2280,  0.4657, -1.2108, -0.4664,  0.8371, -0.2420,  0.3158,  0.3378, -0.4155,  0.1203,
+          0.6813, -0.6258]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 143: first 50 of prob output torch.Size([1, 16, 40]):
+ tensor([3.6468e-05, 3.2912e-05, 7.0259e-05, 8.6325e-06, 6.0551e-06, 2.6446e-05, 5.0355e-05, 1.0659e-04, 1.7319e-04, 3.8024e-04, 1.9417e-04, 3.3732e-04,
+        3.1815e-04, 1.6378e-05, 2.5096e-05, 5.9675e-05, 2.2306e-02, 3.9927e-05, 1.8225e-05, 2.5014e-06, 3.4957e-04, 3.8000e-04, 3.2733e-04, 3.5097e-05,
+        1.7807e-03, 7.8979e-06, 5.0459e-06, 1.3157e-06, 1.4105e-05, 3.3735e-06, 1.4847e-05, 1.6900e-05, 2.8056e-04, 3.0890e-05, 7.2489e-05, 4.4604e-05,
+        3.5589e-04, 1.4346e-04, 2.7513e-05, 9.7190e-01], grad_fn=<SliceBackward>)
+DEBUG:root:iter 143: first 50 of hidden_out first layer torch.Size([5, 1, 512]):
+ tensor([[ 2.7451e-01, -4.7229e-02, -1.8178e-01, -3.4952e-02, -1.6764e-01, -2.1722e-02,  5.5052e-01,  3.0228e-01, -6.0296e-01,  8.4562e-03, -4.9596e-02,
+          2.5242e-02,  1.4404e-01, -1.8926e-01, -1.9121e-01, -3.1982e-02, -2.0780e-02, -1.6055e-01,  2.3518e-01,  5.9182e-04, -5.5163e-02,  3.1429e-02,
+          3.3198e-02, -8.3468e-01,  1.8948e-01, -3.1804e-01,  2.1901e-02,  3.0004e-02,  3.7921e-01,  6.0376e-03, -2.6877e-01, -2.0366e-01, -2.4912e-01,
+         -1.4567e-01, -1.7352e-01, -1.8364e-02,  4.8178e-01, -6.4451e-03, -1.5923e-01, -1.8922e-01, -5.8453e-03, -1.4030e-01,  3.2410e-01, -3.4070e-02,
+         -2.6909e-01,  2.8016e-02, -1.1573e-01, -7.0791e-01,  5.0322e-02,  5.8002e-02]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 143: first 50 of cell_out first layer torch.Size([5, 1, 512]):
+ tensor([[ 1.1760, -0.0861, -0.4293, -0.2245, -1.1505, -0.0431,  0.7021,  0.9628, -0.9068,  0.0224, -0.0685,  0.1288,  0.4613, -0.2476, -0.2948, -0.0516,
+         -0.0215, -0.4570,  0.4446,  0.0139, -0.2064,  0.1186,  0.2131, -1.5593,  0.5720, -1.0923,  0.4075,  0.2793,  0.4062,  0.0492, -0.5499, -0.6591,
+         -0.2789, -0.2552, -0.3394, -0.0826,  0.6716, -0.0329, -0.1908, -0.5241, -0.0584, -1.2235,  1.8160, -0.0601, -0.6207,  1.3060, -0.2549, -1.0790,
+          0.0577,  0.0666]], grad_fn=<SliceBackward>)
+INFO:root:conv_context shape: (1, 46, 257)
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs_list len: 8
+DEBUG:root:----------iteration 144------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 1
+DEBUG:root:----------iteration 145------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 2
+DEBUG:root:----------iteration 146------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 3
+DEBUG:root:----------iteration 147------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 4
+DEBUG:root:----------iteration 148------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 5
+DEBUG:root:----------iteration 149------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 6
+DEBUG:root:----------iteration 150------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 7
+DEBUG:root:----------iteration 151------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 8
+DEBUG:root:----------iteration 152------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 9
+DEBUG:root:----------iteration 153------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 10
+DEBUG:root:----------iteration 154------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 11
+DEBUG:root:----------iteration 155------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 12
+DEBUG:root:----------iteration 156------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 13
+DEBUG:root:----------iteration 157------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 14
+DEBUG:root:----------iteration 158------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 15
+DEBUG:root:----------iteration 159------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 0
+DEBUG:root:iter 159: first 50 of input: (1, 46, 257)
+ [-1.5207909e-01  8.9719838e-01  1.1548839e+00  4.7841135e-01 -2.3279002e-01  6.6497636e-01  1.1932017e+00  1.1426539e+00  3.6433735e-01  6.9006868e-02
+ -3.4711486e-01 -2.5502461e-01  1.1612589e+00  1.3979559e+00  1.0447935e+00 -2.1643972e-01 -2.9597236e-02  4.1496953e-01  1.3641834e+00  1.9813397e+00
+  1.9572119e+00  1.1778882e+00  4.3716326e-01  2.5046402e-01 -3.5540508e-03  9.9768400e-01  1.1926396e+00  7.1999764e-01  7.4686605e-04  1.9945443e-01
+  4.7821280e-02  6.9035429e-01  1.0585316e+00  7.5825840e-01  2.5522581e-01  1.7400268e-01  9.7105570e-02  7.4339233e-02  1.1663959e+00  1.2488060e+00
+  6.3045508e-01  1.3850319e-01  6.6190995e-02  2.2749847e-01  7.0090383e-01  1.0625241e+00  9.0160710e-01  2.9011431e-01  1.6026177e-02 -8.1591018e-02]
+DEBUG:root:iter 159: first 50 of hidden_in first layer: torch.Size([5, 1, 512])
+ tensor([[ 2.7451e-01, -4.7229e-02, -1.8178e-01, -3.4952e-02, -1.6764e-01, -2.1722e-02,  5.5052e-01,  3.0228e-01, -6.0296e-01,  8.4562e-03, -4.9596e-02,
+          2.5242e-02,  1.4404e-01, -1.8926e-01, -1.9121e-01, -3.1982e-02, -2.0780e-02, -1.6055e-01,  2.3518e-01,  5.9182e-04, -5.5163e-02,  3.1429e-02,
+          3.3198e-02, -8.3468e-01,  1.8948e-01, -3.1804e-01,  2.1901e-02,  3.0004e-02,  3.7921e-01,  6.0376e-03, -2.6877e-01, -2.0366e-01, -2.4912e-01,
+         -1.4567e-01, -1.7352e-01, -1.8364e-02,  4.8178e-01, -6.4451e-03, -1.5923e-01, -1.8922e-01, -5.8453e-03, -1.4030e-01,  3.2410e-01, -3.4070e-02,
+         -2.6909e-01,  2.8016e-02, -1.1573e-01, -7.0791e-01,  5.0322e-02,  5.8002e-02]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 159: first 50 of cell_in first layer: torch.Size([5, 1, 512])
+ tensor([[ 1.1760, -0.0861, -0.4293, -0.2245, -1.1505, -0.0431,  0.7021,  0.9628, -0.9068,  0.0224, -0.0685,  0.1288,  0.4613, -0.2476, -0.2948, -0.0516,
+         -0.0215, -0.4570,  0.4446,  0.0139, -0.2064,  0.1186,  0.2131, -1.5593,  0.5720, -1.0923,  0.4075,  0.2793,  0.4062,  0.0492, -0.5499, -0.6591,
+         -0.2789, -0.2552, -0.3394, -0.0826,  0.6716, -0.0329, -0.1908, -0.5241, -0.0584, -1.2235,  1.8160, -0.0601, -0.6207,  1.3060, -0.2549, -1.0790,
+          0.0577,  0.0666]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 159: first 50 of prob output torch.Size([1, 16, 40]):
+ tensor([2.9149e-05, 3.1617e-06, 4.4069e-05, 4.7116e-05, 3.0374e-06, 1.8472e-06, 4.2737e-05, 3.0859e-05, 2.4058e-06, 4.6962e-06, 2.9056e-05, 2.1074e-04,
+        2.9017e-04, 2.9876e-06, 4.5931e-05, 9.0866e-06, 1.4495e-03, 9.3310e-05, 8.3541e-05, 4.0465e-06, 1.2702e-04, 9.5304e-06, 3.3281e-06, 3.7750e-06,
+        4.8943e-05, 5.7438e-07, 5.5293e-06, 7.0842e-07, 6.2234e-05, 4.7371e-06, 4.4237e-04, 1.2971e-05, 4.0219e-04, 1.3752e-04, 2.0470e-05, 1.9632e-04,
+        8.8754e-05, 5.6778e-05, 2.3629e-05, 9.9593e-01], grad_fn=<SliceBackward>)
+DEBUG:root:iter 159: first 50 of hidden_out first layer torch.Size([5, 1, 512]):
+ tensor([[-0.0805,  0.7343, -0.0775,  0.0691, -0.2283,  0.0323,  0.1328, -0.0438,  0.3799,  0.2132,  0.0074, -0.2412,  0.0304, -0.3867, -0.3183, -0.0036,
+         -0.0011,  0.0296, -0.0645, -0.1960,  0.1155, -0.0482, -0.2998, -0.0055, -0.3926, -0.0669, -0.2374, -0.0121,  0.3181, -0.3501, -0.3848, -0.2521,
+          0.1452,  0.0328, -0.0108,  0.6634, -0.0468, -0.0758, -0.2397, -0.0581, -0.0517, -0.0016,  0.0160, -0.1553,  0.0902,  0.0109, -0.0139,  0.0522,
+         -0.1334,  0.3594]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 159: first 50 of cell_out first layer torch.Size([5, 1, 512]):
+ tensor([[-1.7622e-01,  1.1737e+00, -1.0128e-01,  9.4848e-01, -5.0969e-01,  3.6040e-01,  4.4470e-01, -6.7850e-02,  6.0371e-01,  3.6519e-01,  2.7638e-01,
+         -3.9178e-01,  3.4320e-01, -4.1818e-01, -4.7699e-01, -6.0721e-03, -1.2500e-03,  1.6985e-01, -1.3745e-01, -1.5224e+00,  1.7998e+00, -1.5568e-01,
+         -6.4713e-01, -5.8137e-02, -6.1291e-01, -4.5904e-01, -5.1515e-01, -2.3719e-02,  3.4488e-01, -4.2504e-01, -9.2045e-01, -4.0604e-01,  4.2024e-01,
+          1.2753e-01, -2.2264e-02,  8.4639e-01, -3.1591e-01, -1.1075e+00, -2.9836e-01, -1.6095e-01, -2.2123e-01, -3.9189e-03,  4.2675e-01, -4.5742e-01,
+          3.8048e-01,  1.9803e-01, -4.1591e-02,  5.8869e-02, -1.7868e-01,  7.0735e-01]], grad_fn=<SliceBackward>)
+INFO:root:conv_context shape: (1, 46, 257)
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs_list len: 9
+DEBUG:root:----------iteration 160------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 1
+DEBUG:root:----------iteration 161------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 2
+DEBUG:root:----------iteration 162------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 3
+DEBUG:root:----------iteration 163------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 4
+DEBUG:root:----------iteration 164------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 5
+DEBUG:root:----------iteration 165------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 6
+DEBUG:root:----------iteration 166------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 7
+DEBUG:root:----------iteration 167------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 8
+DEBUG:root:----------iteration 168------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 9
+DEBUG:root:----------iteration 169------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 10
+DEBUG:root:----------iteration 170------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 11
+DEBUG:root:----------iteration 171------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 12
+DEBUG:root:----------iteration 172------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 13
+DEBUG:root:----------iteration 173------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 14
+DEBUG:root:----------iteration 174------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 15
+DEBUG:root:----------iteration 175------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 0
+DEBUG:root:iter 175: first 50 of input: (1, 46, 257)
+ [ 4.5056295e-01  1.0480351e+00  1.0867263e+00 -4.0185340e-02 -5.5086511e-01 -2.3864344e-01  1.1560066e-01  3.1586808e-01  1.7429768e-01 -2.4401058e-01
+ -1.4644954e-01 -1.4250147e-01 -7.9969269e-01 -3.1543502e-01 -2.2809228e-01 -2.9311407e-01 -2.5511774e-01 -2.9004636e-01 -2.5335446e-01 -1.6553742e-01
+ -3.2292661e-01 -5.2175575e-01 -2.2353257e-01 -1.6850263e-01 -2.5078446e-01 -7.4169145e-04 -1.1108536e-01 -1.0089298e-01 -6.7881590e-01 -4.2236331e-01
+ -5.6022421e-02  2.5289822e-01  3.7045267e-01  1.4029716e-01  2.9686916e-01  4.7165257e-01  2.3076734e-01  2.5181288e-01  4.0792915e-01  2.7425167e-01
+ -2.0250128e-01 -1.0253289e+00 -6.4253616e-01 -1.1781958e+00 -4.6645302e-01 -8.9217746e-01 -4.3597215e-01 -6.3859516e-01  1.4079551e-01 -1.1203242e-01]
+DEBUG:root:iter 175: first 50 of hidden_in first layer: torch.Size([5, 1, 512])
+ tensor([[-0.0805,  0.7343, -0.0775,  0.0691, -0.2283,  0.0323,  0.1328, -0.0438,  0.3799,  0.2132,  0.0074, -0.2412,  0.0304, -0.3867, -0.3183, -0.0036,
+         -0.0011,  0.0296, -0.0645, -0.1960,  0.1155, -0.0482, -0.2998, -0.0055, -0.3926, -0.0669, -0.2374, -0.0121,  0.3181, -0.3501, -0.3848, -0.2521,
+          0.1452,  0.0328, -0.0108,  0.6634, -0.0468, -0.0758, -0.2397, -0.0581, -0.0517, -0.0016,  0.0160, -0.1553,  0.0902,  0.0109, -0.0139,  0.0522,
+         -0.1334,  0.3594]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 175: first 50 of cell_in first layer: torch.Size([5, 1, 512])
+ tensor([[-1.7622e-01,  1.1737e+00, -1.0128e-01,  9.4848e-01, -5.0969e-01,  3.6040e-01,  4.4470e-01, -6.7850e-02,  6.0371e-01,  3.6519e-01,  2.7638e-01,
+         -3.9178e-01,  3.4320e-01, -4.1818e-01, -4.7699e-01, -6.0721e-03, -1.2500e-03,  1.6985e-01, -1.3745e-01, -1.5224e+00,  1.7998e+00, -1.5568e-01,
+         -6.4713e-01, -5.8137e-02, -6.1291e-01, -4.5904e-01, -5.1515e-01, -2.3719e-02,  3.4488e-01, -4.2504e-01, -9.2045e-01, -4.0604e-01,  4.2024e-01,
+          1.2753e-01, -2.2264e-02,  8.4639e-01, -3.1591e-01, -1.1075e+00, -2.9836e-01, -1.6095e-01, -2.2123e-01, -3.9189e-03,  4.2675e-01, -4.5742e-01,
+          3.8048e-01,  1.9803e-01, -4.1591e-02,  5.8869e-02, -1.7868e-01,  7.0735e-01]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 175: first 50 of prob output torch.Size([1, 16, 40]):
+ tensor([1.5855e-05, 1.7846e-05, 5.3026e-05, 1.5603e-06, 9.2192e-08, 2.4567e-06, 2.5080e-06, 9.6931e-06, 1.5408e-05, 5.4354e-06, 5.1853e-05, 7.1463e-05,
+        1.3872e-04, 1.4132e-06, 7.5082e-06, 1.1378e-04, 1.1912e-05, 6.0681e-06, 2.2131e-05, 1.3120e-05, 1.6267e-05, 1.1494e-04, 2.2467e-04, 3.7074e-06,
+        1.1915e-04, 6.2646e-07, 1.3541e-06, 2.6684e-08, 3.1048e-07, 2.3546e-07, 3.4968e-02, 4.3925e-06, 2.3212e-05, 7.1490e-06, 8.4374e-05, 2.8999e-05,
+        1.5724e-05, 8.2455e-06, 3.9277e-06, 9.6381e-01], grad_fn=<SliceBackward>)
+DEBUG:root:iter 175: first 50 of hidden_out first layer torch.Size([5, 1, 512]):
+ tensor([[ 0.2702, -0.3824,  0.0826, -0.0808,  0.0600, -0.1145,  0.1169, -0.0213,  0.2846,  0.2866, -0.0144,  0.0190, -0.4618, -0.3094, -0.4624, -0.1043,
+          0.0257,  0.1069, -0.0450,  0.0905,  0.0386, -0.3750, -0.2980, -0.1062,  0.0456, -0.1009,  0.0423,  0.0813,  0.2173, -0.0591,  0.5138, -0.2501,
+          0.7460,  0.0880, -0.0109, -0.0284, -0.7634, -0.0319, -0.2692, -0.0402, -0.2248, -0.0390,  0.0628,  0.0340, -0.3292,  0.0588, -0.0346,  0.4021,
+          0.3857, -0.5534]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 175: first 50 of cell_out first layer torch.Size([5, 1, 512]):
+ tensor([[ 0.7182, -0.5725,  0.0960, -0.3812,  0.1921, -0.2266,  0.1965, -0.0840,  0.4387,  0.3441, -0.6481,  0.0430, -0.8347, -0.3508, -0.6517, -0.2115,
+          0.0295,  0.2178, -0.2101,  0.1552,  0.2316, -0.5067, -1.0903, -0.5142,  0.2531, -0.1373,  0.7173,  0.5399,  0.3280, -0.0777,  0.5872, -0.4103,
+          1.1759,  0.3883, -0.0172, -0.2011, -1.3394, -0.3240, -0.2928, -0.0567, -0.4626, -0.1984,  0.7231,  0.1352, -0.5081,  0.7475, -0.0800,  0.5463,
+          0.4611, -0.7301]], grad_fn=<SliceBackward>)
+INFO:root:conv_context shape: (1, 46, 257)
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs_list len: 10
+DEBUG:root:----------iteration 176------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 1
+DEBUG:root:----------iteration 177------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 2
+DEBUG:root:----------iteration 178------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 3
+DEBUG:root:----------iteration 179------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 4
+DEBUG:root:----------iteration 180------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 5
+DEBUG:root:----------iteration 181------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 6
+DEBUG:root:----------iteration 182------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 7
+DEBUG:root:----------iteration 183------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 8
+DEBUG:root:----------iteration 184------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 9
+DEBUG:root:----------iteration 185------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 10
+DEBUG:root:----------iteration 186------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 11
+DEBUG:root:----------iteration 187------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 12
+DEBUG:root:----------iteration 188------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 13
+DEBUG:root:----------iteration 189------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 14
+DEBUG:root:----------iteration 190------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 15
+DEBUG:root:----------iteration 191------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 0
+DEBUG:root:iter 191: first 50 of input: (1, 46, 257)
+ [-0.03002506  1.1038932   1.0169396   0.07705548 -0.05518235  0.6481016   0.9674666   0.76841     0.03761668 -0.00943209 -0.43725517  0.6737361   1.0897522
+  0.91599256 -0.12398253 -0.5389593  -0.720186    0.83892816  1.3333367   1.2343743   0.35999814  0.16005537 -0.05679312  0.77336407  1.3611534   1.3167752
+  0.2763194   0.13065666 -0.1545931   0.2860696   0.8044163   0.66412866  0.37501654  0.48992023  0.5332768   0.61748946  0.9099038   0.83248705  0.00947895
+ -0.105161   -0.3941492  -0.07199248  0.79692155  0.8669056  -0.10257029 -0.04014408  0.00600176  0.188072    1.0981684   1.1077627 ]
+DEBUG:root:iter 191: first 50 of hidden_in first layer: torch.Size([5, 1, 512])
+ tensor([[ 0.2702, -0.3824,  0.0826, -0.0808,  0.0600, -0.1145,  0.1169, -0.0213,  0.2846,  0.2866, -0.0144,  0.0190, -0.4618, -0.3094, -0.4624, -0.1043,
+          0.0257,  0.1069, -0.0450,  0.0905,  0.0386, -0.3750, -0.2980, -0.1062,  0.0456, -0.1009,  0.0423,  0.0813,  0.2173, -0.0591,  0.5138, -0.2501,
+          0.7460,  0.0880, -0.0109, -0.0284, -0.7634, -0.0319, -0.2692, -0.0402, -0.2248, -0.0390,  0.0628,  0.0340, -0.3292,  0.0588, -0.0346,  0.4021,
+          0.3857, -0.5534]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 191: first 50 of cell_in first layer: torch.Size([5, 1, 512])
+ tensor([[ 0.7182, -0.5725,  0.0960, -0.3812,  0.1921, -0.2266,  0.1965, -0.0840,  0.4387,  0.3441, -0.6481,  0.0430, -0.8347, -0.3508, -0.6517, -0.2115,
+          0.0295,  0.2178, -0.2101,  0.1552,  0.2316, -0.5067, -1.0903, -0.5142,  0.2531, -0.1373,  0.7173,  0.5399,  0.3280, -0.0777,  0.5872, -0.4103,
+          1.1759,  0.3883, -0.0172, -0.2011, -1.3394, -0.3240, -0.2928, -0.0567, -0.4626, -0.1984,  0.7231,  0.1352, -0.5081,  0.7475, -0.0800,  0.5463,
+          0.4611, -0.7301]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 191: first 50 of prob output torch.Size([1, 16, 40]):
+ tensor([2.1249e-05, 1.8437e-05, 9.3159e-05, 6.9013e-05, 2.2427e-06, 1.4636e-05, 2.2983e-05, 3.0332e-05, 3.1079e-05, 3.6287e-05, 7.2125e-05, 2.5569e-04,
+        5.6606e-05, 4.6614e-06, 8.9275e-05, 3.8444e-05, 1.1779e-04, 3.3739e-05, 2.9736e-05, 4.8575e-06, 1.0969e-04, 1.1797e-04, 5.4413e-05, 3.2388e-05,
+        2.0964e-04, 2.8373e-06, 2.3709e-06, 4.2863e-07, 1.4324e-05, 3.3955e-06, 2.6596e-05, 1.0560e-04, 4.5858e-05, 1.1787e-05, 1.4104e-04, 2.1200e-04,
+        4.2658e-05, 3.6053e-05, 5.8107e-05, 9.9773e-01], grad_fn=<SliceBackward>)
+DEBUG:root:iter 191: first 50 of hidden_out first layer torch.Size([5, 1, 512]):
+ tensor([[-0.2150,  0.5166,  0.1020, -0.0834, -0.2477,  0.0639,  0.1454,  0.0190,  0.5927,  0.1286, -0.0940, -0.0925,  0.4336, -0.2323, -0.5502, -0.1016,
+         -0.0954, -0.1036,  0.3161, -0.0916,  0.4966, -0.0388,  0.5334,  0.1165, -0.3434, -0.1777,  0.4919, -0.3521,  0.2223,  0.0595, -0.5400, -0.3883,
+         -0.4008,  0.1007,  0.2597, -0.1459,  0.1336, -0.1217, -0.2146,  0.3671,  0.0975, -0.0479, -0.3708, -0.1820,  0.3761, -0.5493,  0.1292,  0.0309,
+          0.6395,  0.1744]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 191: first 50 of cell_out first layer torch.Size([5, 1, 512]):
+ tensor([[-0.2679,  0.8950,  0.1525, -0.1335, -0.3825,  0.4373,  0.2474,  0.0242,  1.9384,  0.3983, -0.3171, -0.1662,  0.8108, -0.3172, -0.8396, -0.1870,
+         -0.1238, -0.2111,  0.5728, -0.3936,  0.8067, -0.0922,  1.0451,  0.5074, -0.4199, -0.5650,  1.9895, -0.6862,  0.2356,  0.3675, -0.9256, -0.6026,
+         -0.4765,  0.3300,  0.4365, -0.2556,  0.3669, -0.8678, -0.3144,  0.7388,  0.3010, -0.1125, -0.8786, -0.7687,  0.6149, -0.8322,  0.1800,  0.0801,
+          1.0756,  0.2568]], grad_fn=<SliceBackward>)
+INFO:root:conv_context shape: (1, 46, 257)
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs_list len: 11
+DEBUG:root:----------iteration 192------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 1
+DEBUG:root:----------iteration 193------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 2
+DEBUG:root:----------iteration 194------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 3
+DEBUG:root:----------iteration 195------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 4
+DEBUG:root:----------iteration 196------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 5
+DEBUG:root:----------iteration 197------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 6
+DEBUG:root:----------iteration 198------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 7
+DEBUG:root:----------iteration 199------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 8
+DEBUG:root:----------iteration 200------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 9
+DEBUG:root:----------iteration 201------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 10
+DEBUG:root:----------iteration 202------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 11
+DEBUG:root:----------iteration 203------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 12
+DEBUG:root:----------iteration 204------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 13
+DEBUG:root:----------iteration 205------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 14
+DEBUG:root:----------iteration 206------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 15
+DEBUG:root:----------iteration 207------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 0
+DEBUG:root:iter 207: first 50 of input: (1, 46, 257)
+ [ 0.58435726  1.128303    1.1075537   0.28003973  0.24670726  0.3363902   0.47660822  0.4308644   0.26951396  0.2475553   0.38677412  0.52405775  0.36734226
+  0.30451348  0.37297997  0.2699646   0.17549416 -0.08127248  0.39788118  0.6832789   0.77019894  0.80990183  0.7075071   0.5781398   0.810807    0.895835
+  0.5862786   0.08882701  0.16025047  0.1264927   0.16924526  0.592914    0.30917555 -0.22399634  0.18757086  0.4880125   0.25630587 -0.29904503  0.23444922
+  0.46700075  0.5305109   0.32735127  0.2796397   0.3234615   0.11867993  0.5047957   0.90984416  1.057847    0.9972424   0.6027469 ]
+DEBUG:root:iter 207: first 50 of hidden_in first layer: torch.Size([5, 1, 512])
+ tensor([[-0.2150,  0.5166,  0.1020, -0.0834, -0.2477,  0.0639,  0.1454,  0.0190,  0.5927,  0.1286, -0.0940, -0.0925,  0.4336, -0.2323, -0.5502, -0.1016,
+         -0.0954, -0.1036,  0.3161, -0.0916,  0.4966, -0.0388,  0.5334,  0.1165, -0.3434, -0.1777,  0.4919, -0.3521,  0.2223,  0.0595, -0.5400, -0.3883,
+         -0.4008,  0.1007,  0.2597, -0.1459,  0.1336, -0.1217, -0.2146,  0.3671,  0.0975, -0.0479, -0.3708, -0.1820,  0.3761, -0.5493,  0.1292,  0.0309,
+          0.6395,  0.1744]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 207: first 50 of cell_in first layer: torch.Size([5, 1, 512])
+ tensor([[-0.2679,  0.8950,  0.1525, -0.1335, -0.3825,  0.4373,  0.2474,  0.0242,  1.9384,  0.3983, -0.3171, -0.1662,  0.8108, -0.3172, -0.8396, -0.1870,
+         -0.1238, -0.2111,  0.5728, -0.3936,  0.8067, -0.0922,  1.0451,  0.5074, -0.4199, -0.5650,  1.9895, -0.6862,  0.2356,  0.3675, -0.9256, -0.6026,
+         -0.4765,  0.3300,  0.4365, -0.2556,  0.3669, -0.8678, -0.3144,  0.7388,  0.3010, -0.1125, -0.8786, -0.7687,  0.6149, -0.8322,  0.1800,  0.0801,
+          1.0756,  0.2568]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 207: first 50 of prob output torch.Size([1, 16, 40]):
+ tensor([1.2722e-06, 6.9073e-08, 2.3583e-06, 1.2370e-05, 8.8399e-07, 1.5090e-07, 6.0955e-06, 3.2440e-07, 7.7187e-08, 9.0784e-07, 5.5600e-06, 1.8597e-05,
+        1.4859e-05, 3.1782e-07, 1.3127e-05, 5.3163e-08, 4.1814e-05, 1.3019e-05, 1.9670e-05, 1.1179e-06, 4.0121e-04, 1.0887e-07, 1.2714e-07, 3.0953e-06,
+        3.3053e-06, 2.3147e-08, 1.5935e-06, 1.5117e-07, 1.0506e-05, 5.5205e-06, 1.1871e-05, 4.9105e-07, 2.5401e-05, 1.2817e-05, 9.1735e-07, 2.8680e-05,
+        5.4350e-07, 7.9001e-07, 1.1373e-05, 9.9933e-01], grad_fn=<SliceBackward>)
+DEBUG:root:iter 207: first 50 of hidden_out first layer torch.Size([5, 1, 512]):
+ tensor([[ 0.2932, -0.8004, -0.2099, -0.2066, -0.4893, -0.2136,  0.1275, -0.0426,  0.0589,  0.0230,  0.0378,  0.0307,  0.0074, -0.3002, -0.2667, -0.2418,
+         -0.1239, -0.3558, -0.1463,  0.1949, -0.3621, -0.2755,  0.0819, -0.4832, -0.1076, -0.2353,  0.1615,  0.0551,  0.2611,  0.0608, -0.2057, -0.0476,
+          0.5444, -0.2348,  0.1314, -0.1810, -0.0055, -0.0429, -0.0457,  0.0912,  0.0009, -0.3316,  0.5907, -0.2909,  0.2862, -0.7829,  0.1215,  0.3615,
+         -0.1208,  0.3421]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 207: first 50 of cell_out first layer torch.Size([5, 1, 512]):
+ tensor([[ 0.5420, -1.2476, -0.3232, -0.2909, -0.8669, -0.2405,  0.1835, -0.0921,  0.0999,  0.0776,  0.2652,  0.1132,  0.0619, -0.4277, -0.4888, -0.4126,
+         -0.1650, -0.4702, -0.2881,  0.3209, -0.4241, -0.5147,  0.6644, -0.6209, -0.3559, -0.3046,  0.4287,  0.2087,  0.2851,  0.1776, -0.2506, -0.0631,
+          0.8637, -0.5662,  0.3078, -0.6795, -0.0252, -0.1422, -0.0525,  0.1003,  0.0042, -1.0450,  1.0446, -0.5336,  0.5549, -1.1333,  0.5521,  0.4291,
+         -0.2224,  0.7957]], grad_fn=<SliceBackward>)
+INFO:root:conv_context shape: (1, 46, 257)
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs_list len: 12
+DEBUG:root:----------iteration 208------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 1
+DEBUG:root:----------iteration 209------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 2
+DEBUG:root:----------iteration 210------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 3
+DEBUG:root:----------iteration 211------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 4
+DEBUG:root:----------iteration 212------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 5
+DEBUG:root:----------iteration 213------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 6
+DEBUG:root:----------iteration 214------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 7
+DEBUG:root:----------iteration 215------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 8
+DEBUG:root:----------iteration 216------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 9
+DEBUG:root:----------iteration 217------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 10
+DEBUG:root:----------iteration 218------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 11
+DEBUG:root:----------iteration 219------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 12
+DEBUG:root:----------iteration 220------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 13
+DEBUG:root:----------iteration 221------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 14
+DEBUG:root:----------iteration 222------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 15
+DEBUG:root:----------iteration 223------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 0
+DEBUG:root:iter 223: first 50 of input: (1, 46, 257)
+ [ 1.014986    1.2644154   1.1862047   0.5238693   0.11756571  0.13192058  1.1936022   1.4263934   1.131151    0.2764441  -0.6369068   0.28414053  0.02777037
+  1.6877267   1.9635845   1.6619055   0.14935681 -0.20538189 -0.3868002   0.2775031   0.8447045   1.0706686   0.70226336  0.20638594  0.11669669 -0.06354314
+ -0.46152255  0.4195786   0.5870726   0.0584315   0.28188264  0.34583488 -0.40451527 -0.41522518  0.9245331   1.0047495   0.46516448  0.2735846   0.24792519
+  0.20512214  0.4415338   0.9207641   0.8501353   0.64685833  0.38534376  0.07521246  0.34784868  0.1032639   0.8652537   0.84780097]
+DEBUG:root:iter 223: first 50 of hidden_in first layer: torch.Size([5, 1, 512])
+ tensor([[ 0.2932, -0.8004, -0.2099, -0.2066, -0.4893, -0.2136,  0.1275, -0.0426,  0.0589,  0.0230,  0.0378,  0.0307,  0.0074, -0.3002, -0.2667, -0.2418,
+         -0.1239, -0.3558, -0.1463,  0.1949, -0.3621, -0.2755,  0.0819, -0.4832, -0.1076, -0.2353,  0.1615,  0.0551,  0.2611,  0.0608, -0.2057, -0.0476,
+          0.5444, -0.2348,  0.1314, -0.1810, -0.0055, -0.0429, -0.0457,  0.0912,  0.0009, -0.3316,  0.5907, -0.2909,  0.2862, -0.7829,  0.1215,  0.3615,
+         -0.1208,  0.3421]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 223: first 50 of cell_in first layer: torch.Size([5, 1, 512])
+ tensor([[ 0.5420, -1.2476, -0.3232, -0.2909, -0.8669, -0.2405,  0.1835, -0.0921,  0.0999,  0.0776,  0.2652,  0.1132,  0.0619, -0.4277, -0.4888, -0.4126,
+         -0.1650, -0.4702, -0.2881,  0.3209, -0.4241, -0.5147,  0.6644, -0.6209, -0.3559, -0.3046,  0.4287,  0.2087,  0.2851,  0.1776, -0.2506, -0.0631,
+          0.8637, -0.5662,  0.3078, -0.6795, -0.0252, -0.1422, -0.0525,  0.1003,  0.0042, -1.0450,  1.0446, -0.5336,  0.5549, -1.1333,  0.5521,  0.4291,
+         -0.2224,  0.7957]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 223: first 50 of prob output torch.Size([1, 16, 40]):
+ tensor([1.7713e-05, 5.0054e-05, 9.9259e-06, 2.0014e-06, 1.3606e-05, 1.7047e-05, 3.7387e-06, 2.8172e-03, 5.1580e-01, 3.3749e-04, 1.0193e-03, 4.4029e-05,
+        3.0003e-05, 5.9133e-05, 4.2767e-06, 1.1552e-03, 5.8241e-06, 7.8964e-06, 1.8162e-06, 1.9124e-07, 1.0879e-05, 8.1303e-02, 9.8231e-03, 6.9033e-05,
+        1.9295e-03, 1.0205e-04, 9.5374e-07, 1.2278e-06, 1.0059e-06, 1.2126e-07, 1.1423e-06, 1.1619e-04, 1.0856e-05, 2.2535e-06, 4.3356e-05, 8.6893e-06,
+        3.8477e-01, 3.9381e-06, 1.3078e-05, 3.9739e-04], grad_fn=<SliceBackward>)
+DEBUG:root:iter 223: first 50 of hidden_out first layer torch.Size([5, 1, 512]):
+ tensor([[-0.0227,  0.0543,  0.3691, -0.0365,  0.0160,  0.0243, -0.1440, -0.2625, -0.0603,  0.4699, -0.0192, -0.1057,  0.0650, -0.3490, -0.0938,  0.2336,
+         -0.0587,  0.0402, -0.3143,  0.6264,  0.4001, -0.3598,  0.2158,  0.1248, -0.3197, -0.2030, -0.1361,  0.0472,  0.2046, -0.0317,  0.3758, -0.6223,
+          0.8192,  0.1373,  0.0054, -0.1304, -0.0589, -0.0119, -0.0254, -0.1909,  0.0587, -0.0053,  0.2565,  0.0052,  0.0399,  0.0491,  0.0047,  0.0737,
+          0.0932,  0.4678]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 223: first 50 of cell_out first layer torch.Size([5, 1, 512]):
+ tensor([[-0.0607,  0.0651,  0.5417, -0.2051,  0.0472,  0.0367, -0.2554, -0.4872, -0.0658,  0.7082, -0.4687, -0.1894,  0.1484, -0.3763, -0.1730,  0.4032,
+         -0.0941,  0.1225, -0.5330,  0.7932,  1.2697, -0.6821,  0.3657,  0.5110, -0.4033, -0.2992, -0.6155,  0.3482,  0.2364, -0.0390,  0.6550, -1.0829,
+          1.4187,  0.3857,  0.0301, -0.3490, -0.4309, -0.1754, -0.0288, -0.3082,  0.1505, -0.0456,  0.9976,  0.0478,  0.1199,  0.6408,  0.0242,  0.1110,
+          0.1178,  0.7302]], grad_fn=<SliceBackward>)
+INFO:root:conv_context shape: (1, 46, 257)
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs_list len: 13
+DEBUG:root:----------iteration 224------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 1
+DEBUG:root:----------iteration 225------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 2
+DEBUG:root:----------iteration 226------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 3
+DEBUG:root:----------iteration 227------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 4
+DEBUG:root:----------iteration 228------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 5
+DEBUG:root:----------iteration 229------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 6
+DEBUG:root:----------iteration 230------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 7
+DEBUG:root:----------iteration 231------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 8
+DEBUG:root:----------iteration 232------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 9
+DEBUG:root:----------iteration 233------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 10
+DEBUG:root:----------iteration 234------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 11
+DEBUG:root:----------iteration 235------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 12
+DEBUG:root:----------iteration 236------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 13
+DEBUG:root:----------iteration 237------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 14
+DEBUG:root:----------iteration 238------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 15
+DEBUG:root:----------iteration 239------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 0
+DEBUG:root:iter 239: first 50 of input: (1, 46, 257)
+ [-1.035668   -0.504291    0.18786727 -1.0621538  -0.09636589  0.14469908  0.891673    1.383599    1.3376034   0.47236246 -0.45416883 -0.3228642  -0.34915406
+ -0.3605064   0.79295117  0.93909043  0.48406795 -0.25801167 -0.41070288 -0.56075966 -0.6099314   0.3163504   0.59359354  0.30407646 -0.49683225 -0.301787
+ -0.06150018 -0.33484635 -0.25673705  0.3797603   0.49444082  0.1693359  -0.36042416  0.24634717  0.295229   -0.18092655  0.40533745  0.5632028   0.15113205
+ -0.7157545  -0.31848773 -0.72812426 -0.2824873  -0.18555303 -0.337906    0.39686272  0.59964     0.44734317  0.2655553   0.17104585]
+DEBUG:root:iter 239: first 50 of hidden_in first layer: torch.Size([5, 1, 512])
+ tensor([[-0.0227,  0.0543,  0.3691, -0.0365,  0.0160,  0.0243, -0.1440, -0.2625, -0.0603,  0.4699, -0.0192, -0.1057,  0.0650, -0.3490, -0.0938,  0.2336,
+         -0.0587,  0.0402, -0.3143,  0.6264,  0.4001, -0.3598,  0.2158,  0.1248, -0.3197, -0.2030, -0.1361,  0.0472,  0.2046, -0.0317,  0.3758, -0.6223,
+          0.8192,  0.1373,  0.0054, -0.1304, -0.0589, -0.0119, -0.0254, -0.1909,  0.0587, -0.0053,  0.2565,  0.0052,  0.0399,  0.0491,  0.0047,  0.0737,
+          0.0932,  0.4678]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 239: first 50 of cell_in first layer: torch.Size([5, 1, 512])
+ tensor([[-0.0607,  0.0651,  0.5417, -0.2051,  0.0472,  0.0367, -0.2554, -0.4872, -0.0658,  0.7082, -0.4687, -0.1894,  0.1484, -0.3763, -0.1730,  0.4032,
+         -0.0941,  0.1225, -0.5330,  0.7932,  1.2697, -0.6821,  0.3657,  0.5110, -0.4033, -0.2992, -0.6155,  0.3482,  0.2364, -0.0390,  0.6550, -1.0829,
+          1.4187,  0.3857,  0.0301, -0.3490, -0.4309, -0.1754, -0.0288, -0.3082,  0.1505, -0.0456,  0.9976,  0.0478,  0.1199,  0.6408,  0.0242,  0.1110,
+          0.1178,  0.7302]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 239: first 50 of prob output torch.Size([1, 16, 40]):
+ tensor([5.9328e-05, 1.6965e-06, 1.9413e-06, 1.8949e-06, 2.1260e-06, 5.6871e-06, 1.3999e-06, 9.2952e-06, 8.0276e-07, 4.1427e-06, 5.9880e-06, 3.6777e-06,
+        1.6193e-05, 9.8474e-07, 8.6393e-06, 2.6639e-06, 4.3458e-05, 8.4853e-06, 2.0445e-05, 1.2973e-06, 7.7632e-04, 7.2418e-06, 1.3570e-05, 5.0772e-05,
+        3.6014e-05, 2.1275e-07, 2.4793e-07, 8.8007e-08, 8.6176e-06, 9.6801e-07, 1.2331e-06, 2.4373e-06, 4.4226e-06, 4.4153e-06, 4.7160e-06, 1.7014e-05,
+        6.2108e-06, 5.5895e-06, 4.7940e-06, 9.9885e-01], grad_fn=<SliceBackward>)
+DEBUG:root:iter 239: first 50 of hidden_out first layer torch.Size([5, 1, 512]):
+ tensor([[-0.0473,  0.0265,  0.0338, -0.0409, -0.1257,  0.0060,  0.1166, -0.1313,  0.2997,  0.0294, -0.0208,  0.0469, -0.0336, -0.2589, -0.2881, -0.1093,
+         -0.0675, -0.1547, -0.1949,  0.1148,  0.1350, -0.0601, -0.0658, -0.1594,  0.0075,  0.0740,  0.0744,  0.0156,  0.1636, -0.0932,  0.2812, -0.3812,
+          0.0795, -0.1841,  0.2748, -0.0752, -0.0524, -0.0065, -0.0354, -0.0548, -0.0574,  0.0688,  0.2128,  0.0718, -0.0460, -0.0075,  0.0469,  0.5120,
+         -0.0168,  0.1490]], grad_fn=<SliceBackward>)
+DEBUG:root:iter 239: first 50 of cell_out first layer torch.Size([5, 1, 512]):
+ tensor([[-0.0757,  0.0491,  0.0409, -0.2231, -0.2282,  0.0211,  0.2359, -0.1808,  0.4700,  0.0516, -0.1597,  0.0988, -0.1450, -0.3034, -0.4443, -0.1757,
+         -0.0867, -0.2435, -0.3868,  0.3823,  0.9909, -0.2119, -0.5159, -0.6530,  0.0172,  0.1183,  0.2856,  0.4544,  0.2358, -0.2431,  0.3801, -0.6816,
+          0.0951, -0.6839,  0.4714, -3.1329, -0.2713, -0.0696, -0.0413, -0.1307, -0.1087,  0.3767,  0.7092,  0.2205, -0.1749, -0.0589,  0.1821,  0.7179,
+         -0.0255,  0.2414]], grad_fn=<SliceBackward>)
+INFO:root:conv_context shape: (1, 46, 257)
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs_list len: 14
+DEBUG:root:----------iteration 240------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 1
+DEBUG:root:----------iteration 241------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 2
+DEBUG:root:----------iteration 242------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 3
+DEBUG:root:----------iteration 243------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 4
+DEBUG:root:----------iteration 244------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 5
+DEBUG:root:----------iteration 245------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 6
+DEBUG:root:----------iteration 246------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 7
+DEBUG:root:----------iteration 247------------
+INFO:root:sample length: 512
+INFO:root:audio_buffer length: 2
+INFO:root:audio integers shape: (512,)
+INFO:root:features_step shape: (1, 257)
+INFO:root:features_buffer length: 46
+INFO:root:stride modulus: 8
+DEBUG:root:----------iteration 248------------
+WARNING:root:final sample length 84
+DEBUG:root:---------- procerssing final sample in audio buffer ------------
+WARNING:root:numpy_buffer shape: 512
+WARNING:root:features_step shape: (1, 257)
+WARNING:root:features_buffer length: 46
+WARNING:root:stride modulus: 9
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 10
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 11
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 12
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 13
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 14
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 15
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 0
+INFO:root:conv_context shape: (1, 46, 257)
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs_list len: 15
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 1
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 2
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 3
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 4
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 5
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 6
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 7
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 8
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 9
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 10
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 11
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 12
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 13
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 14
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 15
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 0
+INFO:root:conv_context shape: (1, 46, 257)
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs_list len: 16
+DEBUG:root:---------- adding zeros at the end of audio sample ------------
+INFO:root:stride modulus: 1
+WARNING:root:length of final_frames: 512
+INFO:root:final predictions: ['k', 'uh', 'ch', 'ah', 't', 'ih', 'l', 'm', 'iy', 'hh', 'w', 'eh', 'r', 'dh', 'ah', 'ah', 'v', 'f', 'ey', 't', 'ih', 'ng', 'r', 'uw', 'm', 'hh', 'iy']
+WARNING:root:-------------- streaming_infer --------------
+WARNING:root:audio_buffer        time (s), count: 0.0, 248
+WARNING:root:numpy_buffer        time (s), count: 0.005, 247
+WARNING:root:features_operation  time (s), count: 0.103, 247
+WARNING:root:normalize           time (s), count: 0.004, 247
+WARNING:root:features_buffer     time (s), count: 0.0, 46
+WARNING:root:numpy_conv          time (s), count: 0.001, 16
+WARNING:root:model_infer         time (s), count: 1.671, 16
+WARNING:root:output_assign       time (s), count: 0.036, 16
+WARNING:root:decoder             time (s), count: 0.001, 1
+WARNING:root:total               time (s), count: 4.711, 241
+WARNING:root:Multiples faster than realtime      : 0.843x
+WARNING:root:-------------- list_chunck_infer --------------
+WARNING:root:chunk_size: 46
+WARNING:root:full_chunks: 16
+WARNING:root:features shape: (248, 257)
+WARNING:root:final_padding: 9
+INFO:root:norm_features with batch shape: (1, 248, 257)
+INFO:root:torch_input shape: torch.Size([1, 248, 257])
+INFO:root:padded_input shape: torch.Size([1, 287, 257])
+INFO:root:input_chunk shape: torch.Size([1, 46, 257])
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs list len: 1
+INFO:root:input_chunk shape: torch.Size([1, 46, 257])
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs list len: 2
+INFO:root:input_chunk shape: torch.Size([1, 46, 257])
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs list len: 3
+INFO:root:input_chunk shape: torch.Size([1, 46, 257])
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs list len: 4
+INFO:root:input_chunk shape: torch.Size([1, 46, 257])
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs list len: 5
+INFO:root:input_chunk shape: torch.Size([1, 46, 257])
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs list len: 6
+INFO:root:input_chunk shape: torch.Size([1, 46, 257])
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs list len: 7
+INFO:root:input_chunk shape: torch.Size([1, 46, 257])
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs list len: 8
+INFO:root:input_chunk shape: torch.Size([1, 46, 257])
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs list len: 9
+INFO:root:input_chunk shape: torch.Size([1, 46, 257])
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs list len: 10
+INFO:root:input_chunk shape: torch.Size([1, 46, 257])
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs list len: 11
+INFO:root:input_chunk shape: torch.Size([1, 46, 257])
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs list len: 12
+INFO:root:input_chunk shape: torch.Size([1, 46, 257])
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs list len: 13
+INFO:root:input_chunk shape: torch.Size([1, 46, 257])
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs list len: 14
+INFO:root:input_chunk shape: torch.Size([1, 46, 257])
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs list len: 15
+INFO:root:input_chunk shape: torch.Size([1, 46, 257])
+INFO:root:probs shape: (1, 16, 40)
+INFO:root:probs list len: 16
+WARNING:root:predictions: ['k', 'uh', 'ch', 'ah', 't', 'ih', 'l', 'm', 'iy', 'hh', 'w', 'eh', 'r', 'dh', 'ah', 'ah', 'v', 'f', 'ey', 't', 'ih', 'ng', 'r', 'uw', 'm', 'hh', 'iy']
+WARNING:root:model infer          time (s), count: 1.15, 16
+WARNING:root:output assign        time (s), count: 0.0, 16
+WARNING:root:decoder              time (s), count: 0.002, 17
+WARNING:root:total                time (s), count: 1.166, 16
+WARNING:root:Multiples faster than realtime      : 3.405x
+WARNING:root:------------ fullaudio_infer -------------
+INFO:root:features shape: (247, 257)
+INFO:root:norm_features with batch shape: (1, 247, 257)
+INFO:root:torch_input shape: torch.Size([1, 247, 257])
+WARNING:root:chunk_size: 46
+WARNING:root:final_padding: 9
+INFO:root:padded_input shape: torch.Size([1, 286, 257])
+INFO:root:model probs shape: (1, 256, 40)
+WARNING:root:predictions: ['k', 'uh', 'ch', 'ah', 't', 'ih', 'l', 'm', 'iy', 'hh', 'w', 'eh', 'r', 'dh', 'ah', 'ah', 'v', 'f', 'ey', 't', 'ih', 'ng', 'r', 'uw', 'm', 'hh', 'iy']
+WARNING:root:features             time (s): 0.002
+WARNING:root:normalization        time (s): 0.0
+WARNING:root:convert & pad        time (s): 0.0
+WARNING:root:model infer          time (s): 0.922
+WARNING:root:decoder              time (s): 0.0
+WARNING:root:total                time (s): 0.926
+WARNING:root:Multiples faster than realtime      : 4.29x

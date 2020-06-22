@@ -1,0 +1,30 @@
+# this document will store various things related to managing the VM'store
+
+# the current list includes
+ * how to resize a disk
+
+
+# HOW TO RESIZE A DISK
+
+
+
+
+# HOW TO START/STOP A VM
+gcloud compute instances start phoneme-3
+gcloud compute instances stop phoneme-3
+gcloud compute ssh --project speak-ml-dev --zone us-central1-a  dzubke@phoneme-1
+
+
+# how to see tensorboard file
+tensorboard --logdir ./  --port=8080
+
+# To see live GPU usage:
+watch -d -n 0.5 nvidia-smi
+
+
+#setting default zone
+gcloud compute project-info add-metadata --metadata google-compute-default-region=us-central1,google-compute-default-zone=us-central1-c
+
+#  HOW TO COMBINE TWO DATASETS  
+cd ~/awni_speech/data/Librispeech
+cat train-clean-460.json train-other-500.json > ./train-other-960.json
