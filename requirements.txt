@@ -6,6 +6,7 @@
 #SoundFile==0.10.2
 #tensorboard-logger==0.0.4
 #python_speech_features==0.6
+#graphviz==0.14
 #librosa==0.7.2
 requests==2.23.0
 numpy==1.13.3
@@ -16,3 +17,4 @@ PyYAML==3.12
 six==1.11.0
 tqdm==4.19.4
 wget==1.19.5
+psutil
