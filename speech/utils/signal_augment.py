@@ -102,7 +102,8 @@ def speed_vol_perturb(audio_path:str, sample_rate:int=16000, tempo_range:Augment
     return audio_data, samp_rate 
 
 
-def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float, logger=None)\
+def augment_audio_with_sox(path:str, sample_rate:int, 
+                            tempo:float, gain:float, logger=None)\
                                                             ->Tuple[np.ndarray,int]:
     """
     Changes speed (tempo) and volume (gain) of the recording with sox and loads it.

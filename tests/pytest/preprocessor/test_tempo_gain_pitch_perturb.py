@@ -23,5 +23,5 @@ def check_speed():
         audio, samp_rate = array_from_wave(audio_file)
         for tempo in tempos:
             aug_data = speed_vol_perturb(path, sample_rate=samp_rate,
-                tempo_range=(tempo, tempo), gain_range=(-6, 8))
+                tempo_range=(tempo, tempo), gain_range=(0, 0), pitch_range=(0,0))
             #assert audio.size == pytest.approx(aug_audio.size * tempo, 1e-1)
