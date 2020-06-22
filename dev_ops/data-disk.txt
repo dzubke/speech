@@ -44,7 +44,7 @@ lsblk
 # STEP 3 & 7, 8: ATTACH AND DETACH THE DISK
 # this is how to attach a disk to the VM, note the `ro` (read-only) mode
 
-gcloud compute instances attach-disk phoneme-4 \
+gcloud compute instances attach-disk phoneme-3 \
     --disk data-disk-readonly-2020-06-19 --mode=ro --zone=us-central1-c
 
 # this is how to detach a disk from a VM.
@@ -59,16 +59,20 @@ gcloud compute instances detach-disk phoneme-4 \
 # the `ro` option is the most crtical is it means `read-only`. For `read-write` use the `rw` option.
 # the options `discard,suid,dev,exec,auto,nouser,async` are all part of the `defaults` on the manpage.
 # the `noload` option seems necessary. Not sure exaclty what that does. 
+# Note: it seems that if the disk is in the `/etc/fstab` directory, you don't need to mount it if attaching.
+
+# the first time you mount a disk to VM run this command: sudo mkdir -p /mnt/disks/data_disk
 
 sudo mount -o ro,discard,suid,dev,exec,auto,nouser,async,noload /dev/sdb1 /mnt/disks/data_disk
 
 # this command will unmount the data disk
+# Note: be sure to navigate out of the disk. If you currrent directory is on the disk, you can't unmount
 
 sudo umount /dev/sdb1
 
 # to see all the mounted filesystems use the command below
-
-mount -l
+mount -l 
+mount -l | grep sdb1    # or to look for the specific disk
  
 
 # STEP 5: RENAME THE FILPATHS
