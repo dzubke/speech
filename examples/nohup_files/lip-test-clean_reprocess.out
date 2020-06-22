@@ -1,0 +1,7 @@
+nohup: ignoring input
+Traceback (most recent call last):
+  File "reprocess.py", line 36, in <module>
+    reprocess(args.dataset_name)
+  File "reprocess.py", line 18, in reprocess
+    audio_pattern = os.path.join(dataset.audio_dir, dataset.pattern)
+AttributeError: 'LibspTestCleanDataset' object has no attribute 'pattern'

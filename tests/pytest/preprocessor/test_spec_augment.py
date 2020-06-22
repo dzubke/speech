@@ -3,15 +3,17 @@ import pytest
 from _pytest.fixtures import SubRequest
 # project libraries
 from speech.utils.wave import array_from_wave
-from speech.loader import log_specgram_from_data, sample_normalize
-
+from speech.loader import log_spectrogram_from_data
+from tests.pytest.utils import get_all_test_audio
 
 def test_single_values():
-    audio_path = "/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/tests/pytest/test_audio/Speak-out.wav"
-    audio_data, samp_rate = array_from_wave(wave_file)
-    log_spec = log_specgram_from_data(audio_data, samp_rate, window_size=32, step_size=16)
-    # normalize
-    # spec_aug
+    audio_paths = get_all_test_audio()
+    for audio_path in audio_paths:
+        audio_data, samp_rate = array_from_wave(wave_file)
+        log_spec = log_spectrogram_from_data(audio_data, samp_rate, window_size=32, step_size=16)
+    raise NotImplementedError
+        # normalize
+        # spec_aug
 
 
 
