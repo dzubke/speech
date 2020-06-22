@@ -20,4 +20,4 @@ class Config:
         self.model_cfg = config["model"]
 
     def __str__(self):
-        return "hello"
+        return "Incomplete Config __str__ method"

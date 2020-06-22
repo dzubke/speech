@@ -5,6 +5,7 @@ from __future__ import print_function
 # standard libraries
 import json
 import random
+from typing import List, Tuple
 # third-party libraries
 import matplotlib.pyplot as plt
 import numpy as np
@@ -14,9 +15,9 @@ import torch
 import torch.autograd as autograd
 import torch.utils.data as tud
 # project libraries
-from speech.utils import wave
+from speech.utils.wave import array_from_wave
 from speech.utils.io import read_data_json
-from speech.utils.signal_augment import apply_pitch_perturb, speed_vol_perturb, inject_noise
+from speech.utils.signal_augment import apply_pitch_perturb, tempo_gain_pitch_perturb, inject_noise
 from speech.utils.signal_augment import synthetic_gaussian_noise_inject
 from speech.utils.feature_augment import apply_spec_augment
 
@@ -27,7 +28,7 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, preproc_cfg, logger=None, max_samples=1000, start_and_end=True):
+    def __init__(self, data_json, preproc_cfg, logger=None, max_samples=100, start_and_end=True):
         """
         Builds a preprocessor from a dataset.
         Arguments:
@@ -56,13 +57,11 @@ class Preprocessor():
         self.step_size = preproc_cfg['step_size']
         self.normalize =  preproc_cfg['normalize']
 
-        self.speed_vol_perturb = preproc_cfg['speed_vol_perturb']
+        self.tempo_gain_pitch_perturb = preproc_cfg['tempo_gain_pitch_perturb']
         self.tempo_range = preproc_cfg['tempo_range']
         self.gain_range = preproc_cfg['gain_range']
-        
-        self.pitch_perturb =  preproc_cfg['pitch_perturb']
         self.pitch_range = preproc_cfg['pitch_range']
-
+       
         self.synthetic_gaussian_noise = preproc_cfg['synthetic_gaussian_noise']
         self.signal_to_noise_range_db=preproc_cfg['signal_to_noise_range_db']
 
@@ -95,7 +94,10 @@ class Preprocessor():
     
     
     def preprocess(self, wave_file, text):
-        
+        if self.use_log: self.logger.info(f"preproc: ======= Entering preprocess =====")
+        if self.use_log: self.logger.info(f"preproc: wave_file: {wave_file}")
+        if self.use_log: self.logger.info(f"preproc: text: {text}") 
+
         audio_data, samp_rate = self.signal_augmentations(wave_file)
 
         # processing method
@@ -106,7 +108,7 @@ class Preprocessor():
         if self.normalize == "batch_normalize":
             feature_data = self.batch_normalize(feature_data)
         elif self.normalize == "sample_normalize":
-            feature_data = self.feature_normalize(feature_data)
+            feature_data = feature_normalize(feature_data)
         else: 
             raise ValueError("preproc config normalize value must be: 'batch_normalize' or 'sample_normalize'")
         if self.use_log: self.logger.info(f"preproc: normalized")
@@ -116,6 +118,7 @@ class Preprocessor():
         # target encoding
         targets = self.encode(text)
         if self.use_log: self.logger.info(f"preproc: text encoded")
+        if self.use_log: self.logger.info(f"preproc: ======= Exiting preprocess =====")
 
         return feature_data, targets
 
@@ -130,26 +133,25 @@ class Preprocessor():
             samp_rate - int: sample rate of the audio recording
         """
         # sox-based tempo, gain, pitch augmentations
-        if self.speed_vol_perturb and self.train_status:
-            audio_data, samp_rate = speed_vol_perturb(wave_file, tempo_range=self.tempo_range, gain_range=self.gain_range)
-        else:
-            audio_data, samp_rate = wave.array_from_wave(wave_file)
         if self.use_log: self.logger.info(f"preproc: audio_data read: {wave_file}")
+        if self.tempo_gain_pitch_perturb and self.train_status:
+            audio_data, samp_rate = tempo_gain_pitch_perturb(wave_file, self.tempo_range, self.gain_range, 
+                                                        self.pitch_range, logger=self.logger)
+        else:
+            audio_data, samp_rate = array_from_wave(wave_file)
 
         # synthetic gaussian noise
         if self.synthetic_gaussian_noise and self.train_status:
-            audio_data = synthetic_gaussian_noise_inject(audio_data, self.signal_to_noise_range_db)
             if self.use_log: self.logger.info(f"preproc: synthetic_gaussian_noise_inject")
+            audio_data = synthetic_gaussian_noise_inject(audio_data, 
+                                self.signal_to_noise_range_db, logger=self.logger)
 
-        # pitch perturb
-        if self.pitch_perturb and self.train_status: 
-            audio_data = apply_pitch_perturb(audio_data, samp_rate, pitch_range=self.pitch_range)
-        
         # noise injection
         if self.inject_noise and self.train_status:
             add_noise = np.random.binomial(1, self.noise_prob)
             if add_noise:
-                audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, self.logger, self.noise_levels) 
+                audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, 
+                                    self.logger, self.noise_levels) 
             if self.use_log: self.logger.info(f"preproc: noise injected")
         
         return audio_data, samp_rate
@@ -193,8 +195,12 @@ class Preprocessor():
         """
         if not hasattr(self, 'pitch_perturb'):
             self.pitch_perturb = False
-        if not hasattr(self, 'speed_vol_perturb'):
-            self.speed_vol_perturb = False
+        if not hasattr(self, 'tempo_gain_pitch_perturb'):
+            if hasattr(self, 'speed_vol_perturb'):
+                self.tempo_gain_pitch_perturb = self.speed_vol_pertub
+                self.pitch_range = [0,0]    # no pitch augmentation
+            else:
+                self.tempo_gain_pitch_perturb = False
         if not hasattr(self, 'train_status'):
             self.train_status = True
         if not hasattr(self, 'synthetic_gaussian_noise'):
@@ -240,31 +246,84 @@ class Preprocessor():
                 string += "\n" + name +": " + str(eval("self."+name))
             return string
 
-    @staticmethod
-    def feature_normalize(feature:np.ndarray)->np.ndarray:
-        """
-        Normalizes the features so that the entire 2d input array
-        has zero mean and unit (1) std deviation
-        """
-        mean = feature.mean()
-        std = feature.std()
-        feature -= mean
-        feature /= std
-        assert feature.dtype == np.float32, "feature is not float32"
-        return feature
 
 
-def compute_mean_std(audio_files, preprocessor, window_size, step_size):
+def feature_normalize(feature:np.ndarray, eps=1e-7)->np.ndarray:
+    """
+    Normalizes the features so that the entire 2d input array
+    has zero mean and unit (1) std deviation
+    The first assert checks std is not zero. If it is zero, will get NaN
+    """
+    mean = feature.mean()
+    std = feature.std()
+    assert std != 0, "feature_normalize: std dev is zero, will get NaN"
+    feature -= mean
+    feature /= (std + eps)
+    assert feature.dtype == np.float32, "feature is not float32"
+    return feature
+
+
+def compute_mean_std(audio_files:List[str], preprocessor:str, window_size:int, step_size:int)\
+                                                                ->Tuple[np.ndarray, np.ndarray]:
+    """
+    Compute the mean and std deviation of all of the feature bins (frequency bins if log_spec
+    preprocessor). Does not first normalize the audio samples 
+    (in contrast to compute_mean_std_with_feature_normalize).
+    Arguments:
+        audio_files - list[str]: a list of shuffled audio files. len = max_samples
+        preprocessor - str: specifies the kind of preprocessor
+        window_size - int: window_size of preprocessor
+        step_size - int: step_size of preprocessor
+    Returns:
+        mean - np.ndarray: the mean of the feature bins - shape = (# feature bins,)
+        std  - np.ndarray: the std deviation of the feature bins - shape = (# bins,)
+    """
     assert preprocessor in ['mfcc', 'log_spectrogram'], "preprocessor string not accepted"
+    assert len(audio_files) > 0, "input list of audio_files is empty"
+
     samples = []
     preprocessing_function  =  eval(preprocessor + "_from_data")
     for audio_file in audio_files: 
-        data, samp_rate = wave.array_from_wave(audio_file)
+        data, samp_rate = array_from_wave(audio_file)
         samples.append(preprocessing_function(data, samp_rate, window_size, step_size))
-     
-    samples = np.vstack(samples)
-    mean = np.mean(samples, axis=0)
+    # compute mean and std dev of the feature bins (along axis=0)
+    # feature arrays aka samples are time x feature bin
+    samples = np.vstack(samples) # stacks along time axis: shape = (all_time, feature bin)
+    mean = np.mean(samples, axis=0) # computes mean along time axis: shape = (feature bin,)
     std = np.std(samples, axis=0)
+    return mean, std
+
+
+def compute_mean_std_with_feature_normalize(audio_files:List[str], preprocessor:str, 
+                                                    window_size:int, step_size:int)\
+                                                    ->Tuple[np.ndarray, np.ndarray]:
+    """
+    First, normalizes the features from the input audio_files (in contrast to compute_mean_std).
+    Then compute the mean and std deviation of all of the feature bins.      
+    Arguments:
+        audio_files - list[str]: a list of shuffled audio files. len = max_samples
+        preprocessor - str: specifies the kind of preprocessor
+        window_size - int: window_size of preprocessor
+        step_size - int: step_size of preprocessor
+    Returns:
+        mean - np.ndarray: the mean of normalized feature bins - shape = (# feature bins,)
+        std  - np.ndarray: the std dev of normalized feature bins - shape = (# feature bins,)
+    """
+    assert preprocessor in ['mfcc', 'log_spectrogram'], "preprocessor string not accepted"
+    assert len(audio_files) > 0, "input list of audio_files is empty"
+    
+    samples = []
+    preprocessing_function  =  eval(preprocessor + "_from_data")
+    for audio_file in audio_files: 
+        data, samp_rate = array_from_wave(audio_file)
+        feature_array = preprocessing_function(data, samp_rate, window_size, step_size)
+        feature_array = feature_normalize(feature_array)   # normalize the feature
+        samples.append(feature_array)
+    # compute mean and std dev of the feature bins (along axis=0)
+    # feature arrays are time x feature bin
+    samples = np.vstack(samples)    # stacks along time axis: shape = (all_time, feature bin)
+    mean = np.mean(samples, axis=0) # computes mean along time axis: shape = (feature bin, )
+    std = np.std(samples, axis=0)   # same as mean: shape = (feature bin,)
     return mean, std
 
 
@@ -349,6 +408,7 @@ def make_loader(dataset_json, preproc,
 def mfcc_from_data(audio: np.ndarray, samp_rate:int, window_size=20, step_size=10):
     """
     Computes the Mel Frequency Cepstral Coefficients (MFCC) from an audio file path by calling the mfcc method
+    Dimensions of output are time x mfcc bin
     Arguments:
         audio - np.ndarray: an array of audio data in pcm16 format
     Returns:
@@ -402,16 +462,17 @@ def create_mfcc(audio, sample_rate: int, window_size, step_size, esp=1e-10):
 
 def log_spectrogram_from_file(audio_path:str, window_size=32, step_size=16):
     
-    audio_data, samp_rate = wave.array_from_wave(audio_path)
+    audio_data, samp_rate = array_from_wave(audio_path)
     return log_spectrogram_from_data(audio_data, samp_rate, window_size=window_size, step_size=step_size)
 
 def log_spectrogram_from_data(audio: np.ndarray, samp_rate:int, window_size=32, step_size=16, plot=False):
     """
-    Computes the log of the spectrogram from from a input audio file string
+    Computes the log of the spectrogram for input audio. Dimensions are time x freq
     Arguments:
         audio_data (np.ndarray)
-    `Returns:
-        np.ndarray, the transposed log of the spectrogram as returned by log_specgram
+    Returns:
+        np.ndarray: log of the spectrogram as returned by log_specgram
+            transposed so dimensions are time x frequency
     """
     
     if len(audio.shape)>1:     # there are multiple channels
@@ -441,8 +502,8 @@ def compare_log_spec_from_file(audio_file_1: str, audio_file_2: str, plot=False)
     This function takes in two audio paths and calculates the difference between the spectrograms 
         by subtracting them. 
     """
-    audio_1, sr_1 = wave.array_from_wave(audio_file_1)
-    audio_2, sr_2 = wave.array_from_wave(audio_file_2)
+    audio_1, sr_1 = array_from_wave(audio_file_1)
+    audio_2, sr_2 = array_from_wave(audio_file_2)
 
     if len(audio_1.shape)>1:
         audio_1 = audio_1[:,0]  # take the first channel

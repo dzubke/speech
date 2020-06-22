@@ -1,0 +1,9 @@
+nohup: ignoring input
+Traceback (most recent call last):
+  File "preprocess.py", line 500, in <module>
+    data_preprocessor.process_datasets()
+  File "preprocess.py", line 181, in process_datasets
+    self.collect_audio_transcripts(data_path)
+  File "preprocess.py", line 195, in collect_audio_transcripts
+    ted_talks = os.listdir(os.path.join(data_path, "sph"))
+FileNotFoundError: [Errno 2] No such file or directory: '/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/sph'

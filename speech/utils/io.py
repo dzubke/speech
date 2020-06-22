@@ -50,4 +50,14 @@ def write_data_json(dataset:list, write_path:str):
             json.dump(example, fid)
             fid.write("\n")
 
-            
+def read_pickle(pickle_path:str):
+    assert pickle_path != '', 'pickle_path is empty'
+    with open(pickle_path, 'rb') as fid:
+        pickle_object = pickle.load(fid)
+    return pickle_object
+
+def write_pickle(pickle_path:str, object_to_pickle):
+    assert pickle_path != '', 'pickle_path is empty'
+    with open(pickle_path, 'wb') as fid:
+        pickle.dump(object_to_pickle, fid) 
+
