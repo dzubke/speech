@@ -116,7 +116,7 @@ examples/librispeech/models/deepspeech_pretrained/librispeech_pretrained_v2.pth
 onnx/examples
 
 # nohup.out files
-*.out
+/*.out
 nohup_files/*
 
 #alexnet is tooo big
