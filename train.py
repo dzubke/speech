@@ -32,7 +32,7 @@ import tensorboard_logger as tb
 torch.autograd.set_detect_anomaly(True)
 
 
-def run_epoch(model, optimizer, train_ldr, logger, iter_count, avg_loss):
+def run_epoch(model, optimizer, train_ldr, logger, debug_mode, iter_count, avg_loss):
     """
     Performs a forwards and backward pass through the model
     Arguments
@@ -48,8 +48,8 @@ def run_epoch(model, optimizer, train_ldr, logger, iter_count, avg_loss):
         
         temp_batch = list(batch)    # this was added as the batch generator was being exhausted when it was called
 
-        if use_log: save_batch_log_stats(temp_batch, logger)
-        if use_log: log_batchnorm_mean_std(model.state_dict(), logger)
+        if use_log: if debug_mode:  save_batch_log_stats(temp_batch, logger)
+        if use_log: if debug_mode: log_batchnorm_mean_std(model.state_dict(), logger)
  
         start_t = time.time()
         optimizer.zero_grad()
@@ -62,8 +62,8 @@ def run_epoch(model, optimizer, train_ldr, logger, iter_count, avg_loss):
         loss.backward()
         if use_log: logger.info(f"train: Backward run ")
         #if use_log: plot_grad_flow_line(model.named_parameters())
-        if use_log: plot_grad_flow_bar(model.named_parameters(),  get_logger_filename(logger))
-        if use_log: log_param_grad_norms(model.named_parameters(), logger)
+        if use_log: if debug_mode: plot_grad_flow_bar(model.named_parameters(),  get_logger_filename(logger))
+        if use_log: if debug_mode: log_param_grad_norms(model.named_parameters(), logger)
 
         grad_norm = nn.utils.clip_grad_norm_(model.parameters(), 200)
         if use_log: logger.info(f"train: Grad_norm clipped ")
@@ -158,6 +158,7 @@ def run(config):
     model_cfg = config["model"]
     
     use_log = log_cfg["use_log"]
+    debug_mode = log_cfg["debug_mode"]
     if use_log:
         # create logger
         logger = logging.getLogger("train_log")
@@ -218,7 +219,7 @@ def run(config):
             print(f'learning rate: {g["lr"]}')
         
         try:
-            run_state = run_epoch(model, optimizer, train_ldr, logger, *run_state)
+            run_state = run_epoch(model, optimizer, train_ldr, logger, debug_mode, *run_state)
         finally: # used to ensure that plots are closed even if exception raised
             plt.close('all')
             if use_log: logger.error(f"train: ====In finally block====")
