@@ -1,15 +1,15 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200611/",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/null/",
     "data" : {
-         "train_set" : "/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json",
-        "dev_set" : "/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json",
+         "train_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json",
+        "dev_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json",
         "start_and_end" : false
     },
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-06-11_lib-ted-cv-VAL.log"
+        "log_file": "logs/null.log"
     },
     "preproc":{
         "preprocessor": "log_spectrogram",
@@ -18,7 +18,7 @@
         "normalize": "batch_normalize",
         "use_spec_augment": true,
         "inject_noise": true,
-        "noise_directory": "/home/dzubke/awni_speech/data/noise/feed_to_model/",
+        "noise_directory": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/",
         "noise_prob": 0.6,
         "noise_levels": [0,0.5], 
         "speed_vol_perturb":true,
