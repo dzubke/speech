@@ -1,0 +1,7 @@
+nohup: ignoring input
+============================= test session starts ==============================
+platform linux -- Python 3.6.5, pytest-3.2.3, py-1.4.34, pluggy-0.4.0
+rootdir: /home/dzubke/awni_speech/speech/tests/pytest_files, inifile:
+collected 1 item
+
+test_nj_all_noise.py 

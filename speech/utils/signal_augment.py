@@ -52,6 +52,7 @@ def apply_augmentation(audio_data:np.ndarray, sr:int, augment_name:str, args):
 
 def apply_pitch_perturb(audio_data:np.ndarray, samp_rate:int=16000, pitch_range:AugmentRange=(-8.0,8.0), logger=None):
     """
+    NOT IN USE. THIS HAS BEEN REPLACED WITH PITCH AUGMENTATION IN TEMPO_GAIN_PITCH_PERTURB.
     Adjusts the pitch of the input audio_data by selecting a random value between the lower
     and upper ranges and adjusting the pitch based on the chosen number of quarter steps
     Arguments:
@@ -76,41 +77,46 @@ def apply_pitch_perturb(audio_data:np.ndarray, samp_rate:int=16000, pitch_range:
 # Sean Naren's Deepspeech implementation at:
 # https://github.com/SeanNaren/deepspeech.pytorch/blob/master/data/data_loader.py
 
-def speed_vol_perturb(audio_path:str, sample_rate:int=16000, tempo_range:AugmentRange=(0.85, 1.15),
-                        gain_range:AugmentRange=(-6.0, 8.0), logger=None)->Tuple[np.ndarray, int]:
+def tempo_gain_pitch_perturb(audio_path:str, sample_rate:int=16000, 
+                            tempo_range:AugmentRange=(0.85, 1.15),
+                            gain_range:AugmentRange=(-6.0, 8.0),
+                            pitch_range:AugmentRange=(-400, 400), 
+                            logger=None)->Tuple[np.ndarray, int]:
     """
     Picks tempo and gain uniformly, applies it to the utterance by using sox utility.
     Returns:
         tuple(np.ndarray, int) - the augmente audio data and the sample_rate
     """
     use_log = (logger is not None)
-    if use_log: logger.info(f"speed_vol_perturb: audio_file: {audio_path}")
+    if use_log: logger.info(f"tempo_gain_pitch_perturb: audio_file: {audio_path}")
     
     tempo_value = np.random.uniform(*tempo_range)
-    if use_log: logger.info(f"speed_vol_perturb: tempo_value: {tempo_value}")
+    if use_log: logger.info(f"tempo_gain_pitch_perturb: tempo_value: {tempo_value}")
     
     gain_value = np.random.uniform(*gain_range)
-    if use_log: logger.info(f"speed_vol_perturb: gain_value: {gain_value}")
+    if use_log: logger.info(f"tempo_gain_pitch_perturb: gain_value: {gain_value}")
+
+    pitch_value = np.random.uniform(*pitch_range)
+    if use_log: logger.info(f"tempo_gain_pitch_perturb: pitch_value: {pitch_value}")
 
     try:    
-        audio_data, samp_rate = augment_audio_with_sox(path=audio_path, sample_rate=sample_rate,
-                                                   tempo=tempo_value, gain=gain_value, logger=logger)
+        audio_data, samp_rate = augment_audio_with_sox(audio_path, sample_rate, tempo_value, 
+                                                        gain_value, pitch_value, logger=logger)
     except RuntimeError as rterr:
-        if use_log: logger.error(f"speed_vol_perturb: RuntimeError: {rterr}")
+        if use_log: logger.error(f"tempo_gain_pitch_perturb: RuntimeError: {rterr}")
         audio_data, samp_rate = array_from_wave(audio_path)
         
     return audio_data, samp_rate 
 
 
-def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float, logger=None)\
-                                                            ->Tuple[np.ndarray,int]:
+def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float, 
+                            pitch:float, logger=None)->Tuple[np.ndarray,int]:
     """
-    Changes speed (tempo) and volume (gain) of the recording with sox and loads it.
+    Changes tempo, gain (volume), and pitch of the recording with sox and loads it.
     """
     use_log = (logger is not None)
     with NamedTemporaryFile(suffix=".wav") as augmented_file:
         augmented_filename = augmented_file.name
-        sox_augment_params = ["tempo", "{:.3f}".format(tempo), "gain", "{:.3f}".format(gain)]
         sox_cmd = ['sox', 
                     path,                       # file to augment
                     '-r', f'{sample_rate}',     # sample rate
@@ -119,7 +125,8 @@ def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float, l
                     '-e', 'si',                 # encoding = signed-integer
                     augmented_filename,         # output temp-filename
                     'tempo', f'{tempo:.3f}',    # augment tempo
-                    'gain', f'{gain:.3f}']      # augment gain (in db)
+                    'gain', f'{gain:.3f}',      # augment gain (in db)
+                    'pitch', f'{pitch:.3f}']    # augment pitch (in hundredths of semi-tone)
         sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
         
         if use_log: logger.info(f"aug_audio_sox: tmpfile exists: {os.path.exists(augmented_filename)}")
