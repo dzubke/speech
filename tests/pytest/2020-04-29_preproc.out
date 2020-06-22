@@ -1,0 +1,9 @@
+nohup: ignoring input
+============================= test session starts ==============================
+platform linux -- Python 3.6.5, pytest-5.4.1, py-1.8.1, pluggy-0.13.1
+rootdir: /home/dzubke/awni_speech/speech/tests/pytest
+collected 1 item
+
+test_preproc.py .
+
+======================= 1 passed in 66055.31s (18:20:55) =======================
