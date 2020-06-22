@@ -22,11 +22,10 @@
         "noise_directory": "/home/dzubke/awni_speech/data/noise/feed_to_model/",
         "noise_prob": 0.6,
         "noise_levels": [0,0.5], 
-        "speed_vol_perturb":true,
+        "tempo_gain_pitch_perturb":true,
         "tempo_range": [0.85, 1.15],
         "gain_range":[-3,4],
-        "pitch_perturb": true,
-        "pitch_range": [-8, 8],
+        "pitch_range":[-400,400],
         "synthetic_gaussian_noise": true, 
         "signal_to_noise_range_db":[10,30]
     },
