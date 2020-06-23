@@ -1,7 +1,3 @@
-## the name of the read-only disk in step X is hard-coded to "sdb", this may not always be the case
-
-
-
 : <<'END'
 END
 
@@ -13,7 +9,7 @@ sudo apt-get update && sudo apt-get --only-upgrade install kubectl google-cloud-
 # 4. install miniconda - the 3-4.5.4 version was the last to use python 3.6 - 283M size of miniconda3/
 sudo apt-get install bzip2  # need to install bzip2 to install miniconda
 wget https://repo.continuum.io/miniconda/Miniconda3-4.5.4-Linux-x86_64.sh
-yes | sh Miniconda3-4.5.4-Linux-x86_64.sh 
+bash Miniconda3-4.5.4-Linux-x86_64.sh -b -p $HOME/miniconda
 rm Miniconda3-4.5.4-Linux-x86_64.sh
 source ~/.bashrc
 
@@ -27,39 +23,40 @@ cd speech/
 conda install --file requirements.txt
 conda install ipython
 pip install editdistance==0.4 protobuf==3.4.0 pytest==3.2.3 scipy==0.18.1 SoundFile==0.10.2 tensorboard-logger==0.0.4 python_speech_features==0.6
-pip install onnx onnxruntime coremltools onnx-coreml
+pip install onnx onnxruntime coremltools onnx-coreml graphviz
 
-# 10. install CUDA
-    # before adding GPU to VM install the driver - Tesla K80 can use CUDA 9.0, 9.2, 10.0, 10.1, and maybe others
-    # location of CUDA archive - http://developer.download.nvidia.com/compute/cuda/repos/
-    # source for below: https://developer.nvidia.com/cuda-92-download-archive?target_os=Linux&target_arch=x86_64&target_distro=Ubuntu&target_version=1604&target_type=debnetwork & https://cloud.google.com/compute/docs/gpus/add-gpus#install-gpu-driver
+# # 10. install CUDA
+#     # before adding GPU to VM install the driver - Tesla K80 can use CUDA 9.0, 9.2, 10.0, 10.1, and maybe others
+#     # location of CUDA archive - http://developer.download.nvidia.com/compute/cuda/repos/
+#     # source for below: https://developer.nvidia.com/cuda-92-download-archive?target_os=Linux&target_arch=x86_64&target_distro=Ubuntu&target_version=1604&target_type=debnetwork & https://cloud.google.com/compute/docs/gpus/add-gpus#install-gpu-driver
 
-#Cuda 10
-curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_10.0.130-1_amd64.deb
-sudo dpkg -i cuda-repo-ubuntu1604_10.0.130-1_amd64.deb
-sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
-sudo apt-get update
-sudo apt-get install cuda
+# #Cuda 10
+# curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_10.0.130-1_amd64.deb
+# sudo dpkg -i cuda-repo-ubuntu1604_10.0.130-1_amd64.deb
+# sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
+# sudo apt-get update
+# sudo apt-get install cuda
 
-# 11. add the GPU to the VM
+# # 11. add the GPU to the VM
 
-# 15. install ffmpeg and vim
-sudo apt-get install ffmpeg
-sudo apt-get install vim
+# # 15. install ffmpeg and vim
+# sudo apt-get install ffmpeg
+# sudo apt-get install vim
 
 
-# 13. install pytorch
-conda install pytorch=0.4.1 cuda92 -c pytorch
-conda install pytorch==1.0.0 torchvision==0.2.1 cuda100 -c pytorch
-#latest, 1.3
-conda install pytorch torchvision cudatoolkit=10.1 -c pytorch 
-#for mac, pytoch 1.3
-conda install pytorch torchvision -c pytorch
+# # 13. install pytorch
+# conda install pytorch=0.4.1 cuda100 -c pytorch
+# # pytorch 1.0 version for linux
+# #conda install pytorch==1.0.0 torchvision==0.2.1 cuda100 -c pytorch
+# # pytorch 1.3 version for linux
+# #conda install pytorch torchvision cudatoolkit=10.1 -c pytorch 
+# # pytoch 1.3 version for mac
+# #conda install pytorch torchvision -c pytorch
 
-# 14. run the makefile
-cd ~/awni_speech/speech/
-sudo apt-get install make
-sudo apt-get install cmake
-make
+# # 14. run the makefile
+# cd ~/awni_speech/speech/
+# sudo apt-get install make
+# sudo apt-get install cmake
+# make
 
-cmake ../ && make; cd ../pytorch_binding; python build.py
+# cmake ../ && make; cd ../pytorch_binding; python build.py
