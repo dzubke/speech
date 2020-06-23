@@ -8,9 +8,11 @@ echo "gcloud username is: $GCLOUD_USER"
 
 gcloud compute instances create $1 \
     --machine-type n1-standard-4 --zone us-central1-c \
-    --create-disk size=150 \
-   # --accelerator type=nvidia-tesla-p100,count=1 \
+    --boot-disk-size size=150 \
     --image-family ubuntu-1604-lts --image-project ubuntu-os-cloud
+
+   # --accelerator type=nvidia-tesla-p100,count=1 \
+
 
 gcloud compute instances attach-disk $1 \
     --disk data-disk-readonly-2020-06-19 --mode=ro --zone=us-central1-c
