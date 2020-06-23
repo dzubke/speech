@@ -129,9 +129,13 @@ def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float,
                     'pitch', f'{pitch:.3f}']    # augment pitch (in hundredths of semi-tone)
         sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
         
-        if use_log: logger.info(f"aug_audio_sox: tmpfile exists: {os.path.exists(augmented_filename)}")
-        if use_log: logger.info(f"aug_audio_sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
-        if use_log: logger.info(f"aug_audio_sox: sox stderr: {sox_result.stderr.decode('utf-8')}")
+        if use_log: 
+            logger.info(f"aug_audio_sox: tmpfile exists: {os.path.exists(augmented_filename)}")
+            logger.info(f"aug_audio_sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
+            stderr_message = sox_result.stderr.decode('utf-8')
+            if stderr_message != '':
+                logger.error(f"aug_audio_sox: sox stderr: {stderr_message}")
+  
         
         data, samp_rate = array_from_wave(augmented_filename)
         return data, samp_rate
