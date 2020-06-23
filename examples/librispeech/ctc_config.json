@@ -10,7 +10,7 @@
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-06-23_ph2-8vCPU-24GB-8wkr-32batch_lib-ted-cv.log",
+        "log_file": "logs/2020-06-23_ph4-12vCPU-24GB-8wkr-16batch_v2_lib-ted-cv.log",
         "debug_mode":false
     },
     "preproc":{
@@ -32,7 +32,7 @@
     },
 
     "optimizer": {
-        "batch_size" : 32,
+        "batch_size" : 16,
         "epochs" : 100,
         "learning_rate" : 8e-4,
         "momentum" : 0.9, 
