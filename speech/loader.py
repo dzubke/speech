@@ -132,14 +132,15 @@ class Preprocessor():
             audio_data - np.ndarray: augmented np-array
             samp_rate - int: sample rate of the audio recording
         """
-        # sox-based tempo, gain, pitch augmentations
         if self.use_log: self.logger.info(f"preproc: audio_data read: {wave_file}")
-        if self.tempo_gain_pitch_perturb and self.train_status:
-            audio_data, samp_rate = tempo_gain_pitch_perturb(wave_file, self.tempo_range, self.gain_range, 
-                                                        self.pitch_range, logger=self.logger)
-        else:
-            audio_data, samp_rate = array_from_wave(wave_file)
+        
+        audio_data, samp_rate = array_from_wave(wave_file)
 
+        # sox-based tempo, gain, pitch augmentations
+        if self.tempo_gain_pitch_perturb and self.train_status:
+            audio_data, samp_rate = tempo_gain_pitch_perturb(wave_file, samp_rate, self.tempo_range, self.gain_range, 
+                                                        self.pitch_range, logger=self.logger)
+        
         # synthetic gaussian noise
         if self.synthetic_gaussian_noise and self.train_status:
             if self.use_log: self.logger.info(f"preproc: synthetic_gaussian_noise_inject")
