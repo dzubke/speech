@@ -9,7 +9,7 @@ from tests.pytest.utils import get_all_test_audio
 def test_single_values():
     audio_paths = get_all_test_audio()
     for audio_path in audio_paths:
-        audio_data, samp_rate = array_from_wave(wave_file)
+        audio_data, samp_rate = array_from_wave(audio_path)
         log_spec = log_spectrogram_from_data(audio_data, samp_rate, window_size=32, step_size=16)
     raise NotImplementedError
         # normalize

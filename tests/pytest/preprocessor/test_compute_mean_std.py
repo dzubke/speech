@@ -52,8 +52,6 @@ def test_compute_mean_std_from_pickle():
         np.testing.assert_allclose(std, std_reference,  rtol=1e-03, atol=1e-05)    
 
 
-
-
 def test_compute_mean_std_empty_input():
 
     audio_files = list()
