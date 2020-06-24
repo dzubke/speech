@@ -5,12 +5,12 @@
          "train_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json",
         "dev_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
         "start_and_end" : false,
-        "num_workers":8
+        "num_workers":16
     },
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-06-23_ph2-8vCPU-24GB-8wkr-32batch_lib-ted-cv.log",
+        "log_file": "logs/2020-06-23_ph2-8vCPU-24GB-16wkr-16batch_v2_lib-ted-cv.log",
         "debug_mode":false
     },
     "preproc":{
@@ -32,7 +32,7 @@
     },
 
     "optimizer": {
-        "batch_size" : 32,
+        "batch_size" : 16,
         "epochs" : 100,
         "learning_rate" : 8e-4,
         "momentum" : 0.9, 
