@@ -28,7 +28,7 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, preproc_cfg, logger=None, max_samples=100, start_and_end=True):
+    def __init__(self, data_json, preproc_cfg, logger=None, max_samples=1000, start_and_end=True):
         """
         Builds a preprocessor from a dataset.
         Arguments:

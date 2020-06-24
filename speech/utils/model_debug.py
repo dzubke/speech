@@ -27,8 +27,10 @@ def check_nan(model_params:Generator):
         model_params - Generator[torch.nn.parameter.Parameter]: output of model.parameters()
     """
     for param in model_params:
+        # checks all parameters for NaN (param!=param is NaN check)
         if (param!=param).any():
             return True
+        # checks all gradients from NaN's
         if param.requires_grad:
             if (param.grad != param.grad).any():
                 return True
@@ -36,7 +38,7 @@ def check_nan(model_params:Generator):
 
 
 
-def log_model_grads(named_params:Generator, logger):
+def log_model_grads(named_params:NamedParams, logger):
     """
     records the gradient values of the parameters in the model
     Arguments:

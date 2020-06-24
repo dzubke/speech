@@ -1,0 +1,59 @@
+sox:      SoX v
+time:     Oct  1 2019 10:21:46
+uname:    Darwin Dustins-MacBook-Pro.local 19.4.0 Darwin Kernel Version 19.4.0: Wed Mar  4 22:28:40 PST 2020; root:xnu-6153.101.6~15/RELEASE_X86_64 x86_64
+compiler: gcc 4.2.1 Compatible Apple LLVM 11.0.0 (clang-1100.0.33.8)
+arch:     1288 48 88 L 
+sox INFO formats: detected file format type `wav'
+sox DBUG wav: Searching for 66 6d 74 20
+sox DBUG wav: WAV Chunk fmt 
+sox DBUG wav: Searching for 64 61 74 61
+sox DBUG wav: WAV Chunk LIST
+sox DBUG wav: WAV Chunk data
+sox DBUG wav: Reading Wave file: Microsoft PCM format, 1 channel, 16000 samp/sec
+sox DBUG wav:         32000 byte/sec, 2 block align, 16 bits/samp, 127060 data bytes
+sox DBUG wav:         63530 Samps/chans
+sox DBUG wav: Searching for 4c 49 53 54
+sox INFO tempo: quick_search=0 factor=2 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=0.793701 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/Users/dustin/CS/consulting/firstlayerai/phoneme_classification/src/awni_speech/speech/tests/pytest/test_audio/Speak-out.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:03.97 = 63530 samples ~ 297.797 CDDA sectors
+File Size      : 127k
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/test.wav'
+sox DBUG wav: Writing Wave file: Microsoft PCM format, 1 channel, 16000 samp/sec
+sox DBUG wav:         32000 byte/sec, 2 block align, 16 bits/samp
+
+Output File    : '/tmp/test.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox DBUG effects_i_dsp: make_lpf(n=513 Fc=0.3797121 β=13.7113 ρ=0.5 dc-norm=0 scale=1)
+sox DBUG rate: fir_len=513 dft_length=2048 Fp=0.913628 Fs=1 Fn=2.51984 att=132.453 2/1
+sox DBUG effects_i_dsp: make_lpf(n=1791 Fc=0.007111711 β=14.0586 ρ=0.75 dc-norm=0 scale=128)
+sox DBUG rate: fir_len=14 phases=128 coef_interp=2 size=43.0k
+sox DBUG rate:     0|0     preload=128 remL=0
+sox DBUG rate:     0|13    preload=6 remL=0
+sox INFO sox: effects chain: input        16000Hz  1 channels (multi) 16 bits 00:00:03.97
+sox INFO sox: effects chain: tempo        16000Hz  1 channels (multi) 32 bits 00:00:01.99
+sox INFO sox: effects chain: gain         16000Hz  1 channels         32 bits 00:00:01.99
+sox INFO sox: effects chain: pitch      20158.7Hz  1 channels (multi) 32 bits 00:00:01.99
+sox INFO sox: effects chain: rate         16000Hz  1 channels         32 bits 00:00:01.99
+sox INFO sox: effects chain: dither       16000Hz  1 channels         16 bits 00:00:01.99
+sox INFO sox: effects chain: output       16000Hz  1 channels (multi) 16 bits 00:00:01.99
+sox DBUG sox: start-up time = 0.001695
+sox DBUG wav: Finished writing Wave file, 63530 data bytes 31765 samples
