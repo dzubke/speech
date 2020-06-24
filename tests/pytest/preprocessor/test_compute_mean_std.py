@@ -27,47 +27,38 @@ def test_compute_mean_std_from_pickle():
         "Speak-out.wav"
     ]
     test_audio = list(map(lambda x: os.path.join(pytest_dir_path, "test_audio", x), test_audio))
-    
-    print("=== Without feature_normalize =====")
-    mean, std = compute_mean_std(test_audio, 'log_spectrogram', 32, 16)
-    
-    mean_pickle_path = os.path.join(pytest_dir_path, 
-                              "./test_pickle/compute-mean-std_log-spec_mean_2020-06-22.pickle")
-    std_pickle_path = os.path.join(pytest_dir_path, 
-                               "./test_pickle/compute-mean-std_log-spec_std_2020-06-22.pickle")
-    mean_reference = read_pickle(mean_pickle_path)
-    std_reference = read_pickle(std_pickle_path)
-    print(f"means shape: {mean.shape}, ref: {mean_reference.shape}")
-    print(f"std shape: {std.shape}, ref: {std_reference.shape}")
+   
+    use_feature_normalize_options = [False, True]
+    for use_feature_normalize in use_feature_normalize_options:
+        print(f"=== feature_normalize: {use_feature_normalize} =====")
+        mean, std = compute_mean_std(test_audio, 'log_spectrogram', 32, 16, use_feature_normalize)
+        
+        if use_feature_normalize:
+            mean_pickle_path = os.path.join(pytest_dir_path, "test_pickle",
+                "compute-mean-std-with-feature-normalize_log-spec_mean_2020-06-22.pickle")
+            std_pickle_path = os.path.join(pytest_dir_path,"test_pickle",
+                "compute-mean-std-with-feature-normalize_log-spec_std_2020-06-22.pickle")
+        else:
+            mean_pickle_path = os.path.join(pytest_dir_path, "test_pickle",
+                                    "compute-mean-std_log-spec_mean_2020-06-22.pickle")
+            std_pickle_path = os.path.join(pytest_dir_path, "test_pickle",
+                                    "compute-mean-std_log-spec_std_2020-06-22.pickle")
+        mean_reference = read_pickle(mean_pickle_path)
+        std_reference = read_pickle(std_pickle_path)
+        print(f"means shape: {mean.shape}, ref: {mean_reference.shape}")
+        print(f"std shape: {std.shape}, ref: {std_reference.shape}")
 
-    np.testing.assert_allclose(mean, mean_reference,  rtol=1e-03, atol=1e-05)
-    np.testing.assert_allclose(std, std_reference,  rtol=1e-03, atol=1e-05)    
-     
-
-    print("=== With feature_normalize =====")
-    mean, std = compute_mean_std_with_feature_normalize(test_audio, 'log_spectrogram', 32, 16)
-
-    mean_pickle_path = os.path.join(pytest_dir_path,
-            "./test_pickle/compute-mean-std-with-feature-normalize_log-spec_mean_2020-06-22.pickle")
-    std_pickle_path = os.path.join(pytest_dir_path,
-            "./test_pickle/compute-mean-std-with-feature-normalize_log-spec_std_2020-06-22.pickle")
-    mean_reference = read_pickle(mean_pickle_path)
-    std_reference = read_pickle(std_pickle_path)
-
-    print(f"means shape: {mean.shape}, ref: {mean_reference.shape}")
-    print(f"std shape: {std.shape}, ref: {std_reference.shape}")
-
-    np.testing.assert_allclose(mean, mean_reference,  rtol=1e-03, atol=1e-05)
-    np.testing.assert_allclose(std, std_reference,  rtol=1e-03, atol=1e-05)
-
-
+        np.testing.assert_allclose(mean, mean_reference,  rtol=1e-03, atol=1e-05)
+        np.testing.assert_allclose(std, std_reference,  rtol=1e-03, atol=1e-05)    
 
 
 def test_compute_mean_std_empty_input():
 
     audio_files = list()
     preprocessor = 'log_spectrogram'
-    with pytest.raises(AssertionError) as execinfo:    
-        mean, std = compute_mean_std(audio_files, preprocessor, WINDOW_SIZE, STEP_SIZE)
-    with pytest.raises(AssertionError) as execinfo:
-        mean, std = compute_mean_std_with_feature_normalize(audio_files, preprocessor, WINDOW_SIZE, STEP_SIZE)
+    use_feature_normalize_options = [False, True]
+    for use_feature_normalize in use_feature_normalize_options:
+        with pytest.raises(AssertionError) as execinfo:    
+            mean, std = compute_mean_std(audio_files, preprocessor, WINDOW_SIZE, 
+                                            STEP_SIZE, use_feature_normalize)
+   
