@@ -32,9 +32,9 @@ def test_compute_mean_std_from_pickle():
     mean, std = compute_mean_std(test_audio, 'log_spectrogram', 32, 16)
     
     mean_pickle_path = os.path.join(pytest_dir_path, 
-                              "./test_pickles/compute-mean-std_log-spec_mean_2020-06-22.pickle")
+                              "./test_pickle/compute-mean-std_log-spec_mean_2020-06-22.pickle")
     std_pickle_path = os.path.join(pytest_dir_path, 
-                               "./test_pickles/compute-mean-std_log-spec_std_2020-06-22.pickle")
+                               "./test_pickle/compute-mean-std_log-spec_std_2020-06-22.pickle")
     mean_reference = read_pickle(mean_pickle_path)
     std_reference = read_pickle(std_pickle_path)
     print(f"means shape: {mean.shape}, ref: {mean_reference.shape}")
@@ -48,9 +48,9 @@ def test_compute_mean_std_from_pickle():
     mean, std = compute_mean_std_with_feature_normalize(test_audio, 'log_spectrogram', 32, 16)
 
     mean_pickle_path = os.path.join(pytest_dir_path,
-            "./test_pickles/compute-mean-std-with-feature-normalize_log-spec_mean_2020-06-22.pickle")
+            "./test_pickle/compute-mean-std-with-feature-normalize_log-spec_mean_2020-06-22.pickle")
     std_pickle_path = os.path.join(pytest_dir_path,
-            "./test_pickles/compute-mean-std-with-feature-normalize_log-spec_std_2020-06-22.pickle")
+            "./test_pickle/compute-mean-std-with-feature-normalize_log-spec_std_2020-06-22.pickle")
     mean_reference = read_pickle(mean_pickle_path)
     std_reference = read_pickle(std_pickle_path)
 
