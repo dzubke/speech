@@ -195,13 +195,14 @@ def audio_with_sox(path:str, sample_rate:int, start_time:float, end_time:float, 
                      'trim', f'{start_time}', '='+f'{end_time}']    # trim to start and end time
         sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        if use_log: logger.info(f"noise_inj_sox: tmpfile exists: {os.path.exists(tar_filename)}")
-        if use_log: logger.info(f"noise_inj_sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
-        stderr_message = sox_result.stderr.decode('utf-8')
-        if 'FAIL' in stderr_message:
-            logger.error(f"aug_audio_sox: sox stderr: {stderr_message}")
-        else:
-            logger.info(f"aug_audio_sox: sox stderr: {stderr_message}")
+        if use_log: 
+            logger.info(f"noise_inj_sox: tmpfile exists: {os.path.exists(tar_filename)}")
+            logger.info(f"noise_inj_sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
+            stderr_message = sox_result.stderr.decode('utf-8')
+            if 'FAIL' in stderr_message:
+                logger.error(f"aug_audio_sox: sox stderr: {stderr_message}")
+            else:
+                logger.info(f"aug_audio_sox: sox stderr: {stderr_message}")
 
         if os.path.exists(tar_filename):
             noise_data, samp_rate = array_from_wave(tar_filename)

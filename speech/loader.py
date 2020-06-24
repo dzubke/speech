@@ -17,7 +17,7 @@ import torch.utils.data as tud
 # project libraries
 from speech.utils.wave import array_from_wave
 from speech.utils.io import read_data_json
-from speech.utils.signal_augment import apply_pitch_perturb, tempo_gain_pitch_perturb, inject_noise
+from speech.utils.signal_augment import tempo_gain_pitch_perturb, inject_noise
 from speech.utils.signal_augment import synthetic_gaussian_noise_inject
 from speech.utils.feature_augment import apply_spec_augment
 
