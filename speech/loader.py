@@ -17,7 +17,7 @@ import torch.utils.data as tud
 # project libraries
 from speech.utils.wave import array_from_wave
 from speech.utils.io import read_data_json
-from speech.utils.signal_augment import apply_pitch_perturb, tempo_gain_pitch_perturb, inject_noise
+from speech.utils.signal_augment import tempo_gain_pitch_perturb, inject_noise
 from speech.utils.signal_augment import synthetic_gaussian_noise_inject
 from speech.utils.feature_augment import apply_spec_augment
 
@@ -28,7 +28,7 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, preproc_cfg, logger=None, max_samples=100, start_and_end=True):
+    def __init__(self, data_json, preproc_cfg, logger=None, max_samples=1000, start_and_end=True):
         """
         Builds a preprocessor from a dataset.
         Arguments:
@@ -42,11 +42,6 @@ class Preprocessor():
                 in computing summary statistics.
             start_and_end (bool): Include start and end tokens in labels.
         """
-        data = read_data_json(data_json)
-
-        # Compute data mean, std from sample
-        audio_files = [sample['audio'] for sample in data]
-        random.shuffle(audio_files)
 
         # if true, data augmentation will be applied
         self.train_status = True
@@ -55,7 +50,7 @@ class Preprocessor():
         self.preprocessor = preproc_cfg['preprocessor']
         self.window_size = preproc_cfg['window_size']
         self.step_size = preproc_cfg['step_size']
-        self.normalize =  preproc_cfg['normalize']
+        self.use_feature_normalize =  preproc_cfg['use_feature_normalize']
 
         self.tempo_gain_pitch_perturb = preproc_cfg['tempo_gain_pitch_perturb']
         self.tempo_range = preproc_cfg['tempo_range']
@@ -72,11 +67,15 @@ class Preprocessor():
         
         self.spec_augment = preproc_cfg['use_spec_augment']
 
-
+        # Compute data mean, std from sample
+        data = read_data_json(data_json)
+        audio_files = [sample['audio'] for sample in data]
+        random.shuffle(audio_files)
         self.mean, self.std = compute_mean_std(audio_files[:max_samples], 
                                                 preprocessor = self.preprocessor,
                                                 window_size = self.window_size, 
-                                                step_size = self.step_size)
+                                                step_size = self.step_size,
+                                                use_feature_normalize =self.use_feature_normalize)
         self._input_dim = self.mean.shape[0]
         self.use_log = (logger is not None)
         self.logger = logger
@@ -100,19 +99,15 @@ class Preprocessor():
 
         audio_data, samp_rate = self.signal_augmentations(wave_file)
 
-        # processing method
+        # instantiate and apply processing function
         preprocessing_function = eval(self.preprocessor + "_from_data")
         feature_data = preprocessing_function(audio_data, samp_rate, self.window_size, self.step_size)
         
-        # normalization
-        if self.normalize == "batch_normalize":
-            feature_data = self.batch_normalize(feature_data)
-        elif self.normalize == "sample_normalize":
-            feature_data = feature_normalize(feature_data)
-        else: 
-            raise ValueError("preproc config normalize value must be: 'batch_normalize' or 'sample_normalize'")
+        # normaliz
+        feature_data = self.normalize(feature_data, self.use_feature_normalize)
         if self.use_log: self.logger.info(f"preproc: normalized")
         
+        # apply feature_augmentations
         feature_data = self.feature_augmentations(feature_data)
 
         # target encoding
@@ -169,9 +164,12 @@ class Preprocessor():
         return feature_data
 
 
-    def batch_normalize(self, np_arr:np.ndarray)->np.ndarray:
-        output = (np_arr - self.mean) / self.std
-        return output.astype(np.float32)
+    def normalize(self, feature_array:np.ndarray, use_feature_normalize:bool)->np.ndarray:
+        if use_feature_normalize:
+            feature_array = feature_normalize(feature_array)
+        feature_array = (feature_array - self.mean) / self.std
+        assert feature_array.dtype == np.float32, "feature_array is not float32"
+        return feature_array
 
     def encode(self, text):
         text = list(text)
@@ -249,32 +247,32 @@ class Preprocessor():
 
 
 
-def feature_normalize(feature:np.ndarray, eps=1e-7)->np.ndarray:
+def feature_normalize(feature_array:np.ndarray, eps=1e-7)->np.ndarray:
     """
     Normalizes the features so that the entire 2d input array
     has zero mean and unit (1) std deviation
     The first assert checks std is not zero. If it is zero, will get NaN
     """
-    mean = feature.mean()
-    std = feature.std()
+    mean = feature_array.mean(dtype='float32')
+    std = feature_array.std(dtype='float32')
     assert std != 0, "feature_normalize: std dev is zero, will get NaN"
-    feature -= mean
-    feature /= (std + eps)
-    assert feature.dtype == np.float32, "feature is not float32"
-    return feature
+    feature_array -= mean
+    feature_array /= (std + eps)
+    assert feature_array.dtype == np.float32, "feature_array is not float32"
+    return feature_array
 
 
-def compute_mean_std(audio_files:List[str], preprocessor:str, window_size:int, step_size:int)\
-                                                                ->Tuple[np.ndarray, np.ndarray]:
+def compute_mean_std(audio_files:List[str], preprocessor:str, window_size:int, 
+                    step_size:int, use_feature_normalize:bool)->Tuple[np.ndarray, np.ndarray]:
     """
     Compute the mean and std deviation of all of the feature bins (frequency bins if log_spec
-    preprocessor). Does not first normalize the audio samples 
-    (in contrast to compute_mean_std_with_feature_normalize).
+    preprocessor). Will first normalize the audio samples if use_feature_normalize is true.
     Arguments:
         audio_files - list[str]: a list of shuffled audio files. len = max_samples
         preprocessor - str: specifies the kind of preprocessor
         window_size - int: window_size of preprocessor
         step_size - int: step_size of preprocessor
+        use_feature_normalize - bool: whether or not the features themselves are normalized
     Returns:
         mean - np.ndarray: the mean of the feature bins - shape = (# feature bins,)
         std  - np.ndarray: the std deviation of the feature bins - shape = (# bins,)
@@ -286,45 +284,16 @@ def compute_mean_std(audio_files:List[str], preprocessor:str, window_size:int, s
     preprocessing_function  =  eval(preprocessor + "_from_data")
     for audio_file in audio_files: 
         data, samp_rate = array_from_wave(audio_file)
-        samples.append(preprocessing_function(data, samp_rate, window_size, step_size))
+        feature_array = preprocessing_function(data, samp_rate, window_size, step_size)
+        if use_feature_normalize:
+            feature_array = feature_normalize(feature_array)   # normalize the feature
+        samples.append(feature_array)
+    
     # compute mean and std dev of the feature bins (along axis=0)
     # feature arrays aka samples are time x feature bin
     samples = np.vstack(samples) # stacks along time axis: shape = (all_time, feature bin)
-    mean = np.mean(samples, axis=0) # computes mean along time axis: shape = (feature bin,)
-    std = np.std(samples, axis=0)
-    return mean, std
-
-
-def compute_mean_std_with_feature_normalize(audio_files:List[str], preprocessor:str, 
-                                                    window_size:int, step_size:int)\
-                                                    ->Tuple[np.ndarray, np.ndarray]:
-    """
-    First, normalizes the features from the input audio_files (in contrast to compute_mean_std).
-    Then compute the mean and std deviation of all of the feature bins.      
-    Arguments:
-        audio_files - list[str]: a list of shuffled audio files. len = max_samples
-        preprocessor - str: specifies the kind of preprocessor
-        window_size - int: window_size of preprocessor
-        step_size - int: step_size of preprocessor
-    Returns:
-        mean - np.ndarray: the mean of normalized feature bins - shape = (# feature bins,)
-        std  - np.ndarray: the std dev of normalized feature bins - shape = (# feature bins,)
-    """
-    assert preprocessor in ['mfcc', 'log_spectrogram'], "preprocessor string not accepted"
-    assert len(audio_files) > 0, "input list of audio_files is empty"
-    
-    samples = []
-    preprocessing_function  =  eval(preprocessor + "_from_data")
-    for audio_file in audio_files: 
-        data, samp_rate = array_from_wave(audio_file)
-        feature_array = preprocessing_function(data, samp_rate, window_size, step_size)
-        feature_array = feature_normalize(feature_array)   # normalize the feature
-        samples.append(feature_array)
-    # compute mean and std dev of the feature bins (along axis=0)
-    # feature arrays are time x feature bin
-    samples = np.vstack(samples)    # stacks along time axis: shape = (all_time, feature bin)
-    mean = np.mean(samples, axis=0) # computes mean along time axis: shape = (feature bin, )
-    std = np.std(samples, axis=0)   # same as mean: shape = (feature bin,)
+    mean = np.mean(samples, axis=0, dtype='float32') # computes mean along time axis: shape = (feature bin,)
+    std = np.std(samples, axis=0, dtype='float32')
     return mean, std
 
 
@@ -420,7 +389,7 @@ def mfcc_from_data(audio: np.ndarray, samp_rate:int, window_size=20, step_size=1
         if audio.shape[1] == 1:
             audio = audio.squeeze()
         else:
-            audio = audio.mean(axis=1)  # multiple channels, average
+            audio = audio.mean(axis=1, dtype='float32')  # multiple channels, average
    
     return create_mfcc(audio, samp_rate, window_size, step_size)
 
@@ -480,7 +449,7 @@ def log_spectrogram_from_data(audio: np.ndarray, samp_rate:int, window_size=32, 
         if audio.shape[1] == 1:
             audio = audio.squeeze()
         else:
-            audio = audio.mean(axis=1)  # multiple channels, average
+            audio = audio.mean(axis=1, dtype='float32')  # multiple channels, average
     return log_spectrogram(audio, samp_rate, window_size, step_size, plot=plot)
 
 def log_spectrogram(audio, sample_rate, window_size=20,
