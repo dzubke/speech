@@ -112,4 +112,4 @@ gcloud compute instances stop phoneme-2
 
 UUID=1bbeb6dc-649d-4726-863b-2d3e7b8a5550 /mnt/disks/data_disk ext4 ro,discard,suid,dev,exec,auto,nouser,async,nofail,noload 0 2
 
-2020-06-23_ph2-8vCPU-24GB-8wkr-32batch_lib-ted-cv
+2020-06-23_ph4-12vCPU-24GB-8wkr-64batch_lib-ted-cv
