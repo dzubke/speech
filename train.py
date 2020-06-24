@@ -100,6 +100,8 @@ def run_epoch(model, optimizer, train_ldr, logger, debug_mode, iter_count, avg_l
         if check_nan(model.parameters()):
             if use_log: logger.error(f"train: labels: {[labels]}, label_lens: {label_lens} state_dict: {model.state_dict()}")
             if use_log: log_model_grads(model.named_parameters(), logger)
+            debug_mode = True
+            torch.autograd.set_detect_anomaly(True)
 
         if iter_count % log_modulus == 0:
             if use_log: log_cpu_mem_disk_usage(logger)
