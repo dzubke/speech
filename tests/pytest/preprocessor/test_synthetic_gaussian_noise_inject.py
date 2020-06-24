@@ -44,7 +44,7 @@ def test_regression_equal_pickle():
     """
     The pickle data is output from using the Speak-out.wav file with an snr_level = 30 and a random seed of zero
     """
-    pickle_path = "../test_pickles/sythentic-gaussian-noise-inject_Speak-out_snr-30.pickle"
+    pickle_path = "../test_pickle/sythentic-gaussian-noise-inject_Speak-out_snr-30.pickle"
     with open(pickle_path, 'rb') as fid:
         pickle_data = pickle.load(fid)
     
