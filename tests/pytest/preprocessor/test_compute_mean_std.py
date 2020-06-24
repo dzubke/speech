@@ -4,7 +4,7 @@ import os
 import numpy as np
 import pytest
 # project libraries
-from speech.loader import compute_mean_std, compute_mean_std_with_feature_normalize
+from speech.loader import compute_mean_std
 from speech.utils.compat import get_main_dir_path
 from speech.utils.io import read_pickle
 from tests.pytest.utils import get_all_test_audio
