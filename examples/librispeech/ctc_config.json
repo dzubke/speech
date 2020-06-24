@@ -1,4 +1,5 @@
-
+{
+    "seed" : 2017,
     "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200624/ph2/",
     "data" : {
          "train_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json",
