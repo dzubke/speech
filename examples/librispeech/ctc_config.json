@@ -1,15 +1,16 @@
-
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200624/ph2/",
+{
+    "seed" : 2017,
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/null/",
     "data" : {
          "train_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json",
-        "dev_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json",
+        "dev_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
         "start_and_end" : false,
         "num_workers":16
     },
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-06-24_ph2_baselin_lib-ted-cv.log",
+        "log_file": "logs/2020-06-23_ph2-8vCPU-24GB-16wkr-16batch_v2_lib-ted-cv.log",
         "debug_mode":false
     },
     "preproc":{
@@ -44,7 +45,7 @@
         "class" : "this value is no longer used as train.py is hardcorded to use CTC_train",
         "dropout" : 0.4,
         "load_trained": false,
-        "trained_path": "examples/librispeech/models/ctc_models/null/", 
+        "trained_path": "examples/librispeech/models/ctc_models/20200601/20200607/best_model", 
         "remove_layers": [],
         "encoder" : {
             "conv" : [
