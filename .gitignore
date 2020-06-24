@@ -59,6 +59,7 @@ coverage.xml
 
 # Djiango stuff:
 /logs/*
+/tests/*.log
 #*.log
     
 local_settings.py
