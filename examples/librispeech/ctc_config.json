@@ -16,7 +16,7 @@
         "preprocessor": "log_spectrogram",
         "window_size": 32,
         "step_size": 16,
-        "normalize": "batch_normalize",
+        "use_feature_normalize": true,
         "use_spec_augment": true,
         "inject_noise": true,
         "noise_directory": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/",
