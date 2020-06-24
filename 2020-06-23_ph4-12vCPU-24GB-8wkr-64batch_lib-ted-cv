@@ -1,75 +1,0 @@
-nohup: ignoring input
-  0%|          | 0/19227 [00:00<?, ?it/s]====== Model, loaders, optimimzer created =======
-model: CTC_train(
-  (conv): Sequential(
-    (0): Conv2d(1, 32, kernel_size=(11, 41), stride=(1, 2), padding=(0, 20))
-    (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-    (2): ReLU()
-    (3): Dropout(p=0.4)
-    (4): Conv2d(32, 32, kernel_size=(11, 21), stride=(1, 2), padding=(0, 10))
-    (5): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-    (6): ReLU()
-    (7): Dropout(p=0.4)
-    (8): Conv2d(32, 96, kernel_size=(11, 21), stride=(1, 1), padding=(0, 10))
-    (9): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-    (10): ReLU()
-    (11): Dropout(p=0.4)
-  )
-  (rnn): LSTM(6240, 512, num_layers=5, batch_first=True, dropout=0.4)
-  (fc): LinearND(
-    (fc): Linear(in_features=512, out_features=40, bias=True)
-  )
-)
-preproc: Showing limited attributes as not all new attributes are supported
-
-_input_dim: 257
-start_and_end: False
-int_to_char: {0: 'm', 1: 'th', 2: 'p', 3: 'aa', 4: 'jh', 5: 'ng', 6: 'n', 7: 'w', 8: 'aw', 9: 's', 10: 'f', 11: 'r', 12: 'ch', 13: 'oy', 14: 'v', 15: 'ah', 16: 'l', 17: 'dh', 18: 'g', 19: 'hh', 20: 'eh', 21: 'd', 22: 'b', 23: 'k', 24: 'iy', 25: 'y', 26: 'er', 27: 'ao', 28: 'ay', 29: 'ow', 30: 'z', 31: 'ey', 32: 't', 33: 'uw', 34: 'ae', 35: 'zh', 36: 'uh', 37: 'ih', 38: 'sh'}
-char_to_int: {'m': 0, 'th': 1, 'p': 2, 'aa': 3, 'jh': 4, 'ng': 5, 'n': 6, 'w': 7, 'aw': 8, 's': 9, 'f': 10, 'r': 11, 'ch': 12, 'oy': 13, 'v': 14, 'ah': 15, 'l': 16, 'dh': 17, 'g': 18, 'hh': 19, 'eh': 20, 'd': 21, 'b': 22, 'k': 23, 'iy': 24, 'y': 25, 'er': 26, 'ao': 27, 'ay': 28, 'ow': 29, 'z': 30, 'ey': 31, 't': 32, 'uw': 33, 'ae': 34, 'zh': 35, 'uh': 36, 'ih': 37, 'sh': 38}
-optimizer: SGD (
-Parameter Group 0
-    dampening: 0.98
-    initial_lr: 0.0008
-    lr: 0.0008
-    momentum: 0.9
-    nesterov: False
-    weight_decay: 0
-)
-learning rate: 0.0008
-  0%|          | 0/19227 [00:29<?, ?it/s, avg_loss=9.57, data_time=26.7, grad_norm=156, iter=0, loss=957, model_time=2.94]  0%|          | 1/19227 [00:29<158:16:54, 29.64s/it, avg_loss=9.57, data_time=26.7, grad_norm=156, iter=0, loss=957, model_time=2.94]  0%|          | 1/19227 [00:36<158:16:54, 29.64s/it, avg_loss=32.2, data_time=28.4, grad_norm=481, iter=1, loss=2.28e+3, model_time=7.74]  0%|          | 2/19227 [00:36<121:07:43, 22.68s/it, avg_loss=32.2, data_time=28.4, grad_norm=481, iter=1, loss=2.28e+3, model_time=7.74]  0%|          | 2/19227 [00:37<121:07:43, 22.68s/it, avg_loss=35.9, data_time=28.4, grad_norm=92, iter=2, loss=395, model_time=8.77]       0%|          | 3/19227 [00:37<86:27:21, 16.19s/it, avg_loss=35.9, data_time=28.4, grad_norm=92, iter=2, loss=395, model_time=8.77]   0%|          | 3/19227 [00:44<86:27:21, 16.19s/it, avg_loss=65.5, data_time=28.6, grad_norm=863, iter=3, loss=3e+3, model_time=15.5]  0%|          | 4/19227 [00:44<71:51:36, 13.46s/it, avg_loss=65.5, data_time=28.6, grad_norm=863, iter=3, loss=3e+3, model_time=15.5]  0%|          | 4/19227 [00:48<71:51:36, 13.46s/it, avg_loss=81.4, data_time=28.7, grad_norm=501, iter=4, loss=1.66e+3, model_time=19.4]  0%|          | 5/19227 [00:48<56:40:23, 10.61s/it, avg_loss=81.4, data_time=28.7, grad_norm=501, iter=4, loss=1.66e+3, model_time=19.4]  0%|          | 5/19227 [00:54<56:40:23, 10.61s/it, avg_loss=106, data_time=28.8, grad_norm=841, iter=5, loss=2.51e+3, model_time=25.3]   0%|          | 6/19227 [00:54<49:08:51,  9.21s/it, avg_loss=106, data_time=28.8, grad_norm=841, iter=5, loss=2.51e+3, model_time=25.3]  0%|          | 6/19227 [00:57<49:08:51,  9.21s/it, avg_loss=117, data_time=28.9, grad_norm=396, iter=6, loss=1.21e+3, model_time=28.3]  0%|          | 7/19227 [00:57<39:20:38,  7.37s/it, avg_loss=117, data_time=28.9, grad_norm=396, iter=6, loss=1.21e+3, model_time=28.3]  0%|          | 7/19227 [01:00<39:20:38,  7.37s/it, avg_loss=129, data_time=28.9, grad_norm=474, iter=7, loss=1.31e+3, model_time=31.6]  0%|          | 8/19227 [01:00<32:52:18,  6.16s/it, avg_loss=129, data_time=28.9, grad_norm=474, iter=7, loss=1.31e+3, model_time=31.6]  0%|          | 8/19227 [01:07<32:52:18,  6.16s/it, avg_loss=155, data_time=29.1, grad_norm=1.06e+3, iter=8, loss=2.75e+3, model_time=38.7]  0%|          | 9/19227 [01:07<34:35:51,  6.48s/it, avg_loss=155, data_time=29.1, grad_norm=1.06e+3, iter=8, loss=2.75e+3, model_time=38.7]THCudaCheck FAIL file=/opt/conda/conda-bld/pytorch_1532579245307/work/aten/src/THC/THCGeneral.cpp line=663 error=2 : out of memory
-Traceback (most recent call last):
-  File "train.py", line 227, in run
-    run_state = run_epoch(model, optimizer, train_ldr, logger, debug_mode, *run_state)
-  File "train.py", line 58, in run_epoch
-    loss = model.loss(temp_batch)
-  File "/home/dzubke/awni_speech/speech/speech/models/ctc_model_train.py", line 53, in loss
-    out, rnn_args = self.forward_impl(x)
-  File "/home/dzubke/awni_speech/speech/speech/models/ctc_model_train.py", line 45, in forward_impl
-    x, rnn_args = self.encode(x, rnn_args)    
-  File "/home/dzubke/awni_speech/speech/speech/models/model.py", line 97, in encode
-    x, rnn_args = self.rnn(x, rnn_args)
-  File "/home/dzubke/miniconda3/envs/awni_env36/lib/python3.6/site-packages/torch/nn/modules/module.py", line 477, in __call__
-    result = self.forward(*input, **kwargs)
-  File "/home/dzubke/miniconda3/envs/awni_env36/lib/python3.6/site-packages/torch/nn/modules/rnn.py", line 192, in forward
-    output, hidden = func(input, self.all_weights, hx, batch_sizes)
-  File "/home/dzubke/miniconda3/envs/awni_env36/lib/python3.6/site-packages/torch/nn/_functions/rnn.py", line 324, in forward
-    return func(input, *fargs, **fkwargs)
-  File "/home/dzubke/miniconda3/envs/awni_env36/lib/python3.6/site-packages/torch/nn/_functions/rnn.py", line 288, in forward
-    dropout_ts)
-RuntimeError: CUDA error: out of memory
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "train.py", line 319, in <module>
-    run(config)
-  File "train.py", line 231, in run
-    if use_log: logger.error(f"train: state_dict: {model.state_dict()}")
-  File "/home/dzubke/miniconda3/envs/awni_env36/lib/python3.6/site-packages/torch/tensor.py", line 57, in __repr__
-    return torch._tensor_str._str(self)
-  File "/home/dzubke/miniconda3/envs/awni_env36/lib/python3.6/site-packages/torch/_tensor_str.py", line 256, in _str
-    formatter = _Formatter(get_summarized_data(self) if summarize else self)
-  File "/home/dzubke/miniconda3/envs/awni_env36/lib/python3.6/site-packages/torch/_tensor_str.py", line 219, in get_summarized_data
-    return torch.cat((start + end))
-RuntimeError: cuda runtime error (2) : out of memory at /opt/conda/conda-bld/pytorch_1532579245307/work/aten/src/THC/THCGeneral.cpp:663
-  0%|          | 9/19227 [01:13<43:26:49,  8.14s/it, avg_loss=155, data_time=29.1, grad_norm=1.06e+3, iter=8, loss=2.75e+3, model_time=38.7]

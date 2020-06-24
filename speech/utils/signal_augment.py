@@ -38,38 +38,11 @@ def os_play(play_file:str):
 def apply_augmentation(audio_data:np.ndarray, sr:int, augment_name:str, args):
 
     
-    if augment_name == "pitch_perturb":
-        pitch_level = int(args)
-        return apply_pitch_perturb(audio_data, sr, pitch_range=(pitch_level, pitch_level))
-    elif augment_name == "synthetic_gaussian_noise_inject":
+    if augment_name == "synthetic_gaussian_noise_inject":
         snr_level = float(args)
         return synthetic_gaussian_noise_inject(audio_data, snr_range=(snr_level, snr_level))
     else:
         raise ValueError("augment_name doesn't match any augmentations")
-
-
-    
-
-def apply_pitch_perturb(audio_data:np.ndarray, samp_rate:int=16000, pitch_range:AugmentRange=(-8.0,8.0), logger=None):
-    """
-    NOT IN USE. THIS HAS BEEN REPLACED WITH PITCH AUGMENTATION IN TEMPO_GAIN_PITCH_PERTURB.
-    Adjusts the pitch of the input audio_data by selecting a random value between the lower
-    and upper ranges and adjusting the pitch based on the chosen number of quarter steps
-    Arguments:
-        audio_data - np.ndarray: array of audio amplitudes
-        samp_rate - int: sample rate of input audio
-        pitch_range - tuple: min and max number of quarter steps to drop the pitch. 
-    Returns: 
-        augment_data - np.ndarrray: array of audio amplitudes with raised pitch
-    """
-    assert audio_data.size >= 2, "input data must be 2 or more long"
-    use_log = (logger is not None)
-    random_steps = random.randint(*pitch_range)
-    if use_log: logger.info(f"pitch_perturb: random_steps: {random_steps}")
-    audio_data = pcm2float(audio_data)
-    augment_data = librosa.effects.pitch_shift(audio_data, samp_rate, n_steps=random_steps, bins_per_octave=24)
-    augment_data = float2pcm(augment_data)
-    return augment_data
 
 
 
@@ -117,7 +90,7 @@ def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float,
     use_log = (logger is not None)
     with NamedTemporaryFile(suffix=".wav") as augmented_file:
         augmented_filename = augmented_file.name
-        sox_cmd = ['sox', 
+        sox_cmd = ['sox', '-V3',                # verbosity level = 3
                     path,                       # file to augment
                     '-r', f'{sample_rate}',     # sample rate
                     '-c', '1',                  # single-channel audio
@@ -126,15 +99,17 @@ def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float,
                     augmented_filename,         # output temp-filename
                     'tempo', f'{tempo:.3f}',    # augment tempo
                     'gain', f'{gain:.3f}',      # augment gain (in db)
-                    'pitch', f'{pitch:.3f}']    # augment pitch (in hundredths of semi-tone)
+                    'pitch', f'{pitch:.0f}']    # augment pitch (in hundredths of semi-tone)
         sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
         
         if use_log: 
             logger.info(f"aug_audio_sox: tmpfile exists: {os.path.exists(augmented_filename)}")
             logger.info(f"aug_audio_sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
             stderr_message = sox_result.stderr.decode('utf-8')
-            if stderr_message != '':
+            if 'FAIL' in stderr_message:
                 logger.error(f"aug_audio_sox: sox stderr: {stderr_message}")
+            else:
+                logger.info(f"aug_audio_sox: sox stderr: {stderr_message}")
   
         
         data, samp_rate = array_from_wave(augmented_filename)
@@ -180,7 +155,7 @@ def inject_noise_sample(data, sample_rate:int, noise_path:str, noise_level:float
         try:
             noise_dst = audio_with_sox(noise_path, sample_rate, noise_start, noise_end, logger)
         except FileNotFoundError as fnf_err:
-            if use_log: logger.info(f"noise_inject: FileNotFoundError: {fnf_err}")
+            if use_log: logger.error(f"noise_inject: FileNotFoundError: {fnf_err}")
             return data
 
         noise_dst = same_size(data, noise_dst)
@@ -210,7 +185,7 @@ def audio_with_sox(path:str, sample_rate:int, start_time:float, end_time:float, 
     use_log = (logger is not None)
     with NamedTemporaryFile(suffix=".wav") as tar_file:
         tar_filename = tar_file.name
-        sox_cmd = ['sox',
+        sox_cmd = ['sox', '-V3',                # verbosity level=3
                     path,                       # noise filename
                     '-r', f'{sample_rate}',     # sample rate
                     '-c', '1',                  # output is single-channel audio
@@ -220,9 +195,14 @@ def audio_with_sox(path:str, sample_rate:int, start_time:float, end_time:float, 
                      'trim', f'{start_time}', '='+f'{end_time}']    # trim to start and end time
         sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        if use_log: logger.info(f"noise_inj_sox: tmpfile exists: {os.path.exists(tar_filename)}")
-        if use_log: logger.info(f"noise_inj_sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
-        if use_log: logger.info(f"noise_inj_sox: sox stderr: {sox_result.stderr.decode('utf-8')}")
+        if use_log: 
+            logger.info(f"noise_inj_sox: tmpfile exists: {os.path.exists(tar_filename)}")
+            logger.info(f"noise_inj_sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
+            stderr_message = sox_result.stderr.decode('utf-8')
+            if 'FAIL' in stderr_message:
+                logger.error(f"aug_audio_sox: sox stderr: {stderr_message}")
+            else:
+                logger.info(f"aug_audio_sox: sox stderr: {stderr_message}")
 
         if os.path.exists(tar_filename):
             noise_data, samp_rate = array_from_wave(tar_filename)

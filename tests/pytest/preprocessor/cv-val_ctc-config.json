@@ -4,18 +4,20 @@
     "data" : {
          "train_set" : "/home/dzubke/awni_speech/data/common-voice/validated-25-maxrepeat.json",
         "dev_set" : "/home/dzubke/awni_speech/data/common-voice/dev.json",
-        "start_and_end" : false
+        "start_and_end" : false,
+        "num_workers": 16
     },
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-04-22_lib-ted-cv.log"
+        "log_file": "logs/2020-04-22_lib-ted-cv.log",
+        "debug_mode":false
     },
     "preproc":{
         "preprocessor": "log_spectrogram",
         "window_size": 32,
         "step_size": 16,
-        "normalize": "sample_normalize",
+        "use_feature_normalize": true,
         "use_spec_augment": true,
         "inject_noise": true,
         "noise_directory": "/home/dzubke/awni_speech/data/noise/feed_to_model",
