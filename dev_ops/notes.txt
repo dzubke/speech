@@ -113,3 +113,38 @@ gcloud compute instances stop phoneme-2
 UUID=1bbeb6dc-649d-4726-863b-2d3e7b8a5550 /mnt/disks/data_disk ext4 ro,discard,suid,dev,exec,auto,nouser,async,nofail,noload 0 2
 
 2020-06-23_ph4-12vCPU-24GB-8wkr-64batch_lib-ted-cv
+
+mkdir -p /home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200624/ph4/
+2020-06-24_ph2_baseline_lib-ted-cv
+
+
+# source: https://www.apoehlmann.com/blog/connecting-tensorboard-your-google-cloud-vm-port-forwarding/
+# connect to tensorboard on VM
+# 1. on VM run:
+nohup tensorboard --logdir=examples/librispeech/models/ctc_models/20200625/ph4/ --port 6004 &
+
+# 2. on local run:
+gcloud compute ssh dzubke@phoneme-5 --zone=us-central1-c --project=speak-ml-dev -- -NfL 6005:localhost:6005
+
+# can kill the tunnel on local by look for process here:
+ps aux | grep ssh
+
+
+
+# installing stackdriver agent
+curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh
+sudo bash add-monitoring-agent-repo.sh
+sudo apt-get update
+
+# see available versions
+sudo apt-cache madison stackdriver-agent
+sudo apt-get install -y 'stackdriver-agent=6.*'
+
+# start stack driver
+sudo service stackdriver-agent start
+
+# verify it works
+sudo service stackdriver-agent status
+
+# examing logs and ensure no errors 
+grep collectd /var/log/{syslog,messages} | tail
