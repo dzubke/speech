@@ -227,6 +227,8 @@ def run(config):
         
         try:
             run_state = run_epoch(model, optimizer, train_ldr, logger, debug_mode, *run_state)
+        except Exception as err:
+             if use_log: logger.error(f"Exception raised: {err}")
         finally: # used to ensure that plots are closed even if exception raised
             plt.close('all')
             if use_log: logger.error(f"train: ====In finally block====")
