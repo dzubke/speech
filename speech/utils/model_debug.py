@@ -49,11 +49,11 @@ def log_model_grads(named_params:NamedParams, logger):
             logger.error(f"log_model_grads: {name}: {params.grad}")
 
 
-def save_batch_log_stats(batch:tuple, logger):
+def save_batch_log_stats(batch:Tuple[List[np.ndarray], List[List[str]]], logger):
     """
     saves the batch to disk and logs a variety of information from a batch. 
     Arguments:
-        batch - tuple(list(np.2darray), list(list)): a tuple of inputs and phoneme labels
+        batch - tuple(list(np.2darray), list(list(str))): a tuple of inputs and phoneme labels
     """
     filename = get_logger_filename(logger) + "_batch.pickle"
     batch_save_path = os.path.join("./saved_batch", filename)
@@ -62,21 +62,21 @@ def save_batch_log_stats(batch:tuple, logger):
 
     if logger is not None:
         # temp_batch is (inputs, labels) so temp_batch[0] is the inputs
-        batch_sample_stds = list(map(np.std, batch[0]))
-        batch_sample_means = list(map(np.mean, batch[0]))
-        batch_sample_maxes = list(map(np.max, batch[0]))
-        batch_sample_mins = list(map(np.min, batch[0]))
-        input_sample_lengths = list(map(lambda x: x.shape[0], batch[0]))
-        label_sample_lengths = list(map(len, batch[1]))
+        batch_feature_stds = list(map(np.std, batch[0]))
+        batch_feature_means = list(map(np.mean, batch[0]))
+        batch_feature_maxes = list(map(np.max, batch[0]))
+        batch_feature_mins = list(map(np.min, batch[0]))
+        input_feature_lengths = list(map(lambda x: x.shape[0], batch[0]))
+        label_lengths = list(map(len, batch[1]))
         stacked_batch = np.vstack(batch[0])
         batch_mean = np.mean(stacked_batch)
         batch_std = np.std(stacked_batch)
 
-        logger.info(f"batch_stats: batch_length: {len(batch[0])}, inputs_length: {input_sample_lengths}, labels_length: {label_sample_lengths}")
-        logger.info(f"batch_stats: batch_sample_mean: {batch_sample_means}")
-        logger.info(f"batch_stats: batch_sample_std: {batch_sample_stds}")
-        logger.info(f"batch_stats: batch_sample_max: {batch_sample_maxes}")
-        logger.info(f"batch_stats: batch_sample_min: {batch_sample_mins}")
+        logger.info(f"batch_stats: batch_length: {len(batch[0])}, inputs_length: {input_feature_lengths}, labels_length: {label_lengths}")
+        logger.info(f"batch_stats: batch_feature_mean: {batch_feature_means}")
+        logger.info(f"batch_stats: batch_feature_std: {batch_feature_stds}")
+        logger.info(f"batch_stats: batch_feature_max: {batch_feature_maxes}")
+        logger.info(f"batch_stats: batch_feature_min: {batch_feature_mins}")
         logger.info(f"batch_stats: batch_mean: {batch_mean}")
         logger.info(f"batch_stats: batch_std: {batch_std}")
 
