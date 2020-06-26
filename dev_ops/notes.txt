@@ -121,10 +121,10 @@ mkdir -p /home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/
 # source: https://www.apoehlmann.com/blog/connecting-tensorboard-your-google-cloud-vm-port-forwarding/
 # connect to tensorboard on VM
 # 1. on VM run:
-nohup tensorboard --logdir=examples/librispeech/models/ctc_models/20200625/ph4/ --port 6004 &
+nohup tensorboard --logdir=examples/librispeech/models/ctc_models/20200625/ph1/ --port 6001 &
 
 # 2. on local run:
-gcloud compute ssh dzubke@phoneme-5 --zone=us-central1-c --project=speak-ml-dev -- -NfL 6005:localhost:6005
+gcloud compute ssh dzubke@phoneme-1 --zone=us-central1-c --project=speak-ml-dev -- -NfL 6001:localhost:6001
 
 # can kill the tunnel on local by look for process here:
 ps aux | grep ssh

@@ -82,6 +82,10 @@ def tempo_gain_pitch_perturb(audio_path:str, sample_rate:int=16000,
     return audio_data, samp_rate 
 
 
+def pysox_augment(audio_path:str):
+    pass
+    #set_globals(self[, dither, guard, …])
+
 def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float, 
                             pitch:float, logger=None)->Tuple[np.ndarray,int]:
     """
