@@ -228,12 +228,13 @@ def run(config):
         try:
             run_state = run_epoch(model, optimizer, train_ldr, logger, debug_mode, *run_state)
         except Exception as err:
-             if use_log: logger.error(f"Exception raised: {err}")
-        finally: # used to ensure that plots are closed even if exception raised
-            plt.close('all')
+            if use_log: logger.error(f"Exception raised: {err}")
             if use_log: logger.error(f"train: ====In finally block====")
             if use_log: logger.error(f"train: state_dict: {model.state_dict()}")
             if use_log: log_model_grads(model.named_parameters(), logger)
+        finally: # used to ensure that plots are closed even if exception raised
+            plt.close('all')
+ 
         
         if use_log: logger.info(f"train: ====== Run_state finished =======") 
         if use_log: logger.info(f"train: preproc type: {type(preproc)}")
