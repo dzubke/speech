@@ -7,7 +7,7 @@
 from datetime import datetime, date
 import os
 import pickle
-from typing import Generator, Iterable, Tuple
+from typing import Generator, Iterable, Tuple, List
 # third-party libraries
 from graphviz import Digraph
 from matplotlib.lines import Line2D
