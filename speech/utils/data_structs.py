@@ -1,4 +1,7 @@
-from typing import Tuple, Iterable
+# standard libraries
+from typing import Tuple, Iterable, List
+# third-party libraries
+import numpy as np
 import torch
 
 # used to specify a range of values within which a single value will be uniformly selected
@@ -6,4 +9,10 @@ import torch
 AugmentRange = Tuple[float, float]
 
 # output from torch.model.named_parameters()
-NamedParams = Iterable[Tuple[str, torch.nn.parameter.Parameter]]
+TorchNamedParams = Iterable[Tuple[str, torch.nn.parameter.Parameter]]
+
+# output of torch.model.parameters()
+TorchParams = Iterable[torch.nn.parameter.Parameter]
+
+# batches from the dataloader
+Batch = Tuple[List[np.ndarray], List[List[str]]]

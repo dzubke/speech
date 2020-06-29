@@ -6,4 +6,4 @@ mkdir ./examples/librispeech/models/ctc_models/$1/$2
 
 cp ./examples/librispeech/models/ctc_models/$1/* ./examples/librispeech/models/ctc_models/$1/$2
 
-bash eval.sh $1 $2 $3
+bash ./dev_ops/eval.sh $1 $2 $3

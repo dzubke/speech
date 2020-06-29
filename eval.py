@@ -61,10 +61,10 @@ def run(model_path, dataset_json, batch_size=1, tag="best",
             preproc, batch_size)
     model.cuda() if use_cuda else model.cpu()
     model.set_eval()
-    print(f"spec_augment before set_eval: {preproc.spec_augment}")
+    print(f"preproc train_status before set_eval: {preproc.train_status}")
     preproc.set_eval()
     preproc.use_log = False
-    print(f"spec_augment after set_eval: {preproc.spec_augment}")
+    print(f"preproc train_status after set_eval: {preproc.train_status}")
 
 
     results = eval_loop(model, ldr)
