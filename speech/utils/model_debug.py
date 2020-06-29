@@ -5,9 +5,10 @@
 
 # standard libraries
 from datetime import datetime, date
+from logging import Logger
 import os
 import pickle
-from typing import Generator, Iterable, Tuple
+from typing import Generator, Iterable, Tuple, List
 # third-party libraries
 from graphviz import Digraph
 from matplotlib.lines import Line2D
@@ -17,14 +18,14 @@ import psutil
 import torch
 from torch.autograd import Variable, Function
 # project libraries
-from speech.utils.data_structs import NamedParams
+from speech.utils.data_structs import TorchNamedParams, TorchParams, Batch
 
 
-def check_nan(model_params:Generator):
+def check_nan(model_params:TorchParams)->bool:
     """
     checks an iterator of model parameters and gradients if any of them have nan values
     Arguments:
-        model_params - Generator[torch.nn.parameter.Parameter]: output of model.parameters()
+        model_params - Iterable[torch.nn.parameter.Parameter]: output of model.parameters()
     """
     for param in model_params:
         # checks all parameters for NaN (param!=param is NaN check)
@@ -38,7 +39,7 @@ def check_nan(model_params:Generator):
 
 
 
-def log_model_grads(named_params:NamedParams, logger):
+def log_model_grads(named_params:TorchNamedParams, logger:Logger)->None:
     """
     records the gradient values of the parameters in the model
     Arguments:
@@ -49,11 +50,11 @@ def log_model_grads(named_params:NamedParams, logger):
             logger.error(f"log_model_grads: {name}: {params.grad}")
 
 
-def save_batch_log_stats(batch:tuple, logger):
+def save_batch_log_stats(batch:Batch, logger:Logger)->None:
     """
     saves the batch to disk and logs a variety of information from a batch. 
     Arguments:
-        batch - tuple(list(np.2darray), list(list)): a tuple of inputs and phoneme labels
+        batch - tuple(list(np.2darray), list(list(str))): a tuple of inputs and phoneme labels
     """
     filename = get_logger_filename(logger) + "_batch.pickle"
     batch_save_path = os.path.join("./saved_batch", filename)
@@ -62,26 +63,37 @@ def save_batch_log_stats(batch:tuple, logger):
 
     if logger is not None:
         # temp_batch is (inputs, labels) so temp_batch[0] is the inputs
-        batch_sample_stds = list(map(np.std, batch[0]))
-        batch_sample_means = list(map(np.mean, batch[0]))
-        batch_sample_maxes = list(map(np.max, batch[0]))
-        batch_sample_mins = list(map(np.min, batch[0]))
-        input_sample_lengths = list(map(lambda x: x.shape[0], batch[0]))
-        label_sample_lengths = list(map(len, batch[1]))
+        batch_feature_stds = list(map(np.std, batch[0]))
+        batch_feature_means = list(map(np.mean, batch[0]))
+        batch_feature_maxes = list(map(np.max, batch[0]))
+        batch_feature_mins = list(map(np.min, batch[0]))
+        input_feature_lengths = list(map(lambda x: x.shape[0], batch[0]))
+        label_lengths = list(map(len, batch[1]))
         stacked_batch = np.vstack(batch[0])
         batch_mean = np.mean(stacked_batch)
         batch_std = np.std(stacked_batch)
 
-        logger.info(f"batch_stats: batch_length: {len(batch[0])}, inputs_length: {input_sample_lengths}, labels_length: {label_sample_lengths}")
-        logger.info(f"batch_stats: batch_sample_mean: {batch_sample_means}")
-        logger.info(f"batch_stats: batch_sample_std: {batch_sample_stds}")
-        logger.info(f"batch_stats: batch_sample_max: {batch_sample_maxes}")
-        logger.info(f"batch_stats: batch_sample_min: {batch_sample_mins}")
+        # error checks for std values nearly zero and for nan values
+        if any([math.isclose(std, 0, abs_tol=1e-6) for std in batch_feature_stds]):
+            logger.error(f"batch_stats: batch_std is nearly zero in {batch_feature_stds}")
+            raise ValueError("batch std value is nearly zero")
+        if any(np.isnan(batch_feature_means)):
+            logger.error(f"batch_stats: batch_mean is NaN in {batch_feature_means}"):
+            raise ValueError("NaN value in batch_means")
+        if any(np.isnan(batch_feature_stds)):
+            logger.error(f"batch_stats: batch_std is NaN in {batch_feature_stds}"):
+            raise ValueError("NaN value in batch_stds")
+
+        logger.info(f"batch_stats: batch_length: {len(batch[0])}, inputs_length: {input_feature_lengths}, labels_length: {label_lengths}")
+        logger.info(f"batch_stats: batch_feature_mean: {batch_feature_means}")
+        logger.info(f"batch_stats: batch_feature_std: {batch_feature_stds}")
+        logger.info(f"batch_stats: batch_feature_max: {batch_feature_maxes}")
+        logger.info(f"batch_stats: batch_feature_min: {batch_feature_mins}")
         logger.info(f"batch_stats: batch_mean: {batch_mean}")
         logger.info(f"batch_stats: batch_std: {batch_std}")
 
 
-def log_batchnorm_mean_std(state_dict:dict, logger):
+def log_batchnorm_mean_std(state_dict:dict, logger:Logger)->None:
     """
     logs the running mean and variance of the batch_norm layers.
     Both the running mean and variance have the word "running" in the name which is
@@ -95,7 +107,7 @@ def log_batchnorm_mean_std(state_dict:dict, logger):
             logger.info(f"batch_norm_mean_var: {name}: {values}")
 
 
-def log_param_grad_norms(named_parameters:NamedParams, logger)->None:
+def log_param_grad_norms(named_parameters:TorchNamedParams, logger:Logger)->None:
     """
     Calculates and logs the norm of the gradients of the parameters
     and the norm of all the gradients together.
@@ -114,14 +126,13 @@ def log_param_grad_norms(named_parameters:NamedParams, logger)->None:
     logger.info(f"param_grad_norm: total_norm: {total_norm}")        
         
 
-def get_logger_filename(logger)->str:
+def get_logger_filename(logger:Logger)->str:
     """
     Returns the filename of the logger
     """
     basename, filename = os.path.split(logger.handlers[0].baseFilename)
     filename, ext = os.path.splitext(filename)
     return filename
-
 
 
 def format_bytes(bytes, suffix="B"):
@@ -138,7 +149,7 @@ def format_bytes(bytes, suffix="B"):
             return f"{bytes:.2f}{unit}{suffix}"
         bytes /= factor
 
-def log_cpu_mem_disk_usage(logger)->None:
+def log_cpu_mem_disk_usage(logger:Logger)->None:
     """
     Logs the certain metrics on the current  cpu, memory, disk usage
 
@@ -176,7 +187,7 @@ def log_cpu_mem_disk_usage(logger)->None:
 # plot_grad_flow comes from this post:
 # https://discuss.pytorch.org/t/check-gradient-flow-in-network/15063/7
 
-def plot_grad_flow_line(named_parameters):
+def plot_grad_flow_line(named_parameters:TorchNamedParams)->None:
     ave_grads = []
     layers = []
     for n, p in named_parameters:
@@ -196,7 +207,7 @@ def plot_grad_flow_line(named_parameters):
     # clears and closes the figure so memory doesn't overfill
     plt.close('all')
 
-def plot_grad_flow_bar(named_parameters:NamedParams, filename:str="grad_flow_bar.png"):
+def plot_grad_flow_bar(named_parameters:TorchNamedParams, filename:str="grad_flow_bar.png"):
     '''
     Plots the gradients flowing through different layers in the net during training.
     Can be used for checking for possible gradient vanishing / exploding problems.

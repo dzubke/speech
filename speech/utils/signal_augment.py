@@ -12,7 +12,6 @@ import librosa
 import numpy as np
 # project libraries
 from speech.utils.wave import array_from_wave, array_to_wave, wav_duration
-from speech.utils.convert import pcm2float, float2pcm
 from speech.utils.data_structs import AugmentRange
 
 
@@ -82,6 +81,10 @@ def tempo_gain_pitch_perturb(audio_path:str, sample_rate:int=16000,
     return audio_data, samp_rate 
 
 
+def pysox_augment(audio_path:str):
+    pass
+    #set_globals(self[, dither, guard, …])
+
 def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float, 
                             pitch:float, logger=None)->Tuple[np.ndarray,int]:
     """
@@ -96,6 +99,7 @@ def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float,
                     '-c', '1',                  # single-channel audio
                     '-b', '16',                 # bitrate = 16
                     '-e', 'si',                 # encoding = signed-integer
+                    '-t', 'wav',                # the output file is wav type
                     augmented_filename,         # output temp-filename
                     'tempo', f'{tempo:.3f}',    # augment tempo
                     'gain', f'{gain:.3f}',      # augment gain (in db)
@@ -191,6 +195,7 @@ def audio_with_sox(path:str, sample_rate:int, start_time:float, end_time:float, 
                     '-c', '1',                  # output is single-channel audio
                     '-b', '16',                 # bitrate = 16
                     '-e', 'si',                 # encoding = signed-integer
+                    '-t', 'wav',                # the output file is wav type
                     tar_filename,               # output temp-filename
                      'trim', f'{start_time}', '='+f'{end_time}']    # trim to start and end time
         sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
