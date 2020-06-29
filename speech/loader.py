@@ -230,20 +230,10 @@ class Preprocessor():
         return len(self.int_to_char)
 
     def __str__(self):
-        try: 
-            attribute_names = ["preprocessor", "window_size", "step_size", "SPEC_AUGMENT_STATIC", "spec_augment",
-            "INJECT_NOISE_STATIC", "inject_noise", "noise_dir", "noise_prob", "noise_levels", "_input_dim", 
-            "start_and_end", "int_to_char", "char_to_int"]
-            string="Showing up-to-date attributes"
-            for name in attribute_names:
-                string += "\n" + name + ": " + str(eval("self."+name))
-            return string
-        except AttributeError:
-            attribute_names = ["_input_dim", "start_and_end", "int_to_char", "char_to_int"]
-            string="Showing limited attributes as not all new attributes are supported\n"
-            for name in attribute_names:
-                string += "\n" + name +": " + str(eval("self."+name))
-            return string
+        string = str()
+        for name, value in vars(self).items():
+            string += f"\n{name}: {value}"
+        return string
 
 
 
