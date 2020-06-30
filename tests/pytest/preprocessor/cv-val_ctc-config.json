@@ -2,8 +2,8 @@
     "seed" : 2017,
     "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200422/",
     "data" : {
-         "train_set" : "/home/dzubke/awni_speech/data/common-voice/validated-25-maxrepeat.json",
-        "dev_set" : "/home/dzubke/awni_speech/data/common-voice/dev.json",
+         "train_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/validated-25-maxrepeat.json",
+        "dev_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/dev.json",
         "start_and_end" : false,
         "num_workers": 16
     },
@@ -20,7 +20,7 @@
         "use_feature_normalize": true,
         "use_spec_augment": true,
         "inject_noise": true,
-        "noise_directory": "/home/dzubke/awni_speech/data/noise/feed_to_model",
+        "noise_directory": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model",
         "noise_prob": 0.7,
         "noise_levels": [0,0.7], 
         "tempo_gain_pitch_perturb":true, 
