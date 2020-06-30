@@ -151,7 +151,7 @@ def format_bytes(bytes, suffix="B"):
 
 def log_cpu_mem_disk_usage(logger:Logger)->None:
     """
-    Logs the certain metrics on the current  cpu, memory, disk usage
+    Logs the certain metrics on the current cpu, memory, disk, and CPU usage
 
     Code adapted from: https://www.thepythoncode.com/article/get-hardware-system-information-python
     """
