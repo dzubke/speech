@@ -10,7 +10,7 @@
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-06-25_ph3_no-feature-normalize_lib-ted-cv.log",
+        "log_file": "logs/2020-06-25-27_ph3_no-feature-normalize_lib-ted-cv.log",
         "debug_mode":false
     },
     "preproc":{
@@ -32,7 +32,7 @@
     },
 
     "optimizer": {
-        "batch_size" : 8,
+        "batch_size" : 16,
         "epochs" : 100,
         "learning_rate" : 8e-4,
         "momentum" : 0.9, 
@@ -44,8 +44,8 @@
     "model" : {
         "class" : "this value is no longer used as train.py is hardcorded to use CTC_train",
         "dropout" : 0.4,
-        "load_trained": false,
-        "trained_path": "examples/librispeech/models/ctc_models/null/", 
+        "load_trained": true,
+        "trained_path": "examples/librispeech/models/ctc_models/20200625/ph3/20200626/best_model", 
         "remove_layers": [],
         "encoder" : {
             "conv" : [
