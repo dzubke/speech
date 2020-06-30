@@ -185,8 +185,11 @@ def run(config):
                   start_and_end=data_cfg["start_and_end"])
     train_ldr = loader.make_loader(data_cfg["train_set"],
                         preproc, batch_size, num_workers=data_cfg["num_workers"])
-    dev_ldr = loader.make_loader(data_cfg["dev_set"],
+    dev_ldr_dict = dict() # dict that includes all the dev_loaders
+    for dev_name, dev_path in data_cfg["dev_sets"].items():
+        dev_ldr = loader.make_loader(dev_path,
                         preproc, batch_size, num_workers=data_cfg["num_workers"])
+        dev_ldr_dict.update({dev_name: dev_ldr})
 
     # Model
     model = CTC_train(preproc.input_dim,
@@ -244,25 +247,30 @@ def run(config):
         print(msg.format(epoch, time.time() - start))
         if use_log: logger.info(msg.format(epoch, time.time() - start))
 
+        # the logger needs to be removed to save the model
         if use_log: preproc.logger = None
         speech.save(model, preproc, config["save_path"])
         if use_log: logger.info(f"train: ====== model saved =======")
         if use_log: preproc.logger = logger
+        
+        for dev_name, dev_ldr in dev_ldr_dict.items():
+            dev_loss, dev_cer = eval_dev(model, dev_ldr, preproc, logger)
+            if use_log: logger.info(f"train: ====== eval_dev {dev_name} finished =======")
 
-        dev_loss, dev_cer = eval_dev(model, dev_ldr, preproc, logger)
-        if use_log: logger.info(f"train: ====== eval_dev finished =======")
-
-        # Log for tensorboard
-        tb.log_value("dev_loss", dev_loss, epoch)
-        tb.log_value("dev_cer", dev_cer, epoch)
+            # Log for tensorboard
+            tb.log_value(f"{dev_name}_loss", dev_loss, epoch)
+            tb.log_value(f"{dev_name}_per", dev_cer, epoch)
            
-        if use_log: preproc.logger = None 
-        # Save the best model on the dev set
-        if dev_cer < best_so_far:
-            best_so_far = dev_cer
-            speech.save(model, preproc,
-                    config["save_path"], tag="best")
-        if use_log: preproc.logger = logger
+            # Save the best model on the dev set
+            if dev_name == data_cfg['dev_set_save_reference']:
+                if dev_cer < best_so_far:
+                    print(f"model saved based per on: {data_cfg['dev_set_save_reference']} dataset")
+                    logger.info(f"model saved based per on: {data_cfg['dev_set_save_reference']} dataset")
+                    if use_log: preproc.logger = None 
+                    best_so_far = dev_cer
+                    speech.save(model, preproc,
+                            config["save_path"], tag="best")
+                    if use_log: preproc.logger = logger
 
 
 def load_from_trained(model, model_cfg):
