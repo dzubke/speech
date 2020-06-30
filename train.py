@@ -219,11 +219,12 @@ def run(config):
 
     run_state = (0, 0)
     best_so_far = float("inf")
-    for e in range(opt_cfg["epochs"]):
+    for epoch in range(opt_cfg["epochs"]):
+        if use_log: logger.error(f"Starting epoch: {epoch}")
         start = time.time()
         scheduler.step()
-        for g in optimizer.param_groups:
-            print(f'learning rate: {g["lr"]}')
+        for group in optimizer.param_groups:
+            print(f'learning rate: {group["lr"]}')
         
         try:
             run_state = run_epoch(model, optimizer, train_ldr, logger, debug_mode, *run_state)
@@ -240,8 +241,8 @@ def run(config):
         if use_log: logger.info(f"train: preproc type: {type(preproc)}")
 
         msg = "Epoch {} completed in {:.2f} (s)."
-        print(msg.format(e, time.time() - start))
-        if use_log: logger.info(msg.format(e, time.time() - start))
+        print(msg.format(epoch, time.time() - start))
+        if use_log: logger.info(msg.format(epoch, time.time() - start))
 
         if use_log: preproc.logger = None
         speech.save(model, preproc, config["save_path"])
@@ -252,8 +253,8 @@ def run(config):
         if use_log: logger.info(f"train: ====== eval_dev finished =======")
 
         # Log for tensorboard
-        tb.log_value("dev_loss", dev_loss, e)
-        tb.log_value("dev_cer", dev_cer, e)
+        tb.log_value("dev_loss", dev_loss, epoch)
+        tb.log_value("dev_cer", dev_cer, epoch)
            
         if use_log: preproc.logger = None 
         # Save the best model on the dev set
