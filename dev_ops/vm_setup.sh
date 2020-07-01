@@ -50,6 +50,21 @@ while read requirement; do conda install --yes $requirement || pip install $requ
 
 #Cuda 10
 echo "installing CUDA" >> ~/setup_log.txt
+# cuda 10.0
+# curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_10.0.130-1_amd64.deb
+# sudo dpkg -i cuda-repo-ubuntu1604_10.0.130-1_amd64.deb
+# sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
+# sudo apt-get -y update
+# sudo apt-get -y install cuda
+# rm ~/awni_speech/speech/cuda-repo-ubuntu1604_10.0.130-1_amd64.deb
+
+# cuda 10.2
+# wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-ubuntu1604.pin
+# sudo mv cuda-ubuntu1604.pin /etc/apt/preferences.d/cuda-repository-pin-600
+# sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
+# sudo add-apt-repository "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/ /"
+# sudo apt-get update
+# sudo apt-get install -y cuda=10.2.89-1
 
 # cuda 10.0
 curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_10.0.130-1_amd64.deb
@@ -61,7 +76,7 @@ sudo apt-get install -y cuda=10.0.130-1
 
 
 # 15. install linux packages
-sudo apt-get -y install ffmpeg sox vim
+sudo apt-get -y install ffmpeg sox soxi vim
 echo 'set tabstop=8 softtabstop=0 expandtab shiftwidth=4 smarttab' >> ~/.vimrc
 
 
@@ -101,9 +116,6 @@ alias ..2="cd ../.."
 
 alias ..3="cd ../../.."
 
-alias rl="readlink -f"
-
-alias watchc="watch -d -n 0.3"
-' >> ~/.bashrc
+alias rl="readlink -f"' >> ~/.bashrc
 
 echo "setup complete" >> ~/setup_log.txt
