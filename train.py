@@ -292,6 +292,7 @@ def run(config):
         train_state = {"next_epoch": epoch+1, "run_state": run_state}
         write_pickle(os.path.join(config["save_path"], "train_state.pickle"), train_state)
 
+
 def load_from_trained(model, model_cfg):
     """
     loads the model with pretrained weights from the model in
