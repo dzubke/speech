@@ -262,9 +262,10 @@ def run(config):
             dev_loss, dev_cer = eval_dev(model, dev_ldr, preproc, logger)
             if use_log: logger.info(f"train: ====== eval_dev {dev_name} finished =======")
 
+        # creating the dictionaries that hold the PER and loss values
         dev_loss_dict = dict()
         dev_per_dict = dict()
-
+        # iterating through the dev-set loaders to calculate the PER/loss
         for dev_name, dev_ldr in dev_ldr_dict.items():
             dev_loss, dev_per = eval_dev(model, dev_ldr, preproc, logger)
 

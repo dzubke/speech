@@ -40,7 +40,7 @@
     "optimizer": {
         "batch_size" : 8,
         "run_state": [97700, 261],
-        "best_so_far": 0.706,
+        "best_so_far": 999,
         "start_epoch": 1,
         "epochs" : 100,
         "learning_rate" : 8e-4,
