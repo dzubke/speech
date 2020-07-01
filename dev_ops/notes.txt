@@ -153,5 +153,4 @@ grep collectd /var/log/{syslog,messages} | tail
 
 /mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json
 
-
-/mnt/disks/data_disk/home/dzubke
+2020-06-25-27_ph3_no-feature-normalize_lib-ted-cv
