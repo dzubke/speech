@@ -225,15 +225,9 @@ def run(config):
     print(f"preproc: {preproc}")
     print(f"optimizer: {optimizer}")
 
-<<<<<<< HEAD
     run_state = opt_cfg["run_state"]
     best_so_far = opt_cfg["best_so_far"]
     for epoch in range(opt_cfg["start_epoch"], opt_cfg["epochs"]):
-=======
-    run_state = (0, 0)
-    best_so_far = float("inf")
-    for epoch in range(opt_cfg["epochs"]):
->>>>>>> 7e0cff5df7910f1be73870aa0a089972d3309959
         if use_log: logger.error(f"Starting epoch: {epoch}")
         start = time.time()
         scheduler.step()
@@ -268,7 +262,6 @@ def run(config):
             dev_loss, dev_cer = eval_dev(model, dev_ldr, preproc, logger)
             if use_log: logger.info(f"train: ====== eval_dev {dev_name} finished =======")
 
-<<<<<<< HEAD
         dev_loss_dict = dict()
         dev_per_dict = dict()
 
@@ -297,23 +290,7 @@ def run(config):
         # save the current state of training
         train_state = {"next_epoch": epoch+1, "run_state": run_state}
         write_pickle(os.path.join(config["save_path"], "train_state.pickle"), train_state)
-=======
-            # Log for tensorboard
-            tb.log_value(f"{dev_name}_loss", dev_loss, epoch)
-            tb.log_value(f"{dev_name}_per", dev_cer, epoch)
-           
-            # Save the best model on the dev set
-            if dev_name == data_cfg['dev_set_save_reference']:
-                if dev_cer < best_so_far:
-                    print(f"model saved based per on: {data_cfg['dev_set_save_reference']} dataset")
-                    logger.info(f"model saved based per on: {data_cfg['dev_set_save_reference']} dataset")
-                    if use_log: preproc.logger = None 
-                    best_so_far = dev_cer
-                    speech.save(model, preproc,
-                            config["save_path"], tag="best")
-                    if use_log: preproc.logger = logger
 
->>>>>>> 7e0cff5df7910f1be73870aa0a089972d3309959
 
 def load_from_trained(model, model_cfg):
     """
