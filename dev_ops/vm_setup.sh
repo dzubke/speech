@@ -82,8 +82,6 @@ sudo apt-get -y install make
 sudo apt-get -y install cmake
 make
 
-cmake ../ && make; cd ../pytorch_binding; python build.py
-
 # add the data disk to the /etc/fstab file
 sudo mkdir -p /mnt/disks/data_disk
 echo UUID=`sudo blkid -s UUID -o value /dev/sdb1` /mnt/disks/data_disk ext4 ro,discard,suid,dev,exec,auto,nouser,async,nofail,noload 0 2 | sudo tee -a /etc/fstab
