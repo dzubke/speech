@@ -5,6 +5,7 @@ from __future__ import print_function
 # standard libraries
 import argparse
 from collections import OrderedDict
+import os
 import itertools
 import json
 import logging
@@ -14,6 +15,7 @@ import time
 # third-party libraries
 import matplotlib.pyplot as plt
 import numpy as np
+from tensorboardX import SummaryWriter
 import torch
 import torch.nn as nn
 import torch.optim
@@ -22,6 +24,7 @@ import tqdm
 import speech
 import speech.loader as loader
 from speech.models.ctc_model_train import CTC_train
+from speech.utils.io import write_pickle
 from speech.utils.model_debug import check_nan, log_model_grads, plot_grad_flow_line, plot_grad_flow_bar
 from speech.utils.model_debug import save_batch_log_stats, log_batchnorm_mean_std, log_param_grad_norms
 from speech.utils.model_debug import get_logger_filename, log_cpu_mem_disk_usage
@@ -30,7 +33,7 @@ import tensorboard_logger as tb
 
 
 
-def run_epoch(model, optimizer, train_ldr, logger, debug_mode, iter_count, avg_loss):
+def run_epoch(model, optimizer, train_ldr, logger, debug_mode, tbX_writer, iter_count, avg_loss):
     """
     Performs a forwards and backward pass through the model
     Arguments
@@ -88,7 +91,7 @@ def run_epoch(model, optimizer, train_ldr, logger, debug_mode, iter_count, avg_l
         exp_w = 0.99
         avg_loss = exp_w * avg_loss + (1 - exp_w) * loss
         if use_log: logger.info(f"train: Avg loss: {avg_loss}")
-        tb.log_value('train_loss', loss, iter_count)
+        tbX_writer.add_scalars('train', {"loss":loss}, iter_count)
         tq.set_postfix(iter=iter_count, loss=loss, 
                 avg_loss=avg_loss, grad_norm=grad_norm,
                 model_time=model_t, data_time=data_t)
@@ -179,6 +182,8 @@ def run(config):
     else:
         logger = None
 
+    tbX_writer = SummaryWriter(logdir=config["save_path"])
+
     # Loaders
     batch_size = opt_cfg["batch_size"]
     preproc = loader.Preprocessor(data_cfg["train_set"], preproc_cfg, logger, 
@@ -220,9 +225,9 @@ def run(config):
     print(f"preproc: {preproc}")
     print(f"optimizer: {optimizer}")
 
-    run_state = (0, 0)
-    best_so_far = float("inf")
-    for epoch in range(opt_cfg["epochs"]):
+    run_state = opt_cfg["run_state"]
+    best_so_far = opt_cfg["best_so_far"]
+    for epoch in range(opt_cfg["start_epoch"], opt_cfg["epochs"]):
         if use_log: logger.error(f"Starting epoch: {epoch}")
         start = time.time()
         scheduler.step()
@@ -230,7 +235,7 @@ def run(config):
             print(f'learning rate: {group["lr"]}')
         
         try:
-            run_state = run_epoch(model, optimizer, train_ldr, logger, debug_mode, *run_state)
+            run_state = run_epoch(model, optimizer, train_ldr, logger, debug_mode, tbX_writer, *run_state)
         except Exception as err:
             if use_log: logger.error(f"Exception raised: {err}")
             if use_log: logger.error(f"train: ====In finally block====")
@@ -257,21 +262,35 @@ def run(config):
             dev_loss, dev_cer = eval_dev(model, dev_ldr, preproc, logger)
             if use_log: logger.info(f"train: ====== eval_dev {dev_name} finished =======")
 
-            # Log for tensorboard
-            tb.log_value(f"{dev_name}_loss", dev_loss, epoch)
-            tb.log_value(f"{dev_name}_per", dev_cer, epoch)
-           
+        # creating the dictionaries that hold the PER and loss values
+        dev_loss_dict = dict()
+        dev_per_dict = dict()
+        # iterating through the dev-set loaders to calculate the PER/loss
+        for dev_name, dev_ldr in dev_ldr_dict.items():
+            dev_loss, dev_per = eval_dev(model, dev_ldr, preproc, logger)
+
+            dev_loss_dict.update({dev_name: dev_loss})
+            dev_per_dict.update({dev_name: dev_per})
+
+            if use_log: logger.info(f"train: ====== eval_dev {dev_name} finished =======")
+            
             # Save the best model on the dev set
             if dev_name == data_cfg['dev_set_save_reference']:
-                if dev_cer < best_so_far:
+                if dev_per < best_so_far:
                     print(f"model saved based per on: {data_cfg['dev_set_save_reference']} dataset")
                     logger.info(f"model saved based per on: {data_cfg['dev_set_save_reference']} dataset")
                     if use_log: preproc.logger = None 
-                    best_so_far = dev_cer
+                    best_so_far = dev_per
                     speech.save(model, preproc,
                             config["save_path"], tag="best")
                     if use_log: preproc.logger = logger
+            
+        tbX_writer.add_scalars('dev/loss', dev_loss_dict, epoch)
+        tbX_writer.add_scalars('dev/per', dev_per_dict, epoch)
 
+        # save the current state of training
+        train_state = {"next_epoch": epoch+1, "run_state": run_state}
+        write_pickle(os.path.join(config["save_path"], "train_state.pickle"), train_state)
 
 def load_from_trained(model, model_cfg):
     """

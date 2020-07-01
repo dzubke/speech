@@ -6,7 +6,6 @@
         "dev_sets" : {
                     "speak": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json",
                     "cv": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/dev.json",
-                    "libsp": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
                     "ted": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/dev.json"
         },
         "dev_set_save_reference": "cv",
@@ -39,6 +38,9 @@
 
     "optimizer": {
         "batch_size" : 16,
+        "run_state": [1000, 250],
+        "best_so_far": 0.706, 
+        "start_epoch": 10,
         "epochs" : 100,
         "learning_rate" : 8e-4,
         "momentum" : 0.9, 
