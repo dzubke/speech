@@ -238,7 +238,7 @@ def run(config):
             run_state = run_epoch(model, optimizer, train_ldr, logger, debug_mode, tbX_writer, *run_state)
         except Exception as err:
             if use_log: logger.error(f"Exception raised: {err}")
-            if use_log: logger.error(f"train: ====In finally block====")
+            if use_log: logger.error(f"train: ====In exceptt block====")
             if use_log: logger.error(f"train: state_dict: {model.state_dict()}")
             if use_log: log_model_grads(model.named_parameters(), logger)
         finally: # used to ensure that plots are closed even if exception raised
@@ -262,9 +262,10 @@ def run(config):
             dev_loss, dev_cer = eval_dev(model, dev_ldr, preproc, logger)
             if use_log: logger.info(f"train: ====== eval_dev {dev_name} finished =======")
 
+        # creating the dictionaries that hold the PER and loss values
         dev_loss_dict = dict()
         dev_per_dict = dict()
-
+        # iterating through the dev-set loaders to calculate the PER/loss
         for dev_name, dev_ldr in dev_ldr_dict.items():
             dev_loss, dev_per = eval_dev(model, dev_ldr, preproc, logger)
 
@@ -290,6 +291,7 @@ def run(config):
         # save the current state of training
         train_state = {"next_epoch": epoch+1, "run_state": run_state}
         write_pickle(os.path.join(config["save_path"], "train_state.pickle"), train_state)
+
 
 def load_from_trained(model, model_cfg):
     """
