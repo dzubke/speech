@@ -78,10 +78,10 @@ def save_batch_log_stats(batch:Batch, logger:Logger)->None:
             logger.error(f"batch_stats: batch_std is nearly zero in {batch_feature_stds}")
             raise ValueError("batch std value is nearly zero")
         if any(np.isnan(batch_feature_means)):
-            logger.error(f"batch_stats: batch_mean is NaN in {batch_feature_means}"):
+            logger.error(f"batch_stats: batch_mean is NaN in {batch_feature_means}")
             raise ValueError("NaN value in batch_means")
         if any(np.isnan(batch_feature_stds)):
-            logger.error(f"batch_stats: batch_std is NaN in {batch_feature_stds}"):
+            logger.error(f"batch_stats: batch_std is NaN in {batch_feature_stds}")
             raise ValueError("NaN value in batch_stds")
 
         logger.info(f"batch_stats: batch_length: {len(batch[0])}, inputs_length: {input_feature_lengths}, labels_length: {label_lengths}")
@@ -151,7 +151,7 @@ def format_bytes(bytes, suffix="B"):
 
 def log_cpu_mem_disk_usage(logger:Logger)->None:
     """
-    Logs the certain metrics on the current  cpu, memory, disk usage
+    Logs the certain metrics on the current cpu, memory, disk, and CPU usage
 
     Code adapted from: https://www.thepythoncode.com/article/get-hardware-system-information-python
     """
