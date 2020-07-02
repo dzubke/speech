@@ -120,13 +120,14 @@ mkdir -p /home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/
 # source: https://www.apoehlmann.com/blog/connecting-tensorboard-your-google-cloud-vm-port-forwarding/
 # connect to tensorboard on VM
 # 1. on VM run:
-nohup tensorboard --logdir=examples/librispeech/models/ctc_models/20200625/ph3/ --port 6003 &
+nohup tensorboard --logdir=examples/librispeech/models/ctc_models/20200625/ph1/ --port 6006 &
 
 # 2. on local run:
-gcloud compute ssh dzubke@phoneme-5 --zone=us-central1-c --project=speak-ml-dev -- -NfL 6005:localhost:6005
+gcloud compute ssh dzubke@phoneme-2 --zone=us-central1-c --project=speak-ml-dev -- -NfL 6002:localhost:6002
 
 # can kill the tunnel on local by look for process here:
-ps aux | grep ssh
+ps aux | grep tensorboard
+
 
 
 
@@ -148,9 +149,11 @@ sudo service stackdriver-agent status
 # examing logs and ensure no errors 
 grep collectd /var/log/{syslog,messages} | tail
 
+/mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json
+/mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json
+
+/mnt/disks/data_disk/home/dzubke
+
+
 # github password
 9!l2&YQCydRAkhr1f6%x
-
-/mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json
-
-2020-06-25-27_ph3_no-feature-normalize_lib-ted-cv
