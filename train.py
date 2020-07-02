@@ -259,6 +259,7 @@ def run(config):
             if use_log: logger.error(f"train: ====In exceptt block====")
             if use_log: logger.error(f"train: state_dict: {model.state_dict()}")
             if use_log: log_model_grads(model.named_parameters(), logger)
+            raise Exception('Failure in run_epoch').with_traceback(err.__traceback__)
         finally: # used to ensure that plots are closed even if exception raised
             plt.close('all')
  
@@ -285,7 +286,6 @@ def run(config):
         for dev_name, dev_ldr in dev_ldr_dict.items():
             print(f"evaluating devset: {dev_name}")
             if use_log: logger.info(f"train: === evaluating devset: {dev_name} ==")
-
             dev_loss, dev_per = eval_dev(model, dev_ldr, preproc, logger)
 
             dev_loss_dict.update({dev_name: dev_loss})
@@ -296,13 +296,14 @@ def run(config):
             # Save the best model on the dev set
             if dev_name == data_cfg['dev_set_save_reference']:
                 if dev_per < best_so_far:
-                    print(f"model saved based per on: {data_cfg['dev_set_save_reference']} dataset")
-                    logger.info(f"model saved based per on: {data_cfg['dev_set_save_reference']} dataset")
                     if use_log: preproc.logger = None   # remove the logger to save the model
                     best_so_far = dev_per
                     speech.save(model, preproc,
                             config["save_path"], tag="best")
                     if use_log: preproc.logger = logger
+                    
+                    print(f"model saved based per on: {data_cfg['dev_set_save_reference']} dataset")
+                    logger.info(f"model saved based per on: {data_cfg['dev_set_save_reference']} dataset")
             
         tbX_writer.add_scalars('dev/loss', dev_loss_dict, epoch)
         tbX_writer.add_scalars('dev/per', dev_per_dict, epoch)
