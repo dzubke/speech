@@ -131,23 +131,7 @@ ps aux | grep tensorboard
 
 
 
-# installing stackdriver agent
-curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh
-sudo bash add-monitoring-agent-repo.sh
-sudo apt-get update
 
-# see available versions
-sudo apt-cache madison stackdriver-agent
-sudo apt-get install -y 'stackdriver-agent=6.*'
-
-# start stack driver
-sudo service stackdriver-agent start
-
-# verify it works
-sudo service stackdriver-agent status
-
-# examing logs and ensure no errors 
-grep collectd /var/log/{syslog,messages} | tail
 
 /mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json
 /mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json
@@ -157,3 +141,6 @@ grep collectd /var/log/{syslog,messages} | tail
 
 # github password
 9!l2&YQCydRAkhr1f6%x
+
+
+* logger.info at 223
