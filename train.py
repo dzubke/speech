@@ -218,17 +218,20 @@ def run(config):
     if use_log: logger.info(f"train: model: {model}")
     if use_log: logger.info(f"train: preproc: {preproc}")
     if use_log: logger.info(f"train: optimizer: {optimizer}")
+    if use_log: logger.info(f"train: config: {config}")
 
     # printing to the output file
     print(f"====== Model, loaders, optimimzer created =======")
     print(f"model: {model}")
     print(f"preproc: {preproc}")
     print(f"optimizer: {optimizer}")
+    print(f"config: {config}")
+
 
     run_state = opt_cfg["run_state"]
     best_so_far = opt_cfg["best_so_far"]
     for epoch in range(opt_cfg["start_epoch"], opt_cfg["epochs"]):
-        if use_log: logger.error(f"Starting epoch: {epoch}")
+        if use_log: logger.info(f"Starting epoch: {epoch}")
         start = time.time()
         scheduler.step()
         for group in optimizer.param_groups:
@@ -241,6 +244,7 @@ def run(config):
             if use_log: logger.error(f"train: ====In exceptt block====")
             if use_log: logger.error(f"train: state_dict: {model.state_dict()}")
             if use_log: log_model_grads(model.named_parameters(), logger)
+            raise Exception('Failure in run_epoch').with_traceback(err.__traceback__)
         finally: # used to ensure that plots are closed even if exception raised
             plt.close('all')
  
@@ -267,6 +271,8 @@ def run(config):
         dev_per_dict = dict()
         # iterating through the dev-set loaders to calculate the PER/loss
         for dev_name, dev_ldr in dev_ldr_dict.items():
+            print(f"evaluating devset: {dev_name}")
+            if use_log: logger.info(f"train: === evaluating devset: {dev_name} ==")
             dev_loss, dev_per = eval_dev(model, dev_ldr, preproc, logger)
 
             dev_loss_dict.update({dev_name: dev_loss})

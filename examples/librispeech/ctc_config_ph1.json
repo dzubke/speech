@@ -16,7 +16,7 @@
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-06-25-30_ph1_debug_lib-ted-cv.log",
+        "log_file": "logs/2020-06-25-07-01_v4_ph1_debug_lib-ted-cv.log",
         "debug_mode":true
     },
     "preproc":{
