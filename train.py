@@ -10,6 +10,7 @@ import itertools
 import json
 import logging
 import math
+import pprint
 import random
 import time
 # third-party libraries
@@ -24,7 +25,7 @@ import tqdm
 import speech
 import speech.loader as loader
 from speech.models.ctc_model_train import CTC_train
-from speech.utils.io import write_pickle
+from speech.utils.io import read_pickle, write_pickle
 from speech.utils.model_debug import check_nan, log_model_grads, plot_grad_flow_line, plot_grad_flow_bar
 from speech.utils.model_debug import save_batch_log_stats, log_batchnorm_mean_std, log_param_grad_norms
 from speech.utils.model_debug import get_logger_filename, log_cpu_mem_disk_usage
@@ -213,6 +214,21 @@ def run(config):
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 
         step_size=opt_cfg["sched_step"], 
         gamma=opt_cfg["sched_gamma"])
+    
+    # train_state is dict with contents:
+    #     {'next_epoch': int, 'run_state': (int, float), 'best_so_far': float}
+    train_state_path = os.path.join(config["save_path"], "train_state.pickle")
+    if os.path.exists(train_state_path):
+        train_state = read_pickle(train_state_path)
+        run_state = train_state['run_state']
+        best_so_far = opt_cfg["best_so_far"]    # currently not in train_state, so use config
+        start_epoch = train_state['next_epoch']
+    else:   # if train_path doesn't exist, load from config
+        run_state = opt_cfg["run_state"]
+        best_so_far = opt_cfg["best_so_far"]
+        start_epoch = opt_cfg['start_epoch']
+
+
 
     if use_log: logger.info(f"train: ====== Model, loaders, optimimzer created =======")
     if use_log: logger.info(f"train: model: {model}")
@@ -225,18 +241,17 @@ def run(config):
     print(f"model: {model}")
     print(f"preproc: {preproc}")
     print(f"optimizer: {optimizer}")
-    print(f"config: {config}")
+    pprint.pprint(f"config: {config}")
 
-
-    run_state = opt_cfg["run_state"]
-    best_so_far = opt_cfg["best_so_far"]
-    for epoch in range(opt_cfg["start_epoch"], opt_cfg["epochs"]):
+    for epoch in range(start_epoch, opt_cfg["epochs"]):
         if use_log: logger.info(f"Starting epoch: {epoch}")
         start = time.time()
         scheduler.step()
         for group in optimizer.param_groups:
             print(f'learning rate: {group["lr"]}')
+            if use_log: logger.info(f"train: learning rate: {group['lr']}")
         
+
         try:
             run_state = run_epoch(model, optimizer, train_ldr, logger, debug_mode, tbX_writer, *run_state)
         except Exception as err:
@@ -252,19 +267,17 @@ def run(config):
         if use_log: logger.info(f"train: ====== Run_state finished =======") 
         if use_log: logger.info(f"train: preproc type: {type(preproc)}")
 
-        msg = "Epoch {} completed in {:.2f} (s)."
-        print(msg.format(epoch, time.time() - start))
-        if use_log: logger.info(msg.format(epoch, time.time() - start))
+        msg = "Epoch {} completed in {:.2f} (hr)."
+        epoch_time_hr = (time.time() - start)/60/60
+        print(msg.format(epoch, epoch_time_hr))
+        if use_log: logger.info(msg.format(epoch, epoch_time_hr))
+        tbX_writer.add_scalars('train/stats', {"epoch_time_hr": epoch_time_hr}, epoch)
 
         # the logger needs to be removed to save the model
         if use_log: preproc.logger = None
         speech.save(model, preproc, config["save_path"])
         if use_log: logger.info(f"train: ====== model saved =======")
         if use_log: preproc.logger = logger
-        
-        for dev_name, dev_ldr in dev_ldr_dict.items():
-            dev_loss, dev_cer = eval_dev(model, dev_ldr, preproc, logger)
-            if use_log: logger.info(f"train: ====== eval_dev {dev_name} finished =======")
 
         # creating the dictionaries that hold the PER and loss values
         dev_loss_dict = dict()
@@ -283,19 +296,20 @@ def run(config):
             # Save the best model on the dev set
             if dev_name == data_cfg['dev_set_save_reference']:
                 if dev_per < best_so_far:
-                    print(f"model saved based per on: {data_cfg['dev_set_save_reference']} dataset")
-                    logger.info(f"model saved based per on: {data_cfg['dev_set_save_reference']} dataset")
-                    if use_log: preproc.logger = None 
+                    if use_log: preproc.logger = None   # remove the logger to save the model
                     best_so_far = dev_per
                     speech.save(model, preproc,
                             config["save_path"], tag="best")
                     if use_log: preproc.logger = logger
+                    
+                    print(f"model saved based per on: {data_cfg['dev_set_save_reference']} dataset")
+                    logger.info(f"model saved based per on: {data_cfg['dev_set_save_reference']} dataset")
             
         tbX_writer.add_scalars('dev/loss', dev_loss_dict, epoch)
         tbX_writer.add_scalars('dev/per', dev_per_dict, epoch)
 
         # save the current state of training
-        train_state = {"next_epoch": epoch+1, "run_state": run_state}
+        train_state = {"next_epoch": epoch+1, "run_state": run_state, "best_so_far": best_so_far}
         write_pickle(os.path.join(config["save_path"], "train_state.pickle"), train_state)
 
 
