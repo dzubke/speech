@@ -249,7 +249,7 @@ def run(config):
         scheduler.step()
         for group in optimizer.param_groups:
             print(f'learning rate: {group["lr"]}')
-            if use_log: logger.info(f"train: learning rate: {group["lr"]}")
+            if use_log: logger.info(f"train: learning rate: {group['lr']}")
         
 
         try:
