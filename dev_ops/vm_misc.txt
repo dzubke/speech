@@ -2,6 +2,7 @@
 
 # the current list includes
  * how to resize a disk
+ * how to setup a stackdriver monitoring agent
 
 
 # HOW TO RESIZE A DISK
@@ -28,3 +29,25 @@ gcloud compute project-info add-metadata --metadata google-compute-default-regio
 #  HOW TO COMBINE TWO DATASETS  
 cd ~/awni_speech/data/Librispeech
 cat train-clean-460.json train-other-500.json > ./train-other-960.json
+
+
+#  HOW TO SETUP STACKDRIVER MONITORING AGENT
+# installing stackdriver agent
+curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh
+sudo bash add-monitoring-agent-repo.sh
+sudo apt-get update
+rm add-monitoring-agent-repo.sh
+
+# see available versions
+sudo apt-cache madison stackdriver-agent
+sudo apt-get install -y 'stackdriver-agent=6.*'
+
+# start stack driver
+sudo service stackdriver-agent start
+
+# verify it works
+sudo service stackdriver-agent status
+
+# examing logs and ensure no errors 
+grep collectd /var/log/{syslog,messages} | tail
+
