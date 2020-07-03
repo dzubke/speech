@@ -82,7 +82,7 @@ def get_gpu_memory_utilization():
 def get_gpu_memory_used():
     return get_nvidia_smi_utilization("memory.used")
 
-def get_gpu_memory_ratio_used_total():
+def get_gpu_mem_percent_used():
     mem_used = get_nvidia_smi_utilization("memory.used")
     mem_total = get_nvidia_smi_utilization("memory.total")
     ratio_used_total = int(round(mem_used/mem_total, 2)*100)
@@ -92,7 +92,7 @@ def get_gpu_memory_ratio_used_total():
 GPU_UTILIZATION_METRIC_NAME = "gpu_utilization"
 GPU_MEMORY_UTILIZATION_METRIC_NAME = "gpu_memory_utilization"
 GPU_MEMORY_USED_METRIC_NAME = "gpu_memory_used"
-GPU_MEMORY_RATIO_USED_TOTAL_METRIC_NAME = "gpu_memory_ratio_used_total"
+GPU_MEMORY_PERCENT_USED_METRIC_NAME = "gpu_mem_perc_used"
 
 while True:
   report_metric(get_gpu_utilization(),
@@ -110,8 +110,8 @@ while True:
                 instance_id,
                 zone,
                 project_id)
-  report_metric(get_gpu_memory_ratio_used_total(),
-                GPU_MEMORY_RATIO_USED_TOTAL_METRIC_NAME,
+  report_metric(get_gpu_mem_percent_used(),
+                GPU_MEMORY_PERCENT_USED_METRIC_NAME,
                 instance_id,
                 zone,
                 project_id)
