@@ -16,6 +16,7 @@
 # metric on memory use, mainly memory.used/memory.total
 # requirements: google-cloud-monitoring>=0.30.1
 
+from __future__ import division
 import time
 import socket
 import subprocess
@@ -78,16 +79,20 @@ def get_gpu_utilization():
 def get_gpu_memory_utilization():
     return get_nvidia_smi_utilization("utilization.memory")
 
+def get_gpu_memory_used():
+    return get_nvidia_smi_utilization("memory.used")
+
 def get_gpu_memory_ratio_used_total():
     mem_used = get_nvidia_smi_utilization("memory.used")
     mem_total = get_nvidia_smi_utilization("memory.total")
-    ratio_used_total = round(mem_used/mem_total, 3)
-    return ratio_used_total 
+    ratio_used_total = int(round(mem_used/mem_total, 2)*100)
+    return ratio_used_total
 
 
 GPU_UTILIZATION_METRIC_NAME = "gpu_utilization"
 GPU_MEMORY_UTILIZATION_METRIC_NAME = "gpu_memory_utilization"
-GPU_MEMORY_RATIO_USED_TOTAL_METRIC_NAME = "gpu_used_%total"
+GPU_MEMORY_USED_METRIC_NAME = "gpu_memory_used"
+GPU_MEMORY_RATIO_USED_TOTAL_METRIC_NAME = "gpu_memory_ratio_used_total"
 
 while True:
   report_metric(get_gpu_utilization(),
@@ -97,6 +102,11 @@ while True:
                 project_id)
   report_metric(get_gpu_memory_utilization(),
                 GPU_MEMORY_UTILIZATION_METRIC_NAME,
+                instance_id,
+                zone,
+                project_id)
+  report_metric(get_gpu_memory_used(),
+                GPU_MEMORY_USED_METRIC_NAME,
                 instance_id,
                 zone,
                 project_id)
