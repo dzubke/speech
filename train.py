@@ -10,7 +10,6 @@ import itertools
 import json
 import logging
 import math
-import pprint
 import random
 import time
 # third-party libraries
@@ -184,6 +183,23 @@ def run(config):
         logger = None
 
     tbX_writer = SummaryWriter(logdir=config["save_path"])
+    
+    # Load previous train state: dict with contents:
+    #   {'start_epoch': int, 'run_state': (int, float), 'best_so_far': float, 'learning_rate': float}
+    train_state_path = os.path.join(config["save_path"], "train_state.pickle")
+    if os.path.exists(train_state_path):
+        print(f"load train_state from: {train_state_path}")
+        train_state = read_pickle(train_state_path)
+    else:   # if train_path doesn't exist, create empty dict to load from config
+        print(f"load train_state from config")
+        train_state = dict()
+    # the get-statements will load from train_state if key exists, and from opt_cfg otherwise
+    run_state = train_state.get('run_state',  opt_cfg['run_state'])
+    best_so_far = train_state.get('best_so_far', opt_cfg['best_so_far'])
+    start_epoch =  train_state.get('start_epoch', # train_state used to use 'next_epoch' 
+                                    train_state.get('next_epoch', opt_cfg['start_epoch'])
+    )
+    learning_rate = train_state.get('learning_rate', opt_cfg['learning_rate'])
 
     # Loaders
     batch_size = opt_cfg["batch_size"]
@@ -208,27 +224,14 @@ def run(config):
 
     # Optimizer
     optimizer = torch.optim.SGD(model.parameters(),
-                    lr=opt_cfg["learning_rate"],
+                    lr=learning_rate,   # from train_state or opt_config
                     momentum=opt_cfg["momentum"],
                     dampening=opt_cfg["dampening"])
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 
         step_size=opt_cfg["sched_step"], 
         gamma=opt_cfg["sched_gamma"])
     
-    # train_state is dict with contents:
-    #     {'next_epoch': int, 'run_state': (int, float), 'best_so_far': float}
-    train_state_path = os.path.join(config["save_path"], "train_state.pickle")
-    if os.path.exists(train_state_path):
-        print(f"load train_state from: {train_state_path}")
-        train_state = read_pickle(train_state_path)
-        run_state = train_state['run_state']
-        best_so_far = opt_cfg["best_so_far"]    # currently not in train_state, so use config
-        start_epoch = train_state['next_epoch']
-    else:   # if train_path doesn't exist, load from config
-        print(f"load train_state from config")
-        run_state = opt_cfg["run_state"]
-        best_so_far = opt_cfg["best_so_far"]
-        start_epoch = opt_cfg['start_epoch']
+
 
 
 
@@ -243,7 +246,7 @@ def run(config):
     print(f"model: {model}")
     print(f"preproc: {preproc}")
     print(f"optimizer: {optimizer}")
-    pprint.pprint(f"config: {config}")
+    print(f"config: {config}")
 
     for epoch in range(start_epoch, opt_cfg["epochs"]):
         if use_log: logger.info(f"Starting epoch: {epoch}")
@@ -297,6 +300,8 @@ def run(config):
             
             # Save the best model on the dev set
             if dev_name == data_cfg['dev_set_save_reference']:
+                print(f"dev_reference {dev_name}: current PER: {dev_per} vs. best_so_far: {best_so_far}")
+                logger.info(f"dev_reference {dev_name}: current PER: {dev_per} vs. best_so_far: {best_so_far}")
                 if dev_per < best_so_far:
                     if use_log: preproc.logger = None   # remove the logger to save the model
                     best_so_far = dev_per
@@ -304,14 +309,17 @@ def run(config):
                             config["save_path"], tag="best")
                     if use_log: preproc.logger = logger
                     
-                    print(f"model saved based per on: {data_cfg['dev_set_save_reference']} dataset")
-                    logger.info(f"model saved based per on: {data_cfg['dev_set_save_reference']} dataset")
+                    print(f"UPDATED: best_model based on PER {best_so_far} for {dev_name} devset")
+                    logger.info(f"model saved based per on: {dev_name} dataset")
             
         tbX_writer.add_scalars('dev/loss', dev_loss_dict, epoch)
         tbX_writer.add_scalars('dev/per', dev_per_dict, epoch)
-
+        learning_rate = list(optimizer.param_groups)[0]["lr"]
         # save the current state of training
-        train_state = {"next_epoch": epoch+1, "run_state": run_state, "best_so_far": best_so_far}
+        train_state = {"start_epoch": epoch + 1, 
+                       "run_state": run_state, 
+                       "best_so_far": best_so_far,
+                       "learning_rate": learning_rate}
         write_pickle(os.path.join(config["save_path"], "train_state.pickle"), train_state)
 
 
