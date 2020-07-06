@@ -16,7 +16,7 @@
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-06-25-30_ph4_large-model_lib-ted-cv.log",
+        "log_file": "logs/2020-06-25-07-02_ph4_large-model_lib-ted-cv.log",
         "debug_mode":false
     },
     "preproc":{
@@ -39,9 +39,9 @@
 
     "optimizer": {
         "batch_size" : 8,
-        "run_state": [288416, 194],
-        "best_so_far": 0.705,
-        "start_epoch": 3,
+        "run_state": [384555, 180.1056583660895],
+        "best_so_far": 0.588,
+        "start_epoch": 4,
         "epochs" : 100,
         "learning_rate" : 8e-4,
         "momentum" : 0.9, 
@@ -54,7 +54,7 @@
         "class" : "this value is no longer used as train.py is hardcorded to use CTC_train",
         "dropout" : 0.4,
         "load_trained": true,
-        "trained_path": "examples/librispeech/models/ctc_models/20200625/ph4/20200630/best_model", 
+        "trained_path": "examples/librispeech/models/ctc_models/20200625/ph4/20200702/best_model", 
         "remove_layers": [],
         "encoder" : {
             "conv" : [
