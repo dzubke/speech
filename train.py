@@ -219,11 +219,13 @@ def run(config):
     #     {'next_epoch': int, 'run_state': (int, float), 'best_so_far': float}
     train_state_path = os.path.join(config["save_path"], "train_state.pickle")
     if os.path.exists(train_state_path):
+        print(f"load train_state from: {train_state_path}")
         train_state = read_pickle(train_state_path)
         run_state = train_state['run_state']
         best_so_far = opt_cfg["best_so_far"]    # currently not in train_state, so use config
         start_epoch = train_state['next_epoch']
     else:   # if train_path doesn't exist, load from config
+        print(f"load train_state from config")
         run_state = opt_cfg["run_state"]
         best_so_far = opt_cfg["best_so_far"]
         start_epoch = opt_cfg['start_epoch']
