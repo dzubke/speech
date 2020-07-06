@@ -1,16 +1,17 @@
 # this document will store various things related to managing the VM'store
 
 # the current list includes
- * how to resize a disk
- * how to setup a stackdriver monitoring agent
+ 1. how to resize a disk
+ 2. how to start/stop a VM
+ 3. how to setup a stackdriver monitoring agent
 
 
-# HOW TO RESIZE A DISK
+1. HOW TO RESIZE A DISK
 
 
 
 
-# HOW TO START/STOP A VM
+2. HOW TO START/STOP A VM
 gcloud compute instances start phoneme-3
 gcloud compute instances stop phoneme-3
 gcloud compute ssh --project speak-ml-dev --zone us-central1-a  dzubke@phoneme-1
@@ -26,12 +27,10 @@ watch -d -n 0.5 nvidia-smi
 #setting default zone
 gcloud compute project-info add-metadata --metadata google-compute-default-region=us-central1,google-compute-default-zone=us-central1-c
 
-#  HOW TO COMBINE TWO DATASETS  
-cd ~/awni_speech/data/Librispeech
-cat train-clean-460.json train-other-500.json > ./train-other-960.json
 
 
-#  HOW TO SETUP STACKDRIVER MONITORING AGENT
+
+3.  HOW TO SETUP STACKDRIVER MONITORING AGENT
 # installing stackdriver agent
 curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh
 sudo bash add-monitoring-agent-repo.sh
@@ -51,3 +50,56 @@ sudo service stackdriver-agent status
 # examing logs and ensure no errors 
 grep collectd /var/log/{syslog,messages} | tail
 
+
+4. HOW TO SETUP GPU MONITORING 
+# modified commands based on:  https://cloud.google.com/compute/docs/gpus/monitor-gpus
+
+# setup root user with python, pip, and google-could-monitoring
+sudo apt-get install -y python-pip
+sudo -H pip install --upgrade pip
+sudo -H  pip install --upgrade setuptools
+sudo pip install google-cloud-monitoring>=0.30.1
+
+sudo cp ~/awni_speech/speech/dev_ops/report_gpu_metrics_editted.py /root/
+
+# create the service file
+sudo vim /lib/systemd/system/gpu_utilization_agent.service
+# inside vim paste the code below into the file: /lib/systemd/system/gpu_utilization_agent.service
+[Unit]
+Description=GPU Utilization Metric Agent
+[Service]
+PIDFile=/run/gpu_agent.pid
+ExecStart=/bin/bash --login -c '/usr/bin/python /root/report_gpu_metrics_editted.py'
+User=root
+Group=root
+WorkingDirectory=/
+Restart=always
+[Install]
+WantedBy=multi-user.target
+
+# when installing for the first time, run two commands below: 
+sudo systemctl daemon-reload
+sudo systemctl --no-reload --now enable /lib/systemd/system/gpu_utilization_agent.service
+
+# check the service status
+systemctl status gpu_utilization_agent.service
+
+# how to stop service and then re-start service
+sudo systemctl stop gpu_utilization_agent.service
+sudo systemctl daemon-reload
+sudo systemctl start gpu_utilization_agent.service
+
+
+5.  HOW TO COMBINE TWO DATASETS  
+cd ~/awni_speech/data/Librispeech
+cat train-clean-460.json train-other-500.json > ./train-other-960.json
+
+
+
+nvidia-smi --query-gpu=utilization.memory -u --format=csv
+
+google-cloud-monitoring>=0.30.1
+
+   mem_used = get_nvidia_smi_utilization("memory.used")
+    mem_total = get_nvidia_smi_utilization("memory.total")
+    ratio_used_total = round(mem_used/mem_total, 3)

@@ -26,7 +26,7 @@ import speech
 import speech.loader as loader
 from speech.models.ctc_model_train import CTC_train
 from speech.utils.io import read_pickle, write_pickle
-from speech.utils.model_debug import check_nan, log_model_grads, plot_grad_flow_line, plot_grad_flow_bar
+from speech.utils.model_debug import check_nan_params_grads log_model_grads, plot_grad_flow_line, plot_grad_flow_bar
 from speech.utils.model_debug import save_batch_log_stats, log_batchnorm_mean_std, log_param_grad_norms
 from speech.utils.model_debug import get_logger_filename, log_cpu_mem_disk_usage
 # TODO, (awni) why does putting this above crash..
@@ -101,9 +101,13 @@ def run_epoch(model, optimizer, train_ldr, logger, debug_mode, tbX_writer, iter_
         if use_log: logger.info(f"train: iter={iter_count}, loss={round(loss,3)}, grad_norm={round(grad_norm,3)}")
         inputs, labels, input_lens, label_lens = model.collate(*temp_batch)
         
-        if check_nan(model.parameters()):
-            if use_log: logger.error(f"train: labels: {[labels]}, label_lens: {label_lens} state_dict: {model.state_dict()}")
-            if use_log: log_model_grads(model.named_parameters(), logger)
+        if check_nan_params_grads(model.parameters()):
+            if use_log:
+                logger.error(f"train: labels: {[labels]}, label_lens: {label_lens} state_dict: {model.state_dict()}")
+                log_model_grads(model.named_parameters(), logger)
+                save_batch_log_stats(temp_batch, logger)
+                log_param_grad_norms(model.named_parameters(), logger)
+                plot_grad_flow_bar(model.named_parameters())
             debug_mode = True
             torch.autograd.set_detect_anomaly(True)
 
@@ -241,7 +245,7 @@ def run(config):
     print(f"model: {model}")
     print(f"preproc: {preproc}")
     print(f"optimizer: {optimizer}")
-    pprint.pprint(f"config: {config}")
+    print(f"config: {config}")
 
     for epoch in range(start_epoch, opt_cfg["epochs"]):
         if use_log: logger.info(f"Starting epoch: {epoch}")
