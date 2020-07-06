@@ -22,7 +22,7 @@ from torch.autograd import Variable, Function
 from speech.utils.data_structs import TorchNamedParams, TorchParams, Batch
 
 
-def check_nan(model_params:TorchParams)->bool:
+def check_nan_params_grads(model_params:TorchParams)->bool:
     """
     checks an iterator of model parameters and gradients if any of them have nan values
     Arguments:
