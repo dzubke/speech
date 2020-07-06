@@ -17,15 +17,21 @@ fi
 
 echo -e "\nEvaluating the New Speak Test Set"
 python eval.py $3 ./examples/librispeech/models/ctc_models/$1/$2 /mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json --save ./predictions/$SAVE_DATE-$2_speak-test
+
 echo -e "\nEvaluating the Old Speak Test Set"
 python eval.py $3 ./examples/librispeech/models/ctc_models/$1/$2 /mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2019-11-29/speak-test_2019-11-29.json --save ./predictions/$SAVE_DATE-$2_old-speak-test
+
 echo -e "\nEvaluating Dustin Clean Testset"
 python eval.py $3 ./examples/librispeech/models/ctc_models/$1/$2 /mnt/disks/data_disk/home/dzubke/awni_speech/data/dustin_test_data/20191202_clean/drz_test.json --save ./predictions/$SAVE_DATE-$2_dustin-1202
+
 echo -e "\nEvaluating the Dustin Noisy Testset"
 python eval.py $3 ./examples/librispeech/models/ctc_models/$1/$2 /mnt/disks/data_disk/home/dzubke/awni_speech/data/dustin_test_data/20191118_plane/simple/drz_test.json --save ./predictions/$SAVE_DATE-$2_dustin-1118-simple
-echo -e "\nEvaluating Librispeech Clean Devset"
-python eval.py $3 ./examples/librispeech/models/ctc_models/$1/$2 /mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json  --save ./predictions/$SAVE_DATE-$2_libsp-dev-clean
-echo -e "\nEvaluating Tedlium Dev set"
-python eval.py $3 ./examples/librispeech/models/ctc_models/$1/$2 /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/dev.json  --save ./predictions/$SAVE_DATE-$2_ted-dev
+
 echo -e "\nEvaluating Common Voice Dev set"
 python eval.py $3 ./examples/librispeech/models/ctc_models/$1/$2 /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/dev.json  --save ./predictions/$SAVE_DATE-$2_cv-dev
+
+echo -e "\nEvaluating Librispeech Clean Devset"
+python eval.py $3 ./examples/librispeech/models/ctc_models/$1/$2 /mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json  --save ./predictions/$SAVE_DATE-$2_libsp-dev-clean
+
+echo -e "\nEvaluating Tedlium Dev set"
+python eval.py $3 ./examples/librispeech/models/ctc_models/$1/$2 /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/dev.json  --save ./predictions/$SAVE_DATE-$2_ted-dev
