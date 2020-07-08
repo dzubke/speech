@@ -18,14 +18,13 @@ import numpy as np
 from tensorboardX import SummaryWriter
 import torch
 import torch.nn as nn
-import torch.optim
 import tqdm
 # project libraries
 import speech
 import speech.loader as loader
 from speech.models.ctc_model_train import CTC_train
 from speech.utils.io import read_pickle, write_pickle
-from speech.utils.model_debug import check_nan_params_grads log_model_grads, plot_grad_flow_line, plot_grad_flow_bar
+from speech.utils.model_debug import check_nan_params_grads, log_model_grads, plot_grad_flow_line, plot_grad_flow_bar
 from speech.utils.model_debug import save_batch_log_stats, log_batchnorm_mean_std, log_param_grad_norms
 from speech.utils.model_debug import get_logger_filename, log_cpu_mem_disk_usage
 # TODO, (awni) why does putting this above crash..
