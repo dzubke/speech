@@ -18,7 +18,6 @@ import numpy as np
 from tensorboardX import SummaryWriter
 import torch
 import torch.nn as nn
-import torch.optim
 import tqdm
 # project libraries
 import speech
