@@ -15,4 +15,4 @@ TorchNamedParams = Iterable[Tuple[str, torch.nn.parameter.Parameter]]
 TorchParams = Iterable[torch.nn.parameter.Parameter]
 
 # batches from the dataloader
-Batch = Tuple[List[np.ndarray], List[List[str]]]
+Batch = Tuple[Tuple[np.ndarray], Tuple[List[str]]]
