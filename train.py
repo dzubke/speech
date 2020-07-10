@@ -4,7 +4,6 @@ from __future__ import division
 from __future__ import print_function
 # standard libraries
 import argparse
-from collections import OrderedDict
 import os
 import itertools
 import json
@@ -23,7 +22,7 @@ import tqdm
 import speech
 import speech.loader as loader
 from speech.models.ctc_model_train import CTC_train
-from speech.utils.io import read_pickle, write_pickle
+from speech.utils.io import read_pickle, write_pickle, load_from_trained
 from speech.utils.model_debug import check_nan_params_grads, log_model_grads, plot_grad_flow_line, plot_grad_flow_bar
 from speech.utils.model_debug import save_batch_log_stats, log_batchnorm_mean_std, log_param_grad_norms
 from speech.utils.model_debug import get_logger_filename, log_cpu_mem_disk_usage
@@ -324,40 +323,6 @@ def run(config):
                        "best_so_far": best_so_far,
                        "learning_rate": learning_rate}
         write_pickle(os.path.join(config["save_path"], "train_state.pickle"), train_state)
-
-
-def load_from_trained(model, model_cfg):
-    """
-    loads the model with pretrained weights from the model in
-    model_cfg["trained_path"]
-    Arguments:
-        model (torch model)
-        model_cfg (dict)
-    """
-    trained_model = torch.load(model_cfg["trained_path"], map_location=torch.device('cpu'))
-    trained_state_dict = trained_model.state_dict()
-    trained_state_dict = filter_state_dict(trained_state_dict, remove_layers=model_cfg["remove_layers"])
-    model_state_dict = model.state_dict()
-    model_state_dict.update(trained_state_dict)
-    model.load_state_dict(model_state_dict)
-    return model
-
-
-def filter_state_dict(state_dict, remove_layers=[]):
-    """
-    filters the inputted state_dict by removing the layers specified
-    in remove_layers
-    Arguments:
-        state_dict (OrderedDict): state_dict of pytorch model
-        remove_layers (list(str)): list of layers to remove 
-    """
-
-    state_dict = OrderedDict(
-        {key:value for key,value in state_dict.items() 
-        if key not in remove_layers}
-        )
-    return state_dict
-
 
 
 
