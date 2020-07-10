@@ -157,3 +157,5 @@ ps aux | grep tensorboard
             "ted": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/dev.json"
 
             {'next_epoch': 2, 'run_state': (192278, 236.77379064869257)}
+
+2020-06-30-07-07_ph3_no-feature-normalize_lib-ted-cv
