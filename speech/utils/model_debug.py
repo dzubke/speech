@@ -55,7 +55,7 @@ def save_batch_log_stats(batch:Batch, logger:Logger)->None:
     """
     saves the batch to disk and logs a variety of information from a batch. 
     Arguments:
-        batch - tuple(list(np.2darray), list(list(str))): a tuple of inputs and phoneme labels
+        batch - tuple(tuple(np.2darray), tuple(list(str))): a tuple of inputs and phoneme labels
     """
     filename = get_logger_filename(logger) + "_batch.pickle"
     batch_save_path = os.path.join("./saved_batch", filename)
@@ -74,17 +74,6 @@ def save_batch_log_stats(batch:Batch, logger:Logger)->None:
         batch_mean = np.mean(stacked_batch)
         batch_std = np.std(stacked_batch)
 
-        # error checks for std values nearly zero and for nan values
-        if any([math.isclose(std, 0, abs_tol=1e-6) for std in batch_feature_stds]):
-            logger.error(f"batch_stats: batch_std is nearly zero in {batch_feature_stds}")
-            raise ValueError("batch std value is nearly zero")
-        if any(np.isnan(batch_feature_means)):
-            logger.error(f"batch_stats: batch_mean is NaN in {batch_feature_means}")
-            raise ValueError("NaN value in batch_means")
-        if any(np.isnan(batch_feature_stds)):
-            logger.error(f"batch_stats: batch_std is NaN in {batch_feature_stds}")
-            raise ValueError("NaN value in batch_stds")
-
         logger.info(f"batch_stats: batch_length: {len(batch[0])}, inputs_length: {input_feature_lengths}, labels_length: {label_lengths}")
         logger.info(f"batch_stats: batch_feature_mean: {batch_feature_means}")
         logger.info(f"batch_stats: batch_feature_std: {batch_feature_stds}")
@@ -92,6 +81,17 @@ def save_batch_log_stats(batch:Batch, logger:Logger)->None:
         logger.info(f"batch_stats: batch_feature_min: {batch_feature_mins}")
         logger.info(f"batch_stats: batch_mean: {batch_mean}")
         logger.info(f"batch_stats: batch_std: {batch_std}")
+        
+        # error checks for std values nearly zero and for nan values
+        if any([math.isclose(std, 0, abs_tol=1e-6) for std in batch_feature_stds]):
+            logger.error(f"batch_stats: batch_std is nearly zero in {batch_feature_stds}")
+            print(f"batch_stats: batch_std is nearly zero in {batch_feature_stds}")
+        if any(np.isnan(batch_feature_means)):
+            logger.error(f"batch_stats: batch_mean is NaN in {batch_feature_means}")
+            print(f"batch_stats: batch_mean is NaN in {batch_feature_means}")
+        if any(np.isnan(batch_feature_stds)):
+            logger.error(f"batch_stats: batch_std is NaN in {batch_feature_stds}")
+            print(f"batch_stats: batch_std is NaN in {batch_feature_stds}")
 
 
 def log_batchnorm_mean_std(state_dict:dict, logger:Logger)->None:
