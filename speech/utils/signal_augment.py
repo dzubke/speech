@@ -107,13 +107,13 @@ def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float,
         sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
         
         if use_log: 
-            logger.info(f"aug_audio_sox: tmpfile exists: {os.path.exists(augmented_filename)}")
-            logger.info(f"aug_audio_sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
+            logger.info(f"sox_pertrub: aug_audio_sox: tmpfile exists: {os.path.exists(augmented_filename)}")
+            logger.info(f"sox_pertrub: aug_audio_sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
             stderr_message = sox_result.stderr.decode('utf-8')
             if 'FAIL' in stderr_message:
-                logger.error(f"aug_audio_sox: sox stderr: {stderr_message}")
+                logger.error(f"sox_pertrub: aug_audio_sox: sox stderr: {stderr_message}")
             else:
-                logger.info(f"aug_audio_sox: sox stderr: {stderr_message}")
+                logger.info(f"sox_pertrub: aug_audio_sox: sox stderr: {stderr_message}")
   
         
         data, samp_rate = array_from_wave(augmented_filename)
@@ -148,8 +148,8 @@ def inject_noise_sample(data, sample_rate:int, noise_path:str, noise_level:float
     noise_len = wav_duration(noise_path)
     data_len = len(data) / sample_rate
 
-    if use_log: logger.info(f"noise_inj: noise_len: {noise_len}")
-    if use_log: logger.info(f"noise_inj: data_len: {data_len}")
+    if use_log: logger.info(f"noise_inj: noise duration (s): {noise_len}")
+    if use_log: logger.info(f"noise_inj: data duration (s): {data_len}")
 
     if data_len > noise_len: # if the noise_file len is too small, skip it
         return data
@@ -201,19 +201,21 @@ def audio_with_sox(path:str, sample_rate:int, start_time:float, end_time:float, 
         sox_result = subprocess.run(sox_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         if use_log: 
-            logger.info(f"noise_inj_sox: tmpfile exists: {os.path.exists(tar_filename)}")
-            logger.info(f"noise_inj_sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
+            logger.info(f"noise_inj: sox: sox stdout: {sox_result.stdout.decode('utf-8')}")
             stderr_message = sox_result.stderr.decode('utf-8')
             if 'FAIL' in stderr_message:
-                logger.error(f"aug_audio_sox: sox stderr: {stderr_message}")
+                logger.error(f"noise_inj: sox: sox stderr: {stderr_message}")
+                print(f"ERROR: noise_inj: sox: sox stderr: {stderr_message}")
             else:
-                logger.info(f"aug_audio_sox: sox stderr: {stderr_message}")
+                logger.info(f"noise_inj: sox: sox stderr: {stderr_message}")
 
         if os.path.exists(tar_filename):
             noise_data, samp_rate = array_from_wave(tar_filename)
         else:
             noise_len = round((end_time - start_time)/sample_rate)
             noise_data = np.zeros((noise_len,))
+            logger.error(f"noise_inj: sox: tmp_file doesnt exist, using zeros of len {noise_len}")
+            print(f"ERROR: noise_inj: sox: sox stderr: tmp_file doesnt exist, using zeros of len {noise_len}")
         
         assert isinstance(noise_data, np.ndarray), "not numpy array returned"
         return noise_data
