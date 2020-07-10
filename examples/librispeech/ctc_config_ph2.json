@@ -16,7 +16,7 @@
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-06-30-07-06_ph2_baseline_lib-ted-cv.log",
+        "log_file": "logs/2020-06-30-07-07_ph2_baseline_lib-ted-cv.log",
         "debug_mode":false
     },
     "preproc":{
