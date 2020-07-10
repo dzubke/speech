@@ -1,6 +1,9 @@
+# standard libraries
+from collections import OrderedDict
 import json 
 import os
 import pickle
+# third-party libraries
 import torch
 
 MODEL = "model"
@@ -60,4 +63,37 @@ def write_pickle(pickle_path:str, object_to_pickle):
     assert pickle_path != '', 'pickle_path is empty'
     with open(pickle_path, 'wb') as fid:
         pickle.dump(object_to_pickle, fid) 
+
+
+def load_from_trained(model, model_cfg):
+    """
+    loads the model with pretrained weights from the model in
+    model_cfg["trained_path"]
+    Arguments:
+        model (torch model)
+        model_cfg (dict)
+    """
+    trained_model = torch.load(model_cfg["trained_path"], map_location=torch.device('cpu'))
+    trained_state_dict = trained_model.state_dict()
+    trained_state_dict = filter_state_dict(trained_state_dict, remove_layers=model_cfg["remove_layers"])
+    model_state_dict = model.state_dict()
+    model_state_dict.update(trained_state_dict)
+    model.load_state_dict(model_state_dict)
+    return model
+
+
+def filter_state_dict(state_dict, remove_layers=[]):
+    """
+    filters the inputted state_dict by removing the layers specified
+    in remove_layers
+    Arguments:
+        state_dict (OrderedDict): state_dict of pytorch model
+        remove_layers (list(str)): list of layers to remove 
+    """
+
+    state_dict = OrderedDict(
+        {key:value for key,value in state_dict.items()
+        if key not in remove_layers}
+        )
+    return state_dict
 
