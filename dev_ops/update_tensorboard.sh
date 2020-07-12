@@ -6,6 +6,5 @@
 
 pip uninstall -y tensorflow-tensorboard
 pip uninstall -y tensorboard-logger
-conda remove -y tensorflow-base
-pip install tensorflow==1.15.3
+pip install tensorflow==1.11.0
 pip install -U tensorboardX
