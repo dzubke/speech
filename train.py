@@ -203,7 +203,7 @@ def run(config):
     start_epoch =  train_state.get('start_epoch', # train_state used to use 'next_epoch' 
                                     train_state.get('next_epoch', opt_cfg['start_epoch'])
     )
-    learning_rate = train_state.get('learning_rate', opt_cfg['learning_rate'])
+    learning_rate = opt_cfg['learning_rate']
 
     # Loaders
     batch_size = opt_cfg["batch_size"]
