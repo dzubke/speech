@@ -26,8 +26,6 @@ from speech.utils.io import read_pickle, write_pickle, load_from_trained
 from speech.utils.model_debug import check_nan_params_grads, log_model_grads, plot_grad_flow_line, plot_grad_flow_bar
 from speech.utils.model_debug import save_batch_log_stats, log_batchnorm_mean_std, log_param_grad_norms
 from speech.utils.model_debug import get_logger_filename, log_cpu_mem_disk_usage
-# TODO, (awni) why does putting this above crash..
-import tensorboard_logger as tb
 
 
 
@@ -42,6 +40,8 @@ def run_epoch(model, optimizer, train_ldr, logger, debug_mode, tbX_writer, iter_
     end_t = time.time()
     tq = tqdm.tqdm(train_ldr)
     log_modulus = 5  # limits certain logging function to only log every "log_modulus" iterations
+    exp_w = 0.985        # exponential weight for exponential moving average loss        
+    
     for batch in tq:
         if use_log: logger.info(f"train: ====== Iteration: {iter_count} in run_epoch =======")
         
@@ -85,11 +85,13 @@ def run_epoch(model, optimizer, train_ldr, logger, debug_mode, tbX_writer, iter_
         data_t += start_t - prev_end_t
         if use_log: logger.info(f"train: time calculated ")
 
-
-        exp_w = 0.99
-        avg_loss = exp_w * avg_loss + (1 - exp_w) * loss
+        if iter_count == 0:
+            avg_loss = loss
+        else: 
+            avg_loss = exp_w * avg_loss + (1 - exp_w) * loss
         if use_log: logger.info(f"train: Avg loss: {avg_loss}")
-        tbX_writer.add_scalars('train', {"loss":loss}, iter_count)
+        tbX_writer.add_scalars('train', {"loss": loss}, iter_count)
+        tbX_writer.add_scalars('train', {"avg_loss": avg_loss}, iter_count)
         tq.set_postfix(iter=iter_count, loss=loss, 
                 avg_loss=avg_loss, grad_norm=grad_norm,
                 model_time=model_t, data_time=data_t)
@@ -201,7 +203,7 @@ def run(config):
     start_epoch =  train_state.get('start_epoch', # train_state used to use 'next_epoch' 
                                     train_state.get('next_epoch', opt_cfg['start_epoch'])
     )
-    learning_rate = train_state.get('learning_rate', opt_cfg['learning_rate'])
+    learning_rate = opt_cfg['learning_rate']
 
     # Loaders
     batch_size = opt_cfg["batch_size"]
@@ -337,8 +339,6 @@ if __name__ == "__main__":
 
     random.seed(config["seed"])
     torch.manual_seed(config["seed"])
-
-    tb.configure(config["save_path"])
 
     use_cuda = torch.cuda.is_available()
 

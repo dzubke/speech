@@ -29,25 +29,25 @@ def apply_spec_augment(features:np.ndarray, logger:Logger=None)->np.ndarray:
     """
     Calls the spec_augment function on the normalized features. A policy defined 
     in the policy_dict will be chosen uniformly at random.
-
     Arguments:
         features - np.ndarray: normalized features with dimensional order time x freq
+        logger - Logger
     Returns:
         features - nd.ndarray: the modified features array with order time x freq
     """
-
+    
     use_log = (logger is not None)
     assert type(features) == np.ndarray, "input is not numpy array"
 
     policy_dict = {
         0: {'time_warping_para':0, 'frequency_masking_para':0,
             'time_masking_para':0, 'frequency_mask_num':0, 'time_mask_num':0}, 
-        1: {"time_warping_para":20, "frequency_masking_para":60,
-            "time_masking_para":60, "frequency_mask_num":1, "time_mask_num":1},
-        2: {"time_warping_para":20, "frequency_masking_para":30,
-            "time_masking_para":30, "frequency_mask_num":2, "time_mask_num":2},
-        3: {"time_warping_para":20, "frequency_masking_para":20,
-            "time_masking_para":20, "frequency_mask_num":3, "time_mask_num":3},
+        1: {"time_warping_para":20, "frequency_masking_para":30,
+            "time_masking_para":30, "frequency_mask_num":1, "time_mask_num":1},
+        2: {"time_warping_para":20, "frequency_masking_para":15,
+            "time_masking_para":15, "frequency_mask_num":2, "time_mask_num":2},
+        3: {"time_warping_para":20, "frequency_masking_para":10,
+            "time_masking_para":10, "frequency_mask_num":3, "time_mask_num":3},
             }
     
     policy_choice = np.random.randint(low=0, high=4)
@@ -77,7 +77,7 @@ def apply_spec_augment(features:np.ndarray, logger:Logger=None)->np.ndarray:
 
 
 
-def time_warp(spec:torch.Tensor, W:float, logger:Logger=None):
+def time_warp(spec:torch.Tensor, W:float, logger:Logger=None, fixed_params:dict=None):
     """
     Given a log mel spectrogram with τ time steps, we view it as an image where 
     the time axis is horizontal and the frequency axis is vertical. 
@@ -91,6 +91,8 @@ def time_warp(spec:torch.Tensor, W:float, logger:Logger=None):
         spec - torch.Tensor: 2d spectrogram with dimensions freq x time
     """
     use_log = (logger is not None)
+    use_fixed = (fixed_params is not None)
+
     if W==0:
         return spec
 
@@ -103,12 +105,17 @@ def time_warp(spec:torch.Tensor, W:float, logger:Logger=None):
     y = num_rows // 2
     horizontal_line_at_ctr = spec[0][y]
     # assert len(horizontal_line_at_ctr) == spec_len
-
-    point_to_warp = horizontal_line_at_ctr[random.randrange(W, spec_len-W)]
-    # assert isinstance(point_to_warp, torch.Tensor)
-
-    # Uniform distribution from (0,W) with chance to be up to W negative
-    dist_to_warp = random.randrange(-W, W)
+    if use_fixed:
+        point_to_warp = fixed_params.get("point_to_warp")
+    else:
+        point_to_warp = horizontal_line_at_ctr[random.randrange(W, spec_len-W)]
+    
+    if use_fixed:
+        dist_to_warp = fixed_params.get("dist_to_warp")
+        assert -W <= dist_to_warp <= W, f"dist_to_warp {dist_to_warp} outside bounds: {-W}, {W}"
+    else:
+        # Uniform distribution from (0,W) with chance to be up to W negative
+        dist_to_warp = random.randrange(-W, W)
     
     if use_log: logger.info(f"spec_aug: W is: {W}")
     if use_log: logger.info(f"spec_aug: point_to_warp: {point_to_warp}")
@@ -127,7 +134,8 @@ def spec_augment(mel_spectrogram:torch.Tensor,
                 time_masking_para:float=50, 
                 frequency_mask_num:float=1, 
                 time_mask_num:float=1, 
-                logger:Logger=None):
+                logger:Logger=None,
+                fixed_params:dict=None):
     """Spec augmentation Calculation Function.
     'SpecAugment' have 3 steps for audio data augmentation.
     first step is time warping using Tensorflow's image_sparse_warp function.
@@ -139,10 +147,12 @@ def spec_augment(mel_spectrogram:torch.Tensor,
       time_masking_para(float): Augmentation parameter, "time mask parameter T"
       frequency_mask_num(float): number of frequency masking lines, "m_F".
       time_mask_num(float): number of time masking lines, "m_T".
+      fixed_params(dict): if given, used parameters in dict instead of random values
     Returns:
       mel_spectrogram(numpy array): warped and masked mel spectrogram.
     """
     use_log = (logger is not None)
+    use_fixed = (fixed_params is not None)
     
     mel_spectrogram = mel_spectrogram.unsqueeze(0)
 
@@ -152,28 +162,48 @@ def spec_augment(mel_spectrogram:torch.Tensor,
     if use_log: logger.info(f"spec_aug: tau is: {tau}")
 
     # Step 1 : Time warping
-    warped_mel_spectrogram = time_warp(mel_spectrogram, W=time_warping_para, logger=logger)
+    warped_mel_spectrogram = time_warp(mel_spectrogram, W=time_warping_para, 
+                                        logger=logger, fixed_params=fixed_params)
     if use_log: logger.info(f"spec_aug: finished time_warp")
     #warped_mel_spectrogram = mel_spectrogram
 
     # Step 2 : Frequency masking
     for i in range(frequency_mask_num):
-        f = np.random.uniform(low=0.0, high=frequency_masking_para)
+        if use_fixed:
+            f = fixed_params.get("f")[i]
+            assert 0 <= f <= frequency_masking_para, f"f {f} is out of bounds 0, {frequency_masking_para}"
+        else:
+            f = np.random.uniform(low=0.0, high=frequency_masking_para)
         f = int(f)
+
         if v - f < 0:
             continue
-        f0 = random.randint(0, v-f)
+
+        if use_fixed:
+            f0 = fixed_params.get("f0")[i]
+            #assert 0 <= f0 <= v-f, f"f0 {f0} value out of bounds: 0, {v-f}"
+        else:
+            f0 = random.randint(0, v-f)
         if use_log: logger.info(f"spec_aug: f is: {f} at: {f0}")
 
         warped_mel_spectrogram[:, f0:f0+f, :] = 0
     # Step 3 : Time masking
     for i in range(time_mask_num):
-        t = np.random.uniform(low=0.0, high=time_masking_para)
+        if use_fixed:
+            t = fixed_params.get("t")[i]
+            assert 0 <= t <= time_masking_para, f"t {t} is out of bounds: 0, {time_masking_para}"
+        else:
+            t = np.random.uniform(low=0.0, high=time_masking_para)
         t = int(t)
 
         if tau - t < 0:
             continue
-        t0 = random.randint(0, tau-t)
+
+        if use_fixed:
+            t0 = fixed_params.get("t0")[i]
+            #assert 0 <= t0 <= tau-t, f"t0 {t0} is out of bounds: 0, {tau-t}"
+        else:
+            t0 = random.randint(0, tau-t)
         if use_log: logger.info(f"spec_aug: t is: {t} at: {t0}")
 
         warped_mel_spectrogram[:, :, t0:t0+t] = 0
