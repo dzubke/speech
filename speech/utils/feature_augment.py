@@ -15,9 +15,14 @@ from speech.utils.convert import to_numpy
 def feature_gaussian_noise_inject(inputs:np.ndarray, 
                                   rand_noise_multi_std:float, 
                                   rand_noise_add_std:float)->np.ndarray:
-  inputs = inputs * np.random.normal(loc=1, scale=rand_noise_multi_std, size=inputs.shape)
-  inputs = inputs + np.random.normal(loc=0, scale=rand_noise_add_std, size=inputs.shape)
-  return inputs
+    """
+    adds gaussian noise to the 2d feature from a standard distribution
+
+    """
+    inputs = inputs * np.random.normal(loc=1, scale=rand_noise_multi_std, size=inputs.shape)
+    inputs = inputs + np.random.normal(loc=0, scale=rand_noise_add_std, size=inputs.shape)
+    return inputs
+
 
 # spec-augment functions: apply_spec_augment, time_warp, spec_augment, visualize_spectrogram
 def apply_spec_augment(features:np.ndarray, logger:Logger=None)->np.ndarray:
@@ -37,12 +42,12 @@ def apply_spec_augment(features:np.ndarray, logger:Logger=None)->np.ndarray:
     policy_dict = {
         0: {'time_warping_para':0, 'frequency_masking_para':0,
             'time_masking_para':0, 'frequency_mask_num':0, 'time_mask_num':0}, 
-        1: {"time_warping_para":20, "frequency_masking_para":60,
-            "time_masking_para":60, "frequency_mask_num":1, "time_mask_num":1},
-        2: {"time_warping_para":20, "frequency_masking_para":30,
-            "time_masking_para":30, "frequency_mask_num":2, "time_mask_num":2},
-        3: {"time_warping_para":20, "frequency_masking_para":20,
-            "time_masking_para":20, "frequency_mask_num":3, "time_mask_num":3},
+        1: {"time_warping_para":20, "frequency_masking_para":30,
+            "time_masking_para":30, "frequency_mask_num":1, "time_mask_num":1},
+        2: {"time_warping_para":20, "frequency_masking_para":15,
+            "time_masking_para":15, "frequency_mask_num":2, "time_mask_num":2},
+        3: {"time_warping_para":20, "frequency_masking_para":10,
+            "time_masking_para":10, "frequency_mask_num":3, "time_mask_num":3},
             }
     
     policy_choice = np.random.randint(low=0, high=4)
@@ -73,17 +78,29 @@ def apply_spec_augment(features:np.ndarray, logger:Logger=None)->np.ndarray:
 
 
 def time_warp(spec:torch.Tensor, W:float, logger:Logger=None, fixed_params:dict=None):
+    """
+    Given a log mel spectrogram with τ time steps, we view it as an image where 
+    the time axis is horizontal and the frequency axis is vertical. 
+    A random point along the horizontal line passing through the center of the image 
+    within the time steps (W, τ − W ) is to be warped either to the left or right by 
+    a distance w chosen from a uniform distribution from 0 to the time warp parameter 
+    W along that line. We fix six anchor points on the boundary—the four corners and
+    the mid-points of the vertical edges.
+    
+    Arguments:
+        spec - torch.Tensor: 2d spectrogram with dimensions freq x time
+    """
     use_log = (logger is not None)
     use_fixed = (fixed_params is not None)
 
     if W==0:
         return spec
 
-    num_rows = spec.shape[1]
-    spec_len = spec.shape[2]
+    num_rows = spec.shape[1]    # freq dimension
+    spec_len = spec.shape[2]    # time dimension
 
-    assert spec_len>2*W, "frequency dimension is not large enough for W parameter"
-    assert num_rows>0, "time dimension must be greater than zero"
+    assert spec_len>2*W, "time dimension is not large enough for W parameter"
+    assert num_rows>0, "freq dimension must be greater than zero"
 
     y = num_rows // 2
     horizontal_line_at_ctr = spec[0][y]
