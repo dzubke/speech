@@ -120,7 +120,7 @@ mkdir -p /home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/
 # source: https://www.apoehlmann.com/blog/connecting-tensorboard-your-google-cloud-vm-port-forwarding/
 # connect to tensorboard on VM
 # 1. on VM run:
-nohup tensorboard --logdir=examples/librispeech/models/ctc_models/20200625/ph5/test-ph1 --port 6006 &
+nohup tensorboard --logdir=examples/librispeech/models/ctc_models/20200630/ph5/ --port 6006 &
 
 # 2. on local run:
 gcloud compute ssh dzubke@phoneme-2 --zone=us-central1-c --project=speak-ml-dev -- -NfL 6002:localhost:6002
@@ -129,9 +129,9 @@ gcloud compute ssh dzubke@phoneme-2 --zone=us-central1-c --project=speak-ml-dev 
 ps aux | grep tensorboard
 
 
+1.57e+03
 
-
-
+10
 
 /mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json
 /mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json
@@ -159,3 +159,9 @@ ps aux | grep tensorboard
             {'next_epoch': 2, 'run_state': (192278, 236.77379064869257)}
 
 2020-06-30-07-07_ph3_no-feature-normalize_lib-ted-cv
+
+
+pip uninstall -y tensorflow-tensorboard
+pip uninstall -y tensorboard-logger
+pip install tensorflow==1.15.3
+pip install -U tensorboardX

@@ -55,8 +55,11 @@ def test_freq_masking(logger:Logger=None):
                 num_freq_masks = param_tuple[3]
                 max_freq_masks = freq_mask_size * num_freq_masks
                 
-                print(f"number of masked rows: {num_mask_rows}, max_masked: {max_freq_masks}")
+                #print(f"number of masked rows: {num_mask_rows}, max_masked: {max_freq_masks}")
                 assert  num_mask_rows<= max_freq_masks
+
+
+
 
 
 def count_freq_mask(array:np.ndarray)->bool:
@@ -100,7 +103,7 @@ def test_time_masking(logger:Logger=None):
                 num_time_masks = param_tuple[4]
                 max_time_masks = time_mask_size * num_time_masks
                 
-                print(f"number of time masked rows: {num_mask_rows}, max_time_masked: {max_time_masks}")
+                #print(f"number of time masked rows: {num_mask_rows}, max_time_masked: {max_time_masks}")
                 assert  num_mask_rows<= max_time_masks
 
 
@@ -129,21 +132,4 @@ def test_logger():
     test_apply_spec_augment_call(logger)
 
 
-# @pytest.fixture
-# def wallet(request: SubRequest):
-#    param = getattr(request, ‘param’, None)
-#    if param:
-#      prepared_wallet = Wallet(initial_amount=param[0])
-#    else:
-#      prepared_wallet = Wallet()
-#    yield prepared_wallet
-#    prepared_wallet.close()
-
-
-# def test_default_initial_amount(wallet):
-#    assert wallet.balance == 0
-   
-# @pytest.mark.parametrize(‘wallet’, [(100,)], indirect=True)
-# def test_setting_initial_amount(wallet):
-#    assert wallet.balance == 100
 

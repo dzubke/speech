@@ -232,10 +232,6 @@ def run(config):
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 
         step_size=opt_cfg["sched_step"], 
         gamma=opt_cfg["sched_gamma"])
-    
-
-
-
 
     if use_log: logger.info(f"train: ====== Model, loaders, optimimzer created =======")
     if use_log: logger.info(f"train: model: {model}")
