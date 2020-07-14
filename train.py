@@ -41,7 +41,8 @@ def run_epoch(model, optimizer, train_ldr, logger, debug_mode, tbX_writer, iter_
     tq = tqdm.tqdm(train_ldr)
     log_modulus = 5  # limits certain logging function to only log every "log_modulus" iterations
     exp_w = 0.985        # exponential weight for exponential moving average loss        
-    
+    avg_grad_norm = 0.0
+
     for batch in tq:
         if use_log: logger.info(f"train: ====== Iteration: {iter_count} in run_epoch =======")
         
@@ -62,7 +63,6 @@ def run_epoch(model, optimizer, train_ldr, logger, debug_mode, tbX_writer, iter_
         #print(f"loss value 1: {loss.data[0]}")
         loss.backward()
         if use_log: logger.info(f"train: Backward run ")
-        #if use_log: plot_grad_flow_line(model.named_parameters())
         if use_log: 
             if debug_mode: 
                 plot_grad_flow_bar(model.named_parameters(),  get_logger_filename(logger))
@@ -87,11 +87,14 @@ def run_epoch(model, optimizer, train_ldr, logger, debug_mode, tbX_writer, iter_
 
         if iter_count == 0:
             avg_loss = loss
+            avg_grad_norm = grad_norm
         else: 
             avg_loss = exp_w * avg_loss + (1 - exp_w) * loss
+            avg_grad_norm = exp_w * avg_grad_norm + (1 - exp_w) * grad_norm
         if use_log: logger.info(f"train: Avg loss: {avg_loss}")
         tbX_writer.add_scalars('train', {"loss": loss}, iter_count)
         tbX_writer.add_scalars('train', {"avg_loss": avg_loss}, iter_count)
+        tbX_writer.add_scalars('train/grad', {"grad_norm": avg_loss}, iter_count)
         tq.set_postfix(iter=iter_count, loss=loss, 
                 avg_loss=avg_loss, grad_norm=grad_norm,
                 model_time=model_t, data_time=data_t)
@@ -203,7 +206,7 @@ def run(config):
     start_epoch =  train_state.get('start_epoch', # train_state used to use 'next_epoch' 
                                     train_state.get('next_epoch', opt_cfg['start_epoch'])
     )
-    learning_rate = train_state.get('learning_rate', opt_cfg['learning_rate'])
+    learning_rate = opt_cfg['learning_rate']
 
     # Loaders
     batch_size = opt_cfg["batch_size"]
@@ -234,10 +237,6 @@ def run(config):
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 
         step_size=opt_cfg["sched_step"], 
         gamma=opt_cfg["sched_gamma"])
-    
-
-
-
 
     if use_log: logger.info(f"train: ====== Model, loaders, optimimzer created =======")
     if use_log: logger.info(f"train: model: {model}")
@@ -265,7 +264,7 @@ def run(config):
             run_state = run_epoch(model, optimizer, train_ldr, logger, debug_mode, tbX_writer, *run_state)
         except Exception as err:
             if use_log: logger.error(f"Exception raised: {err}")
-            if use_log: logger.error(f"train: ====In exceptt block====")
+            if use_log: logger.error(f"train: ====In except block====")
             if use_log: logger.error(f"train: state_dict: {model.state_dict()}")
             if use_log: log_model_grads(model.named_parameters(), logger)
             raise Exception('Failure in run_epoch').with_traceback(err.__traceback__)
