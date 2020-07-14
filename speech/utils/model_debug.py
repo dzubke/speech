@@ -208,6 +208,9 @@ def plot_grad_flow_line(named_parameters:TorchNamedParams)->None:
     # clears and closes the figure so memory doesn't overfill
     plt.close('all')
 
+def tb_log_grad_flow(named_parameters:TorchNamedParams
+
+
 def plot_grad_flow_bar(named_parameters:TorchNamedParams, filename:str="grad_flow_bar.png"):
     '''
     Plots the gradients flowing through different layers in the net during training.
