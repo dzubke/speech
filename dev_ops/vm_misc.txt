@@ -4,6 +4,7 @@
  1. how to resize a disk
  2. how to start/stop a VM
  3. how to setup a stackdriver monitoring agent
+ 3. how to setup gpu_utilization_agent
 
 
 1. HOW TO RESIZE A DISK

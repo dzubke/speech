@@ -109,7 +109,7 @@ def run_epoch(model, optimizer, train_ldr, logger, debug_mode, tbX_writer, iter_
                 log_model_grads(model.named_parameters(), logger)
                 save_batch_log_stats(temp_batch, logger)
                 log_param_grad_norms(model.named_parameters(), logger)
-                plot_grad_flow_bar(model.named_parameters())
+                plot_grad_flow_bar(model.named_parameters(), get_logger_filename(logger))
             debug_mode = True
             torch.autograd.set_detect_anomaly(True)
 
