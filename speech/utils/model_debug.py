@@ -258,10 +258,10 @@ def plot_grad_flow_bar(named_parameters:TorchNamedParams, filename:str="grad_flo
     fig.clear()
     plt.close(fig)
 
+
+
 # bad_grad_viz functions come from here:
 # https://gist.github.com/apaszke/f93a377244be9bfcb96d3547b9bc424d
-
-
 def iter_graph(root, callback):
     queue = [root]
     seen = set()
