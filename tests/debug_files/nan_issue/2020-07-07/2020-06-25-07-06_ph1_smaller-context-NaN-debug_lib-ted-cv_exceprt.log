@@ -1,0 +1,3001 @@
+2020-07-07 04:45:06 - INFO - preproc: normalized
+2020-07-07 04:45:06 - INFO - spec_aug: policy: 1
+2020-07-07 04:45:06 - INFO - spec_aug: features shape: (394, 257)
+2020-07-07 04:45:06 - INFO - spec_aug: nu is: 257
+2020-07-07 04:45:06 - INFO - spec_aug: tau is: 394
+2020-07-07 04:45:06 - INFO - spec_aug: W is: 20
+2020-07-07 04:45:06 - INFO - spec_aug: point_to_warp: 0.3093147575855255
+2020-07-07 04:45:06 - INFO - spec_aug: dist_to_warp: 9
+2020-07-07 04:45:06 - INFO - spec_aug: finished time_warp
+2020-07-07 04:45:06 - INFO - spec_aug: f is: 5 at: 55
+2020-07-07 04:45:06 - INFO - spec_aug: t is: 41 at: 215
+2020-07-07 04:45:06 - INFO - preproc: spec_aug applied
+2020-07-07 04:45:06 - INFO - preproc: text encoded
+2020-07-07 04:45:06 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-07 04:45:06 - INFO - preproc: ======= Entering preprocess =====
+2020-07-07 04:45:06 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/train-other-500/104/132091/104-132091-0045.wav
+2020-07-07 04:45:06 - INFO - preproc: text: ['ay', 'ae', 'm', 's', 'aa', 'r', 'iy', 't', 'ah', 's', 'ey', 'dh', 'ey', 'r', 'ae', 'n', 'ah', 'w', 'ey', 'f', 'er', 'm', 'hh', 'er', 'hh', 'w', 'ih', 'ch', 'ae', 'z', 'dh', 'eh', 'r', 'l', 'eh', 'g', 'z', 'w', 'er', 'l', 'ao', 'ng', 'g', 'ah', 's', 't', 'ih', 't', 'w', 'aa', 'z', 'iy', 'z', 'iy', 't', 'ah', 'd', 'uw']
+2020-07-07 04:45:06 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/train-other-500/104/132091/104-132091-0045.wav
+2020-07-07 04:45:06 - INFO - tempo_gain_pitch_perturb: audio_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/train-other-500/104/132091/104-132091-0045.wav
+2020-07-07 04:45:06 - INFO - tempo_gain_pitch_perturb: tempo_value: 0.9572995300721138
+2020-07-07 04:45:06 - INFO - tempo_gain_pitch_perturb: gain_value: 5.033448387663784
+2020-07-07 04:45:06 - INFO - tempo_gain_pitch_perturb: pitch_value: 134.80700729242074
+2020-07-07 04:45:07 - INFO - aug_audio_sox: tmpfile exists: True
+2020-07-07 04:45:07 - INFO - aug_audio_sox: sox stdout: 
+2020-07-07 04:45:07 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=0.957 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=0.924984 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/train-other-500/104/132091/104-132091-0045.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:06.83 = 109360 samples ~ 512.625 CDDA sectors
+File Size      : 219k
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmpla7fscat.wav'
+
+Output File    : '/tmp/tmpla7fscat.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch      17297.6Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-07 04:45:07 - INFO - preproc: synthetic_gaussian_noise_inject
+2020-07-07 04:45:07 - INFO - syn_gaussian_noise: snr_level: 20.738423544465903
+2020-07-07 04:45:07 - INFO - syn_gaussian_noise: audio_rms: 1961
+2020-07-07 04:45:07 - INFO - syn_gaussian_noise: noise_rms: 180.11770987499662
+2020-07-07 04:45:07 - INFO - noise_inj: noise_path: /mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/NRIVER_ch01.wav
+2020-07-07 04:45:07 - INFO - noise_inj: noise_level: 0.42221023271051916
+2020-07-07 04:45:07 - INFO - noise_inj: noise_len: 300.004
+2020-07-07 04:45:07 - INFO - noise_inj: data_len: 7.142125
+2020-07-07 04:45:07 - INFO - noise_inj_sox: tmpfile exists: True
+2020-07-07 04:45:07 - INFO - noise_inj_sox: sox stdout: 
+2020-07-07 04:45:07 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/NRIVER_ch01.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:05:00.00 = 4800064 samples ~ 22500.3 CDDA sectors
+File Size      : 9.60M
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmpai49ng2f.wav'
+
+Output File    : '/tmp/tmpai49ng2f.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: trim         16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-07 04:45:07 - INFO - noise_inj: noise_start: 256.34321154175115
+2020-07-07 04:45:07 - INFO - noise_inj: noise_end: 263.48533654175117
+2020-07-07 04:45:07 - INFO - preproc: noise injected
+2020-07-07 04:45:07 - INFO - preproc: normalized
+2020-07-07 04:45:07 - INFO - spec_aug: policy: 3
+2020-07-07 04:45:07 - INFO - spec_aug: features shape: (445, 257)
+2020-07-07 04:45:07 - INFO - spec_aug: nu is: 257
+2020-07-07 04:45:07 - INFO - spec_aug: tau is: 445
+2020-07-07 04:45:07 - INFO - spec_aug: W is: 20
+2020-07-07 04:45:07 - INFO - spec_aug: point_to_warp: -1.1162954568862915
+2020-07-07 04:45:07 - INFO - spec_aug: dist_to_warp: -9
+2020-07-07 04:45:07 - INFO - spec_aug: finished time_warp
+2020-07-07 04:45:07 - INFO - spec_aug: f is: 2 at: 116
+2020-07-07 04:45:07 - INFO - spec_aug: f is: 6 at: 191
+2020-07-07 04:45:07 - INFO - spec_aug: f is: 17 at: 76
+2020-07-07 04:45:07 - INFO - spec_aug: t is: 5 at: 192
+2020-07-07 04:45:07 - INFO - spec_aug: t is: 10 at: 95
+2020-07-07 04:45:07 - INFO - spec_aug: t is: 14 at: 320
+2020-07-07 04:45:07 - INFO - preproc: spec_aug applied
+2020-07-07 04:45:07 - INFO - preproc: text encoded
+2020-07-07 04:45:07 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-07 04:45:07 - INFO - preproc: ======= Entering preprocess =====
+2020-07-07 04:45:07 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/train-other-500/5019/38670/5019-38670-0027.wav
+2020-07-07 04:45:07 - INFO - preproc: text: ['ah', 'v', 'k', 'ao', 'r', 's', 'y', 'uw', 'd', 'ow', 'n', 't', 'r', 'ah', 's', 't', 'hh', 'ih', 'm', 's', 'eh', 'd', 'm', 'ae', 'd', 'ah', 'm', 'f', 'ao', 'n', 't', 'ey', 'n', 'w', 'ih', 'dh', 'k', 'iy', 'z', 'dh', 'ae', 't', 'aa', 'r', 'ah', 'v', 'eh', 'n', 'iy', 'ih', 'm', 'p', 'ao', 'r', 't', 'ah', 'n', 's']
+2020-07-07 04:45:07 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/train-other-500/5019/38670/5019-38670-0027.wav
+2020-07-07 04:45:07 - INFO - tempo_gain_pitch_perturb: audio_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/train-other-500/5019/38670/5019-38670-0027.wav
+2020-07-07 04:45:07 - INFO - tempo_gain_pitch_perturb: tempo_value: 1.0387332115522399
+2020-07-07 04:45:07 - INFO - tempo_gain_pitch_perturb: gain_value: 2.898121289695066
+2020-07-07 04:45:07 - INFO - tempo_gain_pitch_perturb: pitch_value: 313.77088348670077
+2020-07-07 04:45:07 - INFO - aug_audio_sox: tmpfile exists: True
+2020-07-07 04:45:07 - INFO - aug_audio_sox: sox stdout: 
+2020-07-07 04:45:07 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=1.039 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=0.834124 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/train-other-500/5019/38670/5019-38670-0027.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:06.83 = 109280 samples ~ 512.25 CDDA sectors
+File Size      : 219k
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmphzki5rl5.wav'
+
+Output File    : '/tmp/tmphzki5rl5.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch      19181.8Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-07 04:45:07 - INFO - preproc: synthetic_gaussian_noise_inject
+2020-07-07 04:45:07 - INFO - syn_gaussian_noise: snr_level: 16.266649278456455
+2020-07-07 04:45:07 - INFO - syn_gaussian_noise: audio_rms: 1785
+2020-07-07 04:45:07 - INFO - syn_gaussian_noise: noise_rms: 274.35050031388056
+2020-07-07 04:45:07 - INFO - noise_inj: noise_path: /mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/54823_170972-lq.wav
+2020-07-07 04:45:07 - INFO - noise_inj: noise_level: 0.06576229638795816
+2020-07-07 04:45:07 - INFO - noise_inj: noise_len: 28.733
+2020-07-07 04:45:07 - INFO - noise_inj: data_len: 6.573625
+2020-07-07 04:45:07 - INFO - noise_inj_sox: tmpfile exists: True
+2020-07-07 04:45:07 - INFO - noise_inj_sox: sox stdout: 
+2020-07-07 04:45:07 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/54823_170972-lq.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:28.73 = 459728 samples ~ 2154.97 CDDA sectors
+File Size      : 920k
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmp1qwpsngy.wav'
+
+Output File    : '/tmp/tmp1qwpsngy.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: trim         16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-07 04:45:07 - INFO - noise_inj: noise_start: 21.37740659781874
+2020-07-07 04:45:07 - INFO - noise_inj: noise_end: 27.95103159781874
+2020-07-07 04:45:07 - INFO - preproc: noise injected
+2020-07-07 04:45:07 - INFO - preproc: normalized
+2020-07-07 04:45:07 - INFO - spec_aug: policy: 0
+2020-07-07 04:45:07 - INFO - spec_aug: features shape: (409, 257)
+2020-07-07 04:45:07 - INFO - spec_aug: nu is: 257
+2020-07-07 04:45:07 - INFO - spec_aug: tau is: 409
+2020-07-07 04:45:07 - INFO - spec_aug: finished time_warp
+2020-07-07 04:45:07 - INFO - preproc: spec_aug applied
+2020-07-07 04:45:07 - INFO - preproc: text encoded
+2020-07-07 04:45:07 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-07 04:45:07 - INFO - preproc: ======= Entering preprocess =====
+2020-07-07 04:45:07 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/train-other-500/2526/156073/2526-156073-0035.wav
+2020-07-07 04:45:07 - INFO - preproc: text: ['hh', 'iy', 'w', 'ah', 'l', 'n', 'aa', 't', 's', 'k', 'r', 'uw', 'p', 'ah', 'l', 't', 'ah', 'b', 'iy', 'g', 'ih', 'l', 't', 'iy', 'ah', 'v', 'hh', 'w', 'eh', 'n', 'eh', 'v', 'er', 'hh', 'iy', 'hh', 'ae', 'z', 'ae', 'n', 'aa', 'p', 'er', 't', 'uw', 'n', 'ah', 't', 'iy', 'ah', 'p', 'aa', 'n', 'dh', 'ah', 'hh', 'ow', 'l']
+2020-07-07 04:45:07 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/train-other-500/2526/156073/2526-156073-0035.wav
+2020-07-07 04:45:07 - INFO - tempo_gain_pitch_perturb: audio_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/train-other-500/2526/156073/2526-156073-0035.wav
+2020-07-07 04:45:07 - INFO - tempo_gain_pitch_perturb: tempo_value: 0.9199473309134392
+2020-07-07 04:45:07 - INFO - tempo_gain_pitch_perturb: gain_value: 5.350098111556562
+2020-07-07 04:45:07 - INFO - tempo_gain_pitch_perturb: pitch_value: -168.05728222397258
+2020-07-07 04:45:07 - INFO - aug_audio_sox: tmpfile exists: True
+2020-07-07 04:45:07 - INFO - aug_audio_sox: sox stdout: 
+2020-07-07 04:45:07 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=0.92 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=1.10191 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/train-other-500/2526/156073/2526-156073-0035.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:06.82 = 109120 samples ~ 511.5 CDDA sectors
+File Size      : 218k
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmpgyt42sb9.wav'
+
+Output File    : '/tmp/tmpgyt42sb9.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch      14520.2Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+sox WARN gain: gain clipped 32 samples; decrease volume?
+sox WARN pitch: pitch clipped 32 samples; decrease volume?
+sox WARN rate: rate clipped 12 samples; decrease volume?
+sox WARN dither: dither clipped 10 samples; decrease volume?
+
+2020-07-07 04:45:07 - INFO - preproc: synthetic_gaussian_noise_inject
+2020-07-07 04:45:07 - INFO - syn_gaussian_noise: snr_level: 15.893302168515987
+2020-07-07 04:45:07 - INFO - syn_gaussian_noise: audio_rms: 4334
+2020-07-07 04:45:07 - INFO - syn_gaussian_noise: noise_rms: 695.3825664979723
+2020-07-07 04:45:07 - INFO - noise_inj: noise_path: /mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/169466_98337-lq.wav
+2020-07-07 04:45:07 - INFO - noise_inj: noise_level: 0.12091053054403872
+2020-07-07 04:45:07 - INFO - noise_inj: noise_len: 302.272
+2020-07-07 04:45:07 - INFO - noise_inj: data_len: 7.413
+2020-07-07 04:45:07 - INFO - noise_inj_sox: tmpfile exists: True
+2020-07-07 04:45:07 - INFO - noise_inj_sox: sox stdout: 
+2020-07-07 04:45:07 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/169466_98337-lq.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:05:02.27 = 4836352 samples ~ 22670.4 CDDA sectors
+File Size      : 9.67M
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmpb3ck6kis.wav'
+
+Output File    : '/tmp/tmpb3ck6kis.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: trim         16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-07 04:45:07 - INFO - noise_inj: noise_start: 83.81610541504072
+2020-07-07 04:45:07 - INFO - noise_inj: noise_end: 91.22910541504072
+2020-07-07 04:45:07 - INFO - preproc: noise injected
+2020-07-07 04:45:07 - INFO - preproc: normalized
+2020-07-07 04:45:07 - INFO - spec_aug: policy: 2
+2020-07-07 04:45:07 - INFO - spec_aug: features shape: (462, 257)
+2020-07-07 04:45:07 - INFO - spec_aug: nu is: 257
+2020-07-07 04:45:07 - INFO - spec_aug: tau is: 462
+2020-07-07 04:45:07 - INFO - spec_aug: W is: 20
+2020-07-07 04:45:07 - INFO - spec_aug: point_to_warp: 0.7640256881713867
+2020-07-07 04:45:07 - INFO - spec_aug: dist_to_warp: 17
+2020-07-07 04:45:07 - INFO - spec_aug: finished time_warp
+2020-07-07 04:45:07 - INFO - spec_aug: f is: 18 at: 58
+2020-07-07 04:45:07 - INFO - spec_aug: f is: 10 at: 218
+2020-07-07 04:45:07 - INFO - spec_aug: t is: 3 at: 288
+2020-07-07 04:45:07 - INFO - spec_aug: t is: 3 at: 265
+2020-07-07 04:45:07 - INFO - preproc: spec_aug applied
+2020-07-07 04:45:07 - INFO - preproc: text encoded
+2020-07-07 04:45:07 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-07 04:45:07 - INFO - train: ====== Iteration: 441544 in run_epoch =======
+2020-07-07 04:45:07 - INFO - batch_stats: batch_length: 8, inputs_length: [499, 478, 399, 406, 394, 445, 409, 462], labels_length: [58, 58, 58, 58, 58, 58, 58, 58]
+2020-07-07 04:45:07 - INFO - batch_stats: batch_feature_mean: [-0.088774584, -0.029512541, 0.0012348228, -0.0051179496, 0.0048689824, -0.0045307558, -0.00074750691, -0.098162882]
+2020-07-07 04:45:07 - INFO - batch_stats: batch_feature_std: [0.97809666, 0.7644369, 0.94409758, 0.94766223, 0.90068322, 0.73832756, 1.1036861, 0.90347719]
+2020-07-07 04:45:07 - INFO - batch_stats: batch_feature_max: [4.9316158, 3.9397688, 4.6721373, 4.8174248, 5.6312399, 4.658761, 5.3364158, 4.5886555]
+2020-07-07 04:45:07 - INFO - batch_stats: batch_feature_min: [-6.8674178, -5.3611083, -5.6699429, -5.1129122, -6.7963257, -4.6007228, -6.6155996, -5.8579717]
+2020-07-07 04:45:07 - INFO - batch_stats: batch_mean: -0.030282216146588326
+2020-07-07 04:45:07 - INFO - batch_stats: batch_std: 0.9144570231437683
+2020-07-07 04:45:07 - INFO - batch_norm_mean_var: conv.1.running_mean: tensor([-0.1028,  0.0139, -0.0072, -0.0183, -0.0343, -0.0826,  0.0359,  0.0918,
+         0.0577, -0.0540, -0.0209, -0.0121,  0.0103,  0.0339,  0.0562, -0.0008,
+         0.0751, -0.0903,  0.0616,  0.0033,  0.0055, -0.0020,  0.1240,  0.0100,
+         0.1550,  0.0698,  0.0420,  0.0204,  0.0376,  0.1049, -0.0063, -0.0442],
+       device='cuda:0')
+2020-07-07 04:45:07 - INFO - batch_norm_mean_var: conv.1.running_var: tensor([ 9.1433,  0.6101,  3.0062,  2.6730, 13.6139,  3.5750,  0.1924,  2.1326,
+         4.2912,  0.6026,  1.3324,  1.9850,  0.1522,  0.1625,  1.6836,  0.9576,
+         1.3601,  5.2472,  0.4521,  5.2673,  1.9215,  1.0744,  2.6180,  6.3719,
+         7.8412,  0.2497,  0.4216,  0.1250,  0.8476,  5.3774,  6.2657,  0.7885],
+       device='cuda:0')
+2020-07-07 04:45:07 - INFO - batch_norm_mean_var: conv.5.running_mean: tensor([ 1.2148, -4.1378, -4.5387, -2.2029, -1.0887,  3.6926, -4.6623, -4.6984,
+         0.4365,  1.0842, -3.8294, -2.1370, -0.4506, -2.6733, -4.0176, -1.2351,
+        -0.1092, -1.8079, -1.4562, -2.5052, -0.9360, -4.0989, -0.5265, -4.0468,
+        -1.5271,  1.7613, -2.6164, -0.9943, -3.7499, -2.5844, -0.6967, -1.6198],
+       device='cuda:0')
+2020-07-07 04:45:07 - INFO - batch_norm_mean_var: conv.5.running_var: tensor([16.0808, 29.8602, 36.9845, 18.7632,  1.3142,  8.0931, 26.4285, 29.5840,
+        20.7141, 23.6602, 28.7183, 13.7011,  0.4383, 14.3350, 39.0024, 14.3232,
+         4.6139,  7.0717, 28.6556, 27.8091,  3.1020, 33.1499, 17.9594, 13.6601,
+         3.3004,  3.1129,  6.2661, 15.2415, 27.5192, 11.7233,  0.9477,  2.8479],
+       device='cuda:0')
+2020-07-07 04:45:07 - INFO - batch_norm_mean_var: conv.9.running_mean: tensor([-0.0616, -1.2021, -3.5590, -4.5941,  0.7198, -0.0383,  0.6593, -1.8769,
+         1.5401, -1.0076, -1.4664,  2.3405,  0.0098, -2.1928, -1.0711, -0.0378,
+        -0.6214, -0.6412, -0.5357, -2.9048, -3.1336, -2.2670,  3.2111,  0.1652,
+        -0.6645,  0.7506,  0.3664, -0.4905,  1.7248, -2.2401, -5.3778, -0.2642,
+        -2.9203, -0.3357, -1.4604, -1.6375, -0.8679,  0.5419, -0.8285, -0.9676,
+         0.0422, -3.7478, -2.1807, -0.0305, -3.1238, -0.4238,  0.6155,  0.0993,
+        -0.9082, -0.8053,  1.7942,  1.3521,  0.2029, -5.7489,  1.4053,  4.9783,
+        -0.0504,  0.1489,  1.0409, -1.3468,  0.0007, -2.3206, -3.3855,  0.7693,
+        -0.9844, -4.3818,  0.9406, -1.1617,  1.1325, -4.1548, -0.1363,  0.4499,
+        -0.1882, -6.1384, -4.1288,  0.4552, -2.4472,  0.1414,  0.8300, -1.1535,
+        -6.4353, -0.1691, -4.1756,  0.5833,  0.3513,  0.2250, -2.1304, -0.5149,
+        -2.0491, -0.4417, -1.8718, -4.3931, -0.5010, -0.1518, -0.3112, -0.9485],
+       device='cuda:0')
+2020-07-07 04:45:07 - INFO - batch_norm_mean_var: conv.9.running_var: tensor([ 0.1394,  0.3158,  5.3975,  7.9924,  5.2127,  0.9795,  2.3016,  0.7615,
+         0.7855,  3.9732, 11.1590,  5.5264,  2.0680,  1.5400,  3.6262,  2.9666,
+         2.9879,  0.4107,  1.8105,  5.9441,  9.0651,  7.9558,  5.6053,  1.4397,
+         3.0535,  0.6023,  1.1888,  5.5686,  3.4775,  5.6476,  4.8847,  0.5387,
+         4.5939,  3.6012,  1.3801,  1.9970,  0.3377,  0.2174,  0.6007,  3.3313,
+         0.0850,  7.6340,  1.1542,  0.1973,  5.5953,  0.1984,  0.6933,  0.0434,
+         2.1947,  0.8560,  1.4839,  3.0583,  0.9078, 11.1080,  1.0901,  8.2048,
+         2.5291,  0.5571,  1.1858,  1.3736,  0.7302,  3.9103,  7.3521,  3.2912,
+         1.3982,  6.8123,  2.4440,  5.2143,  2.5502,  7.8533,  0.1475,  0.7908,
+         4.0912, 14.2812, 10.8703,  0.1771,  2.4948,  0.7974,  0.1881,  2.0132,
+        15.3694,  0.0622,  8.4196,  1.0589,  3.4011,  1.4967,  1.9221,  1.9019,
+         5.4238,  0.2787,  2.3490,  8.9982,  1.3540,  0.8897,  2.3274,  4.2540],
+       device='cuda:0')
+2020-07-07 04:45:07 - INFO - train: Optimizer zero_grad
+2020-07-07 04:45:08 - INFO - train: Loss calculated
+2020-07-07 04:45:08 - INFO - train: Backward run 
+2020-07-07 04:45:09 - INFO - param_grad_norm: conv.0.weight: 10.176697731018066
+2020-07-07 04:45:09 - INFO - param_grad_norm: conv.0.bias: 2.492140993126668e-05
+2020-07-07 04:45:09 - INFO - param_grad_norm: conv.1.weight: 2.5437400341033936
+2020-07-07 04:45:09 - INFO - param_grad_norm: conv.1.bias: 2.2605934143066406
+2020-07-07 04:45:09 - INFO - param_grad_norm: conv.4.weight: 15.43110179901123
+2020-07-07 04:45:09 - INFO - param_grad_norm: conv.4.bias: 5.925848540755396e-07
+2020-07-07 04:45:09 - INFO - param_grad_norm: conv.5.weight: 5.082057476043701
+2020-07-07 04:45:09 - INFO - param_grad_norm: conv.5.bias: 4.882204532623291
+2020-07-07 04:45:09 - INFO - param_grad_norm: conv.8.weight: 30.328638076782227
+2020-07-07 04:45:09 - INFO - param_grad_norm: conv.8.bias: 1.5449446664206334e-06
+2020-07-07 04:45:09 - INFO - param_grad_norm: conv.9.weight: 5.070322513580322
+2020-07-07 04:45:09 - INFO - param_grad_norm: conv.9.bias: 4.441995143890381
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.weight_ih_l0: 38.73896026611328
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.weight_hh_l0: 11.013407707214355
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.bias_ih_l0: 1.2126777172088623
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.bias_hh_l0: 1.2126777172088623
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.weight_ih_l1: 15.350875854492188
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.weight_hh_l1: 6.3097076416015625
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.bias_ih_l1: 1.2464572191238403
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.bias_hh_l1: 1.2464572191238403
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.weight_ih_l2: 8.920635223388672
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.weight_hh_l2: 5.611774921417236
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.bias_ih_l2: 1.5681421756744385
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.bias_hh_l2: 1.5681421756744385
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.weight_ih_l3: 7.801648139953613
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.weight_hh_l3: 8.479401588439941
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.bias_ih_l3: 2.1396689414978027
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.bias_hh_l3: 2.1396689414978027
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.weight_ih_l4: 16.360456466674805
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.weight_hh_l4: 57.962806701660156
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.bias_ih_l4: 4.324042320251465
+2020-07-07 04:45:09 - INFO - param_grad_norm: rnn.bias_hh_l4: 4.324042320251465
+2020-07-07 04:45:09 - INFO - param_grad_norm: fc.fc.weight: 82.57698822021484
+2020-07-07 04:45:09 - INFO - param_grad_norm: fc.fc.bias: 5.769701957702637
+2020-07-07 04:45:09 - INFO - param_grad_norm: total_norm: 118.51840071247581
+2020-07-07 04:45:09 - INFO - train: Grad_norm clipped 
+2020-07-07 04:45:09 - INFO - train: loss reassigned 
+2020-07-07 04:45:09 - INFO - train: Optimizer step taken
+2020-07-07 04:45:09 - INFO - train: time calculated 
+2020-07-07 04:45:09 - INFO - train: Avg loss: 236.23058598079314
+2020-07-07 04:45:09 - INFO - train: loss is inf: False
+2020-07-07 04:45:09 - INFO - train: iter=441544, loss=198.309, grad_norm=118.518
+2020-07-07 04:45:09 - INFO - preproc: ======= Entering preprocess =====
+2020-07-07 04:45:09 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/ElonMusk_2017_25.wv
+2020-07-07 04:45:09 - INFO - preproc: text: ['w', 'ah', 'n', 'l', 'ey', 'er']
+2020-07-07 04:45:09 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/ElonMusk_2017_25.wv
+2020-07-07 04:45:09 - INFO - tempo_gain_pitch_perturb: audio_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/ElonMusk_2017_25.wv
+2020-07-07 04:45:09 - INFO - tempo_gain_pitch_perturb: tempo_value: 0.9539225101923398
+2020-07-07 04:45:09 - INFO - tempo_gain_pitch_perturb: gain_value: -1.6031851789678617
+2020-07-07 04:45:09 - INFO - tempo_gain_pitch_perturb: pitch_value: 248.883362071129
+2020-07-07 04:45:09 - INFO - aug_audio_sox: tmpfile exists: True
+2020-07-07 04:45:09 - INFO - aug_audio_sox: sox stdout: 
+2020-07-07 04:45:09 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=0.954 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=0.866037 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/ElonMusk_2017_25.wv' (wav)
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:01.04 = 16640 samples ~ 78 CDDA sectors
+File Size      : 33.4k
+Bit Rate       : 257k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmpjzllmogi.wav'
+
+Output File    : '/tmp/tmpjzllmogi.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch        18475Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-07 04:45:09 - INFO - preproc: synthetic_gaussian_noise_inject
+2020-07-07 04:45:09 - INFO - syn_gaussian_noise: snr_level: 28.585118239684967
+2020-07-07 04:45:09 - INFO - syn_gaussian_noise: audio_rms: 2647
+2020-07-07 04:45:09 - INFO - syn_gaussian_noise: noise_rms: 98.51401725577439
+2020-07-07 04:45:09 - INFO - noise_inj: noise_path: /mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/SPSQUARE_ch09.wav
+2020-07-07 04:45:09 - INFO - noise_inj: noise_level: 0.4316403858931527
+2020-07-07 04:45:09 - INFO - noise_inj: noise_len: 300.004
+2020-07-07 04:45:09 - INFO - noise_inj: data_len: 1.090125
+2020-07-07 04:45:09 - INFO - noise_inj_sox: tmpfile exists: True
+2020-07-07 04:45:09 - INFO - noise_inj_sox: sox stdout: 
+2020-07-07 04:45:09 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/SPSQUARE_ch09.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:05:00.00 = 4800064 samples ~ 22500.3 CDDA sectors
+File Size      : 9.60M
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmpjge6u3s4.wav'
+
+Output File    : '/tmp/tmpjge6u3s4.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: trim         16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-07 04:45:09 - INFO - noise_inj: noise_start: 119.60585873993247
+2020-07-07 04:45:09 - INFO - noise_inj: noise_end: 120.69598373993247
+2020-07-07 04:45:09 - INFO - preproc: noise injected
+2020-07-07 04:45:09 - INFO - preproc: normalized
+2020-07-07 04:45:09 - INFO - spec_aug: policy: 3
+2020-07-07 04:45:09 - INFO - spec_aug: features shape: (67, 257)
+2020-07-07 04:45:09 - INFO - spec_aug: nu is: 257
+2020-07-07 04:45:09 - INFO - spec_aug: tau is: 67
+2020-07-07 04:45:09 - INFO - spec_aug: W is: 20
+2020-07-07 04:45:09 - INFO - spec_aug: point_to_warp: -0.5811257362365723
+2020-07-07 04:45:09 - INFO - spec_aug: dist_to_warp: 8
+2020-07-07 04:45:09 - INFO - spec_aug: finished time_warp
+2020-07-07 04:45:09 - INFO - spec_aug: f is: 5 at: 44
+2020-07-07 04:45:09 - INFO - spec_aug: f is: 2 at: 198
+2020-07-07 04:45:09 - INFO - spec_aug: f is: 10 at: 9
+2020-07-07 04:45:09 - INFO - spec_aug: t is: 18 at: 40
+2020-07-07 04:45:09 - INFO - spec_aug: t is: 4 at: 30
+2020-07-07 04:45:09 - INFO - spec_aug: t is: 2 at: 37
+2020-07-07 04:45:09 - INFO - preproc: spec_aug applied
+2020-07-07 04:45:09 - INFO - preproc: text encoded
+2020-07-07 04:45:09 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-07 04:45:09 - INFO - preproc: ======= Entering preprocess =====
+2020-07-07 04:45:09 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/DeanOrnish_2004_6.wv
+2020-07-07 04:45:09 - INFO - preproc: text: ['b', 'ah', 't', 'dh', 'ae', 't']
+2020-07-07 04:45:09 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/DeanOrnish_2004_6.wv
+2020-07-07 04:45:09 - INFO - tempo_gain_pitch_perturb: audio_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/DeanOrnish_2004_6.wv
+2020-07-07 04:45:09 - INFO - tempo_gain_pitch_perturb: tempo_value: 1.0798924611652607
+2020-07-07 04:45:09 - INFO - tempo_gain_pitch_perturb: gain_value: 1.3938155249222284
+2020-07-07 04:45:09 - INFO - tempo_gain_pitch_perturb: pitch_value: -326.9725075204347
+2020-07-07 04:45:09 - INFO - aug_audio_sox: tmpfile exists: True
+2020-07-07 04:45:09 - INFO - aug_audio_sox: sox stdout: 
+2020-07-07 04:45:09 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=1.08 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=1.2079 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/DeanOrnish_2004_6.wv' (wav)
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:01.04 = 16640 samples ~ 78 CDDA sectors
+File Size      : 33.4k
+Bit Rate       : 257k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmp8_cmdqo1.wav'
+
+Output File    : '/tmp/tmp8_cmdqo1.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch      13246.1Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-07 04:45:09 - INFO - preproc: synthetic_gaussian_noise_inject
+2020-07-07 04:45:09 - INFO - syn_gaussian_noise: snr_level: 17.665083888787372
+2020-07-07 04:45:09 - INFO - syn_gaussian_noise: audio_rms: 5151
+2020-07-07 04:45:09 - INFO - syn_gaussian_noise: noise_rms: 673.9650184292042
+2020-07-07 04:45:09 - INFO - noise_inj: noise_path: /mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/Thunder-and-wind-noise.wav
+2020-07-07 04:45:09 - INFO - noise_inj: noise_level: 0.015042757351054703
+2020-07-07 04:45:09 - INFO - noise_inj: noise_len: 156.781125
+2020-07-07 04:45:09 - INFO - noise_inj: data_len: 0.9629375
+2020-07-07 04:45:09 - INFO - noise_inj_sox: tmpfile exists: True
+2020-07-07 04:45:09 - INFO - noise_inj_sox: sox stdout: 
+2020-07-07 04:45:09 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/Thunder-and-wind-noise.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:02:36.78 = 2508498 samples ~ 11758.6 CDDA sectors
+File Size      : 5.02M
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmp1poi7orh.wav'
+
+Output File    : '/tmp/tmp1poi7orh.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: trim         16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-07 04:45:09 - INFO - noise_inj: noise_start: 102.97204709226806
+2020-07-07 04:45:09 - INFO - noise_inj: noise_end: 103.93498459226805
+2020-07-07 04:45:09 - INFO - preproc: noise injected
+2020-07-07 04:45:09 - INFO - preproc: normalized
+2020-07-07 04:45:09 - INFO - spec_aug: policy: 3
+2020-07-07 04:45:09 - INFO - spec_aug: features shape: (59, 257)
+2020-07-07 04:45:09 - INFO - spec_aug: nu is: 257
+2020-07-07 04:45:09 - INFO - spec_aug: tau is: 59
+2020-07-07 04:45:09 - INFO - spec_aug: W is: 20
+2020-07-07 04:45:09 - INFO - spec_aug: point_to_warp: -0.6325613856315613
+2020-07-07 04:45:09 - INFO - spec_aug: dist_to_warp: 1
+2020-07-07 04:45:09 - INFO - spec_aug: finished time_warp
+2020-07-07 04:45:09 - INFO - spec_aug: f is: 19 at: 169
+2020-07-07 04:45:09 - INFO - spec_aug: f is: 18 at: 36
+2020-07-07 04:45:09 - INFO - spec_aug: f is: 19 at: 38
+2020-07-07 04:45:09 - INFO - spec_aug: t is: 5 at: 14
+2020-07-07 04:45:09 - INFO - spec_aug: t is: 12 at: 19
+2020-07-07 04:45:09 - INFO - spec_aug: t is: 9 at: 30
+2020-07-07 04:45:09 - INFO - preproc: spec_aug applied
+2020-07-07 04:45:09 - INFO - preproc: text encoded
+2020-07-07 04:45:09 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-07 04:45:09 - INFO - preproc: ======= Entering preprocess =====
+2020-07-07 04:45:09 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/RogierVanDerHeide_2010X_34.wv
+2020-07-07 04:45:09 - INFO - preproc: text: ['ah', 'f', 'ay', 'n', 'ah', 'l']
+2020-07-07 04:45:09 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/RogierVanDerHeide_2010X_34.wv
+2020-07-07 04:45:09 - INFO - tempo_gain_pitch_perturb: audio_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/RogierVanDerHeide_2010X_34.wv
+2020-07-07 04:45:09 - INFO - tempo_gain_pitch_perturb: tempo_value: 0.9511021411958026
+2020-07-07 04:45:09 - INFO - tempo_gain_pitch_perturb: gain_value: 2.2148743176875314
+2020-07-07 04:45:09 - INFO - tempo_gain_pitch_perturb: pitch_value: 209.6061855418734
+2020-07-07 04:45:09 - INFO - aug_audio_sox: tmpfile exists: True
+2020-07-07 04:45:09 - INFO - aug_audio_sox: sox stdout: 
+2020-07-07 04:45:09 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=0.951 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=0.885768 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/RogierVanDerHeide_2010X_34.wv' (wav)
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:01.01 = 16160 samples ~ 75.75 CDDA sectors
+File Size      : 32.4k
+Bit Rate       : 257k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmppj7zy6dr.wav'
+
+Output File    : '/tmp/tmppj7zy6dr.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch      18063.4Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-07 04:45:09 - INFO - preproc: synthetic_gaussian_noise_inject
+2020-07-07 04:45:09 - INFO - syn_gaussian_noise: snr_level: 11.023022935552188
+2020-07-07 04:45:09 - INFO - syn_gaussian_noise: audio_rms: 2132
+2020-07-07 04:45:09 - INFO - syn_gaussian_noise: noise_rms: 599.2886513221077
+2020-07-07 04:45:09 - INFO - preproc: noise injected
+2020-07-07 04:45:09 - INFO - preproc: normalized
+2020-07-07 04:45:09 - INFO - spec_aug: policy: 0
+2020-07-07 04:45:09 - INFO - spec_aug: features shape: (65, 257)
+2020-07-07 04:45:09 - INFO - spec_aug: nu is: 257
+2020-07-07 04:45:09 - INFO - spec_aug: tau is: 65
+2020-07-07 04:45:09 - INFO - spec_aug: finished time_warp
+2020-07-07 04:45:09 - INFO - preproc: spec_aug applied
+2020-07-07 04:45:09 - INFO - preproc: text encoded
+2020-07-07 04:45:09 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-07 04:45:09 - INFO - preproc: ======= Entering preprocess =====
+2020-07-07 04:45:09 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/WilliamKamkwamba_2009G_0.wv
+2020-07-07 04:45:09 - INFO - preproc: text: ['th', 'ae', 'ng', 'k', 'y', 'uw']
+2020-07-07 04:45:09 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/WilliamKamkwamba_2009G_0.wv
+2020-07-07 04:45:09 - INFO - tempo_gain_pitch_perturb: audio_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/WilliamKamkwamba_2009G_0.wv
+2020-07-07 04:45:09 - INFO - tempo_gain_pitch_perturb: tempo_value: 0.8523701298705813
+2020-07-07 04:45:09 - INFO - tempo_gain_pitch_perturb: gain_value: -0.23680606765528367
+2020-07-07 04:45:09 - INFO - tempo_gain_pitch_perturb: pitch_value: 131.40378044089823
+2020-07-07 04:45:09 - INFO - aug_audio_sox: tmpfile exists: True
+2020-07-07 04:45:09 - INFO - aug_audio_sox: sox stdout: 
+2020-07-07 04:45:09 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=0.852 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=0.927123 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/WilliamKamkwamba_2009G_0.wv' (wav)
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:01.03 = 16480 samples ~ 77.25 CDDA sectors
+File Size      : 33.0k
+Bit Rate       : 257k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmpzc8eg74c.wav'
+
+Output File    : '/tmp/tmpzc8eg74c.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch      17257.7Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-07 04:45:09 - INFO - preproc: synthetic_gaussian_noise_inject
+2020-07-07 04:45:09 - INFO - syn_gaussian_noise: snr_level: 24.408473507002284
+2020-07-07 04:45:09 - INFO - syn_gaussian_noise: audio_rms: 926
+2020-07-07 04:45:09 - INFO - syn_gaussian_noise: noise_rms: 55.742611513295664
+2020-07-07 04:45:09 - INFO - preproc: noise injected
+2020-07-07 04:45:09 - INFO - preproc: normalized
+2020-07-07 04:45:09 - INFO - spec_aug: policy: 1
+2020-07-07 04:45:09 - INFO - spec_aug: features shape: (74, 257)
+2020-07-07 04:45:09 - INFO - spec_aug: nu is: 257
+2020-07-07 04:45:09 - INFO - spec_aug: tau is: 74
+2020-07-07 04:45:09 - INFO - spec_aug: W is: 20
+2020-07-07 04:45:09 - INFO - spec_aug: point_to_warp: -0.38759809732437134
+2020-07-07 04:45:09 - INFO - spec_aug: dist_to_warp: -14
+2020-07-07 04:45:09 - INFO - spec_aug: finished time_warp
+2020-07-07 04:45:09 - INFO - spec_aug: f is: 0 at: 222
+2020-07-07 04:45:09 - INFO - spec_aug: t is: 56 at: 1
+2020-07-07 04:45:09 - INFO - preproc: spec_aug applied
+2020-07-07 04:45:09 - INFO - preproc: text encoded
+2020-07-07 04:45:09 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-07 04:45:09 - INFO - preproc: ======= Entering preprocess =====
+2020-07-07 04:45:09 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/RanaelKaliouby_2015W_55.wv
+2020-07-07 04:45:09 - INFO - preproc: text: ['th', 'ae', 'ng', 'k', 'y', 'uw']
+2020-07-07 04:45:09 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/RanaelKaliouby_2015W_55.wv
+2020-07-07 04:45:10 - INFO - tempo_gain_pitch_perturb: audio_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/RanaelKaliouby_2015W_55.wv
+2020-07-07 04:45:10 - INFO - tempo_gain_pitch_perturb: tempo_value: 1.027510544814922
+2020-07-07 04:45:10 - INFO - tempo_gain_pitch_perturb: gain_value: -3.753032407682039
+2020-07-07 04:45:10 - INFO - tempo_gain_pitch_perturb: pitch_value: -307.60470466332924
+2020-07-07 04:45:10 - INFO - aug_audio_sox: tmpfile exists: True
+2020-07-07 04:45:10 - INFO - aug_audio_sox: sox stdout: 
+2020-07-07 04:45:10 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=1.028 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=1.19472 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/RanaelKaliouby_2015W_55.wv' (wav)
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:01.04 = 16640 samples ~ 78 CDDA sectors
+File Size      : 33.4k
+Bit Rate       : 257k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmpmmoek9kt.wav'
+
+Output File    : '/tmp/tmpmmoek9kt.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch      13392.3Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-07 04:45:10 - INFO - preproc: synthetic_gaussian_noise_inject
+2020-07-07 04:45:10 - INFO - syn_gaussian_noise: snr_level: 27.03106779332881
+2020-07-07 04:45:10 - INFO - syn_gaussian_noise: audio_rms: 1186
+2020-07-07 04:45:10 - INFO - syn_gaussian_noise: noise_rms: 52.787524908637124
+2020-07-07 04:45:10 - INFO - preproc: noise injected
+2020-07-07 04:45:10 - INFO - preproc: normalized
+2020-07-07 04:45:10 - INFO - spec_aug: policy: 3
+2020-07-07 04:45:10 - INFO - spec_aug: features shape: (62, 257)
+2020-07-07 04:45:10 - INFO - spec_aug: nu is: 257
+2020-07-07 04:45:10 - INFO - spec_aug: tau is: 62
+2020-07-07 04:45:10 - INFO - spec_aug: W is: 20
+2020-07-07 04:45:10 - INFO - spec_aug: point_to_warp: -0.005734731908887625
+2020-07-07 04:45:10 - INFO - spec_aug: dist_to_warp: -1
+2020-07-07 04:45:10 - INFO - spec_aug: finished time_warp
+2020-07-07 04:45:10 - INFO - spec_aug: f is: 19 at: 56
+2020-07-07 04:45:10 - INFO - spec_aug: f is: 13 at: 108
+2020-07-07 04:45:10 - INFO - spec_aug: f is: 2 at: 111
+2020-07-07 04:45:10 - INFO - spec_aug: t is: 6 at: 18
+2020-07-07 04:45:10 - INFO - spec_aug: t is: 3 at: 35
+2020-07-07 04:45:10 - INFO - spec_aug: t is: 9 at: 34
+2020-07-07 04:45:10 - INFO - preproc: spec_aug applied
+2020-07-07 04:45:10 - INFO - preproc: text encoded
+2020-07-07 04:45:10 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-07 04:45:10 - INFO - preproc: ======= Entering preprocess =====
+2020-07-07 04:45:10 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/MiriamZoilaPerez_2016W_114.wv
+2020-07-07 04:45:10 - INFO - preproc: text: ['th', 'ae', 'ng', 'k', 'y', 'uw']
+2020-07-07 04:45:10 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/MiriamZoilaPerez_2016W_114.wv
+2020-07-07 04:45:10 - INFO - tempo_gain_pitch_perturb: audio_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/MiriamZoilaPerez_2016W_114.wv
+2020-07-07 04:45:10 - INFO - tempo_gain_pitch_perturb: tempo_value: 1.0213436871565833
+2020-07-07 04:45:10 - INFO - tempo_gain_pitch_perturb: gain_value: -5.930857383867612
+2020-07-07 04:45:10 - INFO - tempo_gain_pitch_perturb: pitch_value: -339.04686072960385
+2020-07-07 04:45:10 - INFO - aug_audio_sox: tmpfile exists: True
+2020-07-07 04:45:10 - INFO - aug_audio_sox: sox stdout: 
+2020-07-07 04:45:10 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=1.021 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=1.2163 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/MiriamZoilaPerez_2016W_114.wv' (wav)
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:01.01 = 16160 samples ~ 75.75 CDDA sectors
+File Size      : 32.4k
+Bit Rate       : 257k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmprp8n8ton.wav'
+
+Output File    : '/tmp/tmprp8n8ton.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch      13154.6Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-07 04:45:10 - INFO - preproc: synthetic_gaussian_noise_inject
+2020-07-07 04:45:10 - INFO - syn_gaussian_noise: snr_level: 13.861690351510612
+2020-07-07 04:45:10 - INFO - syn_gaussian_noise: audio_rms: 781
+2020-07-07 04:45:10 - INFO - syn_gaussian_noise: noise_rms: 158.3312047331133
+2020-07-07 04:45:10 - INFO - preproc: noise injected
+2020-07-07 04:45:10 - INFO - preproc: normalized
+2020-07-07 04:45:10 - INFO - spec_aug: policy: 1
+2020-07-07 04:45:10 - INFO - spec_aug: features shape: (60, 257)
+2020-07-07 04:45:10 - INFO - spec_aug: nu is: 257
+2020-07-07 04:45:10 - INFO - spec_aug: tau is: 60
+2020-07-07 04:45:10 - INFO - spec_aug: W is: 20
+2020-07-07 04:45:10 - INFO - spec_aug: point_to_warp: -0.7677140235900879
+2020-07-07 04:45:10 - INFO - spec_aug: dist_to_warp: -20
+2020-07-07 04:45:10 - INFO - spec_aug: finished time_warp
+2020-07-07 04:45:10 - INFO - spec_aug: f is: 56 at: 48
+2020-07-07 04:45:10 - INFO - spec_aug: t is: 40 at: 7
+2020-07-07 04:45:10 - INFO - preproc: spec_aug applied
+2020-07-07 04:45:10 - INFO - preproc: text encoded
+2020-07-07 04:45:10 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-07 04:45:10 - INFO - preproc: ======= Entering preprocess =====
+2020-07-07 04:45:10 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/EvelynGlennie_2003_87.wv
+2020-07-07 04:45:10 - INFO - preproc: text: ['y', 'ah', 'ng', 'l', 'ae', 'd']
+2020-07-07 04:45:10 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/EvelynGlennie_2003_87.wv
+2020-07-07 04:45:10 - INFO - tempo_gain_pitch_perturb: audio_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/EvelynGlennie_2003_87.wv
+2020-07-07 04:45:10 - INFO - tempo_gain_pitch_perturb: tempo_value: 0.9823891422074146
+2020-07-07 04:45:10 - INFO - tempo_gain_pitch_perturb: gain_value: 1.0333148556370233
+2020-07-07 04:45:10 - INFO - tempo_gain_pitch_perturb: pitch_value: 183.5194339731412
+2020-07-07 04:45:10 - INFO - aug_audio_sox: tmpfile exists: True
+2020-07-07 04:45:10 - INFO - aug_audio_sox: sox stdout: 
+2020-07-07 04:45:10 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=0.982 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=0.899171 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/EvelynGlennie_2003_87.wv' (wav)
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:01.03 = 16480 samples ~ 77.25 CDDA sectors
+File Size      : 33.0k
+Bit Rate       : 257k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmpyx516s8b.wav'
+
+Output File    : '/tmp/tmpyx516s8b.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch      17794.2Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-07 04:45:10 - INFO - preproc: synthetic_gaussian_noise_inject
+2020-07-07 04:45:10 - INFO - syn_gaussian_noise: snr_level: 17.1238147295205
+2020-07-07 04:45:10 - INFO - syn_gaussian_noise: audio_rms: 2128
+2020-07-07 04:45:10 - INFO - syn_gaussian_noise: noise_rms: 296.33359323154576
+2020-07-07 04:45:10 - INFO - noise_inj: noise_path: /mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/160016_2558789-lq.wav
+2020-07-07 04:45:10 - INFO - noise_inj: noise_level: 0.04054913069388422
+2020-07-07 04:45:10 - INFO - noise_inj: noise_len: 91.0115625
+2020-07-07 04:45:10 - INFO - noise_inj: data_len: 1.048875
+2020-07-07 04:45:10 - INFO - noise_inj_sox: tmpfile exists: True
+2020-07-07 04:45:10 - INFO - noise_inj_sox: sox stdout: 
+2020-07-07 04:45:10 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/160016_2558789-lq.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:01:31.01 = 1456185 samples ~ 6825.87 CDDA sectors
+File Size      : 2.91M
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmpax_bq1ak.wav'
+
+Output File    : '/tmp/tmpax_bq1ak.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: trim         16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-07 04:45:10 - INFO - noise_inj: noise_start: 3.2096529954387822
+2020-07-07 04:45:10 - INFO - noise_inj: noise_end: 4.258527995438782
+2020-07-07 04:45:10 - INFO - preproc: noise injected
+2020-07-07 04:45:10 - INFO - preproc: normalized
+2020-07-07 04:45:10 - INFO - spec_aug: policy: 2
+2020-07-07 04:45:10 - INFO - spec_aug: features shape: (64, 257)
+2020-07-07 04:45:10 - INFO - spec_aug: nu is: 257
+2020-07-07 04:45:10 - INFO - spec_aug: tau is: 64
+2020-07-07 04:45:10 - INFO - spec_aug: W is: 20
+2020-07-07 04:45:10 - INFO - spec_aug: point_to_warp: -1.0062801837921143
+2020-07-07 04:45:10 - INFO - spec_aug: dist_to_warp: 11
+2020-07-07 04:45:10 - INFO - spec_aug: finished time_warp
+2020-07-07 04:45:10 - INFO - spec_aug: f is: 10 at: 215
+2020-07-07 04:45:10 - INFO - spec_aug: f is: 6 at: 10
+2020-07-07 04:45:10 - INFO - spec_aug: t is: 12 at: 11
+2020-07-07 04:45:10 - INFO - spec_aug: t is: 22 at: 32
+2020-07-07 04:45:10 - INFO - preproc: spec_aug applied
+2020-07-07 04:45:10 - INFO - preproc: text encoded
+2020-07-07 04:45:10 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-07 04:45:10 - INFO - preproc: ======= Entering preprocess =====
+2020-07-07 04:45:10 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/TracyChevalier_2012S_131.wv
+2020-07-07 04:45:10 - INFO - preproc: text: ['th', 'ae', 'ng', 'k', 'y', 'uw']
+2020-07-07 04:45:10 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/TracyChevalier_2012S_131.wv
+2020-07-07 04:45:10 - INFO - tempo_gain_pitch_perturb: audio_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/TracyChevalier_2012S_131.wv
+2020-07-07 04:45:10 - INFO - tempo_gain_pitch_perturb: tempo_value: 1.096230983106398
+2020-07-07 04:45:10 - INFO - tempo_gain_pitch_perturb: gain_value: 5.428912523813581
+2020-07-07 04:45:10 - INFO - tempo_gain_pitch_perturb: pitch_value: 358.37280773552425
+2020-07-07 04:45:10 - INFO - aug_audio_sox: tmpfile exists: True
+2020-07-07 04:45:10 - INFO - aug_audio_sox: sox stdout: 
+2020-07-07 04:45:10 - INFO - aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=1.096 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=0.813191 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/legacy/train/converted/wav/TracyChevalier_2012S_131.wv' (wav)
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:01.01 = 16160 samples ~ 75.75 CDDA sectors
+File Size      : 32.4k
+Bit Rate       : 257k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmpo8oso4i7.wav'
+
+Output File    : '/tmp/tmpo8oso4i7.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch      19675.6Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-07 04:45:10 - INFO - preproc: synthetic_gaussian_noise_inject
+2020-07-07 04:45:10 - INFO - syn_gaussian_noise: snr_level: 19.75335715484841
+2020-07-07 04:45:10 - INFO - syn_gaussian_noise: audio_rms: 2258
+2020-07-07 04:45:10 - INFO - syn_gaussian_noise: noise_rms: 232.30367475167938
+2020-07-07 04:45:10 - INFO - preproc: noise injected
+2020-07-07 04:45:10 - INFO - preproc: normalized
+2020-07-07 04:45:10 - INFO - spec_aug: policy: 1
+2020-07-07 04:45:10 - INFO - spec_aug: features shape: (56, 257)
+2020-07-07 04:45:10 - INFO - spec_aug: nu is: 257
+2020-07-07 04:45:10 - INFO - spec_aug: tau is: 56
+2020-07-07 04:45:10 - INFO - spec_aug: W is: 20
+2020-07-07 04:45:10 - INFO - spec_aug: point_to_warp: -1.5232959985733032
+2020-07-07 04:45:10 - INFO - spec_aug: dist_to_warp: 18
+2020-07-07 04:45:10 - INFO - spec_aug: finished time_warp
+2020-07-07 04:45:10 - INFO - spec_aug: f is: 10 at: 53
+2020-07-07 04:45:10 - INFO - spec_aug: t is: 56 at: 0
+2020-07-07 04:45:10 - INFO - preproc: spec_aug applied
+2020-07-07 04:45:10 - INFO - preproc: text encoded
+2020-07-07 04:45:10 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-07 04:45:10 - INFO - train: ====== Iteration: 441545 in run_epoch =======
+2020-07-07 04:45:10 - ERROR - batch_stats: batch_std is nearly zero in [0.60214061, 0.54593545, 1.0485641, 0.52606136, 0.83123201, 0.52061778, 0.64968944, 0.0]
+2020-07-07 04:45:10 - ERROR - Exception raised: batch std value is nearly zero
+2020-07-07 04:45:10 - ERROR - train: ====In exceptt block====
+2020-07-07 04:45:10 - ERROR - train: state_dict: OrderedDict([('conv.0.weight', tensor([[[[ 0.0191, -0.0303,  0.0089,  ..., -0.0051,  0.0628,  0.0992],
+          [ 0.0062,  0.0292,  0.0344,  ...,  0.0164,  0.0566,  0.0208],
+          [ 0.0709, -0.0082, -0.0297,  ...,  0.0331,  0.0889,  0.0891],
+          ...,
+          [ 0.0383,  0.0649, -0.0273,  ...,  0.0989,  0.0120,  0.0981],
+          [ 0.0766, -0.0391, -0.0289,  ...,  0.0376,  0.0585,  0.1017],
+          [ 0.0064,  0.0203,  0.0137,  ...,  0.0229, -0.0045,  0.1145]]],
+
+
+        [[[-0.0231,  0.0425, -0.0364,  ...,  0.0087,  0.0272, -0.0347],
+          [ 0.0074,  0.0532,  0.0375,  ..., -0.0088, -0.0089, -0.0366],
+          [-0.0244, -0.0101, -0.0257,  ...,  0.0689,  0.0662,  0.0357],
+          ...,
+          [ 0.0153,  0.0039,  0.0356,  ...,  0.0426,  0.0249, -0.0201],
+          [ 0.0180, -0.0754,  0.0137,  ...,  0.0770, -0.0509, -0.0003],
+          [ 0.0202, -0.0350, -0.0222,  ...,  0.0743,  0.0274,  0.0146]]],
+
+
+        [[[-0.0204, -0.0511, -0.0153,  ...,  0.0016,  0.0704,  0.0447],
+          [-0.0258, -0.0867, -0.0027,  ...,  0.0093,  0.1106,  0.0730],
+          [ 0.0246, -0.0785,  0.0290,  ...,  0.1064,  0.1390,  0.0958],
+          ...,
+          [ 0.0137, -0.0856,  0.0152,  ...,  0.1218,  0.1576,  0.1045],
+          [-0.0480, -0.1286, -0.0353,  ...,  0.0507,  0.1148,  0.0860],
+          [-0.1156, -0.0619, -0.0679,  ...,  0.0539,  0.0542,  0.0933]]],
+
+
+        ...,
+
+
+        [[[ 0.0783,  0.0594,  0.0935,  ..., -0.0329, -0.0020, -0.0533],
+          [ 0.0709,  0.0740,  0.0792,  ..., -0.0467, -0.0575,  0.0069],
+          [-0.0220,  0.0112,  0.0129,  ..., -0.0012, -0.0558, -0.0630],
+          ...,
+          [-0.0663, -0.0793, -0.0361,  ..., -0.0224, -0.0360,  0.0364],
+          [-0.0642, -0.0993, -0.0517,  ...,  0.0019,  0.0423,  0.0370],
+          [-0.0169, -0.0479, -0.0061,  ...,  0.0332,  0.0417,  0.0453]]],
+
+
+        [[[-0.0181, -0.0528, -0.0892,  ...,  0.0412,  0.0162, -0.0133],
+          [-0.0403,  0.0091,  0.0439,  ..., -0.0186, -0.0484,  0.0051],
+          [ 0.0907,  0.0813,  0.0867,  ..., -0.0811, -0.0550, -0.0488],
+          ...,
+          [ 0.0551,  0.1093,  0.0276,  ..., -0.0182, -0.0083, -0.0517],
+          [ 0.0344,  0.0597,  0.0396,  ...,  0.0377,  0.0310,  0.0073],
+          [ 0.0073, -0.0531, -0.0763,  ...,  0.0571, -0.0013,  0.0424]]],
+
+
+        [[[ 0.0153, -0.0064,  0.0973,  ...,  0.0623,  0.0046, -0.0137],
+          [-0.0038,  0.0481,  0.0888,  ...,  0.0318,  0.0525, -0.0838],
+          [-0.0414,  0.0391,  0.0447,  ..., -0.0528,  0.0372, -0.0592],
+          ...,
+          [ 0.0133,  0.0832,  0.0454,  ..., -0.0519,  0.0484, -0.0291],
+          [ 0.0206,  0.0421,  0.0560,  ..., -0.0432,  0.0516, -0.0326],
+          [ 0.0501,  0.0431,  0.0607,  ...,  0.0088, -0.0037, -0.0392]]]],
+       device='cuda:0')), ('conv.0.bias', tensor([ 0.0345,  0.0311, -0.0128,  0.0319, -0.0172,  0.0060,  0.0336,  0.0465,
+        -0.0417, -0.0561, -0.0396, -0.0573,  0.0117,  0.0410, -0.0035, -0.0131,
+         0.0487, -0.0018,  0.0336,  0.0079, -0.0025, -0.0119,  0.0502,  0.0266,
+         0.0326,  0.0520,  0.0504,  0.0161,  0.0490,  0.0026,  0.0383, -0.0300],
+       device='cuda:0')), ('conv.1.weight', tensor([0.6920, 0.3734, 0.8665, 0.5680, 1.2611, 0.6995, 0.3601, 0.4187, 0.6601,
+        0.3974, 0.3924, 0.6778, 0.1254, 0.0663, 0.7052, 0.5063, 0.3755, 0.6104,
+        0.2157, 0.9782, 0.7998, 0.6620, 0.6749, 0.8443, 0.7315, 0.0573, 0.5943,
+        0.1145, 0.3860, 0.8056, 0.7858, 0.5188], device='cuda:0')), ('conv.1.bias', tensor([ 0.2028, -0.0063, -0.0341,  0.0125, -0.0522,  0.2186,  0.0201,  0.0402,
+        -0.1138,  0.0699,  0.0514, -0.1117,  0.0013, -0.0008,  0.1086,  0.0485,
+         0.1175,  0.1847,  0.0217, -0.1920, -0.1995, -0.0639, -0.1541,  0.2320,
+         0.1323,  0.0060, -0.0398,  0.0015, -0.0282,  0.1278,  0.1358, -0.0634],
+       device='cuda:0')), ('conv.1.running_mean', tensor([-0.1152,  0.0150, -0.0097, -0.0239, -0.0365, -0.0890,  0.0360,  0.0969,
+         0.0649, -0.0525, -0.0172, -0.0085,  0.0106,  0.0333,  0.0593,  0.0014,
+         0.0765, -0.0977,  0.0630,  0.0013,  0.0044, -0.0021,  0.1290,  0.0081,
+         0.1650,  0.0710,  0.0415,  0.0205,  0.0385,  0.1123, -0.0109, -0.0445],
+       device='cuda:0')), ('conv.1.running_var', tensor([ 9.0893,  0.6111,  3.0024,  2.6648, 13.8042,  3.5715,  0.1934,  2.1235,
+         4.2842,  0.6058,  1.3237,  1.9731,  0.1539,  0.1641,  1.6844,  0.9605,
+         1.3651,  5.2458,  0.4510,  5.2786,  1.9174,  1.0914,  2.6215,  6.3806,
+         7.8155,  0.2506,  0.4240,  0.1261,  0.8488,  5.3718,  6.2190,  0.8019],
+       device='cuda:0')), ('conv.1.num_batches_tracked', tensor(537684, device='cuda:0')), ('conv.4.weight', tensor([[[[-1.9463e-02, -3.5619e-03,  3.0784e-03,  ..., -1.8998e-02,
+           -6.2675e-03, -5.7857e-03],
+          [-1.0076e-02, -1.2209e-02, -4.4925e-03,  ..., -2.4115e-02,
+           -2.0336e-02, -2.3168e-02],
+          [-2.7081e-02, -1.8106e-02, -2.3800e-02,  ..., -1.9823e-02,
+           -2.0086e-02, -3.1304e-02],
+          ...,
+          [-5.1123e-02, -5.1292e-02, -5.3213e-02,  ..., -3.9854e-02,
+           -3.7448e-02, -1.9132e-02],
+          [-4.9493e-02, -5.7317e-02, -4.2054e-02,  ..., -2.5689e-02,
+           -4.3587e-02, -3.8212e-02],
+          [-6.1061e-02, -4.5588e-02, -4.9823e-02,  ..., -2.6750e-02,
+           -1.7651e-02, -2.3651e-02]],
+
+         [[ 7.0444e-03,  4.8451e-03,  8.7398e-03,  ..., -2.9240e-04,
+            1.6325e-02,  4.6147e-03],
+          [-3.6035e-03, -1.0610e-02,  7.4078e-03,  ...,  1.6023e-03,
+            1.2018e-02,  2.0230e-02],
+          [-2.7509e-03, -3.3278e-04, -9.4521e-04,  ...,  1.7964e-02,
+            4.3868e-03,  1.6744e-02],
+          ...,
+          [ 1.1793e-02, -1.0211e-02,  2.0658e-03,  ...,  1.0113e-02,
+            1.6087e-02,  4.9213e-03],
+          [-5.9375e-03, -1.1495e-02,  4.5197e-03,  ...,  1.9199e-02,
+            1.5292e-02,  6.9717e-03],
+          [ 9.7963e-03, -4.4456e-03, -1.8601e-03,  ...,  2.0815e-02,
+            1.7072e-02,  2.5523e-02]],
+
+         [[-1.8834e-02, -2.1090e-02, -3.2278e-02,  ..., -1.0075e-02,
+           -1.1630e-02, -1.3870e-02],
+          [-2.7611e-02, -3.4786e-02, -1.4530e-02,  ..., -1.0121e-02,
+           -1.5707e-03, -1.4239e-02],
+          [-2.7103e-02, -1.9431e-02, -1.9761e-02,  ..., -9.9023e-03,
+           -4.7690e-03, -2.4422e-03],
+          ...,
+          [-1.5387e-02,  5.6828e-03,  2.7308e-03,  ..., -7.6248e-03,
+           -2.0101e-03, -7.4563e-03],
+          [-6.8621e-03, -1.0323e-02, -1.0070e-02,  ..., -1.9799e-02,
+           -1.0066e-02,  1.1900e-03],
+          [-4.0476e-02, -1.0181e-02, -1.4620e-03,  ..., -7.9548e-03,
+           -6.4459e-03, -5.4758e-03]],
+
+         ...,
+
+         [[-2.3128e-02, -2.9278e-02, -8.6631e-03,  ...,  3.0030e-02,
+            1.7605e-02,  2.5408e-02],
+          [-3.9778e-02, -3.7723e-02, -1.4942e-02,  ...,  6.6293e-03,
+            1.5502e-02,  2.7926e-02],
+          [-4.0304e-02, -2.9190e-02, -4.1052e-02,  ...,  2.2825e-02,
+            1.3207e-02,  2.2810e-02],
+          ...,
+          [-2.8118e-02, -3.2884e-02, -2.9115e-02,  ...,  3.6649e-02,
+            1.1103e-02,  2.9152e-02],
+          [-6.6449e-03, -4.0702e-03, -1.2293e-02,  ...,  4.5037e-02,
+            3.4065e-02,  5.1264e-02],
+          [ 1.4619e-02,  3.9417e-02,  2.7488e-02,  ...,  6.1442e-02,
+            5.6416e-02,  6.6466e-02]],
+
+         [[ 2.1192e-02,  1.5425e-02,  1.2152e-02,  ..., -3.7316e-03,
+           -1.4554e-02,  7.1122e-03],
+          [ 3.3128e-02,  2.2695e-02,  2.8855e-02,  ..., -1.7655e-02,
+            2.2537e-03, -6.5977e-04],
+          [ 5.6469e-02,  2.5624e-02,  4.4916e-02,  ..., -7.4518e-03,
+            8.6357e-03,  4.9916e-03],
+          ...,
+          [ 3.6350e-02,  3.2423e-02,  3.3852e-02,  ...,  1.2164e-02,
+            3.4808e-02,  1.7326e-02],
+          [ 1.6843e-02,  1.4682e-02,  3.1412e-02,  ...,  2.1456e-02,
+            4.1722e-02,  3.7534e-02],
+          [ 1.2224e-02,  2.3684e-02,  1.3807e-02,  ...,  4.8724e-02,
+            5.7106e-02,  6.1212e-02]],
+
+         [[-3.3414e-03, -1.2433e-02, -6.4248e-03,  ..., -1.3141e-02,
+           -2.1785e-02, -4.5156e-04],
+          [ 5.5936e-03,  1.7448e-02, -1.1338e-04,  ..., -1.5076e-02,
+            8.2442e-05, -5.2608e-03],
+          [-7.7393e-03,  8.9783e-03,  1.1280e-02,  ..., -4.3960e-03,
+            1.1161e-02,  3.6329e-03],
+          ...,
+          [-2.7826e-03,  1.9192e-02,  2.1179e-02,  ..., -5.4717e-03,
+            1.6785e-03,  6.6828e-03],
+          [ 4.0921e-03,  3.1791e-02,  1.6830e-02,  ...,  1.8168e-03,
+           -1.0119e-02,  5.0637e-03],
+          [ 1.4519e-02,  1.2899e-02,  2.7561e-02,  ..., -1.2690e-03,
+           -6.6503e-03,  6.3973e-03]]],
+
+
+        [[[-6.4971e-03, -7.3716e-03, -4.1361e-03,  ..., -1.7048e-02,
+           -1.8304e-02,  6.9582e-03],
+          [-1.2814e-02,  6.9885e-03, -8.3977e-03,  ..., -1.3906e-02,
+            2.5469e-03,  5.2661e-03],
+          [-4.2679e-03,  9.3583e-03, -1.2497e-02,  ...,  7.0663e-03,
+            7.6196e-03,  6.6234e-03],
+          ...,
+          [-1.7687e-03,  1.4967e-03, -4.3374e-03,  ..., -5.5795e-03,
+            4.9609e-03, -2.1548e-02],
+          [-1.0800e-02,  2.1511e-04,  1.1813e-02,  ..., -5.3021e-03,
+           -4.6656e-03, -2.3284e-02],
+          [-2.4427e-03,  6.8292e-03,  1.2377e-02,  ...,  9.4730e-03,
+            1.1418e-03, -2.8347e-02]],
+
+         [[-1.6957e-03, -6.8935e-03,  2.3603e-03,  ...,  9.0077e-03,
+           -1.0253e-02,  4.9718e-03],
+          [ 2.3494e-02,  2.7944e-03,  1.4272e-02,  ...,  2.6203e-02,
+            1.8772e-03,  7.2037e-03],
+          [ 2.2499e-02,  1.8282e-03, -2.9934e-04,  ..., -3.7574e-03,
+            3.8228e-03, -8.7110e-03],
+          ...,
+          [-4.9297e-03,  8.3066e-03,  8.4169e-03,  ...,  1.1979e-03,
+            6.0687e-03,  1.2425e-02],
+          [ 1.7532e-02, -5.9796e-03,  2.5045e-02,  ...,  1.6274e-02,
+            7.5659e-03,  1.4072e-02],
+          [ 7.7352e-03,  1.6686e-02,  3.1937e-03,  ...,  7.6590e-03,
+            1.7933e-02,  6.4799e-03]],
+
+         [[ 1.0625e-02,  1.2835e-02,  1.8240e-02,  ..., -7.1236e-03,
+           -2.2459e-02, -2.7597e-02],
+          [ 6.2524e-03,  1.5355e-02,  2.0877e-02,  ..., -1.9986e-02,
+           -2.0925e-02, -2.4109e-02],
+          [ 1.0843e-02,  3.2918e-02,  8.5648e-03,  ..., -1.7215e-02,
+           -4.0621e-02, -3.5526e-02],
+          ...,
+          [ 1.6618e-02,  1.0397e-02,  2.0784e-02,  ..., -1.5518e-02,
+           -1.6734e-02, -1.5995e-02],
+          [ 2.2444e-02,  3.1951e-02,  3.5867e-02,  ..., -1.4863e-02,
+           -1.7253e-02, -1.9110e-02],
+          [ 2.7513e-03,  2.4770e-02,  2.1708e-02,  ..., -1.9711e-02,
+           -9.7194e-03, -3.2146e-02]],
+
+         ...,
+
+         [[ 1.1183e-02,  2.7610e-02,  1.0928e-02,  ...,  8.8783e-03,
+            2.2799e-02,  9.5162e-04],
+          [-9.5150e-03,  6.1782e-03,  1.4809e-02,  ...,  2.2014e-02,
+            2.2675e-03, -5.2117e-03],
+          [-2.6739e-03, -6.9928e-03,  2.8852e-03,  ...,  2.0438e-02,
+            9.9227e-03, -4.0086e-03],
+          ...,
+          [-1.4440e-02, -8.5497e-03, -4.2368e-03,  ...,  2.4747e-03,
+            2.9283e-04, -6.2801e-03],
+          [-8.0801e-03, -9.3343e-03, -9.7064e-03,  ..., -2.6038e-02,
+           -1.9893e-02, -2.8196e-02],
+          [-3.2542e-02, -1.8810e-02, -1.5992e-02,  ...,  1.8452e-03,
+           -9.9440e-03, -1.7608e-02]],
+
+         [[-3.9684e-02, -4.2013e-02, -3.0171e-02,  ..., -2.1878e-02,
+           -4.4458e-02, -4.0086e-02],
+          [-3.5986e-02, -2.6616e-02, -3.0460e-02,  ..., -3.8884e-02,
+           -2.8110e-02, -2.7605e-02],
+          [-4.9036e-02, -4.5244e-02, -4.5514e-02,  ..., -2.1496e-02,
+           -1.9670e-02, -1.9809e-02],
+          ...,
+          [-3.0853e-02, -3.8810e-02, -1.9557e-02,  ..., -1.2285e-02,
+           -9.9315e-03, -1.2237e-02],
+          [-3.9597e-02, -4.9597e-02, -2.9669e-02,  ..., -9.9212e-03,
+           -2.0450e-02, -1.8368e-02],
+          [-4.9060e-02, -2.9024e-02, -4.9578e-02,  ..., -6.9288e-03,
+           -2.0669e-02, -2.6953e-02]],
+
+         [[ 2.0509e-02, -2.1398e-02,  6.0027e-03,  ...,  1.2079e-02,
+            2.3604e-03,  2.0471e-02],
+          [ 1.4123e-02, -2.2474e-03, -2.2381e-05,  ...,  1.1568e-03,
+            1.0721e-02, -1.0231e-02],
+          [-5.5601e-03, -4.4595e-03, -2.2486e-03,  ..., -2.0304e-02,
+           -3.9211e-03,  1.0908e-02],
+          ...,
+          [ 3.1081e-03, -5.8308e-03, -4.9942e-03,  ...,  3.1162e-03,
+            8.0058e-03,  7.5580e-03],
+          [-8.5154e-03, -8.6295e-03,  1.3143e-02,  ...,  5.2143e-03,
+           -4.2885e-03,  9.0682e-03],
+          [ 4.9492e-03, -1.2406e-02,  1.2275e-02,  ...,  5.8173e-03,
+            9.6820e-03,  1.7762e-02]]],
+
+
+        [[[-9.6776e-03, -1.1101e-02, -1.3594e-02,  ..., -2.3326e-02,
+           -1.7575e-02,  3.2752e-03],
+          [-7.6661e-03, -1.7451e-02, -2.0001e-02,  ..., -1.4631e-02,
+            9.4393e-03,  3.8657e-03],
+          [-9.1012e-04, -6.7274e-03, -1.2343e-02,  ...,  7.8567e-03,
+            8.8828e-03, -3.1424e-03],
+          ...,
+          [ 1.0772e-02,  5.7212e-04, -5.3560e-03,  ...,  1.7414e-02,
+            9.0842e-03,  6.4495e-03],
+          [ 1.4351e-02,  1.0041e-03, -2.6910e-04,  ...,  1.5375e-02,
+            1.1148e-03,  6.3936e-03],
+          [ 5.8033e-03,  1.7273e-02,  8.5485e-04,  ...,  1.6787e-02,
+            1.3856e-02,  6.1653e-03]],
+
+         [[ 1.3019e-02, -5.3302e-03,  1.7291e-02,  ...,  1.3366e-02,
+           -6.6584e-03, -1.6111e-03],
+          [-5.4208e-03, -2.3752e-03,  4.6150e-03,  ...,  1.4748e-02,
+           -9.6123e-03, -2.3191e-02],
+          [ 5.0491e-03,  8.4859e-03,  1.7758e-02,  ..., -1.3048e-02,
+           -6.6605e-03, -2.1753e-02],
+          ...,
+          [-2.7963e-03,  2.1281e-03,  1.1744e-02,  ...,  1.0459e-02,
+           -1.4662e-02, -2.3915e-02],
+          [ 3.0141e-03, -9.4016e-03, -6.5672e-04,  ..., -8.3609e-03,
+           -1.4438e-02, -1.4493e-02],
+          [ 8.8058e-03, -5.1208e-03,  4.3830e-03,  ...,  1.0987e-03,
+           -9.5005e-03, -3.2576e-02]],
+
+         [[ 1.3060e-02, -2.4693e-03, -1.6799e-02,  ..., -9.8468e-03,
+           -2.9444e-02, -4.4205e-02],
+          [ 1.9930e-02,  1.5634e-03, -9.7845e-03,  ..., -7.5634e-03,
+           -2.1357e-02, -1.4078e-02],
+          [ 6.9286e-03,  1.2452e-02,  1.6000e-02,  ...,  1.1478e-02,
+           -6.2990e-03, -1.7101e-02],
+          ...,
+          [ 2.3294e-02,  1.9758e-02, -7.4154e-04,  ...,  7.2134e-03,
+            4.7564e-03, -3.1870e-02],
+          [ 7.8525e-03,  2.3731e-02,  2.4030e-02,  ...,  7.1497e-03,
+           -9.1037e-03, -2.0388e-02],
+          [ 1.0997e-02,  2.4115e-02,  1.8578e-02,  ..., -4.6665e-03,
+           -7.9350e-03, -3.3619e-02]],
+
+         ...,
+
+         [[ 5.0343e-03,  1.8373e-03,  6.1919e-03,  ...,  3.8368e-02,
+            3.2334e-02,  3.1232e-02],
+          [-1.2149e-02, -6.7727e-03, -2.5641e-02,  ...,  3.5328e-02,
+            3.5173e-02,  2.7135e-02],
+          [-2.2644e-02, -7.7415e-03, -1.7707e-02,  ...,  3.0909e-02,
+            3.6193e-02,  2.1519e-02],
+          ...,
+          [-2.9577e-02, -1.8574e-02, -2.8919e-02,  ...,  2.1001e-02,
+            5.7776e-03,  3.7986e-03],
+          [-5.6874e-02, -2.6066e-02, -4.0814e-02,  ...,  3.2995e-02,
+            1.8649e-02,  1.5440e-02],
+          [-5.4978e-02, -3.7698e-02, -5.2711e-02,  ...,  3.6362e-02,
+            2.1730e-02,  1.4009e-02]],
+
+         [[-3.8949e-02, -5.3693e-02, -4.7128e-02,  ..., -2.5179e-02,
+           -3.3463e-02, -2.1396e-02],
+          [-3.0712e-02, -3.2213e-02, -3.8798e-02,  ..., -1.8987e-02,
+           -2.0105e-02, -1.4809e-02],
+          [-4.5573e-02, -2.8661e-02, -4.6309e-02,  ..., -5.8897e-03,
+           -7.1401e-03, -9.8621e-03],
+          ...,
+          [-3.3508e-02, -2.3749e-02, -4.4187e-02,  ..., -2.2726e-02,
+           -1.4311e-02, -1.5133e-02],
+          [-4.1111e-02, -4.0377e-02, -4.3938e-02,  ..., -3.8925e-02,
+           -1.6527e-02, -1.9829e-02],
+          [-3.7814e-02, -3.3300e-02, -4.4342e-02,  ..., -4.4312e-02,
+           -2.7167e-02, -3.2126e-02]],
+
+         [[-2.8140e-04,  4.4713e-03,  2.3858e-02,  ..., -9.5520e-03,
+            1.5841e-02,  1.2997e-02],
+          [ 1.9945e-03,  1.2922e-02, -1.9819e-03,  ...,  1.2956e-02,
+            2.0754e-03,  1.5171e-02],
+          [ 1.9138e-02, -4.8442e-03,  1.9288e-02,  ...,  8.9387e-04,
+            2.6076e-02,  2.2191e-02],
+          ...,
+          [ 2.3615e-02,  2.7762e-03,  2.1805e-02,  ...,  5.3178e-03,
+           -9.5956e-04,  1.8728e-02],
+          [ 1.7575e-02,  1.8027e-02,  2.9602e-02,  ..., -1.3557e-02,
+            2.0480e-02,  2.4958e-02],
+          [ 1.6573e-02,  1.8201e-02,  2.8572e-02,  ..., -6.5515e-03,
+            2.1745e-03, -6.6490e-03]]],
+
+
+        ...,
+
+
+        [[[-1.7531e-03, -1.0471e-02,  1.0377e-03,  ..., -1.1637e-02,
+            5.3609e-03, -1.3996e-02],
+          [-4.5144e-03, -1.4083e-02,  3.0674e-03,  ..., -1.4648e-04,
+           -2.3681e-02,  4.3754e-03],
+          [-2.3222e-02, -6.4270e-04, -5.8432e-03,  ..., -2.5203e-02,
+           -2.0096e-02, -2.3554e-02],
+          ...,
+          [ 1.4829e-03, -2.3409e-02, -1.3587e-02,  ..., -1.8226e-02,
+           -1.4210e-03, -8.4552e-03],
+          [-6.2443e-03,  1.9794e-03, -2.9043e-03,  ..., -3.0421e-02,
+           -1.2933e-02, -1.2588e-02],
+          [-4.4829e-04, -1.9876e-02, -1.4382e-02,  ..., -2.1996e-02,
+           -1.4726e-02, -2.1584e-02]],
+
+         [[ 1.9428e-02,  9.1462e-03, -2.7757e-03,  ..., -4.7382e-03,
+            1.7967e-02, -6.7095e-03],
+          [-5.1090e-03,  1.6164e-03,  1.9088e-02,  ...,  7.3110e-03,
+            1.6780e-02,  4.8477e-03],
+          [ 1.1165e-02, -6.6461e-03,  9.2432e-03,  ...,  1.5728e-02,
+           -3.0588e-03, -5.2181e-03],
+          ...,
+          [ 1.1819e-02,  1.0482e-02,  1.3412e-02,  ...,  1.0666e-02,
+           -2.0780e-03,  1.4948e-02],
+          [ 6.4437e-03, -8.7636e-03, -1.1218e-02,  ...,  1.6006e-02,
+            1.7129e-02,  9.4938e-04],
+          [ 3.8176e-03,  7.5086e-03,  2.1955e-03,  ..., -1.9997e-03,
+           -4.2748e-03, -3.4057e-03]],
+
+         [[ 2.2339e-04,  2.6537e-02,  1.6844e-02,  ...,  7.4078e-03,
+            4.4465e-04,  2.4119e-03],
+          [ 1.6206e-02,  7.1837e-04,  5.0613e-03,  ...,  7.4715e-03,
+            2.3014e-03, -1.2335e-02],
+          [-2.7057e-03,  9.3249e-03, -7.4949e-04,  ..., -7.7925e-03,
+           -8.4097e-04, -2.1906e-02],
+          ...,
+          [-1.2384e-04,  1.4151e-03, -1.7600e-02,  ...,  2.5925e-03,
+           -4.6655e-03, -6.6648e-03],
+          [-1.8947e-02, -1.6119e-02, -2.5393e-02,  ..., -1.3874e-02,
+           -7.8520e-03, -2.0248e-02],
+          [-9.6282e-03, -1.6350e-02, -7.9829e-03,  ..., -2.6383e-02,
+           -1.4629e-02, -1.5775e-02]],
+
+         ...,
+
+         [[ 1.3153e-02,  1.2776e-02,  6.1934e-03,  ..., -6.4271e-03,
+           -1.8472e-02,  2.8383e-03],
+          [-9.0242e-04,  1.8852e-02,  2.8017e-02,  ..., -5.3512e-03,
+           -1.7161e-02, -1.5634e-02],
+          [ 1.0193e-03,  3.7600e-03,  4.6024e-03,  ..., -1.2531e-02,
+           -1.1134e-02, -6.2984e-03],
+          ...,
+          [ 8.0617e-03,  1.2827e-02,  9.3220e-05,  ..., -9.3086e-03,
+           -2.2341e-02, -2.9105e-02],
+          [-1.5794e-02, -2.2322e-02, -1.7941e-02,  ..., -3.2169e-02,
+           -1.5058e-02, -2.4701e-02],
+          [-1.9781e-02, -5.6188e-03, -2.9614e-02,  ..., -2.5026e-02,
+           -2.6919e-02, -4.2845e-02]],
+
+         [[-2.2496e-02, -1.3025e-02, -1.8947e-02,  ..., -2.3350e-02,
+           -1.7047e-02, -1.8032e-02],
+          [-3.0186e-02, -7.7339e-03, -2.7708e-02,  ..., -2.8525e-02,
+           -2.8378e-03, -3.0095e-03],
+          [-6.0992e-03, -1.7726e-02, -2.8487e-02,  ..., -2.5628e-02,
+           -5.9172e-03, -6.6469e-03],
+          ...,
+          [-9.5425e-03, -7.3164e-03, -2.8412e-03,  ..., -7.0179e-03,
+           -1.7653e-02,  1.1285e-03],
+          [ 2.4386e-03,  6.2157e-03, -3.9754e-04,  ...,  8.3763e-04,
+           -1.1072e-04, -1.2198e-02],
+          [-9.4273e-04, -7.1562e-03,  9.1680e-03,  ..., -1.4071e-02,
+           -1.1899e-02, -1.1472e-02]],
+
+         [[-2.7001e-03, -5.1102e-03,  6.1910e-03,  ..., -2.0197e-02,
+           -1.5057e-03, -1.6030e-02],
+          [ 1.4467e-02,  1.4968e-03,  2.8568e-03,  ..., -1.8684e-02,
+           -1.1896e-02, -1.2964e-02],
+          [-2.0448e-03, -2.2949e-03, -4.6067e-04,  ..., -2.5715e-02,
+           -8.5229e-03, -5.7613e-03],
+          ...,
+          [ 5.0001e-03, -5.3896e-03, -1.5534e-03,  ..., -1.0332e-02,
+           -6.2085e-03, -8.7292e-03],
+          [-1.3885e-02, -1.5082e-02, -8.6921e-03,  ..., -7.5625e-03,
+            1.1196e-04, -7.9301e-03],
+          [ 8.3272e-04, -5.0535e-03,  5.2685e-03,  ..., -9.3186e-03,
+           -8.3783e-03, -5.3198e-03]]],
+
+
+        [[[-1.0256e-02, -1.9685e-02, -2.0461e-02,  ..., -9.6432e-03,
+           -9.2211e-03, -4.1455e-03],
+          [ 3.3978e-03,  2.8771e-03, -4.7133e-03,  ...,  7.6797e-03,
+           -8.2196e-03, -5.9111e-03],
+          [ 5.6384e-03,  5.9649e-03,  3.9694e-03,  ...,  1.1691e-02,
+            3.8210e-03, -9.1223e-03],
+          ...,
+          [ 8.5003e-03,  8.2010e-03, -1.7839e-02,  ..., -6.2569e-04,
+           -9.3622e-03,  1.3165e-02],
+          [-1.2686e-02, -8.6725e-03, -1.0092e-02,  ...,  9.8528e-03,
+           -1.2629e-02,  9.4862e-03],
+          [-1.3565e-02, -1.7749e-02, -8.1511e-03,  ..., -1.5238e-02,
+           -1.3318e-02, -5.4681e-03]],
+
+         [[-4.8529e-03, -4.0752e-03, -5.6358e-03,  ..., -1.7964e-03,
+           -8.8394e-03, -1.6145e-03],
+          [ 7.8202e-04,  1.0358e-02,  8.3556e-03,  ...,  1.2287e-02,
+           -1.2767e-02, -7.4222e-03],
+          [-2.6392e-03, -2.1686e-04, -7.7061e-04,  ...,  4.7339e-03,
+            8.2021e-03, -3.7879e-03],
+          ...,
+          [-9.6533e-03, -1.1164e-02,  1.1840e-02,  ..., -3.1810e-03,
+            2.6459e-03, -1.0911e-02],
+          [ 4.6034e-03, -5.8397e-03, -9.2575e-03,  ...,  3.4971e-03,
+            4.3580e-03, -1.2749e-03],
+          [-3.1427e-03,  9.4784e-03,  3.9419e-03,  ..., -3.3355e-03,
+            1.1152e-02, -1.0432e-02]],
+
+         [[-1.4696e-02, -1.5321e-02, -1.2108e-02,  ..., -4.9364e-03,
+           -6.5912e-03, -2.3985e-03],
+          [-4.8695e-03, -2.1576e-04, -1.7264e-02,  ..., -1.2110e-02,
+            2.5610e-04, -7.3398e-03],
+          [-2.9731e-03,  4.0375e-03, -5.8321e-03,  ..., -6.1022e-03,
+            6.8370e-03,  8.3605e-04],
+          ...,
+          [-2.7868e-03,  2.7371e-03,  1.2769e-02,  ..., -1.1867e-02,
+           -9.2413e-03, -4.4910e-03],
+          [-8.7919e-03, -8.4720e-03,  6.4727e-03,  ..., -1.4312e-02,
+           -8.9280e-03, -1.4721e-02],
+          [ 9.8986e-03,  3.8953e-03, -1.3997e-02,  ..., -7.9195e-03,
+           -1.1881e-02, -1.3638e-02]],
+
+         ...,
+
+         [[-1.6756e-02,  1.1095e-02, -1.0729e-02,  ...,  5.9621e-03,
+           -1.1710e-02,  6.8618e-03],
+          [-1.5921e-02,  2.2488e-03,  3.1812e-03,  ...,  1.5548e-02,
+            7.7210e-03,  6.7409e-03],
+          [-1.2545e-02, -1.3485e-02, -1.9493e-02,  ...,  8.0034e-04,
+           -1.0931e-02, -1.7799e-02],
+          ...,
+          [ 1.1018e-02, -1.1854e-02,  4.2353e-03,  ...,  1.6597e-02,
+            2.9651e-03,  1.2519e-02],
+          [-1.8185e-03, -8.4170e-03,  2.8337e-03,  ...,  8.7709e-03,
+           -1.0195e-02, -3.8740e-03],
+          [ 1.1101e-02, -1.0865e-02, -9.7618e-03,  ...,  9.7065e-03,
+           -8.0790e-03, -7.4825e-03]],
+
+         [[ 9.9274e-03,  1.2170e-02,  7.9567e-03,  ..., -3.9311e-03,
+           -1.1549e-02,  3.6700e-04],
+          [-6.5185e-03, -1.2483e-02, -1.1066e-03,  ...,  1.0232e-02,
+           -4.6599e-03, -4.4363e-03],
+          [-9.9170e-03,  3.4339e-03,  1.0196e-02,  ..., -4.0200e-03,
+            4.8715e-03,  1.7820e-02],
+          ...,
+          [ 7.3971e-03,  1.8313e-03, -1.2419e-02,  ...,  9.9630e-03,
+           -5.1204e-03, -7.2838e-03],
+          [ 1.0143e-02,  5.1595e-03,  6.5102e-03,  ...,  6.3407e-03,
+           -9.0123e-03,  3.1539e-04],
+          [ 3.6451e-03, -1.0766e-02, -2.3502e-03,  ..., -4.7452e-03,
+           -8.5930e-03,  1.4658e-02]],
+
+         [[-7.0971e-03, -1.4291e-02,  3.0953e-04,  ...,  1.2917e-02,
+            2.8468e-03, -1.2960e-02],
+          [-1.5317e-02, -1.4788e-02, -1.1794e-02,  ...,  5.5700e-03,
+            6.4639e-03, -6.9943e-03],
+          [-3.3667e-03,  7.5611e-03,  8.1800e-03,  ...,  8.3464e-03,
+           -1.4043e-02,  3.1840e-03],
+          ...,
+          [-9.2357e-03, -1.4463e-02,  1.0094e-02,  ..., -1.5223e-02,
+           -1.5185e-02, -1.5965e-02],
+          [ 3.9389e-03, -7.8719e-04,  2.3522e-03,  ..., -2.0852e-03,
+            2.1330e-04, -1.0289e-03],
+          [-7.6710e-03,  5.5586e-03,  7.1613e-03,  ..., -2.6393e-03,
+           -3.5947e-03,  1.1615e-02]]],
+
+
+        [[[-1.8787e-02, -1.9117e-02,  3.2528e-03,  ...,  1.2667e-04,
+           -2.0095e-02, -1.4990e-02],
+          [-1.9598e-02,  1.6896e-03, -9.7531e-03,  ..., -1.1899e-02,
+           -2.0178e-03, -3.0516e-04],
+          [-6.1488e-03,  2.9144e-03, -2.9924e-03,  ...,  2.6521e-03,
+            3.3615e-03, -1.7010e-02],
+          ...,
+          [-1.8341e-02, -3.5799e-03, -6.7343e-03,  ..., -1.3686e-02,
+            4.0184e-03,  1.9222e-03],
+          [-1.5408e-02, -2.0474e-02,  1.7816e-03,  ..., -1.8042e-02,
+            6.5120e-03, -1.1657e-02],
+          [-1.9197e-02, -3.4251e-03, -2.2630e-02,  ...,  1.0828e-02,
+           -1.0872e-02, -1.8319e-02]],
+
+         [[ 1.2847e-02,  1.5919e-02,  3.8565e-03,  ...,  4.3394e-03,
+            4.5900e-03, -4.7941e-03],
+          [ 8.1265e-03,  1.2658e-02,  3.2194e-03,  ...,  1.5726e-02,
+            1.0941e-02,  3.5773e-03],
+          [ 9.5581e-03, -3.4992e-05,  1.0587e-02,  ..., -3.4420e-03,
+            1.9192e-02, -6.1839e-03],
+          ...,
+          [ 7.9127e-03,  3.1002e-04,  1.0804e-02,  ...,  2.0621e-04,
+           -8.5780e-04,  1.4501e-02],
+          [-3.6830e-03,  1.2327e-02,  6.9605e-03,  ...,  1.7146e-02,
+            1.1113e-02,  5.6005e-05],
+          [ 8.3928e-03, -4.4734e-03,  7.6724e-03,  ..., -5.1222e-03,
+            4.8351e-03,  1.1744e-02]],
+
+         [[-2.0683e-03, -6.5648e-03, -6.8639e-03,  ..., -1.8104e-02,
+           -7.7148e-04, -1.8193e-02],
+          [-2.2819e-03,  7.1997e-03, -1.2469e-02,  ..., -1.1660e-02,
+           -6.4074e-03, -8.3911e-03],
+          [-3.2352e-03, -1.6321e-02,  5.6714e-03,  ...,  1.2974e-03,
+           -1.1787e-02, -2.0259e-02],
+          ...,
+          [-1.8494e-02,  3.1391e-03, -2.6694e-02,  ...,  4.9644e-03,
+           -7.2509e-03, -7.8427e-04],
+          [-1.0144e-02, -8.5015e-03, -5.5605e-03,  ...,  3.7542e-03,
+            1.7667e-03, -1.0492e-02],
+          [-1.4549e-02, -9.1050e-03, -3.1390e-03,  ..., -7.8171e-03,
+            6.7080e-04, -8.4443e-03]],
+
+         ...,
+
+         [[-6.5711e-03, -2.1728e-02, -1.6279e-02,  ..., -6.9906e-04,
+           -1.2683e-02, -1.9703e-03],
+          [-1.5108e-02,  7.1464e-03, -1.6904e-02,  ..., -7.8428e-03,
+            1.9104e-03, -1.3617e-03],
+          [ 7.2275e-03, -9.6638e-03, -1.0842e-02,  ..., -3.3136e-04,
+           -1.3125e-02, -2.4908e-02],
+          ...,
+          [ 1.4491e-02, -1.3199e-03, -1.6486e-03,  ..., -6.3566e-03,
+           -2.3587e-03, -2.5711e-02],
+          [ 5.8146e-03,  7.5224e-03,  2.8564e-03,  ...,  7.5998e-04,
+           -3.0876e-02, -2.6053e-03],
+          [ 1.0060e-02, -2.5454e-03,  8.6278e-03,  ..., -1.4364e-02,
+           -1.5273e-02, -2.7073e-02]],
+
+         [[-1.9281e-02, -1.1564e-02, -9.6633e-03,  ..., -3.6082e-03,
+            1.3936e-03,  5.6190e-03],
+          [-6.1811e-03, -1.0123e-02, -2.1124e-02,  ...,  9.1050e-03,
+           -7.7880e-03, -1.4464e-02],
+          [-1.6924e-02, -1.8178e-02,  2.6488e-03,  ..., -6.0401e-03,
+            1.1556e-02,  6.7011e-04],
+          ...,
+          [-1.3852e-02, -1.7352e-02, -1.8934e-02,  ...,  1.6262e-02,
+            1.2969e-02,  1.5887e-02],
+          [-8.9212e-03, -1.4458e-02, -1.1199e-02,  ..., -1.3082e-03,
+            1.0273e-02, -1.2688e-02],
+          [-3.0914e-03, -4.5694e-03, -5.4775e-03,  ..., -1.2022e-02,
+           -3.4771e-03,  2.1510e-04]],
+
+         [[-4.4184e-03, -1.2389e-02, -9.3090e-04,  ..., -7.1219e-03,
+           -1.2524e-02, -2.1481e-02],
+          [-1.8222e-02, -2.0668e-02,  5.6951e-06,  ..., -2.2590e-04,
+            6.8188e-03, -1.4147e-02],
+          [-5.9835e-03, -5.3257e-03, -1.6239e-02,  ...,  4.9008e-03,
+            2.2337e-03,  4.5243e-03],
+          ...,
+          [-9.7426e-03,  1.2360e-03,  3.3641e-04,  ..., -1.4535e-02,
+           -4.0860e-03, -1.4187e-02],
+          [-1.6397e-02,  2.8172e-03, -1.9145e-02,  ..., -1.2775e-02,
+           -4.3434e-03, -1.9609e-02],
+          [-7.7903e-03, -1.8508e-02, -1.9347e-02,  ..., -1.4104e-02,
+           -1.2057e-03, -1.1042e-02]]]], device='cuda:0')), ('conv.4.bias', tensor([ 0.0123, -0.0110, -0.0106, -0.0026,  0.0131, -0.0135, -0.0006, -0.0062,
+         0.0012, -0.0046, -0.0065,  0.0083, -0.0085, -0.0061, -0.0066, -0.0088,
+        -0.0029, -0.0126, -0.0085,  0.0110, -0.0142,  0.0122,  0.0019,  0.0032,
+        -0.0106, -0.0026,  0.0144, -0.0002, -0.0030,  0.0126, -0.0109, -0.0021],
+       device='cuda:0')), ('conv.5.weight', tensor([0.7964, 0.8912, 0.9208, 0.6885, 0.1456, 0.2601, 0.8090, 0.7002, 0.9668,
+        0.8111, 1.0955, 0.5812, 0.1036, 0.5899, 0.9015, 0.4882, 0.4270, 0.4461,
+        0.7586, 0.5405, 0.4148, 0.8640, 0.6411, 0.6608, 0.3480, 0.2147, 0.5866,
+        0.3550, 0.6609, 0.4519, 0.1903, 0.2762], device='cuda:0')), ('conv.5.bias', tensor([-0.3555,  0.1076, -0.3958, -0.0394,  0.0108,  0.0212, -0.3266,  0.1036,
+        -0.7032, -0.4551, -0.1052, -0.1347, -0.0506, -0.0369, -0.0523, -0.1451,
+        -0.1490, -0.0544,  0.4569,  0.2165, -0.1446, -0.2773, -0.1537, -0.1841,
+        -0.1778, -0.0117, -0.2477,  0.0106, -0.0660, -0.0883, -0.0441,  0.0171],
+       device='cuda:0')), ('conv.5.running_mean', tensor([ 1.2143, -4.1325, -4.5306, -2.2019, -1.0886,  3.6930, -4.6576, -4.6957,
+         0.4307,  1.0821, -3.8180, -2.1338, -0.4510, -2.6708, -4.0087, -1.2371,
+        -0.1087, -1.8104, -1.4460, -2.5040, -0.9350, -4.0977, -0.5304, -4.0431,
+        -1.5274,  1.7610, -2.6156, -0.9938, -3.7458, -2.5859, -0.6962, -1.6204],
+       device='cuda:0')), ('conv.5.running_var', tensor([15.9231, 29.8821, 37.1065, 18.6801,  1.3093,  8.1103, 26.3639, 29.5900,
+        20.4827, 23.5018, 28.7356, 13.7744,  0.4355, 14.3517, 39.1452, 14.2300,
+         4.6179,  7.0038, 28.5791, 27.6903,  3.1013, 33.0088, 17.7787, 13.6715,
+         3.3112,  3.1261,  6.2412, 15.1805, 27.5250, 11.6436,  0.9450,  2.8317],
+       device='cuda:0')), ('conv.5.num_batches_tracked', tensor(537684, device='cuda:0')), ('conv.8.weight', tensor([[[[-0.0052, -0.0056,  0.0145,  ...,  0.0124,  0.0061,  0.0048],
+          [ 0.0057, -0.0056,  0.0087,  ...,  0.0154,  0.0103,  0.0049],
+          [-0.0109, -0.0092,  0.0074,  ...,  0.0129,  0.0170, -0.0046],
+          ...,
+          [ 0.0087, -0.0093, -0.0011,  ...,  0.0123, -0.0033,  0.0091],
+          [ 0.0090,  0.0045,  0.0163,  ..., -0.0055, -0.0079,  0.0156],
+          [-0.0053,  0.0072, -0.0081,  ...,  0.0088, -0.0043,  0.0097]],
+
+         [[-0.0052,  0.0014,  0.0023,  ...,  0.0064, -0.0111, -0.0136],
+          [ 0.0025, -0.0036, -0.0011,  ..., -0.0158, -0.0087,  0.0025],
+          [-0.0141,  0.0005,  0.0053,  ...,  0.0023,  0.0124, -0.0118],
+          ...,
+          [-0.0010, -0.0047, -0.0117,  ..., -0.0140, -0.0131, -0.0109],
+          [ 0.0047,  0.0073,  0.0042,  ...,  0.0041,  0.0008,  0.0123],
+          [-0.0080, -0.0172, -0.0097,  ..., -0.0083,  0.0060, -0.0102]],
+
+         [[-0.0051, -0.0097, -0.0047,  ...,  0.0117, -0.0059, -0.0038],
+          [-0.0089,  0.0080, -0.0039,  ...,  0.0059, -0.0056, -0.0006],
+          [ 0.0027, -0.0065, -0.0051,  ..., -0.0156,  0.0073,  0.0072],
+          ...,
+          [ 0.0026,  0.0067, -0.0138,  ...,  0.0048, -0.0106, -0.0065],
+          [-0.0135,  0.0078,  0.0064,  ..., -0.0088,  0.0059, -0.0020],
+          [-0.0101,  0.0062, -0.0146,  ..., -0.0003, -0.0060,  0.0114]],
+
+         ...,
+
+         [[ 0.0022, -0.0117,  0.0090,  ...,  0.0075,  0.0081,  0.0082],
+          [-0.0002, -0.0015,  0.0081,  ..., -0.0111, -0.0011, -0.0075],
+          [ 0.0050,  0.0100,  0.0122,  ...,  0.0013,  0.0033,  0.0013],
+          ...,
+          [-0.0057, -0.0054, -0.0039,  ..., -0.0142,  0.0052, -0.0022],
+          [-0.0092, -0.0046, -0.0058,  ..., -0.0106, -0.0146, -0.0138],
+          [ 0.0161,  0.0120, -0.0093,  ..., -0.0081, -0.0084, -0.0069]],
+
+         [[-0.0007,  0.0136,  0.0128,  ...,  0.0123, -0.0022,  0.0096],
+          [-0.0048,  0.0065, -0.0014,  ...,  0.0062,  0.0044, -0.0077],
+          [ 0.0139,  0.0088, -0.0047,  ...,  0.0094, -0.0102, -0.0131],
+          ...,
+          [ 0.0062,  0.0105, -0.0043,  ...,  0.0154,  0.0030, -0.0047],
+          [ 0.0004,  0.0105, -0.0034,  ...,  0.0048, -0.0026,  0.0093],
+          [-0.0037,  0.0069, -0.0043,  ..., -0.0004,  0.0104,  0.0074]],
+
+         [[ 0.0138, -0.0133,  0.0114,  ..., -0.0106,  0.0018, -0.0096],
+          [-0.0085,  0.0034, -0.0091,  ..., -0.0098,  0.0009,  0.0089],
+          [-0.0072, -0.0126,  0.0124,  ..., -0.0019, -0.0076, -0.0070],
+          ...,
+          [-0.0121,  0.0084, -0.0025,  ...,  0.0103,  0.0029, -0.0089],
+          [-0.0030, -0.0103,  0.0010,  ...,  0.0056,  0.0138,  0.0069],
+          [-0.0001, -0.0105,  0.0074,  ..., -0.0046, -0.0009,  0.0166]]],
+
+
+        [[[ 0.0144,  0.0105, -0.0113,  ..., -0.0201, -0.0034, -0.0023],
+          [-0.0027,  0.0163,  0.0116,  ...,  0.0051, -0.0015, -0.0074],
+          [-0.0108, -0.0056, -0.0063,  ..., -0.0089, -0.0219, -0.0093],
+          ...,
+          [ 0.0036,  0.0069, -0.0058,  ..., -0.0093,  0.0032,  0.0037],
+          [-0.0049, -0.0054, -0.0008,  ...,  0.0018,  0.0036,  0.0097],
+          [-0.0046,  0.0041,  0.0005,  ...,  0.0093,  0.0156, -0.0120]],
+
+         [[ 0.0034,  0.0003, -0.0075,  ..., -0.0109,  0.0017, -0.0003],
+          [-0.0113, -0.0064,  0.0016,  ..., -0.0081, -0.0023,  0.0123],
+          [-0.0133,  0.0031, -0.0036,  ..., -0.0107, -0.0103, -0.0084],
+          ...,
+          [ 0.0047,  0.0089,  0.0016,  ..., -0.0078,  0.0053,  0.0037],
+          [ 0.0132,  0.0008,  0.0065,  ..., -0.0120, -0.0027,  0.0009],
+          [ 0.0136,  0.0078,  0.0027,  ...,  0.0058,  0.0005,  0.0067]],
+
+         [[-0.0120, -0.0163, -0.0043,  ...,  0.0063,  0.0104, -0.0145],
+          [ 0.0022,  0.0088, -0.0109,  ..., -0.0078, -0.0115,  0.0079],
+          [ 0.0119, -0.0058, -0.0042,  ..., -0.0013, -0.0022,  0.0072],
+          ...,
+          [-0.0093, -0.0044,  0.0096,  ..., -0.0049, -0.0107,  0.0104],
+          [-0.0064, -0.0134,  0.0132,  ..., -0.0118, -0.0157,  0.0034],
+          [ 0.0040, -0.0159,  0.0051,  ..., -0.0166,  0.0091,  0.0007]],
+
+         ...,
+
+         [[ 0.0047,  0.0141,  0.0086,  ..., -0.0038, -0.0052,  0.0090],
+          [ 0.0073, -0.0016,  0.0033,  ..., -0.0030, -0.0005,  0.0086],
+          [-0.0069,  0.0093, -0.0056,  ..., -0.0078,  0.0053,  0.0068],
+          ...,
+          [-0.0115,  0.0056,  0.0103,  ..., -0.0100, -0.0037, -0.0085],
+          [-0.0127, -0.0109,  0.0085,  ..., -0.0153, -0.0091,  0.0056],
+          [-0.0151, -0.0114, -0.0152,  ..., -0.0100, -0.0015, -0.0154]],
+
+         [[-0.0014,  0.0009,  0.0024,  ...,  0.0134, -0.0111, -0.0016],
+          [ 0.0045,  0.0102,  0.0026,  ..., -0.0036,  0.0034,  0.0037],
+          [ 0.0005, -0.0071, -0.0072,  ..., -0.0045,  0.0028,  0.0101],
+          ...,
+          [-0.0038,  0.0109, -0.0069,  ...,  0.0079, -0.0044, -0.0078],
+          [-0.0126,  0.0120, -0.0082,  ...,  0.0077,  0.0134,  0.0006],
+          [ 0.0050,  0.0102, -0.0090,  ...,  0.0098,  0.0049, -0.0057]],
+
+         [[ 0.0070, -0.0146,  0.0095,  ...,  0.0038, -0.0003, -0.0093],
+          [-0.0014,  0.0087, -0.0023,  ..., -0.0074,  0.0018, -0.0013],
+          [-0.0025, -0.0136, -0.0001,  ..., -0.0130, -0.0083, -0.0065],
+          ...,
+          [-0.0139, -0.0115, -0.0066,  ..., -0.0141, -0.0076,  0.0053],
+          [-0.0042, -0.0013, -0.0031,  ...,  0.0013, -0.0085, -0.0082],
+          [ 0.0067,  0.0081, -0.0137,  ..., -0.0009, -0.0067,  0.0106]]],
+
+
+        [[[-0.0104,  0.0113,  0.0149,  ..., -0.0097,  0.0089, -0.0106],
+          [ 0.0016,  0.0033,  0.0046,  ..., -0.0097,  0.0091,  0.0226],
+          [ 0.0018, -0.0054,  0.0086,  ...,  0.0022,  0.0201,  0.0010],
+          ...,
+          [-0.0007, -0.0025, -0.0060,  ..., -0.0055,  0.0112,  0.0017],
+          [-0.0149, -0.0008,  0.0064,  ...,  0.0088, -0.0176, -0.0014],
+          [-0.0096,  0.0234,  0.0158,  ...,  0.0144, -0.0094, -0.0149]],
+
+         [[-0.0510, -0.0387, -0.0221,  ..., -0.0010,  0.0209,  0.0162],
+          [-0.0391, -0.0176, -0.0430,  ...,  0.0089,  0.0054,  0.0119],
+          [-0.0483, -0.0442, -0.0280,  ...,  0.0282,  0.0206,  0.0142],
+          ...,
+          [-0.0260, -0.0134, -0.0265,  ...,  0.0193,  0.0191,  0.0111],
+          [-0.0481, -0.0423, -0.0312,  ...,  0.0324,  0.0429,  0.0133],
+          [-0.0438, -0.0320, -0.0272,  ...,  0.0081,  0.0049,  0.0310]],
+
+         [[-0.0264, -0.0047, -0.0014,  ..., -0.0041,  0.0086, -0.0144],
+          [-0.0306, -0.0279,  0.0045,  ..., -0.0060,  0.0031, -0.0092],
+          [-0.0292, -0.0026, -0.0180,  ...,  0.0101,  0.0014,  0.0093],
+          ...,
+          [-0.0138, -0.0150, -0.0180,  ...,  0.0049, -0.0016,  0.0107],
+          [-0.0085, -0.0101, -0.0148,  ..., -0.0057, -0.0024,  0.0095],
+          [-0.0119, -0.0079, -0.0121,  ...,  0.0156,  0.0001, -0.0039]],
+
+         ...,
+
+         [[ 0.0020, -0.0041, -0.0133,  ...,  0.0022,  0.0034,  0.0202],
+          [-0.0046, -0.0126,  0.0091,  ..., -0.0015,  0.0132,  0.0257],
+          [-0.0198, -0.0082, -0.0149,  ..., -0.0002,  0.0049,  0.0119],
+          ...,
+          [-0.0032,  0.0085,  0.0038,  ...,  0.0113,  0.0349,  0.0058],
+          [-0.0106, -0.0116, -0.0068,  ...,  0.0164,  0.0149,  0.0088],
+          [-0.0083, -0.0040, -0.0004,  ...,  0.0152,  0.0273,  0.0113]],
+
+         [[ 0.0128, -0.0143,  0.0040,  ..., -0.0043, -0.0057,  0.0010],
+          [ 0.0123,  0.0149,  0.0003,  ...,  0.0057,  0.0063,  0.0079],
+          [-0.0076, -0.0013,  0.0161,  ...,  0.0081,  0.0035, -0.0037],
+          ...,
+          [-0.0131, -0.0049,  0.0046,  ...,  0.0156,  0.0001, -0.0106],
+          [-0.0008, -0.0007, -0.0020,  ..., -0.0074,  0.0069, -0.0109],
+          [ 0.0105,  0.0132, -0.0028,  ..., -0.0087,  0.0035,  0.0010]],
+
+         [[-0.0088,  0.0094, -0.0018,  ...,  0.0073,  0.0161, -0.0039],
+          [ 0.0054, -0.0055, -0.0113,  ...,  0.0041,  0.0010,  0.0216],
+          [ 0.0115,  0.0105, -0.0030,  ..., -0.0036,  0.0214,  0.0018],
+          ...,
+          [ 0.0033,  0.0091, -0.0021,  ...,  0.0077, -0.0045,  0.0029],
+          [ 0.0109, -0.0049,  0.0101,  ...,  0.0117,  0.0146,  0.0132],
+          [-0.0040,  0.0034,  0.0149,  ...,  0.0102, -0.0005,  0.0020]]],
+
+
+        ...,
+
+
+        [[[-0.0208, -0.0112, -0.0087,  ...,  0.0248,  0.0210,  0.0164],
+          [-0.0090, -0.0102, -0.0136,  ...,  0.0131, -0.0010,  0.0060],
+          [-0.0024, -0.0014, -0.0107,  ..., -0.0148,  0.0011, -0.0107],
+          ...,
+          [-0.0041, -0.0103,  0.0062,  ..., -0.0173, -0.0153, -0.0001],
+          [ 0.0081,  0.0116,  0.0245,  ...,  0.0055, -0.0099,  0.0090],
+          [ 0.0131,  0.0076,  0.0003,  ...,  0.0073,  0.0279, -0.0131]],
+
+         [[ 0.0206,  0.0221, -0.0006,  ...,  0.0083, -0.0014,  0.0118],
+          [ 0.0090, -0.0037,  0.0001,  ..., -0.0066, -0.0041,  0.0006],
+          [ 0.0131,  0.0068,  0.0177,  ...,  0.0182, -0.0078,  0.0079],
+          ...,
+          [-0.0087,  0.0054,  0.0096,  ...,  0.0273, -0.0083,  0.0064],
+          [ 0.0060, -0.0031, -0.0055,  ...,  0.0087, -0.0001, -0.0026],
+          [ 0.0246, -0.0024, -0.0103,  ...,  0.0149,  0.0238, -0.0060]],
+
+         [[ 0.0128,  0.0078,  0.0007,  ..., -0.0121,  0.0103, -0.0148],
+          [ 0.0039,  0.0083, -0.0060,  ...,  0.0019, -0.0065,  0.0002],
+          [ 0.0122,  0.0074,  0.0071,  ...,  0.0101,  0.0003,  0.0016],
+          ...,
+          [-0.0020, -0.0125,  0.0035,  ...,  0.0107,  0.0022,  0.0109],
+          [ 0.0107, -0.0055,  0.0081,  ...,  0.0081, -0.0127, -0.0010],
+          [ 0.0139, -0.0052, -0.0145,  ...,  0.0073,  0.0060,  0.0100]],
+
+         ...,
+
+         [[-0.0028,  0.0055,  0.0060,  ...,  0.0077, -0.0160, -0.0007],
+          [-0.0056, -0.0100,  0.0132,  ..., -0.0053,  0.0020,  0.0068],
+          [ 0.0102,  0.0103, -0.0115,  ...,  0.0072,  0.0117,  0.0054],
+          ...,
+          [ 0.0007,  0.0159,  0.0129,  ..., -0.0165, -0.0027,  0.0058],
+          [ 0.0248, -0.0067,  0.0174,  ..., -0.0156,  0.0102, -0.0027],
+          [ 0.0004,  0.0134,  0.0078,  ..., -0.0085,  0.0075,  0.0078]],
+
+         [[ 0.0130, -0.0116,  0.0017,  ...,  0.0021,  0.0023,  0.0043],
+          [-0.0039, -0.0125,  0.0047,  ...,  0.0008, -0.0085,  0.0143],
+          [-0.0061,  0.0051, -0.0128,  ..., -0.0138, -0.0088, -0.0074],
+          ...,
+          [ 0.0052,  0.0037, -0.0086,  ..., -0.0078, -0.0043, -0.0151],
+          [ 0.0007,  0.0036, -0.0025,  ...,  0.0042,  0.0103, -0.0130],
+          [ 0.0073, -0.0025,  0.0034,  ..., -0.0125,  0.0015,  0.0017]],
+
+         [[-0.0070,  0.0166, -0.0065,  ...,  0.0102,  0.0128, -0.0001],
+          [-0.0017, -0.0027, -0.0087,  ...,  0.0140,  0.0136, -0.0005],
+          [ 0.0054,  0.0112,  0.0108,  ..., -0.0092,  0.0155, -0.0089],
+          ...,
+          [ 0.0086,  0.0082, -0.0049,  ..., -0.0008,  0.0159,  0.0109],
+          [ 0.0069, -0.0091,  0.0105,  ..., -0.0024,  0.0149,  0.0105],
+          [ 0.0176,  0.0024,  0.0034,  ..., -0.0086, -0.0025, -0.0063]]],
+
+
+        [[[-0.0266, -0.0262, -0.0361,  ..., -0.0032, -0.0056,  0.0010],
+          [-0.0277, -0.0279, -0.0085,  ..., -0.0274, -0.0124, -0.0003],
+          [-0.0152, -0.0312, -0.0167,  ..., -0.0056,  0.0024,  0.0032],
+          ...,
+          [-0.0351, -0.0212, -0.0128,  ..., -0.0177, -0.0151, -0.0034],
+          [-0.0207, -0.0394, -0.0305,  ...,  0.0031, -0.0102, -0.0025],
+          [-0.0101, -0.0152, -0.0302,  ..., -0.0179,  0.0179,  0.0101]],
+
+         [[-0.0021, -0.0185,  0.0111,  ...,  0.0065,  0.0083,  0.0183],
+          [-0.0075,  0.0143,  0.0039,  ..., -0.0014,  0.0123,  0.0018],
+          [-0.0193, -0.0066,  0.0182,  ...,  0.0075,  0.0067,  0.0045],
+          ...,
+          [ 0.0150,  0.0072,  0.0181,  ...,  0.0054, -0.0049, -0.0133],
+          [-0.0009, -0.0076,  0.0250,  ...,  0.0108,  0.0048,  0.0080],
+          [-0.0002,  0.0059,  0.0082,  ...,  0.0013,  0.0118,  0.0020]],
+
+         [[-0.0126,  0.0014, -0.0084,  ...,  0.0185,  0.0012,  0.0079],
+          [-0.0076, -0.0112,  0.0046,  ...,  0.0064,  0.0050,  0.0093],
+          [-0.0097, -0.0131, -0.0094,  ...,  0.0034, -0.0128,  0.0103],
+          ...,
+          [ 0.0009,  0.0036,  0.0019,  ..., -0.0029, -0.0063,  0.0058],
+          [-0.0199, -0.0133, -0.0221,  ...,  0.0005, -0.0001, -0.0078],
+          [-0.0254, -0.0142,  0.0081,  ...,  0.0084,  0.0036,  0.0048]],
+
+         ...,
+
+         [[-0.0080,  0.0119, -0.0152,  ...,  0.0133,  0.0071, -0.0029],
+          [ 0.0102, -0.0136,  0.0074,  ..., -0.0163, -0.0069, -0.0084],
+          [-0.0075, -0.0015, -0.0114,  ...,  0.0110,  0.0023, -0.0173],
+          ...,
+          [-0.0035, -0.0118,  0.0004,  ...,  0.0040, -0.0084, -0.0063],
+          [-0.0114, -0.0025,  0.0074,  ...,  0.0101, -0.0064, -0.0148],
+          [ 0.0125,  0.0001,  0.0027,  ...,  0.0077, -0.0202, -0.0119]],
+
+         [[-0.0159,  0.0020,  0.0002,  ...,  0.0085,  0.0079, -0.0080],
+          [-0.0028,  0.0067, -0.0002,  ..., -0.0050,  0.0071, -0.0120],
+          [ 0.0079,  0.0028, -0.0091,  ..., -0.0160, -0.0135,  0.0126],
+          ...,
+          [-0.0080,  0.0021, -0.0057,  ...,  0.0087,  0.0081,  0.0043],
+          [-0.0141,  0.0027, -0.0063,  ...,  0.0114,  0.0105,  0.0132],
+          [-0.0158, -0.0061,  0.0035,  ...,  0.0078, -0.0066,  0.0018]],
+
+         [[-0.0164, -0.0138, -0.0029,  ..., -0.0032, -0.0029, -0.0102],
+          [-0.0118,  0.0109, -0.0153,  ...,  0.0141,  0.0108, -0.0071],
+          [-0.0100, -0.0125,  0.0016,  ...,  0.0179,  0.0030,  0.0055],
+          ...,
+          [ 0.0087, -0.0078, -0.0140,  ..., -0.0127,  0.0052, -0.0017],
+          [ 0.0063, -0.0130, -0.0147,  ...,  0.0025,  0.0122, -0.0031],
+          [-0.0002, -0.0153, -0.0061,  ..., -0.0128, -0.0016,  0.0006]]],
+
+
+        [[[-0.0146, -0.0161, -0.0225,  ..., -0.0110, -0.0087, -0.0071],
+          [-0.0236, -0.0207, -0.0086,  ..., -0.0171, -0.0043, -0.0045],
+          [-0.0063, -0.0223, -0.0176,  ...,  0.0016, -0.0051, -0.0069],
+          ...,
+          [-0.0254, -0.0290, -0.0291,  ...,  0.0259,  0.0191,  0.0057],
+          [-0.0089, -0.0068, -0.0278,  ...,  0.0106,  0.0250,  0.0109],
+          [-0.0052, -0.0041, -0.0275,  ...,  0.0161,  0.0010,  0.0028]],
+
+         [[ 0.0125,  0.0187, -0.0035,  ..., -0.0009, -0.0173, -0.0064],
+          [ 0.0059,  0.0169,  0.0219,  ...,  0.0041,  0.0022, -0.0086],
+          [ 0.0060,  0.0000,  0.0150,  ...,  0.0173, -0.0100,  0.0085],
+          ...,
+          [-0.0095,  0.0214, -0.0084,  ...,  0.0075,  0.0013, -0.0096],
+          [ 0.0093, -0.0013,  0.0043,  ..., -0.0030,  0.0014,  0.0007],
+          [-0.0034,  0.0054,  0.0086,  ..., -0.0149, -0.0087, -0.0171]],
+
+         [[-0.0156, -0.0043,  0.0009,  ..., -0.0029, -0.0091, -0.0026],
+          [-0.0127, -0.0102,  0.0108,  ..., -0.0137,  0.0040,  0.0014],
+          [ 0.0033, -0.0010,  0.0034,  ...,  0.0042, -0.0034, -0.0081],
+          ...,
+          [ 0.0097, -0.0041,  0.0088,  ..., -0.0090, -0.0176, -0.0131],
+          [-0.0156,  0.0069,  0.0050,  ..., -0.0152,  0.0019, -0.0157],
+          [-0.0149, -0.0170, -0.0092,  ..., -0.0120,  0.0081, -0.0045]],
+
+         ...,
+
+         [[ 0.0070, -0.0061,  0.0118,  ...,  0.0012,  0.0068, -0.0009],
+          [-0.0010,  0.0038, -0.0013,  ..., -0.0050, -0.0035, -0.0073],
+          [ 0.0083, -0.0091, -0.0145,  ..., -0.0000, -0.0156,  0.0064],
+          ...,
+          [-0.0018,  0.0003,  0.0017,  ...,  0.0035, -0.0133,  0.0033],
+          [ 0.0002, -0.0086, -0.0108,  ..., -0.0009,  0.0026, -0.0032],
+          [-0.0164, -0.0124, -0.0125,  ..., -0.0066, -0.0088, -0.0053]],
+
+         [[-0.0096, -0.0157, -0.0118,  ..., -0.0014,  0.0014,  0.0022],
+          [-0.0079,  0.0079, -0.0047,  ..., -0.0086, -0.0106,  0.0026],
+          [-0.0141, -0.0111,  0.0053,  ...,  0.0097, -0.0099,  0.0028],
+          ...,
+          [-0.0182,  0.0061, -0.0122,  ...,  0.0032, -0.0013, -0.0098],
+          [-0.0024,  0.0033, -0.0006,  ...,  0.0120, -0.0170, -0.0154],
+          [-0.0152, -0.0040, -0.0014,  ...,  0.0107, -0.0136, -0.0021]],
+
+         [[ 0.0097, -0.0024,  0.0030,  ...,  0.0010, -0.0072, -0.0027],
+          [ 0.0014,  0.0003,  0.0150,  ...,  0.0088,  0.0100,  0.0112],
+          [ 0.0001, -0.0027,  0.0123,  ..., -0.0073,  0.0067,  0.0219],
+          ...,
+          [ 0.0010,  0.0121, -0.0008,  ..., -0.0042,  0.0083,  0.0161],
+          [-0.0012, -0.0008,  0.0097,  ..., -0.0090, -0.0071,  0.0102],
+          [-0.0104, -0.0027, -0.0187,  ...,  0.0132,  0.0079, -0.0036]]]],
+       device='cuda:0')), ('conv.8.bias', tensor([ 0.0022,  0.0133, -0.0026, -0.0037,  0.0127,  0.0104,  0.0036, -0.0053,
+        -0.0123,  0.0063,  0.0029,  0.0066,  0.0053, -0.0091,  0.0124, -0.0093,
+         0.0134, -0.0023, -0.0136,  0.0107, -0.0016,  0.0103, -0.0102,  0.0088,
+        -0.0031,  0.0065,  0.0123, -0.0037, -0.0010,  0.0026,  0.0065, -0.0102,
+        -0.0052, -0.0124,  0.0019,  0.0115, -0.0006,  0.0145, -0.0065,  0.0010,
+        -0.0140, -0.0010,  0.0014,  0.0142,  0.0027, -0.0143, -0.0052,  0.0116,
+        -0.0106,  0.0002, -0.0014, -0.0075,  0.0016, -0.0028,  0.0090, -0.0052,
+        -0.0076,  0.0002, -0.0035,  0.0063, -0.0060,  0.0013,  0.0135,  0.0007,
+        -0.0101,  0.0082, -0.0071, -0.0067,  0.0120,  0.0050, -0.0126, -0.0085,
+        -0.0031, -0.0022,  0.0069, -0.0089,  0.0145, -0.0022, -0.0136, -0.0089,
+         0.0124,  0.0127, -0.0024, -0.0042, -0.0104,  0.0106,  0.0136,  0.0120,
+        -0.0011, -0.0020, -0.0083,  0.0139, -0.0055,  0.0134, -0.0135,  0.0109],
+       device='cuda:0')), ('conv.9.weight', tensor([0.0904, 0.1454, 0.8244, 0.8251, 0.8108, 0.3496, 0.3553, 0.2818, 0.2972,
+        0.5970, 1.0750, 0.8931, 0.4153, 0.5502, 0.5303, 0.8154, 0.5947, 0.1553,
+        0.6496, 0.9011, 0.9134, 0.8983, 0.6335, 0.2813, 0.7244, 0.2170, 0.3611,
+        0.9527, 0.6182, 0.7880, 0.9444, 0.1184, 0.7187, 0.6572, 0.5499, 0.4359,
+        0.1988, 0.0698, 0.1787, 0.7573, 0.0268, 0.7254, 0.5186, 0.0829, 0.7031,
+        0.0920, 0.1850, 0.0056, 0.4963, 0.2522, 0.4641, 0.5623, 0.2334, 1.0431,
+        0.2164, 0.8579, 0.6461, 0.2479, 0.3829, 0.6443, 0.2815, 0.5659, 0.6689,
+        0.7132, 0.2811, 0.8787, 0.6127, 0.6535, 0.4629, 0.9567, 0.0571, 0.2007,
+        0.5481, 1.0778, 0.9459, 0.0733, 0.6298, 0.2497, 0.0824, 0.4464, 1.0778,
+        0.0009, 0.9619, 0.4669, 0.6344, 0.3561, 0.4869, 0.4905, 0.8886, 0.1131,
+        0.4646, 0.8930, 0.4109, 0.4380, 0.5385, 0.6541], device='cuda:0')), ('conv.9.bias', tensor([ 0.0054, -0.0517, -0.1723, -0.2695, -0.2512, -0.0591, -0.0301, -0.0420,
+        -0.0659, -0.1733, -0.3069, -0.0595, -0.1120, -0.0761, -0.1408, -0.1449,
+        -0.0422, -0.0257, -0.1006, -0.1295, -0.2240, -0.2499, -0.0867, -0.1483,
+        -0.1653, -0.0367, -0.0944, -0.0508, -0.1377, -0.2058, -0.1846,  0.0363,
+        -0.0911, -0.0750, -0.1234, -0.1437,  0.0232, -0.0398, -0.0096, -0.0974,
+        -0.0262, -0.0576, -0.0909,  0.0021, -0.2100, -0.0169, -0.0254, -0.0221,
+        -0.1098, -0.0972, -0.1032, -0.0482, -0.0480, -0.2590, -0.0846, -0.1075,
+        -0.1568, -0.0715, -0.1391, -0.1212, -0.0481, -0.1740, -0.1097, -0.0414,
+        -0.1016, -0.2633, -0.1831, -0.1843, -0.0889, -0.2675,  0.0174, -0.0460,
+        -0.1567, -0.3472, -0.2319, -0.0078, -0.0863, -0.0496, -0.0144, -0.1338,
+        -0.4100, -0.0116, -0.2134, -0.1612, -0.2337, -0.0228, -0.0359, -0.1519,
+        -0.1758, -0.0673, -0.1385, -0.2089, -0.0782, -0.0406, -0.0898, -0.0412],
+       device='cuda:0')), ('conv.9.running_mean', tensor([-0.0616, -1.2028, -3.5572, -4.5939,  0.7212, -0.0385,  0.6603, -1.8773,
+         1.5407, -1.0088, -1.4687,  2.3417,  0.0119, -2.1938, -1.0723, -0.0375,
+        -0.6215, -0.6412, -0.5363, -2.9068, -3.1334, -2.2690,  3.2117,  0.1649,
+        -0.6640,  0.7504,  0.3686, -0.4902,  1.7255, -2.2405, -5.3779, -0.2646,
+        -2.9206, -0.3353, -1.4605, -1.6390, -0.8678,  0.5420, -0.8287, -0.9681,
+         0.0420, -3.7486, -2.1813, -0.0304, -3.1251, -0.4239,  0.6158,  0.0993,
+        -0.9086, -0.8052,  1.7947,  1.3522,  0.2032, -5.7489,  1.4057,  4.9809,
+        -0.0506,  0.1479,  1.0411, -1.3472,  0.0009, -2.3203, -3.3855,  0.7702,
+        -0.9841, -4.3808,  0.9421, -1.1615,  1.1324, -4.1554, -0.1361,  0.4506,
+        -0.1894, -6.1363, -4.1298,  0.4555, -2.4483,  0.1415,  0.8305, -1.1546,
+        -6.4341, -0.1691, -4.1783,  0.5837,  0.3507,  0.2258, -2.1318, -0.5149,
+        -2.0507, -0.4421, -1.8723, -4.3913, -0.5010, -0.1521, -0.3118, -0.9476],
+       device='cuda:0')), ('conv.9.running_var', tensor([ 0.1388,  0.3141,  5.4455,  8.0788,  5.1817,  0.9838,  2.2855,  0.7679,
+         0.8008,  3.9343, 11.0547,  5.4741,  2.0528,  1.5491,  3.5938,  2.9374,
+         2.9788,  0.4150,  1.8050,  5.8865,  8.9942,  7.8845,  5.5880,  1.4349,
+         3.0192,  0.5992,  1.1895,  5.5512,  3.5725,  5.6938,  4.8842,  0.5364,
+         4.5353,  3.5760,  1.3920,  1.9721,  0.3406,  0.2168,  0.5969,  3.3188,
+         0.0849,  7.5538,  1.1519,  0.1983,  5.5495,  0.2011,  0.6964,  0.0432,
+         2.1991,  0.8470,  1.5083,  3.0374,  0.9011, 11.2168,  1.1010,  8.1766,
+         2.4966,  0.5580,  1.1959,  1.3775,  0.7314,  3.9444,  7.2863,  3.2540,
+         1.4055,  6.8861,  2.4451,  5.1649,  2.5470,  7.7816,  0.1473,  0.7899,
+         4.0534, 14.4403, 10.7363,  0.1789,  2.4905,  0.7997,  0.1914,  1.9906,
+        15.5487,  0.0622,  8.3273,  1.0683,  3.4021,  1.4910,  1.9161,  1.8879,
+         5.3537,  0.2798,  2.3228,  9.0850,  1.3343,  0.8937,  2.3172,  4.2440],
+       device='cuda:0')), ('conv.9.num_batches_tracked', tensor(537684, device='cuda:0')), ('rnn.weight_ih_l0', tensor([[-0.0253, -0.0020,  0.0134,  ...,  0.0392, -0.0023,  0.0160],
+        [ 0.0001,  0.0302, -0.0029,  ...,  0.0367,  0.0138,  0.0435],
+        [-0.0354,  0.0069, -0.0441,  ...,  0.0018, -0.0105,  0.0410],
+        ...,
+        [-0.0318, -0.0091,  0.0441,  ..., -0.0132,  0.0312,  0.0077],
+        [-0.0435, -0.0273,  0.0035,  ...,  0.0210, -0.0132, -0.0279],
+        [ 0.0382,  0.0437, -0.0354,  ...,  0.0234,  0.0383,  0.0225]],
+       device='cuda:0')), ('rnn.weight_hh_l0', tensor([[ 0.0154,  0.0180,  0.0221,  ...,  0.0382, -0.0435,  0.0023],
+        [-0.0290, -0.0378, -0.0216,  ..., -0.0036,  0.0033, -0.0343],
+        [ 0.0123, -0.0151,  0.0367,  ..., -0.0002, -0.0294, -0.0142],
+        ...,
+        [ 0.0181, -0.0284, -0.0115,  ...,  0.0446,  0.0100, -0.0375],
+        [-0.0360,  0.0349,  0.0003,  ..., -0.0219,  0.0383, -0.0235],
+        [-0.0206,  0.0039,  0.0093,  ..., -0.0061,  0.0230,  0.0257]],
+       device='cuda:0')), ('rnn.bias_ih_l0', tensor([-0.0176,  0.0381,  0.0373,  ...,  0.0368,  0.0371,  0.0025], device='cuda:0')), ('rnn.bias_hh_l0', tensor([0.0357, 0.0087, 0.0103,  ..., 0.0369, 0.0019, 0.0006], device='cuda:0')), ('rnn.weight_ih_l1', tensor([[-0.0210,  0.0346, -0.0153,  ...,  0.0039,  0.0339,  0.0227],
+        [-0.0233, -0.0131, -0.0205,  ...,  0.0082, -0.0428, -0.0345],
+        [-0.0282,  0.0095, -0.0159,  ...,  0.0209,  0.0008, -0.0230],
+        ...,
+        [ 0.0213,  0.0321,  0.0303,  ..., -0.0041, -0.0077,  0.0080],
+        [ 0.0042, -0.0122, -0.0264,  ...,  0.0162,  0.0199,  0.0267],
+        [-0.0121, -0.0401, -0.0156,  ...,  0.0020, -0.0023, -0.0213]],
+       device='cuda:0')), ('rnn.weight_hh_l1', tensor([[ 0.0155, -0.0200,  0.0017,  ..., -0.0027,  0.0343,  0.0210],
+        [ 0.0126, -0.0187,  0.0408,  ..., -0.0351,  0.0153, -0.0042],
+        [ 0.0057,  0.0112,  0.0339,  ...,  0.0220,  0.0313,  0.0204],
+        ...,
+        [ 0.0178,  0.0291, -0.0213,  ...,  0.0064,  0.0211,  0.0355],
+        [-0.0389, -0.0256,  0.0331,  ..., -0.0026,  0.0390,  0.0006],
+        [-0.0256, -0.0384, -0.0422,  ...,  0.0211, -0.0427, -0.0001]],
+       device='cuda:0')), ('rnn.bias_ih_l1', tensor([ 0.0455,  0.0128,  0.0387,  ...,  0.0421, -0.0324,  0.0249], device='cuda:0')), ('rnn.bias_hh_l1', tensor([ 0.0158, -0.0266,  0.0300,  ...,  0.0167,  0.0193,  0.0377], device='cuda:0')), ('rnn.weight_ih_l2', tensor([[-0.0016, -0.0329, -0.0125,  ..., -0.0061,  0.0109,  0.0149],
+        [ 0.0218, -0.0244, -0.0152,  ...,  0.0287,  0.0228, -0.0004],
+        [-0.0229,  0.0393,  0.0114,  ..., -0.0125,  0.0355,  0.0378],
+        ...,
+        [-0.0402,  0.0390,  0.0247,  ..., -0.0399,  0.0369,  0.0269],
+        [-0.0337,  0.0346, -0.0040,  ..., -0.0088,  0.0206, -0.0329],
+        [-0.0167, -0.0407, -0.0108,  ..., -0.0002, -0.0215,  0.0270]],
+       device='cuda:0')), ('rnn.weight_hh_l2', tensor([[-0.0391,  0.0030, -0.0435,  ..., -0.0128,  0.0299,  0.0216],
+        [ 0.0045, -0.0308,  0.0440,  ..., -0.0091,  0.0217,  0.0045],
+        [ 0.0432, -0.0243,  0.0344,  ...,  0.0244, -0.0237, -0.0051],
+        ...,
+        [-0.0128, -0.0401,  0.0128,  ...,  0.0414,  0.0243,  0.0444],
+        [-0.0109, -0.0316,  0.0376,  ..., -0.0231,  0.0176,  0.0251],
+        [-0.0367, -0.0209, -0.0254,  ...,  0.0220, -0.0318,  0.0104]],
+       device='cuda:0')), ('rnn.bias_ih_l2', tensor([ 0.0456, -0.0112,  0.0239,  ...,  0.0235,  0.0376, -0.0000], device='cuda:0')), ('rnn.bias_hh_l2', tensor([ 0.0504, -0.0305, -0.0159,  ...,  0.0455, -0.0217,  0.0191], device='cuda:0')), ('rnn.weight_ih_l3', tensor([[ 0.0293,  0.0390,  0.0147,  ..., -0.0386, -0.0327,  0.0067],
+        [ 0.0351,  0.0026,  0.0051,  ..., -0.0089, -0.0238,  0.0417],
+        [-0.0394,  0.0359,  0.0295,  ..., -0.0162,  0.0167,  0.0357],
+        ...,
+        [ 0.0137,  0.0344,  0.0428,  ...,  0.0289,  0.0007,  0.0305],
+        [ 0.0217,  0.0152,  0.0072,  ...,  0.0328, -0.0062, -0.0118],
+        [-0.0028,  0.0230,  0.0419,  ...,  0.0048,  0.0017, -0.0310]],
+       device='cuda:0')), ('rnn.weight_hh_l3', tensor([[ 0.0446, -0.0335,  0.0411,  ...,  0.0367,  0.0266, -0.0357],
+        [ 0.0091, -0.0294,  0.0199,  ..., -0.0099, -0.0020, -0.0073],
+        [-0.0243,  0.0141,  0.0379,  ..., -0.0182, -0.0037,  0.0027],
+        ...,
+        [ 0.0114, -0.0013, -0.0225,  ...,  0.0338, -0.0161,  0.0165],
+        [-0.0109, -0.0015, -0.0427,  ...,  0.0428, -0.0122, -0.0284],
+        [-0.0057, -0.0151, -0.0265,  ..., -0.0255,  0.0423,  0.0314]],
+       device='cuda:0')), ('rnn.bias_ih_l3', tensor([ 0.0100,  0.0239,  0.0440,  ...,  0.0014, -0.0335,  0.0077], device='cuda:0')), ('rnn.bias_hh_l3', tensor([ 0.0107,  0.0460,  0.0006,  ...,  0.0402,  0.0333, -0.0009], device='cuda:0')), ('rnn.weight_ih_l4', tensor([[ 0.0158,  0.0394, -0.0366,  ..., -0.0208,  0.0408,  0.0189],
+        [-0.0399, -0.0022, -0.0188,  ...,  0.0039, -0.0158, -0.0100],
+        [-0.0204,  0.0262,  0.0281,  ...,  0.0149, -0.0239, -0.0299],
+        ...,
+        [ 0.0442, -0.0158, -0.0205,  ...,  0.0026, -0.0207,  0.0214],
+        [-0.0420,  0.0166, -0.0356,  ..., -0.0110, -0.0200, -0.0148],
+        [-0.0243, -0.0093, -0.0128,  ...,  0.0276,  0.0099, -0.0325]],
+       device='cuda:0')), ('rnn.weight_hh_l4', tensor([[-0.0129,  0.0240,  0.0357,  ...,  0.0393, -0.0282, -0.0298],
+        [ 0.0243, -0.0357,  0.0353,  ..., -0.0087,  0.0361, -0.0365],
+        [-0.0035, -0.0221, -0.0339,  ...,  0.0419,  0.0126, -0.0492],
+        ...,
+        [ 0.0259, -0.0123,  0.0325,  ..., -0.0314, -0.0100, -0.0391],
+        [ 0.0227,  0.0481, -0.0276,  ..., -0.0375, -0.0422,  0.0293],
+        [ 0.0223, -0.0279,  0.0382,  ...,  0.0082, -0.0331, -0.0373]],
+       device='cuda:0')), ('rnn.bias_ih_l4', tensor([-0.0004,  0.0023,  0.0397,  ...,  0.0685, -0.0052,  0.0538], device='cuda:0')), ('rnn.bias_hh_l4', tensor([ 0.0167,  0.0793,  0.0659,  ..., -0.0100,  0.0764,  0.0820], device='cuda:0')), ('fc.fc.weight', tensor([[-0.0266,  0.0031,  0.0111,  ...,  0.0369,  0.0147,  0.0643],
+        [ 0.0526,  0.0733,  0.0756,  ..., -0.0007, -0.0127,  0.0657],
+        [-0.0249, -0.0177,  0.0232,  ...,  0.0756, -0.0103, -0.0154],
+        ...,
+        [ 0.0578,  0.0825,  0.0360,  ..., -0.0239,  0.0192,  0.0253],
+        [ 0.0207, -0.0304, -0.0081,  ...,  0.0405,  0.0444,  0.0385],
+        [-0.0129,  0.0019, -0.1127,  ..., -0.0788, -0.2106, -0.2259]],
+       device='cuda:0')), ('fc.fc.bias', tensor([-0.3816, -0.1288,  0.2196, -0.1315, -0.2353, -0.4977, -0.3322,  0.3551,
+        -0.0232,  0.0726, -0.1952, -0.1387, -0.1124,  0.0423, -0.4603, -0.2225,
+         0.1510,  0.5856, -0.1941,  0.1614, -0.0613, -0.2355,  0.5037,  0.2206,
+         0.4519,  0.6810, -0.3007, -0.3104, -0.3211, -0.3748,  0.2796, -0.3671,
+         0.1914, -0.5744,  0.0403, -0.1704, -0.2957, -0.2566, -0.4032,  2.8743],
+       device='cuda:0'))])
+2020-07-07 04:45:10 - ERROR - log_model_grads: conv.0.weight: tensor([[[[-0.0534, -0.0866, -0.0538,  ...,  0.0655,  0.1049,  0.0529],
+          [-0.0237, -0.0793, -0.0487,  ...,  0.0872,  0.1361,  0.0837],
+          [ 0.0004, -0.0593, -0.0144,  ...,  0.0952,  0.1723,  0.0953],
+          ...,
+          [ 0.1312,  0.0618,  0.1142,  ...,  0.0670,  0.1692,  0.0817],
+          [ 0.1858,  0.0960,  0.1548,  ...,  0.0551,  0.1557,  0.0580],
+          [ 0.2056,  0.1187,  0.1874,  ...,  0.0450,  0.1488,  0.0437]]],
+
+
+        [[[-0.1947, -0.1544, -0.1536,  ...,  0.0500,  0.0182,  0.0431],
+          [-0.2215, -0.1815, -0.1512,  ...,  0.0787,  0.0574,  0.0625],
+          [-0.2227, -0.1856, -0.1382,  ...,  0.1063,  0.0939,  0.1024],
+          ...,
+          [-0.1742, -0.1881, -0.1384,  ...,  0.1279,  0.1150,  0.1146],
+          [-0.1894, -0.1973, -0.1334,  ...,  0.1576,  0.1132,  0.1142],
+          [-0.1720, -0.1716, -0.1313,  ...,  0.1164,  0.0994,  0.1187]]],
+
+
+        [[[-0.1215, -0.1066, -0.0889,  ...,  0.0024,  0.0491,  0.0426],
+          [-0.1131, -0.1009, -0.1042,  ...,  0.0232,  0.0215,  0.0347],
+          [-0.0798, -0.1068, -0.0995,  ...,  0.0664,  0.0352,  0.0781],
+          ...,
+          [-0.0770, -0.0563, -0.0182,  ...,  0.0720, -0.0007,  0.0213],
+          [-0.0416, -0.0575, -0.0373,  ...,  0.0287,  0.0047,  0.0130],
+          [-0.0501, -0.0834, -0.0341,  ...,  0.0045, -0.0092,  0.0005]]],
+
+
+        ...,
+
+
+        [[[-0.0918, -0.0437, -0.0553,  ..., -0.1238, -0.1119, -0.1390],
+          [-0.0882, -0.0763, -0.0402,  ..., -0.0997, -0.0496, -0.0740],
+          [-0.0489, -0.0411,  0.0019,  ..., -0.0617, -0.0223, -0.0465],
+          ...,
+          [ 0.0228,  0.0021,  0.0159,  ...,  0.0163,  0.0205,  0.0105],
+          [-0.0123, -0.0117,  0.0155,  ...,  0.0007,  0.0048,  0.0133],
+          [ 0.0021, -0.0274, -0.0071,  ..., -0.0235, -0.0151, -0.0179]]],
+
+
+        [[[ 0.0600,  0.1101,  0.0964,  ..., -0.2165, -0.2019, -0.2149],
+          [ 0.0498,  0.0809,  0.0767,  ..., -0.2614, -0.2342, -0.2191],
+          [ 0.0354,  0.0656,  0.0295,  ..., -0.2920, -0.2847, -0.2828],
+          ...,
+          [-0.0043, -0.0038,  0.0223,  ..., -0.3310, -0.2861, -0.2968],
+          [-0.0645, -0.0328, -0.0075,  ..., -0.2824, -0.2826, -0.2555],
+          [-0.1306, -0.0954, -0.0659,  ..., -0.2375, -0.2634, -0.2548]]],
+
+
+        [[[-0.2686, -0.2952, -0.2318,  ...,  0.1113,  0.1194,  0.1113],
+          [-0.2877, -0.2938, -0.2737,  ...,  0.1226,  0.1437,  0.0778],
+          [-0.3121, -0.2981, -0.3006,  ...,  0.1606,  0.1759,  0.1521],
+          ...,
+          [-0.3392, -0.3377, -0.3020,  ...,  0.1629,  0.2065,  0.1943],
+          [-0.3395, -0.3291, -0.3023,  ...,  0.2286,  0.2761,  0.2508],
+          [-0.3660, -0.3599, -0.3076,  ...,  0.2470,  0.2650,  0.3113]]]],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: conv.0.bias: tensor([ 5.1176e-07,  2.7791e-06, -1.4491e-06,  1.7947e-06,  9.9614e-06,
+        -9.4809e-07, -1.7229e-06,  1.8412e-06,  1.2890e-06,  5.9605e-07,
+        -1.4510e-06,  7.2177e-07, -8.1491e-09, -5.9372e-08, -2.1914e-06,
+        -5.5879e-08, -1.2191e-06, -3.2224e-07, -4.2142e-08, -2.9565e-06,
+        -2.8023e-06, -8.1956e-08,  8.9407e-07,  1.3784e-06, -6.3796e-07,
+         7.0315e-08, -2.1165e-05,  2.5895e-06, -3.4301e-06,  4.6007e-07,
+         2.9802e-07, -1.9465e-06], device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: conv.1.weight: tensor([ 0.4563, -0.1232,  0.4503,  0.8980, -0.9953, -1.1881,  0.2967,  0.1440,
+         0.0177,  0.2500,  0.0878,  0.1722,  0.0455,  0.0676,  0.4413,  0.4275,
+         0.1564, -0.0061,  0.1793,  0.0507,  0.2003,  0.4905, -0.0095, -0.5552,
+         0.4169,  0.0429,  0.1956,  0.1963, -1.0056, -0.2576, -0.3426, -0.3835],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: conv.1.bias: tensor([ 0.2550, -0.0708,  0.8732,  1.0378,  0.5132, -0.2409,  0.0924,  0.2037,
+         0.1016,  0.0827,  0.0475,  0.0297, -0.0458,  0.0414,  0.4872, -0.0239,
+         0.0936,  0.7182,  0.0606, -0.3378,  0.1292,  0.5460,  0.1605,  0.5775,
+         0.4033,  0.0416, -0.0958,  0.0665, -0.7977, -0.2152,  0.5206, -0.3452],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: conv.4.weight: tensor([[[[-0.0520, -0.0461, -0.0201,  ..., -0.0036, -0.0590, -0.0308],
+          [ 0.0043, -0.0831, -0.0163,  ..., -0.0317, -0.0570, -0.0354],
+          [-0.0327, -0.0431, -0.0168,  ..., -0.0361, -0.0479, -0.0187],
+          ...,
+          [-0.0027, -0.0095, -0.0018,  ..., -0.0155, -0.0041,  0.0026],
+          [ 0.0040,  0.0062,  0.0336,  ...,  0.0205, -0.0006,  0.0078],
+          [-0.0075,  0.0508,  0.0504,  ...,  0.0192,  0.0357,  0.0442]],
+
+         [[-0.0039, -0.0094,  0.0034,  ..., -0.0155, -0.0470, -0.0143],
+          [-0.0142, -0.0105,  0.0066,  ..., -0.0387, -0.0483, -0.0209],
+          [-0.0075,  0.0015,  0.0041,  ..., -0.0413, -0.0484, -0.0378],
+          ...,
+          [ 0.0102,  0.0009,  0.0050,  ..., -0.0628, -0.0561, -0.0409],
+          [ 0.0233,  0.0140, -0.0006,  ..., -0.0547, -0.0511, -0.0267],
+          [ 0.0009,  0.0094,  0.0021,  ..., -0.0677, -0.0544, -0.0373]],
+
+         [[ 0.0258,  0.0133,  0.0195,  ...,  0.0245, -0.0215, -0.0118],
+          [ 0.0374,  0.0590,  0.0557,  ...,  0.0419, -0.0320,  0.0229],
+          [ 0.0737,  0.1442,  0.0969,  ...,  0.0265,  0.0108,  0.0295],
+          ...,
+          [ 0.1509,  0.2024,  0.1279,  ...,  0.0758,  0.0132,  0.0906],
+          [ 0.2207,  0.2129,  0.2185,  ...,  0.0569,  0.0278,  0.0562],
+          [ 0.1497,  0.2356,  0.2635,  ...,  0.0460,  0.0864,  0.0597]],
+
+         ...,
+
+         [[ 0.0195,  0.0284,  0.0296,  ..., -0.0845, -0.0979, -0.0858],
+          [ 0.0217,  0.0165,  0.0317,  ..., -0.1181, -0.1138, -0.1421],
+          [ 0.0270,  0.0061,  0.0132,  ..., -0.1252, -0.1391, -0.1477],
+          ...,
+          [ 0.0342,  0.0655,  0.0424,  ..., -0.1978, -0.2196, -0.1995],
+          [ 0.0462,  0.0754,  0.0539,  ..., -0.1885, -0.2519, -0.2119],
+          [ 0.0542,  0.0509,  0.0544,  ..., -0.1584, -0.2202, -0.1542]],
+
+         [[ 0.0409,  0.0160,  0.0648,  ..., -0.0463, -0.0448, -0.0379],
+          [ 0.1041,  0.0228,  0.1633,  ..., -0.0244, -0.0230, -0.0418],
+          [ 0.1287,  0.0920,  0.1651,  ...,  0.0575,  0.0073, -0.0137],
+          ...,
+          [ 0.0522,  0.0728,  0.1075,  ...,  0.1155,  0.1182,  0.1021],
+          [ 0.0352,  0.0178,  0.0678,  ...,  0.0977,  0.1231,  0.0953],
+          [-0.0283,  0.0099,  0.0136,  ...,  0.0711,  0.0822,  0.0888]],
+
+         [[ 0.0841,  0.0022,  0.0528,  ...,  0.0211,  0.0053, -0.0137],
+          [ 0.0578,  0.0231,  0.0335,  ...,  0.0047, -0.0008, -0.0213],
+          [ 0.0574,  0.0331,  0.0343,  ...,  0.0321,  0.0023, -0.0052],
+          ...,
+          [ 0.0416,  0.0506,  0.0653,  ...,  0.0226,  0.0168,  0.0120],
+          [ 0.0560,  0.0652,  0.0755,  ...,  0.0456,  0.0236,  0.0061],
+          [ 0.0621,  0.0117,  0.0605,  ...,  0.0432,  0.0537,  0.0010]]],
+
+
+        [[[-0.0092,  0.0107, -0.0134,  ...,  0.0904,  0.0780,  0.0662],
+          [-0.0185, -0.0142, -0.0296,  ...,  0.0864,  0.0856,  0.0927],
+          [-0.0514, -0.0284, -0.0608,  ...,  0.0698,  0.0821,  0.0608],
+          ...,
+          [-0.0682, -0.0607, -0.0857,  ...,  0.0816,  0.0706,  0.0960],
+          [-0.0659, -0.0669, -0.0920,  ...,  0.0932,  0.0713,  0.1030],
+          [-0.0716, -0.0739, -0.0861,  ...,  0.0892,  0.0796,  0.0990]],
+
+         [[-0.0197, -0.0086, -0.0221,  ..., -0.0299, -0.0099, -0.0258],
+          [-0.0110, -0.0141, -0.0285,  ..., -0.0511, -0.0117, -0.0212],
+          [-0.0123, -0.0160, -0.0203,  ..., -0.0405, -0.0325, -0.0250],
+          ...,
+          [-0.0090,  0.0038, -0.0077,  ..., -0.0439, -0.0381, -0.0124],
+          [-0.0038,  0.0167, -0.0131,  ..., -0.0401, -0.0171, -0.0098],
+          [-0.0141,  0.0169, -0.0064,  ..., -0.0391, -0.0146, -0.0028]],
+
+         [[ 0.0644,  0.0196,  0.0291,  ..., -0.0831, -0.0246, -0.0352],
+          [ 0.0374, -0.0180, -0.0047,  ..., -0.0397, -0.0053,  0.0183],
+          [-0.0193, -0.0327, -0.0374,  ..., -0.0173,  0.0215,  0.0386],
+          ...,
+          [-0.0406, -0.0508, -0.0539,  ...,  0.0151,  0.0787,  0.0991],
+          [-0.0570, -0.0750, -0.0664,  ...,  0.0066,  0.0950,  0.0584],
+          [-0.0488, -0.0874, -0.0622,  ...,  0.0157,  0.0795,  0.0941]],
+
+         ...,
+
+         [[ 0.0173,  0.0472,  0.0222,  ..., -0.0099, -0.0955, -0.0738],
+          [ 0.0001,  0.0316,  0.0494,  ..., -0.0049, -0.0657,  0.0075],
+          [ 0.0117,  0.0443,  0.0806,  ...,  0.0054, -0.0006, -0.0171],
+          ...,
+          [ 0.0522,  0.0797,  0.0938,  ...,  0.0134, -0.1224, -0.1192],
+          [ 0.0507,  0.0419,  0.1044,  ...,  0.0410, -0.0706, -0.0059],
+          [ 0.0401,  0.1108,  0.1320,  ...,  0.0310, -0.0881, -0.0706]],
+
+         [[-0.0406, -0.0414, -0.0348,  ...,  0.0534,  0.0977,  0.0574],
+          [-0.0336, -0.0285, -0.0285,  ...,  0.0199,  0.0483,  0.0288],
+          [-0.0367, -0.0294, -0.0510,  ..., -0.0136,  0.0252,  0.0005],
+          ...,
+          [-0.0323, -0.0410, -0.0411,  ...,  0.0016,  0.0046, -0.0192],
+          [-0.0249, -0.0373, -0.0355,  ..., -0.0177,  0.0100,  0.0065],
+          [-0.0246, -0.0397, -0.0397,  ..., -0.0200,  0.0221, -0.0205]],
+
+         [[-0.0247,  0.0161, -0.0171,  ..., -0.0847, -0.0069,  0.0206],
+          [-0.0297,  0.0143, -0.0169,  ..., -0.0677,  0.0125,  0.0218],
+          [-0.0304,  0.0146, -0.0165,  ..., -0.0195,  0.0049,  0.0394],
+          ...,
+          [ 0.0041,  0.0156, -0.0110,  ..., -0.0635, -0.0368,  0.0349],
+          [-0.0108,  0.0404, -0.0097,  ..., -0.0865, -0.0440,  0.0364],
+          [ 0.0075,  0.0696,  0.0008,  ..., -0.0606, -0.0411,  0.0467]]],
+
+
+        [[[-0.0057, -0.0064, -0.0048,  ...,  0.1168,  0.1057,  0.1242],
+          [-0.0108, -0.0121, -0.0117,  ...,  0.1105,  0.1240,  0.1288],
+          [-0.0156, -0.0141, -0.0168,  ...,  0.1122,  0.1051,  0.0987],
+          ...,
+          [-0.0224, -0.0203, -0.0248,  ...,  0.1186,  0.1179,  0.1080],
+          [-0.0231, -0.0219, -0.0241,  ...,  0.1187,  0.1095,  0.1192],
+          [-0.0223, -0.0214, -0.0216,  ...,  0.1123,  0.1142,  0.1257]],
+
+         [[ 0.0026, -0.0020, -0.0007,  ...,  0.0004, -0.0108, -0.0194],
+          [-0.0063, -0.0077, -0.0067,  ..., -0.0070, -0.0009, -0.0016],
+          [ 0.0119, -0.0187, -0.0095,  ..., -0.0093,  0.0019,  0.0007],
+          ...,
+          [ 0.0068, -0.0121, -0.0028,  ...,  0.0042, -0.0004,  0.0117],
+          [ 0.0007, -0.0073, -0.0072,  ...,  0.0171, -0.0100, -0.0017],
+          [ 0.0063, -0.0033,  0.0114,  ...,  0.0169,  0.0051,  0.0093]],
+
+         [[-0.0189, -0.0058, -0.0138,  ...,  0.0077,  0.0698,  0.0597],
+          [-0.0129, -0.0045, -0.0364,  ...,  0.0309,  0.0629,  0.0546],
+          [-0.0228, -0.0166, -0.0124,  ...,  0.0285,  0.0759,  0.0403],
+          ...,
+          [-0.0196, -0.0095, -0.0326,  ...,  0.0493,  0.0842,  0.0612],
+          [-0.0176, -0.0174, -0.0254,  ...,  0.0614,  0.0758,  0.0402],
+          [-0.0231, -0.0183, -0.0214,  ...,  0.0165,  0.0690,  0.0478]],
+
+         ...,
+
+         [[-0.0093,  0.0221, -0.0173,  ..., -0.0901, -0.0759, -0.0556],
+          [-0.0063,  0.0279, -0.0121,  ..., -0.1005, -0.0448, -0.2086],
+          [ 0.0281,  0.0378, -0.0092,  ..., -0.1334, -0.0816, -0.1707],
+          ...,
+          [ 0.0344,  0.0544,  0.0440,  ..., -0.0568, -0.0757, -0.0861],
+          [ 0.0253,  0.0463,  0.0508,  ..., -0.0488, -0.1575, -0.1241],
+          [ 0.0600,  0.0452,  0.0512,  ...,  0.0202, -0.1224, -0.1206]],
+
+         [[-0.0219, -0.0109, -0.0205,  ...,  0.0313,  0.0568,  0.0289],
+          [-0.0332, -0.0222, -0.0291,  ...,  0.0268,  0.0572,  0.0447],
+          [-0.0323, -0.0227, -0.0306,  ...,  0.0430,  0.0627,  0.0464],
+          ...,
+          [-0.0142, -0.0158, -0.0175,  ...,  0.0764,  0.0715,  0.0585],
+          [-0.0169, -0.0070, -0.0154,  ...,  0.0614,  0.0853,  0.0778],
+          [-0.0164, -0.0122, -0.0196,  ...,  0.0526,  0.0510,  0.0760]],
+
+         [[-0.0074, -0.0041,  0.0035,  ..., -0.0102,  0.0029,  0.0479],
+          [-0.0055, -0.0030,  0.0041,  ..., -0.0182, -0.0032,  0.0661],
+          [-0.0100, -0.0029, -0.0091,  ...,  0.0106, -0.0071,  0.0676],
+          ...,
+          [-0.0218,  0.0048,  0.0003,  ..., -0.0654, -0.0263,  0.0732],
+          [-0.0206,  0.0047,  0.0107,  ..., -0.0401, -0.0056,  0.0704],
+          [-0.0116,  0.0123,  0.0101,  ..., -0.0011, -0.0504,  0.0626]]],
+
+
+        ...,
+
+
+        [[[ 0.0027,  0.0028,  0.0014,  ..., -0.0089, -0.0141, -0.0097],
+          [ 0.0035,  0.0023,  0.0033,  ..., -0.0096, -0.0128, -0.0074],
+          [ 0.0066,  0.0067,  0.0047,  ..., -0.0007, -0.0067, -0.0090],
+          ...,
+          [ 0.0064,  0.0090,  0.0055,  ..., -0.0050, -0.0052, -0.0042],
+          [ 0.0061,  0.0058,  0.0061,  ..., -0.0100, -0.0125, -0.0082],
+          [ 0.0034,  0.0001,  0.0031,  ..., -0.0157, -0.0179, -0.0168]],
+
+         [[ 0.0167,  0.0251,  0.0164,  ..., -0.0098, -0.0048, -0.0070],
+          [ 0.0260,  0.0393,  0.0179,  ..., -0.0111, -0.0040, -0.0049],
+          [ 0.0279,  0.0434,  0.0153,  ..., -0.0140, -0.0018, -0.0060],
+          ...,
+          [ 0.0150,  0.0381,  0.0145,  ..., -0.0095,  0.0003, -0.0019],
+          [ 0.0251,  0.0427,  0.0093,  ..., -0.0049, -0.0066, -0.0013],
+          [ 0.0204,  0.0382,  0.0096,  ..., -0.0065, -0.0029, -0.0010]],
+
+         [[-0.0008, -0.0083, -0.0044,  ..., -0.0187, -0.0053, -0.0153],
+          [-0.0081, -0.0077, -0.0101,  ..., -0.0187,  0.0051, -0.0206],
+          [-0.0082, -0.0118, -0.0129,  ..., -0.0181,  0.0009, -0.0174],
+          ...,
+          [-0.0010, -0.0039, -0.0050,  ..., -0.0003, -0.0161, -0.0320],
+          [ 0.0010, -0.0029,  0.0044,  ..., -0.0072, -0.0134, -0.0278],
+          [ 0.0081, -0.0069,  0.0071,  ..., -0.0093, -0.0111, -0.0189]],
+
+         ...,
+
+         [[ 0.0239,  0.0389,  0.0479,  ...,  0.0540, -0.0030,  0.0709],
+          [ 0.0238,  0.0305,  0.0645,  ...,  0.0581,  0.0381,  0.0620],
+          [ 0.0176,  0.0518,  0.0387,  ...,  0.0443,  0.0329,  0.0684],
+          ...,
+          [ 0.0099,  0.0390,  0.0253,  ...,  0.0487,  0.0444,  0.0502],
+          [-0.0023, -0.0002,  0.0027,  ...,  0.0451,  0.0484,  0.0207],
+          [-0.0162,  0.0180, -0.0068,  ...,  0.0538,  0.0340,  0.0193]],
+
+         [[ 0.0040,  0.0054,  0.0071,  ..., -0.0080, -0.0016, -0.0027],
+          [ 0.0043,  0.0027,  0.0100,  ..., -0.0069, -0.0066, -0.0034],
+          [ 0.0018,  0.0058,  0.0074,  ..., -0.0122, -0.0147, -0.0129],
+          ...,
+          [ 0.0170,  0.0191,  0.0182,  ..., -0.0285, -0.0208, -0.0261],
+          [ 0.0231,  0.0066,  0.0369,  ..., -0.0131, -0.0223, -0.0220],
+          [ 0.0259,  0.0142,  0.0358,  ..., -0.0207, -0.0200, -0.0241]],
+
+         [[ 0.0137,  0.0149,  0.0172,  ..., -0.0169,  0.0006, -0.0018],
+          [ 0.0101,  0.0077,  0.0221,  ..., -0.0195, -0.0054, -0.0057],
+          [ 0.0049,  0.0253,  0.0179,  ..., -0.0181, -0.0106, -0.0035],
+          ...,
+          [ 0.0180,  0.0325,  0.0318,  ..., -0.0208, -0.0075, -0.0003],
+          [ 0.0109,  0.0373,  0.0156,  ..., -0.0235, -0.0071,  0.0036],
+          [ 0.0156,  0.0410,  0.0265,  ..., -0.0141,  0.0007,  0.0070]]],
+
+
+        [[[ 0.0026,  0.0038,  0.0012,  ..., -0.0026, -0.0058, -0.0067],
+          [ 0.0034,  0.0023,  0.0033,  ..., -0.0117, -0.0160, -0.0132],
+          [ 0.0011,  0.0029,  0.0026,  ..., -0.0177, -0.0156, -0.0161],
+          ...,
+          [ 0.0009,  0.0018,  0.0044,  ..., -0.0221, -0.0172, -0.0244],
+          [ 0.0015,  0.0035,  0.0018,  ..., -0.0229, -0.0196, -0.0203],
+          [ 0.0030,  0.0044,  0.0017,  ..., -0.0225, -0.0235, -0.0265]],
+
+         [[-0.0004, -0.0020, -0.0067,  ..., -0.0029, -0.0075, -0.0067],
+          [ 0.0005, -0.0034, -0.0093,  ..., -0.0001, -0.0081, -0.0079],
+          [ 0.0005, -0.0051, -0.0058,  ..., -0.0035, -0.0100, -0.0086],
+          ...,
+          [ 0.0019, -0.0004, -0.0096,  ..., -0.0081, -0.0100, -0.0103],
+          [-0.0003, -0.0013, -0.0100,  ..., -0.0088, -0.0162, -0.0133],
+          [-0.0023,  0.0020, -0.0077,  ..., -0.0117, -0.0118, -0.0135]],
+
+         [[ 0.0005, -0.0057, -0.0060,  ..., -0.0108, -0.0213, -0.0116],
+          [-0.0017, -0.0080, -0.0047,  ..., -0.0109, -0.0163, -0.0111],
+          [-0.0059, -0.0123, -0.0043,  ..., -0.0108, -0.0268, -0.0200],
+          ...,
+          [ 0.0012, -0.0049,  0.0039,  ..., -0.0196, -0.0276, -0.0203],
+          [ 0.0041, -0.0016,  0.0045,  ..., -0.0229, -0.0282, -0.0161],
+          [-0.0002,  0.0002,  0.0058,  ..., -0.0252, -0.0255, -0.0114]],
+
+         ...,
+
+         [[-0.0057, -0.0005, -0.0028,  ...,  0.0196,  0.0195,  0.0165],
+          [ 0.0018,  0.0017, -0.0006,  ...,  0.0378,  0.0310,  0.0217],
+          [ 0.0013, -0.0043,  0.0061,  ...,  0.0397,  0.0171,  0.0406],
+          ...,
+          [-0.0008,  0.0058,  0.0012,  ...,  0.0377,  0.0241,  0.0411],
+          [ 0.0062, -0.0055, -0.0039,  ...,  0.0347,  0.0159,  0.0361],
+          [ 0.0023, -0.0009,  0.0038,  ...,  0.0403,  0.0318,  0.0422]],
+
+         [[ 0.0015,  0.0026,  0.0028,  ..., -0.0074, -0.0163, -0.0070],
+          [ 0.0046,  0.0066,  0.0022,  ..., -0.0081, -0.0118, -0.0102],
+          [ 0.0047,  0.0074,  0.0046,  ..., -0.0102, -0.0062, -0.0104],
+          ...,
+          [ 0.0053,  0.0095,  0.0076,  ..., -0.0114, -0.0142, -0.0123],
+          [ 0.0030,  0.0049,  0.0036,  ..., -0.0216, -0.0176, -0.0185],
+          [ 0.0008,  0.0004, -0.0010,  ..., -0.0217, -0.0146, -0.0127]],
+
+         [[-0.0044, -0.0057,  0.0006,  ...,  0.0008, -0.0031, -0.0090],
+          [-0.0030, -0.0032, -0.0004,  ..., -0.0015, -0.0024, -0.0072],
+          [-0.0028, -0.0078,  0.0009,  ..., -0.0031,  0.0004, -0.0088],
+          ...,
+          [ 0.0021, -0.0092, -0.0026,  ..., -0.0029,  0.0031, -0.0077],
+          [-0.0041, -0.0047,  0.0003,  ..., -0.0014,  0.0017, -0.0113],
+          [-0.0019, -0.0035, -0.0035,  ..., -0.0035, -0.0032, -0.0102]]],
+
+
+        [[[-0.0207, -0.0215, -0.0200,  ...,  0.0007,  0.0031,  0.0076],
+          [-0.0238, -0.0279, -0.0286,  ..., -0.0001,  0.0090,  0.0170],
+          [-0.0194, -0.0301, -0.0250,  ...,  0.0130,  0.0214,  0.0238],
+          ...,
+          [-0.0150, -0.0228, -0.0204,  ...,  0.0212,  0.0232,  0.0294],
+          [-0.0124, -0.0172, -0.0192,  ...,  0.0254,  0.0309,  0.0386],
+          [-0.0121, -0.0158, -0.0160,  ...,  0.0268,  0.0363,  0.0373]],
+
+         [[ 0.0072,  0.0108,  0.0021,  ...,  0.0178,  0.0266,  0.0200],
+          [ 0.0099,  0.0160,  0.0070,  ...,  0.0176,  0.0307,  0.0276],
+          [ 0.0180,  0.0208,  0.0098,  ...,  0.0247,  0.0313,  0.0324],
+          ...,
+          [ 0.0144,  0.0255,  0.0162,  ...,  0.0297,  0.0345,  0.0374],
+          [ 0.0151,  0.0300,  0.0092,  ...,  0.0317,  0.0421,  0.0384],
+          [ 0.0212,  0.0211,  0.0086,  ...,  0.0380,  0.0425,  0.0439]],
+
+         [[-0.0181, -0.0063, -0.0100,  ...,  0.0135,  0.0196,  0.0110],
+          [-0.0158, -0.0203, -0.0112,  ...,  0.0091,  0.0224,  0.0108],
+          [-0.0164, -0.0178, -0.0086,  ...,  0.0092,  0.0188,  0.0105],
+          ...,
+          [-0.0235, -0.0242, -0.0125,  ...,  0.0172,  0.0277,  0.0216],
+          [-0.0135, -0.0152, -0.0119,  ...,  0.0212,  0.0337,  0.0248],
+          [-0.0136, -0.0106, -0.0014,  ...,  0.0191,  0.0308,  0.0260]],
+
+         ...,
+
+         [[ 0.0610,  0.0467,  0.0570,  ...,  0.0575,  0.0317,  0.0500],
+          [ 0.0579,  0.0609,  0.0677,  ...,  0.0508,  0.0263,  0.0635],
+          [ 0.0583,  0.0626,  0.0676,  ...,  0.0388,  0.0196,  0.0418],
+          ...,
+          [ 0.0603,  0.0716,  0.0657,  ...,  0.0518,  0.0283,  0.0350],
+          [ 0.0552,  0.0518,  0.0636,  ...,  0.0376,  0.0369,  0.0405],
+          [ 0.0405,  0.0505,  0.0480,  ...,  0.0097,  0.0110,  0.0392]],
+
+         [[-0.0112, -0.0060, -0.0161,  ...,  0.0201,  0.0289,  0.0304],
+          [-0.0096, -0.0089, -0.0147,  ...,  0.0267,  0.0223,  0.0297],
+          [-0.0011, -0.0010, -0.0057,  ...,  0.0138,  0.0293,  0.0298],
+          ...,
+          [ 0.0173,  0.0119,  0.0238,  ...,  0.0379,  0.0459,  0.0506],
+          [ 0.0341,  0.0312,  0.0317,  ...,  0.0538,  0.0488,  0.0548],
+          [ 0.0518,  0.0439,  0.0497,  ...,  0.0470,  0.0467,  0.0552]],
+
+         [[ 0.0096,  0.0115,  0.0138,  ...,  0.0141,  0.0178,  0.0203],
+          [ 0.0109,  0.0129,  0.0107,  ...,  0.0098,  0.0231,  0.0212],
+          [ 0.0100,  0.0162,  0.0105,  ...,  0.0214,  0.0240,  0.0219],
+          ...,
+          [ 0.0126,  0.0186,  0.0271,  ...,  0.0219,  0.0254,  0.0272],
+          [ 0.0165,  0.0216,  0.0198,  ...,  0.0195,  0.0207,  0.0266],
+          [ 0.0204,  0.0311,  0.0196,  ...,  0.0125,  0.0277,  0.0258]]]],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: conv.4.bias: tensor([ 0.0000,  0.0000,  0.0000, -0.0000, -0.0000, -0.0000,  0.0000, -0.0000,
+         0.0000, -0.0000,  0.0000,  0.0000,  0.0000, -0.0000,  0.0000,  0.0000,
+         0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,
+        -0.0000,  0.0000,  0.0000,  0.0000, -0.0000,  0.0000, -0.0000,  0.0000],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: conv.5.weight: tensor([-1.1790, -0.9323, -1.0677, -0.9199,  0.2049,  0.9941,  1.5543,  0.3916,
+         2.8336, -0.8872, -0.0877, -0.7578,  0.0141,  0.3761, -0.4140, -0.7458,
+         1.3475, -0.3235, -0.2604,  0.7262, -0.2173,  0.0439,  1.3352, -0.2422,
+        -0.0019,  0.6634,  0.3388,  1.4871, -0.3129,  0.1648,  0.2338, -0.6025],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: conv.5.bias: tensor([-0.4262, -1.0743, -1.0108, -0.2662,  0.0792,  1.1312,  1.9506,  0.0837,
+         1.7838,  0.0550,  0.5467, -0.1406, -0.0631,  0.5638, -0.1218, -0.5617,
+         1.2973, -0.4842,  0.5954,  1.5900,  0.3704,  0.5716,  1.1040, -0.3759,
+         0.0360,  0.3128,  0.1162,  1.6084, -0.5713, -0.0643,  0.3228, -1.5479],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: conv.8.weight: tensor([[[[ 0.0339,  0.0386,  0.0327,  ..., -0.0034, -0.0062, -0.0245],
+          [ 0.0394,  0.0301,  0.0229,  ..., -0.0259,  0.0026, -0.0129],
+          [ 0.0189,  0.0165, -0.0086,  ..., -0.0113, -0.0001, -0.0029],
+          ...,
+          [ 0.0096, -0.0061, -0.0102,  ..., -0.0047, -0.0022, -0.0126],
+          [ 0.0021, -0.0017, -0.0183,  ..., -0.0199, -0.0226, -0.0211],
+          [ 0.0031, -0.0003, -0.0345,  ..., -0.0252, -0.0293, -0.0229]],
+
+         [[-0.0147, -0.0205, -0.0138,  ...,  0.0215,  0.0316,  0.0281],
+          [ 0.0152,  0.0057, -0.0179,  ...,  0.0225,  0.0434,  0.0099],
+          [ 0.0136,  0.0008,  0.0038,  ...,  0.0274,  0.0141,  0.0437],
+          ...,
+          [ 0.0260, -0.0049, -0.0085,  ...,  0.0236,  0.0270,  0.0379],
+          [-0.0282, -0.0156, -0.0078,  ...,  0.0394,  0.0465,  0.0505],
+          [ 0.0084,  0.0242, -0.0195,  ...,  0.0449,  0.0449,  0.0434]],
+
+         [[-0.0029, -0.0178, -0.0084,  ...,  0.0016,  0.0055,  0.0014],
+          [-0.0005, -0.0232, -0.0042,  ...,  0.0057,  0.0033,  0.0068],
+          [-0.0047, -0.0008,  0.0049,  ...,  0.0035,  0.0087,  0.0065],
+          ...,
+          [ 0.0039,  0.0099,  0.0113,  ...,  0.0016,  0.0183,  0.0155],
+          [-0.0006, -0.0126,  0.0083,  ...,  0.0069,  0.0196,  0.0186],
+          [-0.0049, -0.0139,  0.0404,  ...,  0.0228,  0.0280,  0.0120]],
+
+         ...,
+
+         [[-0.0034, -0.0008, -0.0035,  ...,  0.0005,  0.0002,  0.0030],
+          [-0.0025,  0.0003, -0.0078,  ...,  0.0012,  0.0005,  0.0037],
+          [ 0.0023, -0.0023, -0.0033,  ..., -0.0027, -0.0007,  0.0027],
+          ...,
+          [-0.0066, -0.0049,  0.0030,  ...,  0.0008, -0.0069,  0.0018],
+          [ 0.0074,  0.0008, -0.0070,  ...,  0.0038,  0.0020,  0.0102],
+          [-0.0038,  0.0031, -0.0039,  ...,  0.0064,  0.0083,  0.0074]],
+
+         [[ 0.0045,  0.0013,  0.0049,  ...,  0.0032,  0.0051,  0.0043],
+          [ 0.0036,  0.0006,  0.0019,  ...,  0.0010,  0.0005,  0.0028],
+          [ 0.0011,  0.0015, -0.0001,  ...,  0.0006, -0.0012, -0.0014],
+          ...,
+          [ 0.0011, -0.0013, -0.0002,  ...,  0.0027,  0.0039,  0.0030],
+          [-0.0004, -0.0012, -0.0003,  ...,  0.0032,  0.0056,  0.0033],
+          [ 0.0033, -0.0027, -0.0022,  ...,  0.0027,  0.0024,  0.0022]],
+
+         [[-0.0003,  0.0043,  0.0048,  ...,  0.0129,  0.0088,  0.0093],
+          [-0.0083,  0.0022, -0.0013,  ...,  0.0162,  0.0055,  0.0089],
+          [-0.0026,  0.0064, -0.0045,  ...,  0.0116,  0.0112,  0.0067],
+          ...,
+          [-0.0038,  0.0040,  0.0071,  ...,  0.0109,  0.0054,  0.0070],
+          [-0.0011,  0.0040,  0.0066,  ...,  0.0086, -0.0077,  0.0030],
+          [ 0.0014,  0.0123, -0.0019,  ...,  0.0039,  0.0040,  0.0091]]],
+
+
+        [[[-0.0123,  0.0180,  0.0140,  ..., -0.0034, -0.0172, -0.0109],
+          [ 0.0100,  0.0127,  0.0106,  ...,  0.0081, -0.0049, -0.0156],
+          [ 0.0076,  0.0183,  0.0072,  ...,  0.0034,  0.0046,  0.0005],
+          ...,
+          [-0.0025,  0.0021,  0.0122,  ...,  0.0131,  0.0146,  0.0121],
+          [ 0.0061,  0.0143,  0.0097,  ...,  0.0196,  0.0326,  0.0077],
+          [ 0.0141,  0.0161,  0.0059,  ...,  0.0187,  0.0157,  0.0233]],
+
+         [[-0.0387, -0.0356, -0.0238,  ..., -0.0018,  0.0008,  0.0028],
+          [-0.0418, -0.0470, -0.0234,  ..., -0.0101,  0.0054, -0.0001],
+          [-0.0471, -0.0494, -0.0152,  ..., -0.0026,  0.0098,  0.0040],
+          ...,
+          [-0.0462, -0.0807, -0.0406,  ...,  0.0047,  0.0011,  0.0049],
+          [-0.0715, -0.0568, -0.0371,  ...,  0.0043,  0.0093, -0.0045],
+          [-0.0840, -0.0809, -0.0717,  ..., -0.0019, -0.0004,  0.0003]],
+
+         [[ 0.0010,  0.0018, -0.0006,  ..., -0.0005, -0.0004, -0.0011],
+          [-0.0050,  0.0028, -0.0003,  ..., -0.0036, -0.0005, -0.0001],
+          [-0.0028, -0.0006, -0.0010,  ..., -0.0014, -0.0011, -0.0004],
+          ...,
+          [-0.0087, -0.0128, -0.0000,  ...,  0.0019,  0.0017,  0.0007],
+          [-0.0135, -0.0162, -0.0041,  ...,  0.0011,  0.0014,  0.0009],
+          [-0.0207, -0.0232, -0.0030,  ..., -0.0006, -0.0005,  0.0009]],
+
+         ...,
+
+         [[-0.0122, -0.0084, -0.0095,  ..., -0.0014,  0.0026, -0.0007],
+          [-0.0136, -0.0072, -0.0083,  ...,  0.0023,  0.0012, -0.0035],
+          [-0.0172, -0.0114, -0.0046,  ...,  0.0001,  0.0052, -0.0036],
+          ...,
+          [-0.0165, -0.0091, -0.0056,  ..., -0.0037,  0.0010, -0.0010],
+          [-0.0124, -0.0134, -0.0055,  ...,  0.0002,  0.0001, -0.0010],
+          [-0.0133, -0.0216, -0.0043,  ..., -0.0016, -0.0008, -0.0011]],
+
+         [[-0.0016, -0.0038, -0.0031,  ...,  0.0034,  0.0021,  0.0009],
+          [ 0.0015, -0.0050, -0.0011,  ...,  0.0006, -0.0010, -0.0001],
+          [ 0.0007, -0.0017, -0.0020,  ...,  0.0012, -0.0008, -0.0017],
+          ...,
+          [-0.0026, -0.0027, -0.0028,  ...,  0.0022,  0.0025,  0.0010],
+          [-0.0033, -0.0020, -0.0037,  ...,  0.0016,  0.0012,  0.0005],
+          [-0.0044, -0.0049, -0.0040,  ...,  0.0016, -0.0006,  0.0002]],
+
+         [[-0.0170, -0.0186, -0.0096,  ...,  0.0039,  0.0008, -0.0004],
+          [-0.0175, -0.0232, -0.0147,  ...,  0.0044,  0.0020,  0.0029],
+          [-0.0131, -0.0151, -0.0205,  ...,  0.0050,  0.0027,  0.0045],
+          ...,
+          [-0.0122, -0.0069, -0.0101,  ...,  0.0008,  0.0045,  0.0055],
+          [-0.0169, -0.0105, -0.0129,  ...,  0.0037,  0.0015,  0.0013],
+          [-0.0113, -0.0089, -0.0092,  ...,  0.0094,  0.0036,  0.0062]]],
+
+
+        [[[-0.0500, -0.0639, -0.0404,  ...,  0.0606, -0.0052, -0.0731],
+          [-0.0465, -0.0599, -0.0820,  ...,  0.0518,  0.0768,  0.0519],
+          [-0.0478, -0.0205, -0.0535,  ..., -0.0020, -0.0009,  0.0370],
+          ...,
+          [-0.0153, -0.0096, -0.0261,  ..., -0.0617, -0.0561, -0.0929],
+          [-0.0243, -0.0353, -0.0149,  ..., -0.0969, -0.0445, -0.0581],
+          [-0.0210, -0.0454, -0.0210,  ..., -0.0834,  0.0067, -0.0774]],
+
+         [[ 0.1054,  0.0859,  0.0823,  ...,  0.1126,  0.1727,  0.2434],
+          [ 0.0907,  0.0851,  0.0658,  ...,  0.1167,  0.2083,  0.2550],
+          [ 0.0658,  0.0756,  0.0690,  ...,  0.1314,  0.2065,  0.3004],
+          ...,
+          [ 0.1009,  0.0874,  0.0954,  ...,  0.2006,  0.3550,  0.3570],
+          [ 0.1038,  0.0842,  0.0694,  ...,  0.3013,  0.3321,  0.3576],
+          [ 0.1116,  0.0647,  0.1263,  ...,  0.3570,  0.3329,  0.5295]],
+
+         [[ 0.0133,  0.0169,  0.0266,  ..., -0.0046,  0.0025, -0.0028],
+          [ 0.0155,  0.0223,  0.0267,  ..., -0.0218, -0.0003,  0.0011],
+          [ 0.0060,  0.0146,  0.0239,  ..., -0.0184,  0.0091,  0.0033],
+          ...,
+          [ 0.0186,  0.0295,  0.0356,  ...,  0.0517,  0.0492,  0.0357],
+          [ 0.0111,  0.0411,  0.0406,  ...,  0.0416,  0.0352,  0.0523],
+          [ 0.0112,  0.0243,  0.0573,  ...,  0.0401,  0.0440,  0.0581]],
+
+         ...,
+
+         [[ 0.0176,  0.0117,  0.0134,  ...,  0.0409,  0.0330,  0.0327],
+          [ 0.0103,  0.0072,  0.0128,  ...,  0.0525,  0.0618,  0.0447],
+          [ 0.0134,  0.0120,  0.0056,  ...,  0.0584,  0.0671,  0.0708],
+          ...,
+          [ 0.0149,  0.0171,  0.0191,  ...,  0.1012,  0.0614,  0.0449],
+          [ 0.0144,  0.0213,  0.0121,  ...,  0.0829,  0.0481,  0.0636],
+          [ 0.0159,  0.0186,  0.0098,  ...,  0.1079,  0.0676,  0.0758]],
+
+         [[ 0.0002,  0.0012,  0.0053,  ...,  0.0022,  0.0016,  0.0044],
+          [-0.0028,  0.0016,  0.0026,  ..., -0.0100, -0.0056, -0.0106],
+          [-0.0040, -0.0041, -0.0011,  ..., -0.0111, -0.0093,  0.0006],
+          ...,
+          [-0.0057, -0.0010, -0.0002,  ...,  0.0002,  0.0074,  0.0079],
+          [-0.0046, -0.0041, -0.0026,  ...,  0.0035,  0.0134,  0.0182],
+          [-0.0067, -0.0005, -0.0004,  ...,  0.0044,  0.0099,  0.0064]],
+
+         [[ 0.0189,  0.0150,  0.0046,  ...,  0.0412,  0.0666,  0.0628],
+          [ 0.0247,  0.0167,  0.0135,  ...,  0.0516,  0.0648,  0.0496],
+          [ 0.0136,  0.0089,  0.0160,  ...,  0.0782,  0.0213,  0.0565],
+          ...,
+          [ 0.0150,  0.0183,  0.0105,  ...,  0.0376,  0.0222,  0.0032],
+          [ 0.0068,  0.0166,  0.0142,  ...,  0.0228,  0.0119,  0.0076],
+          [ 0.0016,  0.0137,  0.0023,  ...,  0.0194,  0.0032,  0.0179]]],
+
+
+        ...,
+
+
+        [[[ 0.0151,  0.0232,  0.0235,  ..., -0.0280, -0.0278, -0.0724],
+          [ 0.0164,  0.0073,  0.0572,  ...,  0.0165, -0.0106, -0.0366],
+          [ 0.0368,  0.0284,  0.0301,  ...,  0.0467,  0.0188, -0.0112],
+          ...,
+          [ 0.0272,  0.0304,  0.0200,  ...,  0.0737,  0.0324,  0.0151],
+          [ 0.0404,  0.0695,  0.0432,  ...,  0.0363, -0.0230, -0.0006],
+          [ 0.0233,  0.0509,  0.0696,  ...,  0.0265,  0.0431, -0.0043]],
+
+         [[-0.0095,  0.0081, -0.0290,  ..., -0.0508, -0.0125, -0.0107],
+          [-0.0482, -0.0455, -0.0796,  ..., -0.0596, -0.0442, -0.0308],
+          [-0.0296, -0.0263, -0.0547,  ..., -0.0417, -0.0643, -0.0301],
+          ...,
+          [-0.1058, -0.1021, -0.0827,  ..., -0.1241, -0.0488, -0.1016],
+          [-0.0988, -0.0975, -0.0516,  ..., -0.1291, -0.0728, -0.0877],
+          [-0.0772, -0.0575, -0.0926,  ..., -0.1626, -0.0567, -0.1189]],
+
+         [[ 0.0064,  0.0011,  0.0130,  ...,  0.0125,  0.0168,  0.0141],
+          [ 0.0155, -0.0060,  0.0045,  ...,  0.0122,  0.0150,  0.0132],
+          [-0.0172, -0.0171, -0.0053,  ...,  0.0219,  0.0167,  0.0174],
+          ...,
+          [-0.0255, -0.0306, -0.0265,  ..., -0.0076, -0.0015, -0.0131],
+          [-0.0275, -0.0552, -0.0397,  ..., -0.0474, -0.0040, -0.0120],
+          [-0.0523, -0.0742, -0.0082,  ..., -0.0414, -0.0666, -0.0453]],
+
+         ...,
+
+         [[ 0.0059,  0.0044, -0.0029,  ...,  0.0053,  0.0212,  0.0149],
+          [ 0.0027, -0.0042, -0.0007,  ...,  0.0046,  0.0196,  0.0140],
+          [ 0.0017, -0.0015,  0.0026,  ...,  0.0094,  0.0218,  0.0125],
+          ...,
+          [ 0.0053,  0.0010, -0.0112,  ...,  0.0152,  0.0185,  0.0206],
+          [ 0.0043, -0.0041, -0.0089,  ..., -0.0000,  0.0149,  0.0224],
+          [-0.0002,  0.0009, -0.0084,  ...,  0.0017,  0.0236,  0.0138]],
+
+         [[ 0.0001,  0.0040, -0.0041,  ..., -0.0032, -0.0008,  0.0019],
+          [-0.0002,  0.0092,  0.0030,  ..., -0.0012,  0.0069,  0.0045],
+          [ 0.0074,  0.0007,  0.0020,  ..., -0.0020,  0.0065,  0.0040],
+          ...,
+          [ 0.0051,  0.0115,  0.0018,  ..., -0.0011,  0.0001,  0.0033],
+          [ 0.0087,  0.0018,  0.0059,  ..., -0.0007,  0.0016,  0.0022],
+          [ 0.0030,  0.0048,  0.0006,  ..., -0.0035, -0.0013,  0.0019]],
+
+         [[-0.0133, -0.0072, -0.0034,  ..., -0.0369, -0.0205, -0.0084],
+          [-0.0127,  0.0035,  0.0071,  ..., -0.0214, -0.0119,  0.0001],
+          [-0.0120, -0.0057,  0.0061,  ..., -0.0113, -0.0055, -0.0020],
+          ...,
+          [-0.0009,  0.0149,  0.0250,  ...,  0.0089,  0.0083,  0.0167],
+          [-0.0002,  0.0029, -0.0005,  ...,  0.0032,  0.0092,  0.0133],
+          [ 0.0018,  0.0054,  0.0050,  ...,  0.0128,  0.0176,  0.0108]]],
+
+
+        [[[ 0.0199,  0.0165,  0.0043,  ...,  0.0604,  0.0082,  0.0399],
+          [ 0.0056,  0.0054,  0.0051,  ...,  0.0163,  0.0192,  0.0298],
+          [ 0.0070,  0.0033,  0.0127,  ..., -0.0006,  0.0154,  0.0097],
+          ...,
+          [-0.0010,  0.0006, -0.0046,  ..., -0.0048,  0.0280,  0.0182],
+          [ 0.0046, -0.0074, -0.0055,  ...,  0.0235,  0.0082,  0.0099],
+          [ 0.0010,  0.0016, -0.0170,  ...,  0.0016,  0.0149,  0.0137]],
+
+         [[ 0.0448,  0.0155,  0.0418,  ..., -0.0224, -0.0055, -0.0466],
+          [ 0.0764,  0.0502, -0.0073,  ...,  0.0196, -0.0526, -0.0057],
+          [ 0.0246,  0.0940, -0.0257,  ..., -0.0255,  0.0139, -0.0051],
+          ...,
+          [ 0.0397,  0.0758,  0.0410,  ..., -0.0641, -0.0453, -0.0214],
+          [ 0.0451,  0.0697,  0.0169,  ...,  0.0181,  0.0064, -0.0149],
+          [ 0.0168,  0.0722,  0.0412,  ..., -0.0251,  0.0478,  0.0190]],
+
+         [[ 0.0240,  0.0030, -0.0269,  ..., -0.0103, -0.0162, -0.0116],
+          [ 0.0388,  0.0200,  0.0133,  ...,  0.0012, -0.0054,  0.0004],
+          [ 0.0608,  0.0422,  0.0136,  ...,  0.0074, -0.0038,  0.0061],
+          ...,
+          [ 0.0553,  0.0364,  0.0127,  ...,  0.0310, -0.0035,  0.0484],
+          [ 0.0620,  0.0346,  0.0066,  ...,  0.0544,  0.0110,  0.0608],
+          [ 0.0801,  0.0245,  0.0116,  ...,  0.0368,  0.0128,  0.0807]],
+
+         ...,
+
+         [[ 0.0067, -0.0004,  0.0048,  ..., -0.0156, -0.0118, -0.0191],
+          [ 0.0043,  0.0034,  0.0009,  ..., -0.0181, -0.0197, -0.0135],
+          [ 0.0006,  0.0008,  0.0099,  ..., -0.0181, -0.0097, -0.0045],
+          ...,
+          [ 0.0006,  0.0144,  0.0028,  ..., -0.0105,  0.0030, -0.0040],
+          [ 0.0071,  0.0034,  0.0013,  ..., -0.0093, -0.0070, -0.0040],
+          [-0.0036,  0.0061,  0.0028,  ..., -0.0006, -0.0112, -0.0224]],
+
+         [[ 0.0106,  0.0101, -0.0065,  ...,  0.0102,  0.0070,  0.0134],
+          [ 0.0152,  0.0088, -0.0093,  ...,  0.0003, -0.0023,  0.0013],
+          [ 0.0205,  0.0041, -0.0032,  ..., -0.0031, -0.0004, -0.0013],
+          ...,
+          [ 0.0222,  0.0102, -0.0063,  ...,  0.0020, -0.0030, -0.0055],
+          [ 0.0178,  0.0043, -0.0032,  ...,  0.0037,  0.0040, -0.0013],
+          [ 0.0229,  0.0106, -0.0003,  ...,  0.0017,  0.0069,  0.0038]],
+
+         [[ 0.0034,  0.0100, -0.0013,  ...,  0.0003,  0.0073,  0.0089],
+          [-0.0028,  0.0234, -0.0040,  ..., -0.0165,  0.0237,  0.0024],
+          [ 0.0014,  0.0227, -0.0054,  ...,  0.0060, -0.0137, -0.0097],
+          ...,
+          [-0.0013,  0.0078, -0.0093,  ..., -0.0024, -0.0083,  0.0067],
+          [-0.0097,  0.0051, -0.0105,  ..., -0.0046, -0.0130, -0.0099],
+          [-0.0037, -0.0007, -0.0013,  ..., -0.0031,  0.0019, -0.0050]]],
+
+
+        [[[-0.0005,  0.0006, -0.0163,  ...,  0.0039, -0.0088,  0.0080],
+          [-0.0209, -0.0178,  0.0063,  ...,  0.0062, -0.0081,  0.0032],
+          [-0.0224, -0.0127, -0.0162,  ...,  0.0195, -0.0053, -0.0163],
+          ...,
+          [-0.0203, -0.0121, -0.0225,  ...,  0.0508,  0.0286,  0.0132],
+          [-0.0225, -0.0318, -0.0154,  ...,  0.0223,  0.0243,  0.0407],
+          [-0.0196, -0.0179, -0.0198,  ...,  0.0411,  0.0663,  0.0442]],
+
+         [[-0.0193,  0.0205,  0.0258,  ..., -0.0123, -0.0106, -0.0369],
+          [-0.0179,  0.0060,  0.0216,  ..., -0.0208, -0.0280, -0.0125],
+          [-0.0074,  0.0043,  0.0112,  ..., -0.0235, -0.0202, -0.0274],
+          ...,
+          [-0.0189, -0.0019,  0.0123,  ..., -0.0238, -0.0077, -0.0187],
+          [-0.0056, -0.0077,  0.0225,  ..., -0.0432, -0.0372, -0.0571],
+          [-0.0219,  0.0180,  0.0279,  ..., -0.0397, -0.0502, -0.0644]],
+
+         [[-0.0080, -0.0028,  0.0021,  ...,  0.0088,  0.0098,  0.0046],
+          [-0.0040, -0.0023,  0.0016,  ...,  0.0057,  0.0044, -0.0010],
+          [-0.0029,  0.0003,  0.0047,  ...,  0.0048,  0.0032,  0.0014],
+          ...,
+          [-0.0067, -0.0033, -0.0015,  ..., -0.0016,  0.0006, -0.0021],
+          [ 0.0002, -0.0062, -0.0005,  ...,  0.0020,  0.0042,  0.0019],
+          [-0.0038, -0.0027, -0.0021,  ..., -0.0117, -0.0041, -0.0027]],
+
+         ...,
+
+         [[ 0.0050,  0.0043,  0.0018,  ..., -0.0000,  0.0042,  0.0041],
+          [ 0.0043,  0.0030, -0.0014,  ..., -0.0021,  0.0040, -0.0048],
+          [ 0.0043, -0.0038, -0.0015,  ..., -0.0034,  0.0008, -0.0101],
+          ...,
+          [ 0.0038,  0.0033, -0.0003,  ..., -0.0089, -0.0112, -0.0133],
+          [-0.0027,  0.0045, -0.0016,  ..., -0.0232, -0.0149, -0.0133],
+          [ 0.0017,  0.0020, -0.0049,  ..., -0.0221, -0.0243, -0.0260]],
+
+         [[-0.0039, -0.0004,  0.0009,  ..., -0.0081,  0.0005, -0.0050],
+          [-0.0048, -0.0010,  0.0031,  ...,  0.0016,  0.0023, -0.0006],
+          [-0.0046, -0.0048,  0.0015,  ...,  0.0025,  0.0009,  0.0024],
+          ...,
+          [-0.0045, -0.0008,  0.0016,  ...,  0.0017,  0.0024,  0.0030],
+          [-0.0064, -0.0014,  0.0020,  ...,  0.0030,  0.0034,  0.0003],
+          [-0.0059, -0.0045, -0.0005,  ...,  0.0027,  0.0028,  0.0037]],
+
+         [[-0.0011,  0.0168,  0.0080,  ..., -0.0047, -0.0082, -0.0099],
+          [ 0.0129,  0.0180,  0.0192,  ..., -0.0065, -0.0115, -0.0189],
+          [ 0.0048,  0.0138,  0.0141,  ..., -0.0162, -0.0074, -0.0146],
+          ...,
+          [ 0.0099,  0.0060,  0.0112,  ..., -0.0090, -0.0071, -0.0087],
+          [ 0.0032,  0.0117,  0.0107,  ..., -0.0063, -0.0022, -0.0023],
+          [ 0.0048,  0.0074,  0.0062,  ..., -0.0033, -0.0020,  0.0001]]]],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: conv.8.bias: tensor([-0.0000,  0.0000,  0.0000, -0.0000,  0.0000,  0.0000,  0.0000, -0.0000,
+         0.0000, -0.0000, -0.0000,  0.0000,  0.0000,  0.0000,  0.0000, -0.0000,
+         0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,
+         0.0000,  0.0000,  0.0000,  0.0000, -0.0000, -0.0000,  0.0000,  0.0000,
+        -0.0000, -0.0000,  0.0000,  0.0000,  0.0000, -0.0000,  0.0000,  0.0000,
+         0.0000, -0.0000,  0.0000,  0.0000,  0.0000, -0.0000, -0.0000, -0.0000,
+        -0.0000,  0.0000, -0.0000,  0.0000,  0.0000, -0.0000,  0.0000, -0.0000,
+        -0.0000,  0.0000, -0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,
+         0.0000,  0.0000,  0.0000,  0.0000, -0.0000,  0.0000,  0.0000, -0.0000,
+        -0.0000,  0.0000,  0.0000, -0.0000, -0.0000,  0.0000,  0.0000,  0.0000,
+         0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,
+         0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: conv.9.weight: tensor([ 0.3137,  0.0332,  0.4389,  0.3947, -1.2683, -1.1774,  0.0597,  0.3547,
+        -0.4005,  0.7617,  0.4486,  0.3391,  0.0214,  0.0837,  0.8410, -1.5024,
+         0.5522, -0.2943,  0.3282,  0.5228,  0.5782,  0.2738,  0.1615, -0.0291,
+        -1.2797, -0.3348, -0.1723,  0.5533, -0.7089, -0.9935, -2.2014,  0.4738,
+         0.3101,  0.7058,  0.0889,  0.1952,  0.0761, -0.1076,  0.0089,  0.0803,
+         0.2243,  0.0111,  0.1719,  0.1195, -0.3507,  0.0971, -0.1240, -0.0085,
+        -0.6933, -0.1202, -0.2723,  0.2638, -0.1260,  0.4137, -0.3523,  0.6081,
+        -0.9118, -0.4195, -0.6139, -0.4736, -0.5764,  0.4626,  0.1819,  0.6158,
+        -0.4869, -0.3988, -0.0437, -0.6472,  0.2978,  0.0393, -0.0488, -0.7982,
+         0.5118, -0.1012, -0.0709, -0.5372,  0.0034, -0.0034, -0.0898,  0.4471,
+        -0.1569,  0.0000,  0.0534,  0.4709,  0.2497,  0.1680, -0.0716,  0.6540,
+         0.0465, -0.0942, -0.1440, -0.5098, -0.0007, -0.1717,  0.0983, -0.1900],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: conv.9.bias: tensor([ 0.3449,  0.0141, -0.2899, -0.1143, -0.9569, -0.8454, -0.1355,  0.3478,
+        -0.0355,  0.7639,  0.0220,  0.4993, -0.2713,  0.1455,  0.5795, -0.6309,
+         0.1877, -0.2089,  0.1433,  0.9202,  0.6115,  0.0201, -0.3558, -0.0161,
+        -0.7610, -0.3875, -0.3991,  0.1859, -0.5834, -0.6502, -1.9538,  0.4488,
+         0.3862,  0.6244,  0.2788, -0.0169, -0.1144, -0.0637,  0.2679, -0.0605,
+         0.1607,  0.3553,  0.2072, -0.0107, -0.2466,  0.0357, -0.0441, -0.0024,
+        -0.4120, -0.1224, -0.3885, -0.0513, -0.1409, -0.3481, -0.3414, -0.1027,
+        -0.4354, -0.2800, -0.5944, -0.3893, -0.3415, -0.1142,  0.7608,  0.3543,
+        -0.4826, -0.7453, -0.2302, -0.2694,  0.1709,  0.5473, -0.3580, -0.5007,
+         0.4631, -1.1275,  0.1144, -0.4266, -0.1626,  0.0023, -0.2174,  0.3988,
+        -0.8006,  0.0000, -0.0019,  0.4478,  0.2592, -0.0995, -0.0810,  0.5558,
+        -0.1280, -0.1282, -0.1344, -0.8762, -0.2501,  0.0478,  0.0410, -0.3052],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.weight_ih_l0: tensor([[-0.0007, -0.0005, -0.0009,  ...,  0.0011,  0.0010,  0.0014],
+        [-0.0003,  0.0010,  0.0003,  ...,  0.0005,  0.0012,  0.0020],
+        [-0.0002,  0.0010,  0.0004,  ...,  0.0025,  0.0039,  0.0030],
+        ...,
+        [-0.0005, -0.0016,  0.0013,  ..., -0.0044, -0.0046, -0.0055],
+        [ 0.0009, -0.0002, -0.0012,  ..., -0.0030, -0.0000,  0.0004],
+        [ 0.0017,  0.0036,  0.0010,  ...,  0.0117,  0.0143,  0.0161]],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.weight_hh_l0: tensor([[-0.0014,  0.0008,  0.0006,  ...,  0.0037, -0.0050, -0.0055],
+        [-0.0009, -0.0009, -0.0001,  ..., -0.0010, -0.0012,  0.0012],
+        [-0.0000,  0.0012,  0.0027,  ...,  0.0004, -0.0009, -0.0012],
+        ...,
+        [ 0.0044,  0.0041, -0.0032,  ..., -0.0001,  0.0125,  0.0079],
+        [-0.0020,  0.0028, -0.0092,  ...,  0.0043, -0.0117, -0.0141],
+        [-0.0013, -0.0078,  0.0028,  ..., -0.0157, -0.0150,  0.0014]],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.bias_ih_l0: tensor([-0.0066,  0.0030,  0.0028,  ...,  0.0043, -0.0114,  0.0194], device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.bias_hh_l0: tensor([-0.0066,  0.0030,  0.0028,  ...,  0.0043, -0.0114,  0.0194], device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.weight_ih_l1: tensor([[-0.0020,  0.0015,  0.0028,  ...,  0.0095,  0.0012,  0.0029],
+        [-0.0007,  0.0004,  0.0076,  ...,  0.0001,  0.0084,  0.0076],
+        [-0.0011, -0.0058,  0.0013,  ..., -0.0095,  0.0068,  0.0100],
+        ...,
+        [-0.0002,  0.0009,  0.0006,  ...,  0.0001, -0.0003, -0.0009],
+        [-0.0047,  0.0005, -0.0052,  ...,  0.0104, -0.0142, -0.0136],
+        [ 0.0022, -0.0119,  0.0089,  ...,  0.0062,  0.0094,  0.0372]],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.weight_hh_l1: tensor([[ 0.0029,  0.0010, -0.0010,  ...,  0.0007, -0.0002, -0.0009],
+        [ 0.0002, -0.0024, -0.0002,  ...,  0.0019,  0.0026,  0.0036],
+        [-0.0008, -0.0010,  0.0005,  ...,  0.0004,  0.0025,  0.0027],
+        ...,
+        [-0.0002, -0.0005, -0.0001,  ..., -0.0000,  0.0002,  0.0005],
+        [ 0.0004,  0.0041,  0.0013,  ..., -0.0047, -0.0034, -0.0075],
+        [ 0.0009, -0.0031, -0.0001,  ...,  0.0032,  0.0035,  0.0035]],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.bias_ih_l1: tensor([-0.0055,  0.0086,  0.0111,  ..., -0.0002, -0.0232,  0.0190], device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.bias_hh_l1: tensor([-0.0055,  0.0086,  0.0111,  ..., -0.0002, -0.0232,  0.0190], device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.weight_ih_l2: tensor([[ 0.0016,  0.0061,  0.0004,  ..., -0.0069, -0.0034, -0.0089],
+        [-0.0005, -0.0009, -0.0000,  ...,  0.0006,  0.0014,  0.0020],
+        [ 0.0025,  0.0017, -0.0013,  ...,  0.0004, -0.0041, -0.0017],
+        ...,
+        [-0.0011, -0.0008, -0.0010,  ...,  0.0003, -0.0021, -0.0017],
+        [ 0.0002, -0.0002, -0.0004,  ...,  0.0001, -0.0006,  0.0002],
+        [-0.0003, -0.0001,  0.0002,  ..., -0.0004, -0.0014, -0.0041]],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.weight_hh_l2: tensor([[-0.0041,  0.0007, -0.0039,  ..., -0.0045, -0.0004,  0.0015],
+        [ 0.0006, -0.0001,  0.0009,  ...,  0.0008,  0.0002, -0.0003],
+        [-0.0014,  0.0002, -0.0017,  ..., -0.0014, -0.0006,  0.0007],
+        ...,
+        [-0.0009,  0.0004, -0.0003,  ..., -0.0004,  0.0000,  0.0002],
+        [-0.0001, -0.0000,  0.0000,  ..., -0.0001,  0.0001,  0.0001],
+        [-0.0000, -0.0002,  0.0000,  ..., -0.0004,  0.0003,  0.0002]],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.bias_ih_l2: tensor([-0.0335,  0.0063, -0.0124,  ...,  0.0003, -0.0003, -0.0033], device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.bias_hh_l2: tensor([-0.0335,  0.0063, -0.0124,  ...,  0.0003, -0.0003, -0.0033], device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.weight_ih_l3: tensor([[-0.0006, -0.0005, -0.0016,  ..., -0.0020, -0.0009,  0.0002],
+        [ 0.0019, -0.0004,  0.0021,  ...,  0.0016,  0.0014,  0.0012],
+        [ 0.0007, -0.0001,  0.0009,  ...,  0.0001,  0.0001, -0.0001],
+        ...,
+        [-0.0028,  0.0012, -0.0022,  ..., -0.0014,  0.0011,  0.0005],
+        [ 0.0007,  0.0003,  0.0009,  ..., -0.0009, -0.0000,  0.0005],
+        [-0.0007,  0.0001, -0.0035,  ..., -0.0092, -0.0025,  0.0032]],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.weight_hh_l3: tensor([[ 0.0008,  0.0005,  0.0002,  ...,  0.0006,  0.0009,  0.0014],
+        [-0.0004,  0.0001,  0.0004,  ..., -0.0006, -0.0021, -0.0025],
+        [ 0.0000,  0.0001, -0.0001,  ..., -0.0001, -0.0003, -0.0002],
+        ...,
+        [ 0.0014,  0.0008, -0.0009,  ...,  0.0027,  0.0006,  0.0015],
+        [ 0.0002,  0.0006,  0.0004,  ...,  0.0003, -0.0008, -0.0004],
+        [ 0.0054,  0.0035, -0.0015,  ...,  0.0043,  0.0040,  0.0102]],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.bias_ih_l3: tensor([-0.0020, -0.0087, -0.0004,  ..., -0.0088, -0.0000, -0.0353], device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.bias_hh_l3: tensor([-0.0020, -0.0087, -0.0004,  ..., -0.0088, -0.0000, -0.0353], device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.weight_ih_l4: tensor([[ 0.0047,  0.0033,  0.0022,  ...,  0.0031,  0.0044,  0.0083],
+        [ 0.0014, -0.0002,  0.0011,  ...,  0.0010, -0.0000, -0.0001],
+        [-0.0025,  0.0003,  0.0021,  ..., -0.0038, -0.0009, -0.0039],
+        ...,
+        [ 0.0048,  0.0040, -0.0041,  ...,  0.0046,  0.0022,  0.0092],
+        [-0.0276, -0.0204,  0.0250,  ..., -0.0255, -0.0290, -0.0514],
+        [ 0.0115,  0.0038, -0.0116,  ...,  0.0149,  0.0140,  0.0272]],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.weight_hh_l4: tensor([[ 0.0035,  0.0344, -0.0238,  ..., -0.0151, -0.0454,  0.0315],
+        [-0.0015,  0.0007, -0.0008,  ..., -0.0023, -0.0025,  0.0005],
+        [ 0.0079, -0.0127,  0.0137,  ..., -0.0066, -0.0013, -0.0121],
+        ...,
+        [ 0.0139,  0.0239, -0.0246,  ...,  0.0165, -0.0160,  0.0271],
+        [-0.0537, -0.1583,  0.1669,  ..., -0.0960,  0.0800, -0.1803],
+        [ 0.0251,  0.0915, -0.0928,  ...,  0.0346, -0.0580,  0.0963]],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.bias_ih_l4: tensor([-0.0277,  0.0025,  0.0150,  ..., -0.0321,  0.2130, -0.0945], device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: rnn.bias_hh_l4: tensor([-0.0277,  0.0025,  0.0150,  ..., -0.0321,  0.2130, -0.0945], device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: fc.fc.weight: tensor([[-0.0442,  0.0936, -0.0917,  ...,  0.0739, -0.0511,  0.0924],
+        [-0.0840, -0.4298,  0.4532,  ..., -0.2058,  0.2498, -0.4761],
+        [ 0.0009, -0.2988,  0.3083,  ..., -0.1200,  0.1718, -0.3267],
+        ...,
+        [-0.2098, -0.6630,  0.6903,  ..., -0.3897,  0.3869, -0.7621],
+        [-0.1007,  0.0721, -0.0681,  ..., -0.0341, -0.0308,  0.0715],
+        [ 1.3338,  3.5402, -3.6807,  ...,  1.9579, -1.9821,  3.9566]],
+       device='cuda:0')
+2020-07-07 04:45:10 - ERROR - log_model_grads: fc.fc.bias: tensor([-0.1134,  0.5524,  0.3789,  0.5816,  0.5401,  0.9099, -0.3627,  0.0675,
+         0.8986,  0.0397, -0.0675, -0.2360,  0.2659, -0.5747,  0.4095, -0.0083,
+        -0.2293,  0.3523,  0.0336, -0.2332,  1.9797,  0.0898,  0.0601, -0.0354,
+         0.0022, -0.4693,  0.4361,  0.0847, -1.1216, -0.9985, -0.1017, -0.1788,
+        -0.1560,  0.7250, -0.2232, -0.1560,  0.6381,  0.8884, -0.0775, -4.5924],
+       device='cuda:0')
