@@ -35,10 +35,10 @@ def assess_commonvoice(validated_path:str, max_occurance:int):
     val_df, drop_row_count = filter_by_count(val_df, count_dict, max_occurance)
     print(f"number of rows dropped: {drop_row_count}")
     dirname = os.path.dirname(validated_path)
-    write_path = os.path.join(dirname, f"./validated-filtered-{max_occurance}.tsv")
+    write_path = os.path.join(dirname, f"validated-filtered-{max_occurance}.tsv")
     if os.path.exists(write_path):
         print(f"file: {write_path} already exists.")
-        print("Would you like to rewrite it? y/n)
+        print("Would you like to rewrite it? y/n")
         answer = input()
         if answer in ["Y", "y"]:
             val_df.to_csv(write_path, sep="\t", index=False)

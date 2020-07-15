@@ -47,8 +47,10 @@ class DataPreprocessor(object):
         raise NotImplementedError
     
     def clear_audio_trans(self):
-        # this method needs to be called between iterations of train/dev/test sets
-        # otherwise, the samples will accumulate with sucessive iteration calls
+        """
+        this method needs to be called between iterations of train/dev/test sets
+        otherwise, the samples will accumulate with sucessive iteration calls
+        """
         self.audio_trans = list()
 
     def write_json(self, save_path:str):
@@ -98,18 +100,19 @@ class DataPreprocessor(object):
         """
         # allows for alphanumeric characters, space, and apostrophe
         accepted_char = '[^A-Za-z0-9 \']+'
-        # filters out unaccepted characters, lowers the case, & splits into list
+        # filters out unaccepted characters, lowers the case
         try:
             transcript = re.sub(accepted_char, '', transcript).lower()
         except TypeError:
             logging.info(f"Type Error with: {transcript}")
         # check that all punctuation (minus apostrophe) has been removed 
         punct_noapost = '!"#$%&()*+,-./:;<=>?@[\]^_`{|}~'
-        for p in punct_noapost:
-            if p in transcript: raise ValueError(f"unwanted punctuation {p} in transcript")
-        #assert any([p in transcript for p in punct_noapost]), "unwanted punctuation in transcript"
+        for punc in punct_noapost:
+            if punc in transcript: 
+                raise ValueError(f"unwanted punctuation {punc} in transcript")
+        # split the transcript into a list of words
         transcript = transcript.split()
-        # if there is a pronunciation dict, convert to phonemes
+        # if there is a pronunciation dict, convert words to phonemes
         if self.lex_dict is not None:
             unknown_words.check_transcript(audio_path, transcript, self.lex_dict)
             phonemes = []
@@ -127,7 +130,7 @@ class CommonvoicePreprocessor(DataPreprocessor):
         super(CommonvoicePreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
             force_convert, min_duration, max_duration)
         self.dataset_dict = {
-                            "validated-25-max-repeat": "validated-25-maxrepeat.tsv"
+                            "validated-50-max-repeat": "validated-50-maxrepeat.tsv"
         }
 
     def process_datasets(self):
@@ -151,7 +154,8 @@ class CommonvoicePreprocessor(DataPreprocessor):
         with open(label_path) as fid: 
             reader = csv.reader(fid, delimiter='\t')
             # first line in reader is the header which equals:
-            # ['client_id','path','sentence','up_votes','down_votes','age','gender','accent']
+            # ['client_id', 'path', 'sentence', 'up_votes', 'down_votes', 'age', 'gender', 'accent'] or 
+            # ['client_id', 'path', 'sentence', 'up_votes', 'down_votes', 'age', 'gender', 'accent', 'locale', 'segment', 'vote_diff']
             header = next(reader)
             for line in reader:
                 # filter by accent
@@ -403,15 +407,25 @@ class UnknownWords():
 
     def check_transcript(self, filename:str, text:str, word_phoneme_dict:dict):
         
-        if type(text) == str: text = text.split()
-        elif type(text) == list: pass
-        else: raise(TypeError("input text is not string or list type"))
+        # convert the text into a list if it is a string
+        if type(text) == str: 
+            text = text.split()
+        elif type(text) == list: 
+            pass
+        else: 
+            raise(TypeError("input text is not string or list type"))
 
+        # increment the line and word counts
         self.line_count += 1
         self.word_count += len(text) - 1
+        
+        # if the word_phoneme_dict doesn't have an entry for 'word', it is an unknown word
         line_unk = [word for word in text if word_phoneme_dict[word]==data_helpers.UNK_WORD_TOKEN]
+        
         #if line_unk is empty, has_unknown is False
         self.has_unknown = bool(line_unk)
+
+        # if unknown words exist, update the word_set and log the count per filename
         if self.has_unknown:
             self.word_set.update(line_unk)
             self.filename_dict.update({filename: len(line_unk)})
