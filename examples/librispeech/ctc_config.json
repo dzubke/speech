@@ -50,7 +50,7 @@
     "model" : {
         "class" : "this value is no longer used as train.py is hardcorded to use CTC_train",
         "dropout" : 0.4,
-        "load_trained": false,
+        "load_trained": true,
         "trained_path": "examples/librispeech/models/ctc_models/null/best_model", 
         "remove_layers": [],
         "encoder" : {
