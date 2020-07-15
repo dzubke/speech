@@ -1,6 +1,6 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200625/ph5/",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200630/ph5/",
     "data" : {
         "train_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json",
         "dev_sets" : {
@@ -11,19 +11,19 @@
         },
         "dev_set_save_reference": "cv",
         "start_and_end" : false,
-        "num_workers":8
+        "num_workers": 4
     },
 
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-06-25-07-02_ph5_context-size-19_lib-ted-cv.log",
+        "log_file": "logs/2020-06-30-07-12_ph5_context-size-19_lib-ted-cv.log",
         "debug_mode":false
     },
     "preproc":{
         "preprocessor": "log_spectrogram",
         "window_size": 32,
         "step_size": 16,
-        "use_feature_normalize": true,
+        "use_feature_normalize": false,
         "use_spec_augment": true,
         "inject_noise": true,
         "noise_directory": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/",
@@ -38,15 +38,15 @@
     },
 
     "optimizer": {
-        "batch_size" : 16,
-        "run_state": [288413, 249],
-        "best_so_far": 0.831,
-        "start_epoch": 6,
+        "batch_size" : 8,
+        "run_state": [576833, 240.98],
+        "best_so_far": 0.828,
+        "start_epoch": 7,
         "epochs" : 100,
-        "learning_rate" : 8e-4,
+        "learning_rate" : 1e-3,
         "momentum" : 0.9, 
         "dampening": 0.98,
-        "sched_gamma": 0.90, 
+        "sched_gamma": 0.95, 
         "sched_step": 1
     },
 
@@ -54,7 +54,7 @@
         "class" : "this value is no longer used as train.py is hardcorded to use CTC_train",
         "dropout" : 0.4,
         "load_trained": true,
-        "trained_path": "examples/librispeech/models/ctc_models/20200625/ph5/20200630/model", 
+        "trained_path": "examples/librispeech/models/ctc_models/20200630/ph5/20200712/best_model", 
         "remove_layers": [],
         "encoder" : {
             "conv" : [
