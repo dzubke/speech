@@ -44,7 +44,7 @@ def to_wave(audio_file, wave_file, use_avconv=USE_AVCONV):
     Convert audio file to wave format.
     """
     prog = AVCONV if use_avconv else FFMPEG
-    args = [prog, "-y", "-i", audio_file, "-ac", "1", "-ar", "16000","-f", "wav", wave_file]
+    args = [prog, "-y", "-i", audio_file, "-ac", "1", "-ar", "16000", "-sample_fmt", "s16", "-f", "wav", wave_file]
     subprocess.check_output(args, stderr=subprocess.STDOUT)
 
 def convert_2channels(audio_file:str, max_channels:int=1):
