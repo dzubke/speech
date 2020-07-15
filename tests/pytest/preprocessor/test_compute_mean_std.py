@@ -52,7 +52,17 @@ def test_compute_mean_std_from_pickle():
         np.testing.assert_allclose(std, std_reference,  rtol=1e-03, atol=1e-05)    
 
 
+
+def test_single_input():
+    """
+    tests that a list with a single file will output a...
+    """
+    pass
+
 def test_compute_mean_std_empty_input():
+    """
+    tests that an assertion is raised if an empyt list is sent as input
+    """
 
     audio_files = list()
     preprocessor = 'log_spectrogram'

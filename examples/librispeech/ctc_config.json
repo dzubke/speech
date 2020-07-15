@@ -4,10 +4,9 @@
     "data" : {
         "train_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json",
         "dev_sets" : {
-            "speak": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json",
-            "cv": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/dev.json"
+            "speak": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json"
         },
-        "dev_set_save_reference": "cv",
+        "dev_set_save_reference": "speak",
         "start_and_end" : false,
         "num_workers":4
     },
@@ -37,9 +36,9 @@
 
     "optimizer": {
         "batch_size" : 8,
-        "run_state": [1000, 250],
-        "best_so_far": 0.706, 
-        "start_epoch": 10,
+        "run_state": [0, 0],
+        "best_so_far": 999, 
+        "start_epoch": 0,
         "epochs" : 100,
         "learning_rate" : 8e-4,
         "momentum" : 0.9, 
@@ -51,8 +50,8 @@
     "model" : {
         "class" : "this value is no longer used as train.py is hardcorded to use CTC_train",
         "dropout" : 0.4,
-        "load_trained": false,
-        "trained_path": "examples/librispeech/models/ctc_models/null", 
+        "load_trained": true,
+        "trained_path": "examples/librispeech/models/ctc_models/null/best_model", 
         "remove_layers": [],
         "encoder" : {
             "conv" : [
