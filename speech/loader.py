@@ -103,7 +103,7 @@ class Preprocessor():
         preprocessing_function = eval(self.preprocessor + "_from_data")
         feature_data = preprocessing_function(audio_data, samp_rate, self.window_size, self.step_size)
         
-        # normaliz
+        # normalize
         feature_data = self.normalize(feature_data, self.use_feature_normalize)
         if self.use_log: self.logger.info(f"preproc: normalized")
         
@@ -243,9 +243,14 @@ def feature_normalize(feature_array:np.ndarray, eps=1e-7)->np.ndarray:
     has zero mean and unit (1) std deviation
     The first assert checks std is not zero. If it is zero, will get NaN
     """
+    assert feature_array.dtype == np.float32, "feature_array is not float32"
+
     mean = feature_array.mean(dtype='float32')
     std = feature_array.std(dtype='float32')
-    assert std != 0, "feature_normalize: std dev is zero, will get NaN"
+    # the eps factor will prevent from getting NaN value, but the assert is just to surface
+    # the the std value is zero
+    assert std != 0, "feature_normalize: std dev is zero, may get NaN"
+    assert std == std, "NaN value in feature array!"
     feature_array -= mean
     feature_array /= (std + eps)
     assert feature_array.dtype == np.float32, "feature_array is not float32"
@@ -258,7 +263,7 @@ def compute_mean_std(audio_files:List[str], preprocessor:str, window_size:int,
     Compute the mean and std deviation of all of the feature bins (frequency bins if log_spec
     preprocessor). Will first normalize the audio samples if use_feature_normalize is true.
     Arguments:
-        audio_files - list[str]: a list of shuffled audio files. len = max_samples
+        audio_files - List[str]: a list of shuffled audio files. len = max_samples
         preprocessor - str: specifies the kind of preprocessor
         window_size - int: window_size of preprocessor
         step_size - int: step_size of preprocessor
