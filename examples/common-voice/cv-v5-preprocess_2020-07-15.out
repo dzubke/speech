@@ -1,0 +1,7 @@
+nohup: ignoring input
+usage: preprocess.py [-h] [--dataset-dir DATASET_DIR]
+                     [--dataset-name DATASET_NAME]
+                     [--lexicon-path LEXICON_PATH] [--force-convert]
+                     [--min-duration MIN_DURATION]
+                     [--max-duration MAX_DURATION]
+preprocess.py: error: unrecognized arguments: --lexiconpath /home/dzubke/awni_speech/speech/examples/common-voice/cv-lex_extended_20200417.txt
