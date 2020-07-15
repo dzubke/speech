@@ -13,6 +13,7 @@ import subprocess
 import unicodedata
 # third party libraries
 import tqdm
+import yaml
 # project libraries
 from speech.utils import data_helpers, wave, convert
 
@@ -20,10 +21,17 @@ logging.basicConfig(filename=None, level=10)
 
 class DataPreprocessor(object):
     
-    def __init__(self, dataset_dir:str, dataset_name:str, lexicon_path:str,
-                        force_convert:bool, min_duration:float, max_duration:float):
+    def __init__(self, 
+                 dataset_dir:str, 
+                 dataset_files:dict,
+                 dataset_name:str, 
+                 lexicon_path:str,
+                 force_convert:bool, 
+                 min_duration:float, 
+                 max_duration:float):
 
         self.dataset_dir = dataset_dir
+        self.dataset_dict = dataset_files
         if lexicon_path !='':
             self.lex_dict = data_helpers.lexicon_to_dict(lexicon_path, dataset_name.lower())
         else: 
@@ -125,13 +133,11 @@ class DataPreprocessor(object):
 
     
 class CommonvoicePreprocessor(DataPreprocessor):
-    def __init__(self, dataset_dir, dataset_name, lexicon_path,
+    def __init__(self, dataset_dir, dataset_files, dataset_name, lexicon_path,
                         force_convert, min_duration, max_duration):
-        super(CommonvoicePreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
-            force_convert, min_duration, max_duration)
-        self.dataset_dict = {
-                            "validated-50-max-repeat": "validated-50-maxrepeat.tsv"
-        }
+        super(CommonvoicePreprocessor, self).__init__(dataset_dir, dataset_files,
+                                                      dataset_name, lexicon_path,
+                                                      force_convert, min_duration, max_duration)
 
     def process_datasets(self):
         for set_name, label_name in self.dataset_dict.items():
@@ -165,17 +171,17 @@ class CommonvoicePreprocessor(DataPreprocessor):
                     self.audio_trans.append((audio_path, transcript))
 
 class TedliumPreprocessor(DataPreprocessor):
-    def __init__(self, dataset_dir, dataset_name, lexicon_path,
+    def __init__(self, dataset_dir, dataset_files, dataset_name, lexicon_path,
                         force_convert, min_duration, max_duration):
-        super(TedliumPreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
-            force_convert, min_duration, max_duration)
+        super(TedliumPreprocessor, self).__init__(dataset_dir, dataset_files, dataset_name, 
+                                    lexicon_path, force_convert, min_duration, max_duration)
 
         # legacy means the data are in the format of previous version. 
         # legacy contains all the data in tedlium v3
-        train_dir = os.path.join("legacy", "train")
-        dev_dir = os.path.join("legacy", "dev")
-        test_dir = os.path.join("legacy", "test")
-        self.dataset_dict = {"train":train_dir, "dev": dev_dir, "test": test_dir}
+        #train_dir = os.path.join("legacy", "train")
+        #dev_dir = os.path.join("legacy", "dev")
+        #test_dir = os.path.join("legacy", "test")
+        #self.dataset_dict = {"train":train_dir, "dev": dev_dir, "test": test_dir}
 
 
     def process_datasets(self):
@@ -273,11 +279,12 @@ class TedliumPreprocessor(DataPreprocessor):
         subprocess.call([cmd], shell=True)
            
 class VoxforgePreprocessor(DataPreprocessor):
-    def __init__(self, dataset_dir, dataset_name, lexicon_path,
+    def __init__(self, dataset_dir, dataset_files, dataset_name, lexicon_path,
                         force_convert, min_duration, max_duration):
-        super(VoxforgePreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
-            force_convert, min_duration, max_duration)
-        self.dataset_dict = {"all":"archive"}
+        super(VoxforgePreprocessor, self).__init__(dataset_dir, dataset_files, dataset_name, 
+                                    lexicon_path, force_convert, min_duration, max_duration)
+        
+        #self.dataset_dict = {"all":"archive"}
 
     def process_datasets(self):
         for set_name, label_name in self.dataset_dict.items():
@@ -353,11 +360,11 @@ class VoxforgePreprocessor(DataPreprocessor):
         return audio_path
         
 class TatoebaPreprocessor(DataPreprocessor):
-    def __init__(self, dataset_dir, dataset_name, lexicon_path,
+    def __init__(self, dataset_dir, dataset_files, dataset_name, lexicon_path,
                         force_convert, min_duration, max_duration):
-        super(TatoebaPreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
-            force_convert, min_duration, max_duration)
-        self.dataset_dict = {"all":"sentences_with_audio.csv"}
+        super(TatoebaPreprocessor, self).__init__(dataset_dir, dataset_files, dataset_name, 
+                                    lexicon_path, force_convert, min_duration, max_duration)
+        #self.dataset_dict = {"all":"sentences_with_audio.csv"}
 
     def process_datasets(self):
         logging.info("In Tatoeba process_datasets")
@@ -494,21 +501,19 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
             description="creates a data json file")
-    parser.add_argument("--dataset-dir", type=str,
-        help="directory where the dataset is located.")
-    parser.add_argument("--dataset-name", type=str,
-        help="Name of dataset with a capitalized first letter.")
-    parser.add_argument("--lexicon-path", type=str, default='',
-        help="path to pronunciation lexicon, if desired.")
-    parser.add_argument("--force-convert", action='store_true', default=False,
-        help="Converts audio to wav file even if .wav file already exists.")
-    parser.add_argument("--min-duration", type=float, default=1, 
-        help="minimum audio duration in seconds")
-    parser.add_argument("--max-duration", type=float, default=20,
-        help="maximum audio duration in seconds")
+    parser.add_argument("--config-path", type=str,
+        help="path to preprocessing config.")
     args = parser.parse_args()
 
-    data_preprocessor = eval(args.dataset_name+"Preprocessor")
-    data_preprocessor = data_preprocessor(args.dataset_dir, args.dataset_name, args.lexicon_path,
-                        args.force_convert, args.min_duration, args.max_duration)
+    with open(args.config_path, 'r') as config_file:
+        config = yaml.load(config_file) 
+
+    data_preprocessor = eval(config['dataset_name']+"Preprocessor")
+    data_preprocessor = data_preprocessor(config['dataset_dir'], 
+                                          config['dataset_files'], 
+                                          config['dataset_name'], 
+                                          config['lexicon_path'],
+                                          config['force_convert'], 
+                                          config['min_duration'], 
+                                          config['max_duration'])
     data_preprocessor.process_datasets()
