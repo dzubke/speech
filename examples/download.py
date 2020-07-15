@@ -249,9 +249,13 @@ class TatoebaV2Downloader(Downloader):
 class CommonvoiceDownloader(Downloader):
 
     def __init__(self, output_dir, dataset_name):
+        """
+        A previous version of common voice (v4) can be downloaded here:
+        "data":"https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-4-2019-12-10/en.tar.gz"
+        """
         super(CommonvoiceDownloader, self).__init__(output_dir, dataset_name)
         self.download_dict = {
-            "data":"https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-4-2019-12-10/en.tar.gz"
+            "data":"https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-5.1-2020-06-22/en.tar.gz"
         }
         self.data_dirname = "clips"
     
