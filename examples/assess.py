@@ -5,6 +5,7 @@ license: MIT
 """
 # standard libary
 import argparse
+import os
 # third party libraries
 import pandas as pd
 # project libraries
@@ -13,25 +14,43 @@ from speech.utils import wave, data_helpers
 
 
 def assess_commonvoice(validated_path:str, max_occurance:int):
-    # 854445 rows total
-    val_df = pd.read_csv(validated_path, delimiter='\t',encoding='utf-8')    
+
+    val_df = pd.read_csv(validated_path, delimiter='\t',encoding='utf-8')
+    print(f"there are {val_df.shape[0]} entries/rows in the dataset")
     accents=["us", "canada"]    
     # 231011 rows with accents "us" and "canada", 206653 with us and 24358 with canada 
     val_df = val_df[val_df.accent.isin(accents)]
+    print(f"there are {val_df.shape[0]} entries with accents {accents}")
     # create vote_diff column to sort the sentences upon
     val_df["vote_diff"] = val_df.up_votes - val_df.down_votes
     # remove punctiation and lower the case in sentence
     val_df['sentence']=val_df['sentence'].str.replace('[^\w\s]','').str.lower() 
-    # counts of unique utterances
+    # sorts by the number of unique utterances in descending order
     val_df.sentence.value_counts(sort=True, ascending=False)
     # histogram bins
     #pd.cut(val_df.sentence.value_counts(sort=True, ascending=False),bin_range).value_counts().sort_index() 
     # dictionary of frequency counts
     count_dict=val_df.sentence.value_counts(sort=True, ascending=False).to_dict() 
+    # filters so utterances only have at most max_occurances
+    # keeps utterances with highest difference between up_votes and down_votes
     val_df, drop_row_count = filter_by_count(val_df, count_dict, max_occurance)
     print(f"number of rows dropped: {drop_row_count}")
-    write_path=f"./validated-filtered-{max_occurance}.tsv"
-    val_df.to_csv(write_path, sep="\t", index=False)
+    dirname = os.path.dirname(validated_path)
+    write_path = os.path.join(dirname, f"validated-{max_occurance}-maxrepeat.tsv")
+    if os.path.exists(write_path):
+        print(f"file: {write_path} already exists.")
+        print("Would you like to rewrite it? y/n")
+        answer = input()
+        if answer in ["Y", "y"]:
+            val_df.to_csv(write_path, sep="\t", index=False)
+            print(f"file: {write_path} successfully saved")
+        else: 
+            print("file has not be overwritten. No new file saved")
+    else:
+        val_df.to_csv(write_path, sep="\t", index=False)
+        print(f"file: {write_path} successfully saved")
+
+
 
 def filter_by_count(in_df:pd.DataFrame, count_dict:dict, filter_value:int):
     """
