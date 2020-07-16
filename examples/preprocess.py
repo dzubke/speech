@@ -13,6 +13,7 @@ import subprocess
 import unicodedata
 # third party libraries
 import tqdm
+import yaml
 # project libraries
 from speech.utils import data_helpers, wave, convert
 
@@ -20,10 +21,17 @@ logging.basicConfig(filename=None, level=10)
 
 class DataPreprocessor(object):
     
-    def __init__(self, dataset_dir:str, dataset_name:str, lexicon_path:str,
-                        force_convert:bool, min_duration:float, max_duration:float):
+    def __init__(self, 
+                 dataset_dir:str, 
+                 dataset_files:dict,
+                 dataset_name:str, 
+                 lexicon_path:str,
+                 force_convert:bool, 
+                 min_duration:float, 
+                 max_duration:float):
 
         self.dataset_dir = dataset_dir
+        self.dataset_dict = dataset_files
         if lexicon_path !='':
             self.lex_dict = data_helpers.lexicon_to_dict(lexicon_path, dataset_name.lower())
         else: 
@@ -47,8 +55,10 @@ class DataPreprocessor(object):
         raise NotImplementedError
     
     def clear_audio_trans(self):
-        # this method needs to be called between iterations of train/dev/test sets
-        # otherwise, the samples will accumulate with sucessive iteration calls
+        """
+        this method needs to be called between iterations of train/dev/test sets
+        otherwise, the samples will accumulate with sucessive iteration calls
+        """
         self.audio_trans = list()
 
     def write_json(self, save_path:str):
@@ -98,18 +108,19 @@ class DataPreprocessor(object):
         """
         # allows for alphanumeric characters, space, and apostrophe
         accepted_char = '[^A-Za-z0-9 \']+'
-        # filters out unaccepted characters, lowers the case, & splits into list
+        # filters out unaccepted characters, lowers the case
         try:
             transcript = re.sub(accepted_char, '', transcript).lower()
         except TypeError:
             logging.info(f"Type Error with: {transcript}")
         # check that all punctuation (minus apostrophe) has been removed 
         punct_noapost = '!"#$%&()*+,-./:;<=>?@[\]^_`{|}~'
-        for p in punct_noapost:
-            if p in transcript: raise ValueError(f"unwanted punctuation {p} in transcript")
-        #assert any([p in transcript for p in punct_noapost]), "unwanted punctuation in transcript"
+        for punc in punct_noapost:
+            if punc in transcript: 
+                raise ValueError(f"unwanted punctuation {punc} in transcript")
+        # split the transcript into a list of words
         transcript = transcript.split()
-        # if there is a pronunciation dict, convert to phonemes
+        # if there is a pronunciation dict, convert words to phonemes
         if self.lex_dict is not None:
             unknown_words.check_transcript(audio_path, transcript, self.lex_dict)
             phonemes = []
@@ -122,13 +133,11 @@ class DataPreprocessor(object):
 
     
 class CommonvoicePreprocessor(DataPreprocessor):
-    def __init__(self, dataset_dir, dataset_name, lexicon_path,
+    def __init__(self, dataset_dir, dataset_files, dataset_name, lexicon_path,
                         force_convert, min_duration, max_duration):
-        super(CommonvoicePreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
-            force_convert, min_duration, max_duration)
-        self.dataset_dict = {
-                            "validated-25-max-repeat": "validated-25-maxrepeat.tsv"
-        }
+        super(CommonvoicePreprocessor, self).__init__(dataset_dir, dataset_files,
+                                                      dataset_name, lexicon_path,
+                                                      force_convert, min_duration, max_duration)
 
     def process_datasets(self):
         for set_name, label_name in self.dataset_dict.items():
@@ -151,7 +160,8 @@ class CommonvoicePreprocessor(DataPreprocessor):
         with open(label_path) as fid: 
             reader = csv.reader(fid, delimiter='\t')
             # first line in reader is the header which equals:
-            # ['client_id','path','sentence','up_votes','down_votes','age','gender','accent']
+            # ['client_id', 'path', 'sentence', 'up_votes', 'down_votes', 'age', 'gender', 'accent'] or 
+            # ['client_id', 'path', 'sentence', 'up_votes', 'down_votes', 'age', 'gender', 'accent', 'locale', 'segment', 'vote_diff']
             header = next(reader)
             for line in reader:
                 # filter by accent
@@ -161,17 +171,17 @@ class CommonvoicePreprocessor(DataPreprocessor):
                     self.audio_trans.append((audio_path, transcript))
 
 class TedliumPreprocessor(DataPreprocessor):
-    def __init__(self, dataset_dir, dataset_name, lexicon_path,
+    def __init__(self, dataset_dir, dataset_files, dataset_name, lexicon_path,
                         force_convert, min_duration, max_duration):
-        super(TedliumPreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
-            force_convert, min_duration, max_duration)
+        super(TedliumPreprocessor, self).__init__(dataset_dir, dataset_files, dataset_name, 
+                                    lexicon_path, force_convert, min_duration, max_duration)
 
         # legacy means the data are in the format of previous version. 
         # legacy contains all the data in tedlium v3
-        train_dir = os.path.join("legacy", "train")
-        dev_dir = os.path.join("legacy", "dev")
-        test_dir = os.path.join("legacy", "test")
-        self.dataset_dict = {"train":train_dir, "dev": dev_dir, "test": test_dir}
+        #train_dir = os.path.join("legacy", "train")
+        #dev_dir = os.path.join("legacy", "dev")
+        #test_dir = os.path.join("legacy", "test")
+        #self.dataset_dict = {"train":train_dir, "dev": dev_dir, "test": test_dir}
 
 
     def process_datasets(self):
@@ -269,11 +279,12 @@ class TedliumPreprocessor(DataPreprocessor):
         subprocess.call([cmd], shell=True)
            
 class VoxforgePreprocessor(DataPreprocessor):
-    def __init__(self, dataset_dir, dataset_name, lexicon_path,
+    def __init__(self, dataset_dir, dataset_files, dataset_name, lexicon_path,
                         force_convert, min_duration, max_duration):
-        super(VoxforgePreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
-            force_convert, min_duration, max_duration)
-        self.dataset_dict = {"all":"archive"}
+        super(VoxforgePreprocessor, self).__init__(dataset_dir, dataset_files, dataset_name, 
+                                    lexicon_path, force_convert, min_duration, max_duration)
+        
+        #self.dataset_dict = {"all":"archive"}
 
     def process_datasets(self):
         for set_name, label_name in self.dataset_dict.items():
@@ -349,11 +360,11 @@ class VoxforgePreprocessor(DataPreprocessor):
         return audio_path
         
 class TatoebaPreprocessor(DataPreprocessor):
-    def __init__(self, dataset_dir, dataset_name, lexicon_path,
+    def __init__(self, dataset_dir, dataset_files, dataset_name, lexicon_path,
                         force_convert, min_duration, max_duration):
-        super(TatoebaPreprocessor, self).__init__(dataset_dir, dataset_name, lexicon_path,
-            force_convert, min_duration, max_duration)
-        self.dataset_dict = {"all":"sentences_with_audio.csv"}
+        super(TatoebaPreprocessor, self).__init__(dataset_dir, dataset_files, dataset_name, 
+                                    lexicon_path, force_convert, min_duration, max_duration)
+        #self.dataset_dict = {"all":"sentences_with_audio.csv"}
 
     def process_datasets(self):
         logging.info("In Tatoeba process_datasets")
@@ -403,15 +414,25 @@ class UnknownWords():
 
     def check_transcript(self, filename:str, text:str, word_phoneme_dict:dict):
         
-        if type(text) == str: text = text.split()
-        elif type(text) == list: pass
-        else: raise(TypeError("input text is not string or list type"))
+        # convert the text into a list if it is a string
+        if type(text) == str: 
+            text = text.split()
+        elif type(text) == list: 
+            pass
+        else: 
+            raise(TypeError("input text is not string or list type"))
 
+        # increment the line and word counts
         self.line_count += 1
         self.word_count += len(text) - 1
+        
+        # if the word_phoneme_dict doesn't have an entry for 'word', it is an unknown word
         line_unk = [word for word in text if word_phoneme_dict[word]==data_helpers.UNK_WORD_TOKEN]
+        
         #if line_unk is empty, has_unknown is False
         self.has_unknown = bool(line_unk)
+
+        # if unknown words exist, update the word_set and log the count per filename
         if self.has_unknown:
             self.word_set.update(line_unk)
             self.filename_dict.update({filename: len(line_unk)})
@@ -480,21 +501,19 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
             description="creates a data json file")
-    parser.add_argument("--dataset-dir", type=str,
-        help="directory where the dataset is located.")
-    parser.add_argument("--dataset-name", type=str,
-        help="Name of dataset with a capitalized first letter.")
-    parser.add_argument("--lexicon-path", type=str, default='',
-        help="path to pronunciation lexicon, if desired.")
-    parser.add_argument("--force-convert", action='store_true', default=False,
-        help="Converts audio to wav file even if .wav file already exists.")
-    parser.add_argument("--min-duration", type=float, default=1, 
-        help="minimum audio duration in seconds")
-    parser.add_argument("--max-duration", type=float, default=20,
-        help="maximum audio duration in seconds")
+    parser.add_argument("--config-path", type=str,
+        help="path to preprocessing config.")
     args = parser.parse_args()
 
-    data_preprocessor = eval(args.dataset_name+"Preprocessor")
-    data_preprocessor = data_preprocessor(args.dataset_dir, args.dataset_name, args.lexicon_path,
-                        args.force_convert, args.min_duration, args.max_duration)
+    with open(args.config_path, 'r') as config_file:
+        config = yaml.load(config_file) 
+
+    data_preprocessor = eval(config['dataset_name']+"Preprocessor")
+    data_preprocessor = data_preprocessor(config['dataset_dir'], 
+                                          config['dataset_files'], 
+                                          config['dataset_name'], 
+                                          config['lexicon_path'],
+                                          config['force_convert'], 
+                                          config['min_duration'], 
+                                          config['max_duration'])
     data_preprocessor.process_datasets()
