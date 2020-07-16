@@ -1,0 +1,58 @@
+config_path = "./examples/librispeech/ctc_config_ph6.json"
+import json
+with open(config_path, 'r') as fid: 
+    config = json.load(fid)
+data_cfg = config["data"] 
+preproc_cfg = config["preproc"] 
+opt_cfg = config["optimizer"] 
+model_cfg = config["model"]
+logger = None
+# standard libraries
+import json
+import os 
+import numpy as np 
+import pytest 
+import torch  
+import torch.nn as nn 
+# project libraries          
+from speech.models.ctc_model_train import CTC_train  
+import speech.loader as loader  
+from speech.utils.compat import get_main_dir_path 
+from speech.utils.data_structs import Batch 
+from speech.utils.io import read_pickle, load_from_trained 
+from speech.utils.model_debug import check_nan_params_grads 
+preproc = loader.Preprocessor(data_cfg["train_set"], preproc_cfg, logger,   
+                    max_samples=100, start_and_end=data_cfg["start_and_end"]) 
+batch_size=8
+dev_ldr = loader.make_loader(data_cfg["dev_sets"]['speak'], 
+                        preproc, batch_size, num_workers=data_cfg["num_workers"]) 
+dev_ldr = loader.make_loader(data_cfg["dev_sets"]['speak'], 
+                        preproc, 8, num_workers=data_cfg["num_workers"]) 
+device_ids = [i for i in range(torch.cuda.device_count())] 
+
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") 
+model = CTC_train(preproc.input_dim,  
+                            preproc.vocab_size,  
+                            model_cfg,
+                            device) 
+model = torch.nn.DataParallel(model)
+optimizer = torch.optim.SGD(model.module.parameters(),  
+                        lr= opt_cfg['learning_rate'],  
+                        momentum=opt_cfg["momentum"],  
+                        dampening=opt_cfg["dampening"])
+
+
+ 
+
+
+model = model.to(device)
+
+
+
+for temp_batch in dev_ldr: 
+    optimizer.zero_grad() 
+    loss = model.module.loss(temp_batch) 
+    loss.backward() 
+    optimizer.step() 
+    print(f"loss: {loss.item()}")
