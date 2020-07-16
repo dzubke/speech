@@ -5,6 +5,7 @@ license: MIT
 """
 # standard libary
 import argparse
+import os
 # third party libraries
 import pandas as pd
 # project libraries
@@ -35,21 +36,21 @@ def assess_commonvoice(validated_path:str, max_occurance:int):
     val_df, drop_row_count = filter_by_count(val_df, count_dict, max_occurance)
     print(f"number of rows dropped: {drop_row_count}")
     dirname = os.path.dirname(validated_path)
-    write_path = os.path.join(dirname, f"validated-filtered-{max_occurance}.tsv")
+    write_path = os.path.join(dirname, f"validated-{max_occurance}-maxrepeat.tsv")
     if os.path.exists(write_path):
         print(f"file: {write_path} already exists.")
         print("Would you like to rewrite it? y/n")
         answer = input()
         if answer in ["Y", "y"]:
             val_df.to_csv(write_path, sep="\t", index=False)
+            print(f"file: {write_path} successfully saved")
         else: 
             print("file has not be overwritten. No new file saved")
     else:
         val_df.to_csv(write_path, sep="\t", index=False)
+        print(f"file: {write_path} successfully saved")
 
 
-
-    write_path=
 
 def filter_by_count(in_df:pd.DataFrame, count_dict:dict, filter_value:int):
     """
