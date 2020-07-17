@@ -109,7 +109,7 @@ def run_epoch(model, optimizer, train_ldr, logger, debug_mode, tbX_writer, iter_
                 log_model_grads(model.named_parameters(), logger)
                 save_batch_log_stats(temp_batch, logger)
                 log_param_grad_norms(model.named_parameters(), logger)
-                plot_grad_flow_bar(model.named_parameters())
+                plot_grad_flow_bar(model.named_parameters(), get_logger_filename(logger))
             debug_mode = True
             torch.autograd.set_detect_anomaly(True)
 
@@ -234,7 +234,7 @@ def run(config):
                     lr=learning_rate,   # from train_state or opt_config
                     momentum=opt_cfg["momentum"],
                     dampening=opt_cfg["dampening"])
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 
+    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 
         step_size=opt_cfg["sched_step"], 
         gamma=opt_cfg["sched_gamma"])
 
@@ -254,7 +254,6 @@ def run(config):
     for epoch in range(start_epoch, opt_cfg["epochs"]):
         if use_log: logger.info(f"Starting epoch: {epoch}")
         start = time.time()
-        scheduler.step()
         for group in optimizer.param_groups:
             print(f'learning rate: {group["lr"]}')
             if use_log: logger.info(f"train: learning rate: {group['lr']}")
@@ -270,8 +269,10 @@ def run(config):
             raise Exception('Failure in run_epoch').with_traceback(err.__traceback__)
         finally: # used to ensure that plots are closed even if exception raised
             plt.close('all')
+    
+        # update the learning rate
+        lr_scheduler.step()       
  
-        
         if use_log: logger.info(f"train: ====== Run_state finished =======") 
         if use_log: logger.info(f"train: preproc type: {type(preproc)}")
 
