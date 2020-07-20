@@ -69,6 +69,7 @@ class DataPreprocessor(object):
         """
         # filter the entries by the duration bounds and write file
         unknown_words = UnknownWords()
+        count_outside_duration = 0.0  # count the utterance outside duration bounds
         with open(save_path, 'w') as fid:
             logging.info("Writing files to label json")
             for audio_path, transcript in tqdm.tqdm(self.audio_trans):
@@ -98,7 +99,9 @@ class DataPreprocessor(object):
                             'audio' : wav_path}
                     json.dump(datum, fid)
                     fid.write("\n")
-    
+                else:
+                    count_outside_duration += 1
+        print(f"Count excluded because of duration bounds: {count_outside_duration}")
         unknown_words.process_save(save_path)
     
     def process_text(self, transcript:str, unknown_words, audio_path:str, lex_dict:dict=None,):
@@ -148,6 +151,7 @@ class CommonvoicePreprocessor(DataPreprocessor):
             logging.info(f"len of auddio_trans: {len(self.audio_trans)}")
             root, ext = os.path.splitext(label_path)
             json_path = root + os.path.extsep + "json"
+            logging.info(f"entering write_json for {set_name}")
             self.write_json(json_path)
         unique_unknown_words(self.dataset_dir)
 
@@ -437,24 +441,23 @@ class UnknownWords():
             self.word_set.update(line_unk)
             self.filename_dict.update({filename: len(line_unk)})
 
-    def process_save(self, label_path:str):
+    def process_save(self, label_path:str)->None:
         """
         saves a json object of the dictionary with relevant statistics on the unknown words in corpus
         """
         stats_dict=dict()
-        stats_dict.update({"unique_unknown_words": len(self.word_set)})
-        stats_dict.update({"count_unknown_words": sum(self.filename_dict.values())})
-        stats_dict.update({"total_words": self.word_count})
-        stats_dict.update({"lines_unknown_words": len(self.filename_dict)})
-        stats_dict.update({"total_lines": self.line_count})
-        stats_dict.update({"unknown_words_set": list(self.word_set)})
-        stats_dict.update({"unknown_words_dict": self.filename_dict})
+        stats_dict.update({"unique_unknown_words": len(self.word_set),
+                            "count_unknown_words": sum(self.filename_dict.values()),
+                            "total_words": self.word_count,
+                            "lines_unknown_words": len(self.filename_dict),
+                            "total_lines": self.line_count,
+                            "unknown_words_set": list(self.word_set),
+                            "unknown_words_dict": self.filename_dict})
         
-        dir_path, base_name = os.path.dirname(label_path),  os.path.basename(label_path)
-        base, ext = os.path.splitext(base_name)
+        dir_path, base_ext = os.path.split(label_path)
+        base, ext = os.path.splitext(base_ext)
         stats_dir = os.path.join(dir_path, "unk_word_stats")
-        if not os.path.exists(stats_dir):
-            os.makedirs(stats_dir)
+        os.makedirs(stats_dir, exist_ok=True)
         unk_words_filename = "{}_unk-words-stats_{}.json".format(base, str(date.today()))
         stats_dict_fn = os.path.join(stats_dir, unk_words_filename)
         with open(stats_dict_fn, 'w') as fid:
@@ -468,14 +471,14 @@ def unique_unknown_words(dataset_dir:str):
     Arguments:
         dataset_dir (str): pathname of dir continaing "unknown_word_stats" dir with unk-words-stats.json files
     """
-    pattern = os.path.join(dataset_dir, "unk_word_stats", "*unk-words-stats.json")
+    pattern = os.path.join(dataset_dir, "unk_word_stats", "*unk-words-stats*.json")
     dataset_list = glob.glob(pattern)
     unknown_set = set()
     for data_fn in dataset_list: 
         with open(data_fn, 'r') as fid: 
             unk_words_dict = json.load(fid)
             unknown_set.update(unk_words_dict['unknown_words_set'])
-            logging.info(len(unk_words_dict['unknown_words_set']))
+            logging.info(f"for {data_fn}, # unique unknownw words: {len(unk_words_dict['unknown_words_set'])}")
 
     unknown_set = filter_set(unknown_set)
     unknown_list = list(unknown_set)
@@ -488,8 +491,8 @@ def unique_unknown_words(dataset_dir:str):
 
 def filter_set(unknown_set:set):
     """
-    currently no filtering is being done
-    #filters the set based on the length and presence of digits.
+    currently no filtering is being done. Previously, it had filters the set based on the length 
+    and presence of digits.
     """
     # unk_filter = filter(lambda x: len(x)<30, unknown_set)
     # search_pattern = r'[0-9!#$%&()*+,\-./:;<=>?@\[\\\]^_{|}~]'
@@ -517,3 +520,4 @@ if __name__ == "__main__":
                                           config['min_duration'], 
                                           config['max_duration'])
     data_preprocessor.process_datasets()
+
