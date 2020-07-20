@@ -24,6 +24,7 @@
         "window_size": 32,
         "step_size": 16,
         "use_feature_normalize": false,
+        "select_from_normal": true,
         "use_spec_augment": true,
         "inject_noise": true,
         "noise_directory": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/",
