@@ -1,4 +1,5 @@
 # third-party libraries
+import json
 import pytest
 # project libraries
 from speech.loader import Preprocessor, AudioDataset
@@ -6,12 +7,14 @@ from speech.utils.config import Config
 
 def test_main():
     config_json = "./cv-val_ctc-config.json"
-    config = Config(config_json)
-    data_json = config.data_cfg.get("dev_set")
+    with open(config_json, 'r') as fid:
+        config = json.load(fid)
+    data_json = config['data']
     print(config)
     logger = None
-    preproc = Preprocessor(data_json, config.preproc_cfg, logger)
+    preproc = Preprocessor(data_cfg['dev_set'], config['preproc'], logger)
     preproc.update()
+    print("preproc: \n", preproc)
 
     check_empty_filename(preproc)
     check_run_from_AudioDataset(preproc, data_json)
