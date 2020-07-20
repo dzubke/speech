@@ -24,7 +24,7 @@
         "window_size": 32,
         "step_size": 16,
         "use_feature_normalize": false,
-        "select_from_normal": true,
+        "augment_from_normal": true,
         "use_spec_augment": true,
         "inject_noise": true,
         "noise_directory": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/",
@@ -35,7 +35,7 @@
         "gain_range":[-6,6],
         "pitch_range":[-400,400],
         "synthetic_gaussian_noise": true, 
-        "signal_to_noise_range_db":[10,30]
+        "signal_to_noise_range_db":[10,50]
     },
 
     "optimizer": {
