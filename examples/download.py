@@ -184,6 +184,13 @@ class TatoebaDownloader(Downloader):
         }
         self.data_dirname = "audio"
 
+        # downloads
+        # https://downloads.tatoeba.org/exports/per_language/eng/eng_sentences.tsv.bz2
+        # https://downloads.tatoeba.org/exports/per_language/eng/eng_sentences_CC0.tsv.bz2
+        # https://downloads.tatoeba.org/exports/sentences_with_audio.tar.bz2
+        # https://downloads.tatoeba.org/exports/user_languages.tar.bz2
+        # https://downloads.tatoeba.org/exports/users_sentences.csv
+
 
     def download_extract(self):
         """
