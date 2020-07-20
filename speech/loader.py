@@ -51,6 +51,7 @@ class Preprocessor():
         self.window_size = preproc_cfg['window_size']
         self.step_size = preproc_cfg['step_size']
         self.use_feature_normalize =  preproc_cfg['use_feature_normalize']
+        self.augment_from_normal = preproc_cfg.get('augment_from_normal', False)
 
         self.tempo_gain_pitch_perturb = preproc_cfg['tempo_gain_pitch_perturb']
         self.tempo_range = preproc_cfg['tempo_range']
@@ -133,21 +134,22 @@ class Preprocessor():
 
         # sox-based tempo, gain, pitch augmentations
         if self.tempo_gain_pitch_perturb and self.train_status:
-            audio_data, samp_rate = tempo_gain_pitch_perturb(wave_file, samp_rate, self.tempo_range, self.gain_range, 
-                                                        self.pitch_range, logger=self.logger)
-        
+            audio_data, samp_rate = tempo_gain_pitch_perturb(wave_file, samp_rate, self.tempo_range,
+                                                            self.gain_range, self.pitch_range, 
+                                                            self.augment_from_normal, logger=self.logger)
+    
         # synthetic gaussian noise
         if self.synthetic_gaussian_noise and self.train_status:
             if self.use_log: self.logger.info(f"preproc: synthetic_gaussian_noise_inject")
-            audio_data = synthetic_gaussian_noise_inject(audio_data, 
-                                self.signal_to_noise_range_db, logger=self.logger)
+            audio_data = synthetic_gaussian_noise_inject(audio_data, self.signal_to_noise_range_db,
+                                                        self.augment_from_normal, logger=self.logger)
 
         # noise injection
         if self.inject_noise and self.train_status:
             add_noise = np.random.binomial(1, self.noise_prob)
             if add_noise:
-                audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, 
-                                    self.logger, self.noise_levels) 
+                audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, self.noise_levels, 
+                                            self.augment_from_normal, self.logger) 
             if self.use_log: self.logger.info(f"preproc: noise injected")
         
         return audio_data, samp_rate

@@ -10,6 +10,7 @@ from typing import Tuple
 # third-party libraries
 import librosa
 import numpy as np
+import scipy.stats      # need to include "stats" to aviod name-conflict
 # project libraries
 from speech.utils.wave import array_from_wave, array_to_wave, wav_duration
 from speech.utils.data_structs import AugmentRange
@@ -52,23 +53,33 @@ def apply_augmentation(audio_data:np.ndarray, sr:int, augment_name:str, args):
 def tempo_gain_pitch_perturb(audio_path:str, sample_rate:int=16000, 
                             tempo_range:AugmentRange=(0.85, 1.15),
                             gain_range:AugmentRange=(-6.0, 8.0),
-                            pitch_range:AugmentRange=(-400, 400), 
+                            pitch_range:AugmentRange=(-400, 400),
+                            augment_from_normal:bool=False,
                             logger=None)->Tuple[np.ndarray, int]:
     """
     Picks tempo and gain uniformly, applies it to the utterance by using sox utility.
+    Arguments:
+        augment_from_normal - bool: if true, the augmentation values will be drawn from normal dist
     Returns:
         tuple(np.ndarray, int) - the augmente audio data and the sample_rate
     """
     use_log = (logger is not None)
-    if use_log: logger.info(f"tempo_gain_pitch_perturb: audio_file: {audio_path}")
     
-    tempo_value = np.random.uniform(*tempo_range)
-    if use_log: logger.info(f"tempo_gain_pitch_perturb: tempo_value: {tempo_value}")
-    
-    gain_value = np.random.uniform(*gain_range)
-    if use_log: logger.info(f"tempo_gain_pitch_perturb: gain_value: {gain_value}")
+    if augment_from_normal:
+        tempo_center = np.mean(tempo_range)
+        tempo_value = get_value_from_truncnorm(tempo_center, tempo_range, bounds=[0.0, 3.0])
+        gain_center = np.mean(gain_range)
+        gain_value = get_value_from_truncnorm(gain_center, gain_range, bounds=[-10, 10])
+        pitch_center = np.mean(pitch_range)
+        pitch_value = get_value_from_truncnorm(pitch_center, pitch_range, bounds=[-1200, 1200])
+    else:
+        tempo_value = np.random.uniform(*tempo_range)
+        gain_value = np.random.uniform(*gain_range)
+        pitch_value = np.random.uniform(*pitch_range)
 
-    pitch_value = np.random.uniform(*pitch_range)
+    if use_log: logger.info(f"tempo_gain_pitch_perturb: audio_file: {audio_path}")
+    if use_log: logger.info(f"tempo_gain_pitch_perturb: tempo_value: {tempo_value}")
+    if use_log: logger.info(f"tempo_gain_pitch_perturb: gain_value: {gain_value}")
     if use_log: logger.info(f"tempo_gain_pitch_perturb: pitch_value: {pitch_value}")
 
     try:    
@@ -121,17 +132,24 @@ def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float,
 
 
 # Noise inject functions
-def inject_noise(data, data_samp_rate, noise_dir, logger, noise_levels=(0, 0.5)):
+def inject_noise(data, data_samp_rate, noise_dir, noise_levels=(0, 0.5), 
+                    augment_from_normal:bool=False, logger=None):
     """
     injects noise from files in noise_dir into the input data. These
     methods require the noise files in noise_dir be resampled to 16kHz
-    with process_noise.py in speech.utils.
+    Arguments:
+        augment_from_normal - bool: if true, augment value selected from normal distribution
+
+
     """
     use_log = (logger is not None)
     pattern = os.path.join(noise_dir, "*.wav")
     noise_files = glob.glob(pattern)    
     noise_path = np.random.choice(noise_files)
-    noise_level = np.random.uniform(*noise_levels)
+    if augment_from_normal:
+        noise_level = get_value_from_truncnorm(center=0.0, noise_levels, bounds=[0.0, 0.9])
+    else:
+        noise_level = np.random.uniform(*noise_levels)
 
     if use_log: logger.info(f"noise_inj: noise_path: {noise_path}")
     if use_log: logger.info(f"noise_inj: noise_level: {noise_level}")
@@ -238,22 +256,26 @@ def same_size(data:np.ndarray, noise_dst:np.ndarray) -> np.ndarray:
 
 # synthetic gaussian noise injection 
 def synthetic_gaussian_noise_inject(audio_data: np.ndarray, snr_range:tuple=(10,30),
-                                    logger=None):
+                                    augment_from_normal:bool=False, logger=None):
     """
     Applies random noise to an audio sample scaled to a uniformly selected
     signal-to-noise ratio (snr) bounded by the snr_range
-
     Arguments:
         audio_data - np.ndarry: 1d array of audio amplitudes
         snr_range - tuple: range of values the signal-to-noise ratio (snr) can take on
+        augment_from_normal - bool: if true, augment values are chosen from normal distribution
 
     Note: Power = Amplitude^2 and here we are dealing with amplitudes = RMS
     """
     use_log = (logger is not None)
-    snr_level = np.random.uniform(*snr_range)
+    if augment_from_normal:
+        center = np.mean(snr_range)
+        snr_level = get_value_from_truncnorm(center, value_range=snr_range, bounds=[1.0, 100])
+    else:
+        snr_level = np.random.uniform(*snr_range)
+
     audio_rms = audioop.rms(audio_data, 2) 
-    # 20 is in the exponent because we are dealing in amplitudes
-    noise_rms = audio_rms / 10**(snr_level/20)
+    noise_rms = audio_rms / 10**(snr_level/20)    # 20 is in the exponent because we are dealing in amplitudes
     gaussian_noise = np.random.normal(loc=0, scale=noise_rms, size=audio_data.size).astype('int16')
     augmented_data = audio_data + gaussian_noise
     
@@ -263,6 +285,25 @@ def synthetic_gaussian_noise_inject(audio_data: np.ndarray, snr_range:tuple=(10,
     assert augmented_data.dtype == "int16"
     
     return augmented_data
+
+
+def get_value_from_truncnorm(center:int,
+                             value_range:AugmentRange,
+                             bounds:AugmentRange) -> float:
+    """
+    Returns a value from a normal distribution trunacated within a range of bounds. 
+    """
+    # ensures value_range and bounds are sorted from lowest to highest
+    value_range.sort()
+    bounds.sort()
+
+    # setting range difference to be 2 standard devations from mean
+    std_dev = abs(value_range[0] - value_range[1])/2
+    # bound are compute relative to center/mean and std deviation
+    lower_bound = (bounds[0] - center) / std_dev
+    upper_bound = (bounds[1] - center) / std_dev
+
+    return scipy.stats.truncnorm.rvs(lower_bound, upper_bound, loc=center, scale=std_dev, size=1) 
 
 
 
