@@ -1,15 +1,22 @@
 # this document will store various things related to managing the VM'store
 
 # the current list includes
- 1. how to resize a disk
+ 1. how to increase disk size (cannot decrease disk size)
  2. how to start/stop a VM
  3. how to setup a stackdriver monitoring agent
  3. how to setup gpu_utilization_agent
 
 
-1. HOW TO RESIZE A DISK
-
-
+1. HOW TO INCREASE DISK SIZE
+## how to increase persistent disk size
+# go to Disks in GCP Compute in browser and increase the size. 
+# then resize the persistent disk and the file system: https://cloud.google.com/compute/docs/disks/add-persistent-disk#resize_partitions
+sudo lsblk                    # see the disk and partition sizes
+sudo df -h                    # see the current filesystem size
+sudo growpart /dev/sda 1		#sudo growpart /dev/[DEVICE_ID] [PARTITION_NUMBER]
+sudo resize2fs /dev/sda1		#sudo resize2fs /dev/[DEVICE_ID][PARTITION_NUMBER]
+sudo lsblk                    # can check the partition has increased
+sudo df -h                    # as well as the filesystem
 
 
 2. HOW TO START/STOP A VM
