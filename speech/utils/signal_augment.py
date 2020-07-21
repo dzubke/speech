@@ -2,6 +2,8 @@
 import argparse
 import audioop
 import glob
+import logging
+from logging import Logger
 import os
 import random
 import subprocess
@@ -11,38 +13,84 @@ from typing import Tuple
 import librosa
 import numpy as np
 import scipy.stats      # need to include "stats" to aviod name-conflict
+import yaml
 # project libraries
-from speech.utils.wave import array_from_wave, array_to_wave, wav_duration
+from speech.utils.io import read_data_json
 from speech.utils.data_structs import AugmentRange
+from speech.utils.wave import array_from_wave, array_to_wave, wav_duration
 
 
-def main(audio_path: str, out_path:str, augment_name:str, ARGS):
-    audio_data, sr = array_from_wave(audio_path)
+def main(config:dict):
+    data_cfg = config.get('data')
+    log_cfg = config.get('logger')
+    preproc_cfg = config.get('preproc')
 
-    aug_audio_data = apply_augmentation(audio_data, sr, augment_name, ARGS)
+    if log_cfg['use_log']:
+        # create logger
+        logger = logging.getLogger("sig_aug")
+        logger.setLevel(logging.DEBUG)
+        # create file handler which logs even debug messages
+        fh = logging.FileHandler(log_cfg["log_file"])
+        fh.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
+        fh.setFormatter(formatter)
+        logger.addHandler(fh)
+    else:
+        logger = None
 
-    with NamedTemporaryFile(suffix=".wav") as tmp_file:
-        tmp_filename = tmp_file.name
+    dataset = read_data_json(data_cfg['data_set'])
+    audio_list = [example['audio'] for example in dataset]
+    audio_subset  = random.sample(audio_list, data_cfg['num_examples'])
 
-        save_path = tmp_filename if out_path is None else out_path
-        array_to_wave(save_path, aug_audio_data, sr)
-        print(f"sample rate: {sr}")
-        print(f"Saved to: {save_path}")
-        os_play(audio_path)
-        os_play(save_path)
+    for audio_path in audio_subset: 
+
+        aug_audio_data, samp_rate = apply_augmentation(audio_path, preproc_cfg, logger)
+
+        basename = os.path.basename(audio_path)
+        save_path = os.path.join(data_cfg['save_dir'], basename)
+        array_to_wave(save_path, aug_audio_data, samp_rate)
+        if preproc_cfg['play_audio']
+            print(f"sample rate: {sr}")
+            print(f"Saved to: {save_path}")
+            print("Playing original audio...")
+            os_play(audio_path)
+            print("Playing augmented audio...")
+            os_play(save_path)
 
 def os_play(play_file:str):
     play_str = f"play {play_file}"
     os.system(play_str)
 
-def apply_augmentation(audio_data:np.ndarray, sr:int, augment_name:str, args):
+def apply_augmentation(audio_path:str, preproc_cfg:dict, logger:Logger)\
+                                                ->Tuple[np.ndarray, np.ndarray]:
 
-    
-    if augment_name == "synthetic_gaussian_noise_inject":
-        snr_level = float(args)
-        return synthetic_gaussian_noise_inject(audio_data, snr_range=(snr_level, snr_level))
-    else:
-        raise ValueError("augment_name doesn't match any augmentations")
+    logger.info(f"audio_path: {audio_path}")
+    if preproc_cfg['tempo_gain_pitch_perturb']:
+        aug_data, samp_rate = tempo_gain_pitch_perturb(audio_path,
+                                            tempo_range = preproc_cfg['tempo_range'],
+                                            gain_range = preproc_cfg['gain_range'],
+                                            pitch_range = preproc_cfg['pitch_range'],
+                                            augment_from_normal = preproc_cfg['augment_from_normal'],
+                                            logger= logger)
+    else: 
+        aug_data, samp_rate = array_from_wave(audio_path)
+
+    if preproc_cfg['synthetic_gaussian_noise']:
+        aug_data = synthetic_gaussian_noise_inject(aug_data, preproc_cfg['signal_to_noise_range_db'],
+                                                        preproc_cfg['augment_from_normal'], logger=logger)
+    if preproc_cfg['inject_noise']: 
+        add_noise = np.random.binomial(1, preproc_cfg['noise_prob'])
+        if add_noise:
+            logger.info("noise injected")
+            aug_data =  inject_noise(aug_data, samp_rate,  
+                                        preproc_cfg['noise_dir'], 
+                                        preproc_cfg['noise_levels'], 
+                                        preproc_cfg['augment_from_normal'],
+                                        logger) 
+        else:
+            logger.info("noise not injected")
+
+    return aug_data, samp_rate
 
 
 
@@ -91,10 +139,6 @@ def tempo_gain_pitch_perturb(audio_path:str, sample_rate:int=16000,
         
     return audio_data, samp_rate 
 
-
-def pysox_augment(audio_path:str):
-    pass
-    #set_globals(self[, dither, guard, …])
 
 def augment_audio_with_sox(path:str, sample_rate:int, tempo:float, gain:float, 
                             pitch:float, logger=None)->Tuple[np.ndarray,int]:
@@ -308,17 +352,13 @@ def get_value_from_truncnorm(center:int,
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Adjust the pitch of a file and play new file")
-    parser.add_argument("--audio-path",
-        help="Path to input audio file.")
-    parser.add_argument("--augment-name",
-        help="Name of augmentation applied.")
-    parser.add_argument("--out-path", default=None,
-        help="Path the augmented file will be saved to.")
-    parser.add_argument("--quarter-steps",
-        help="Number of half stesp to augment the file.")
-    ARGS = parser.parse_args()
+    parser = argparse.ArgumentParser(description="Augment a file.")
+    parser.add_argument("--config", help="Path to config file.")
+    args = parser.parse_args()
 
-    main(ARGS.audio_path, ARGS.out_path, ARGS.augment_name, ARGS.quarter_steps)
+    with open(args.config, 'r') as config_file:
+        config = yaml.load(config_file) 
+
+    main(config)
     
     
