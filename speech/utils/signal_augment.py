@@ -25,18 +25,17 @@ def main(config:dict):
     log_cfg = config.get('logger')
     preproc_cfg = config.get('preproc')
 
-    if log_cfg['use_log']:
-        # create logger
-        logger = logging.getLogger("sig_aug")
-        logger.setLevel(logging.DEBUG)
-        # create file handler which logs even debug messages
-        fh = logging.FileHandler(log_cfg["log_file"])
-        fh.setLevel(logging.DEBUG)
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
-        fh.setFormatter(formatter)
-        logger.addHandler(fh)
-    else:
-        logger = None
+    # create logger
+    logger = logging.getLogger("sig_aug")
+    logger.setLevel(logging.DEBUG)
+    # create file handler which logs even debug messages
+    fh = logging.FileHandler(log_cfg["log_file"])
+    fh.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
+    logger.info(f"config:\n{config}")
 
     dataset = read_data_json(data_cfg['data_set'])
     audio_list = [example['audio'] for example in dataset]
@@ -49,7 +48,7 @@ def main(config:dict):
         basename = os.path.basename(audio_path)
         save_path = os.path.join(data_cfg['save_dir'], basename)
         array_to_wave(save_path, aug_audio_data, samp_rate)
-        if preproc_cfg['play_audio']
+        if preproc_cfg['play_audio']:
             print(f"sample rate: {sr}")
             print(f"Saved to: {save_path}")
             print("Playing original audio...")
@@ -83,7 +82,7 @@ def apply_augmentation(audio_path:str, preproc_cfg:dict, logger:Logger)\
         if add_noise:
             logger.info("noise injected")
             aug_data =  inject_noise(aug_data, samp_rate,  
-                                        preproc_cfg['noise_dir'], 
+                                        preproc_cfg['noise_directory'], 
                                         preproc_cfg['noise_levels'], 
                                         preproc_cfg['augment_from_normal'],
                                         logger) 
