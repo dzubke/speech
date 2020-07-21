@@ -25,19 +25,6 @@ gcloud compute instances stop phoneme-3
 gcloud compute ssh --project speak-ml-dev --zone us-central1-a  dzubke@phoneme-1
 
 
-# how to see tensorboard file
-tensorboard --logdir ./  --port=8080
-
-# To see live GPU usage:
-watch -d -n 0.5 nvidia-smi
-
-
-#setting default zone
-gcloud compute project-info add-metadata --metadata google-compute-default-region=us-central1,google-compute-default-zone=us-central1-c
-
-
-
-
 3.  HOW TO SETUP STACKDRIVER MONITORING AGENT
 # installing stackdriver agent
 curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh
@@ -104,10 +91,21 @@ cat train-clean-460.json train-other-500.json > ./train-other-960.json
 
 
 
+X. MISC commands
+
+# how to see tensorboard file
+tensorboard --logdir ./  --port=8080
+
+# To see live GPU usage:
+watch -d -n 0.5 nvidia-smi
+
+#setting default zone
+gcloud compute project-info add-metadata --metadata google-compute-default-region=us-central1,google-compute-default-zone=us-central1-c
+
+
+
+
 nvidia-smi --query-gpu=utilization.memory -u --format=csv
 
 google-cloud-monitoring>=0.30.1
 
-   mem_used = get_nvidia_smi_utilization("memory.used")
-    mem_total = get_nvidia_smi_utilization("memory.total")
-    ratio_used_total = round(mem_used/mem_total, 3)
