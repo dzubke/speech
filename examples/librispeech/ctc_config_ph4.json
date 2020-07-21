@@ -4,10 +4,10 @@
     "data" : {
         "train_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-v5_2020-07-17_dd.json",
         "dev_sets" : {
-            "speak": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json",
-            "cv": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/XXXXXX",
-            "libsp": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
-            "ted": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/dev.json"
+            "speak": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27_dd.json",
+            "cv": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/v5.1_2020-06-22/dev_dd.json",
+            "libsp": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/dev-clean_dd.json",
+            "ted": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/dev_dd.json"
         },
         "dev_set_save_reference": "cv", 
         "start_and_end" : false,
