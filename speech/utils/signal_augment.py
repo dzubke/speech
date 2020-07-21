@@ -120,11 +120,11 @@ def tempo_gain_pitch_perturb(audio_path:str, sample_rate:int=16000,
     
     if augment_from_normal:
         tempo_center = np.mean(tempo_range)
-        tempo_value = get_value_from_truncnorm(tempo_center, tempo_range, bounds=[0.0, 3.0])
+        tempo_value = get_value_from_truncnorm(tempo_center, tempo_range, bounds=tempo_range)
         gain_center = np.mean(gain_range)
-        gain_value = get_value_from_truncnorm(gain_center, gain_range, bounds=[-10, 10])
+        gain_value = get_value_from_truncnorm(gain_center, gain_range, bounds=gain_range)
         pitch_center = np.mean(pitch_range)
-        pitch_value = get_value_from_truncnorm(pitch_center, pitch_range, bounds=[-1200, 1200])
+        pitch_value = get_value_from_truncnorm(pitch_center, pitch_range, bounds=pitch_range)
     else:
         tempo_value = np.random.uniform(*tempo_range)
         gain_value = np.random.uniform(*gain_range)
@@ -196,7 +196,7 @@ def inject_noise(data, data_samp_rate, noise_dir, noise_levels=(0, 0.5),
     noise_files = glob.glob(pattern)    
     noise_path = np.random.choice(noise_files)
     if augment_from_normal:
-        noise_level = get_value_from_truncnorm(center=0.0, value_range=noise_levels, bounds=[0.0, 0.9])
+        noise_level = get_value_from_truncnorm(center=0.0, value_range=noise_levels, bounds=noise_levels)
     else:
         noise_level = np.random.uniform(*noise_levels)
 
@@ -319,7 +319,7 @@ def synthetic_gaussian_noise_inject(audio_data: np.ndarray, snr_range:tuple=(10,
     use_log = (logger is not None)
     if augment_from_normal:
         center = np.mean(snr_range)
-        snr_level = get_value_from_truncnorm(center, value_range=snr_range, bounds=[1.0, 100])
+        snr_level = get_value_from_truncnorm(center, value_range=snr_range, bounds=snr_range)
     else:
         snr_level = np.random.uniform(*snr_range)
 
@@ -346,8 +346,8 @@ def get_value_from_truncnorm(center:int,
     value_range.sort()
     bounds.sort()
 
-    # setting range difference to be 2 standard devations from mean
-    std_dev = abs(value_range[0] - value_range[1])/2
+    # setting range difference to be 3 standard devations from mean
+    std_dev = abs(value_range[0] - value_range[1])/3
     # bound are compute relative to center/mean and std deviation
     lower_bound = (bounds[0] - center) / std_dev
     upper_bound = (bounds[1] - center) / std_dev
