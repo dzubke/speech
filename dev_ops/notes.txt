@@ -100,27 +100,12 @@ logger = logging.getLogger("train_log")
 
 # data-disk prefix
 /mnt/disks/data_disk/
-/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/null/
-
-
-nohup python train.py examples/librispeech/ctc_config.json &> 2020-06-22_ph4-8vCPU-30GB_lib-ted-cv.out &
-
-gcloud compute instances stop phoneme-2
-
-2020-06-23_ph2-8vCPU-24GB-8wkr-16batch_lib-ted-cv
-
-UUID=1bbeb6dc-649d-4726-863b-2d3e7b8a5550 /mnt/disks/data_disk ext4 ro,discard,suid,dev,exec,auto,nouser,async,nofail,noload 0 2
-
-2020-06-23_ph4-12vCPU-24GB-8wkr-64batch_lib-ted-cv
-
-mkdir -p /home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200624/ph4/
-2020-06-24_ph2_baseline_lib-ted-cv
 
 
 # source: https://www.apoehlmann.com/blog/connecting-tensorboard-your-google-cloud-vm-port-forwarding/
 # connect to tensorboard on VM
 # 1. on VM run:
-nohup tensorboard --logdir=examples/librispeech/models/ctc_models/20200625/ph2/ --port 6001 &> tb.out &
+nohup tensorboard --logdir=examples/librispeech/models/ctc_models/20200630/ph3/ --port 6006 &> tb.out &
 
 # 2. on local run:
 gcloud compute ssh dzubke@phoneme-2 --zone=us-central1-c --project=speak-ml-dev -- -NfL 6002:localhost:6002
@@ -129,41 +114,7 @@ gcloud compute ssh dzubke@phoneme-2 --zone=us-central1-c --project=speak-ml-dev 
 ps aux | grep tensorboard
 
 
-1.57e+03
-
-10
-
-/mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json
-/mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json
-
-/mnt/disks/data_disk/home/dzubke
-
-
 # github password
 9!l2&YQCydRAkhr1f6%x
 
 
-2020-06-25-07-06_ph1_smaller-context-NaN-debug_lib-ted-cv
-
-2020-06-30-07-06_ph3_no-feature-normalize_lib-ted-cv
-
-2020-06-30-07-06_ph2_baseline_lib-ted-cv
-
-2020-06-30-07-06_ph5_context-size-19_lib-ted-cv
-
-2020-06-25-07-06_ph1_smaller-context-NaN-debug_lib-ted-cv
-
-            "libsp": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
-            "ted": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/dev.json"
-
-            {'next_epoch': 2, 'run_state': (192278, 236.77379064869257)}
-
-2020-06-30-07-07_ph3_no-feature-normalize_lib-ted-cv
-
-
-pip uninstall -y tensorflow-tensorboard
-pip uninstall -y tensorboard-logger
-pip install tensorflow==1.15.3
-pip install -U tensorboardX
-
-2020-06-30-07-13_ph2_baseline_lib-ted-cv
