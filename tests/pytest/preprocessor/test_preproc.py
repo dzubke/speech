@@ -9,7 +9,7 @@ def test_main():
     config_json = "./cv-val_ctc-config.json"
     with open(config_json, 'r') as fid:
         config = json.load(fid)
-    data_json = config['data']
+    data_cfg = config['data']
     print(config)
     logger = None
     preproc = Preprocessor(data_cfg['dev_set'], config['preproc'], logger)
@@ -17,7 +17,7 @@ def test_main():
     print("preproc: \n", preproc)
 
     check_empty_filename(preproc)
-    check_run_from_AudioDataset(preproc, data_json)
+    check_run_from_AudioDataset(preproc, data_cfg['dev_set'])
 
 def check_empty_filename(preproc):
     wave_file = ""
