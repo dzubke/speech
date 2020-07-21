@@ -1,0 +1,100 @@
+2020-07-21 10:49:19 - INFO - config:
+{'data': {'data_set': '/home/dzubke/awni_speech/data/lib-ted-cv/old_versions/dev_lib-combo-ted-cv-v4_2020-05-26.json', 'num_examples': 100, 'save_dir': './tests/pytest/preprocessor/signal_augment/audio/'}, 'logger': {'use_log': True, 'log_file': './tests/pytest/preprocessor/signal_augment/logs/2020-07-21_no-normal.log'}, 'preproc': {'augment_from_normal': False, 'tempo_gain_pitch_perturb': True, 'tempo_range': [0.85, 1.15], 'gain_range': [-6, 6], 'pitch_range': [-400, 400], 'inject_noise': True, 'noise_directory': '/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/', 'noise_prob': 0.6, 'noise_levels': [0.0, 0.5], 'synthetic_gaussian_noise': True, 'signal_to_noise_range_db': [10, 30]}}
+2020-07-21 10:49:20 - INFO - audio_path: /home/dzubke/awni_speech/data/LibriSpeech/dev-other/7601/175351/7601-175351-0006.wav
+2020-07-21 10:49:20 - INFO - tempo_gain_pitch_perturb: audio_file: /home/dzubke/awni_speech/data/LibriSpeech/dev-other/7601/175351/7601-175351-0006.wav
+2020-07-21 10:49:20 - INFO - tempo_gain_pitch_perturb: tempo_value: 0.9440342213979672
+2020-07-21 10:49:20 - INFO - tempo_gain_pitch_perturb: gain_value: -4.676746148574505
+2020-07-21 10:49:20 - INFO - tempo_gain_pitch_perturb: pitch_value: -292.4418398013779
+2020-07-21 10:49:20 - INFO - sox_pertrub: aug_audio_sox: tmpfile exists: True
+2020-07-21 10:49:20 - INFO - sox_pertrub: aug_audio_sox: sox stdout: 
+2020-07-21 10:49:20 - INFO - sox_pertrub: aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=0.944 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=1.18372 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/home/dzubke/awni_speech/data/LibriSpeech/dev-other/7601/175351/7601-175351-0006.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:03.31 = 52880 samples ~ 247.875 CDDA sectors
+File Size      : 106k
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmp0zjrukf1.wav'
+
+Output File    : '/tmp/tmp0zjrukf1.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch      13516.7Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-21 10:49:20 - INFO - syn_gaussian_noise: snr_level: 15.11212982427516
+2020-07-21 10:49:20 - INFO - syn_gaussian_noise: audio_rms: 1312
+2020-07-21 10:49:20 - INFO - syn_gaussian_noise: noise_rms: 230.3177153202564
+2020-07-21 10:49:20 - INFO - noise not injected
+2020-07-21 10:50:23 - INFO - config:
+{'data': {'data_set': '/home/dzubke/awni_speech/data/lib-ted-cv/old_versions/dev_lib-combo-ted-cv-v4_2020-05-26.json', 'num_examples': 100, 'save_dir': './tests/pytest/preprocessor/signal_augment/audio/'}, 'logger': {'use_log': True, 'log_file': './tests/pytest/preprocessor/signal_augment/logs/2020-07-21_no-normal.log'}, 'preproc': {'augment_from_normal': False, 'play_audio': False, 'tempo_gain_pitch_perturb': True, 'tempo_range': [0.85, 1.15], 'gain_range': [-6, 6], 'pitch_range': [-400, 400], 'inject_noise': True, 'noise_directory': '/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/', 'noise_prob': 0.6, 'noise_levels': [0.0, 0.5], 'synthetic_gaussian_noise': True, 'signal_to_noise_range_db': [10, 30]}}
+2020-07-21 10:50:23 - INFO - audio_path: /home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_19622971.wv
+2020-07-21 10:50:23 - INFO - tempo_gain_pitch_perturb: audio_file: /home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_19622971.wv
+2020-07-21 10:50:23 - INFO - tempo_gain_pitch_perturb: tempo_value: 0.8698466425349396
+2020-07-21 10:50:23 - INFO - tempo_gain_pitch_perturb: gain_value: 0.22639325604891702
+2020-07-21 10:50:23 - INFO - tempo_gain_pitch_perturb: pitch_value: 9.448402438595508
+2020-07-21 10:50:23 - INFO - sox_pertrub: aug_audio_sox: tmpfile exists: True
+2020-07-21 10:50:23 - INFO - sox_pertrub: aug_audio_sox: sox stdout: 
+2020-07-21 10:50:23 - INFO - sox_pertrub: aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=0.87 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=0.994815 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_19622971.wv' (wav)
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:06.84 = 109440 samples ~ 513 CDDA sectors
+File Size      : 219k
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmpj5l0tgsd.wav'
+
+Output File    : '/tmp/tmpj5l0tgsd.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch      16083.4Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-21 10:50:23 - INFO - syn_gaussian_noise: snr_level: 24.22723524600564
+2020-07-21 10:50:23 - INFO - syn_gaussian_noise: audio_rms: 2622
+2020-07-21 10:50:23 - INFO - syn_gaussian_noise: noise_rms: 161.1650714473427
+2020-07-21 10:50:23 - INFO - noise injected
