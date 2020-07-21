@@ -13,10 +13,9 @@
         "start_and_end" : false,
         "num_workers": 4
     },
-
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-07-15-07-17_ph2_large-no-feature-norm_lib-ted-cv.log",
+        "log_file": "logs/2020-07-15-07-21_ph2_large-no-feature-norm_lib-ted-cv.log",
         "debug_mode":false
     },
     "preproc":{
@@ -27,34 +26,32 @@
         "use_spec_augment": true,
         "inject_noise": true,
         "noise_directory": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/",
-        "noise_prob": 0.6,
-        "noise_levels": [0,0.5],
+        "noise_prob": 0.8,
+        "noise_levels": [0, 0.4],
         "tempo_gain_pitch_perturb":true,
-        "tempo_range": [0.85, 1.15],
+        "tempo_range": [0.80, 1.2],
         "gain_range":[-6,6],
         "pitch_range":[-400,400],
         "synthetic_gaussian_noise": true,
-        "signal_to_noise_range_db":[10,30]
+        "signal_to_noise_range_db":[10, 50]
     },
-
     "optimizer": {
         "batch_size" : 8,
-        "run_state": [96139, 145.08],
-        "best_so_far": 0.3817,
-        "start_epoch": 1,
+        "run_state": [305807, 122.225],
+        "best_so_far": 0.3728,
+        "start_epoch": 3,
         "epochs" : 100,
-        "learning_rate" : 7.2e-4,
+        "learning_rate" : 0.000648,
         "momentum" : 0.9,
         "dampening": 0.98,
-        "sched_gamma": 0.90, 
+        "sched_gamma": 0.90,
         "sched_step": 1
     },
-
     "model" : {
         "class" : "this value is no longer used as train.py is hardcorded to use CTC_train",
         "dropout" : 0.4,
         "load_trained": true,
-        "trained_path": "./examples/librispeech/models/ctc_models/20200715/ph2/20200717/best_model", 
+        "trained_path": "./examples/librispeech/models/ctc_models/20200715/ph2/20200721/best_model", 
         "remove_layers": [],
         "encoder" : {
             "conv" : [
