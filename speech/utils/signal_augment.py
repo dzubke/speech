@@ -191,7 +191,7 @@ def inject_noise(data, data_samp_rate, noise_dir, noise_levels=(0, 0.5),
     noise_files = glob.glob(pattern)    
     noise_path = np.random.choice(noise_files)
     if augment_from_normal:
-        noise_level = get_value_from_truncnorm(center=0.0, noise_levels, bounds=[0.0, 0.9])
+        noise_level = get_value_from_truncnorm(center=0.0, value_range=noise_levels, bounds=[0.0, 0.9])
     else:
         noise_level = np.random.uniform(*noise_levels)
 
@@ -347,7 +347,7 @@ def get_value_from_truncnorm(center:int,
     lower_bound = (bounds[0] - center) / std_dev
     upper_bound = (bounds[1] - center) / std_dev
 
-    return scipy.stats.truncnorm.rvs(lower_bound, upper_bound, loc=center, scale=std_dev, size=1) 
+    return scipy.stats.truncnorm.rvs(lower_bound, upper_bound, loc=center, scale=std_dev, size=None) 
 
 
 
