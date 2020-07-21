@@ -1,0 +1,10 @@
+dataset_dir: /home/dzubke/awni_speech/data/common-voice/v5.1_2020-06-22 # directory where the dataset is located
+dataset_files:           # dataset filenames to be processed, files should be in dataset_dir
+    validated-50-max-repeat: validated-50-maxrepeat.tsv
+    dev: dev.tsv
+    test: test.tsv
+dataset_name: Commonvoice # Name of dataset with a capitalized first letter
+lexicon_path: /home/dzubke/awni_speech/speech/examples/common-voice/cv-lex-extended_2020-07-16.txt #path to pronunciation lexicon
+force_convert: false    # Converts audio to wav file even if .wav file already exists
+min_duration: 1         # minimum audio duration in seconds
+max_duration: 20        # maximum audio duration in seconds
