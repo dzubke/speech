@@ -7,6 +7,7 @@ from logging import Logger
 import os
 import random
 import subprocess
+import shutil
 from tempfile import NamedTemporaryFile
 from typing import Tuple
 # third-party libraries
@@ -42,12 +43,17 @@ def main(config:dict):
     audio_subset  = random.sample(audio_list, data_cfg['num_examples'])
 
     for audio_path in audio_subset: 
-
         aug_audio_data, samp_rate = apply_augmentation(audio_path, preproc_cfg, logger)
-
+        
+        os.makedirs(os.path.join(data_cfg['save_dir'], "aug"), exist_ok=True)
+        os.makedirs(os.path.join(data_cfg['save_dir'], "org"), exist_ok=True)
+        # save the augmented file
         basename = os.path.basename(audio_path)
-        save_path = os.path.join(data_cfg['save_dir'], basename)
+        save_path = os.path.join(data_cfg['save_dir'], "aug", basename)
         array_to_wave(save_path, aug_audio_data, samp_rate)
+        # copy the original audio file for comparison
+        save_org_path = os.path.join(data_cfg['save_dir'], "org", basename)
+        shutil.copyfile(audio_path, save_org_path)
         if preproc_cfg['play_audio']:
             print(f"sample rate: {sr}")
             print(f"Saved to: {save_path}")
