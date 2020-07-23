@@ -23,7 +23,7 @@ import yaml
 import speech
 import speech.loader as loader
 from speech.models.ctc_model_train import CTC_train
-from speech.utils.io import read_pickle, write_pickle, load_from_trained
+from speech.utils.io import read_pickle, write_pickle, load_from_trained, load_config
 from speech.utils.model_debug import check_nan_params_grads, log_model_grads, plot_grad_flow_line, plot_grad_flow_bar
 from speech.utils.model_debug import save_batch_log_stats, log_batchnorm_mean_std, log_param_grad_norms
 from speech.utils.model_debug import get_logger_filename, log_cpu_mem_disk_usage
@@ -339,16 +339,7 @@ if __name__ == "__main__":
         help="Run in deterministic mode (no cudnn). Only works on GPU.")
     args = parser.parse_args()
 
-    _, config_ext = os.path.splitext(args.config)
-
-    if config_ext == '.json':
-        with open(args.config, 'r') as fid:
-            config = json.load(fid)
-    elif config_ext == '.yaml':
-        with open(args.config, 'r') as config_file:
-            config = yaml.load(config_file) 
-    else:
-        raise ValueError(f"config file extension {config_ext} not accepted")
+    config = load_config(args.config)
 
     random.seed(config["seed"])
     torch.manual_seed(config["seed"])
