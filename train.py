@@ -18,6 +18,7 @@ from tensorboardX import SummaryWriter
 import torch
 import torch.nn as nn
 import tqdm
+import yaml
 # project libraries
 import speech
 import speech.loader as loader
@@ -338,8 +339,16 @@ if __name__ == "__main__":
         help="Run in deterministic mode (no cudnn). Only works on GPU.")
     args = parser.parse_args()
 
-    with open(args.config, 'r') as fid:
-        config = json.load(fid)
+    _, config_ext = os.path.splitext(args.config)
+
+    if config_ext == '.json':
+        with open(args.config, 'r') as fid:
+            config = json.load(fid)
+    elif config_ext == '.yaml':
+        with open(args.config, 'r') as config_file:
+            config = yaml.load(config_file) 
+    else:
+        raise ValueError(f"config file extension {config_ext} not accepted")
 
     random.seed(config["seed"])
     torch.manual_seed(config["seed"])
