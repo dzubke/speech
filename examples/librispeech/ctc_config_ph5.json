@@ -1,13 +1,13 @@
 {
     "seed" : 2017,
-    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200630/ph5/",
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200717/ph5/",
     "data" : {
-        "train_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json",
+        "train_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-v5_2020-07-17_dd.json",
         "dev_sets" : {
-            "speak": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json",
-            "cv": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/dev.json",
-            "libsp": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
-            "ted": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/dev.json"
+            "speak": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27_dd.json",
+            "cv": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/v5.1_2020-06-22/dev_dd.json",
+            "libsp": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/dev-clean_dd.json",
+            "ted": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/dev_dd.json"
         },
         "dev_set_save_reference": "cv",
         "start_and_end" : false,
@@ -15,7 +15,7 @@
     },
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-06-30-07-16_ph5_context-size-19_lib-ted-cv.log",
+        "log_file": "logs/2020-07-17_ph5_small-context_lib-ted-cv.log",
         "debug_mode":false
     },
     "preproc":{
@@ -38,20 +38,20 @@
     },
     "optimizer": {
         "batch_size" : 8,
-        "run_state": [769111, 237.85],
-        "best_so_far": 0.829,
-        "start_epoch": 9,
+        "run_state": [0, 0],
+        "best_so_far": 999,
+        "start_epoch": 0,
         "epochs" : 100,
         "learning_rate" : 1e-3,
         "momentum" : 0.9, 
         "dampening": 0.98,
-        "sched_gamma": 0.95, 
+        "sched_gamma": 0.90, 
         "sched_step": 1
     },
     "model" : {
         "class" : "this value is no longer used as train.py is hardcorded to use CTC_train",
         "dropout" : 0.4,
-        "load_trained": true,
+        "load_trained": false,
         "trained_path": "examples/librispeech/models/ctc_models/20200630/ph5/20200715/model", 
         "remove_layers": [],
         "encoder" : {
