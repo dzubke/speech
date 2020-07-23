@@ -5,6 +5,7 @@
 
 # standard libraries
 from datetime import datetime, date
+import logging
 from logging import Logger
 import math
 import os
@@ -20,6 +21,22 @@ import torch
 from torch.autograd import Variable, Function
 # project libraries
 from speech.utils.data_structs import TorchNamedParams, TorchParams, Batch
+
+
+def get_logger(logger_path:str)->Logger:
+        # create logger
+        logger = logging.getLogger("log")
+        logger.setLevel(logging.DEBUG)
+        # create file handler which logs even debug messages
+        if logger_path:
+            fh = logging.FileHandler(logger_path)
+            fh.setLevel(logging.DEBUG)
+            formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
+            fh.setFormatter(formatter)
+            logger.addHandler(fh)
+        
+        return logger
+
 
 
 def check_nan_params_grads(model_params:TorchParams)->bool:
