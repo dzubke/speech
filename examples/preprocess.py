@@ -151,6 +151,7 @@ class CommonvoicePreprocessor(DataPreprocessor):
             logging.info(f"len of auddio_trans: {len(self.audio_trans)}")
             root, ext = os.path.splitext(label_path)
             json_path = root + os.path.extsep + "json"
+            logging.info(f"entering write_json for {set_name}")
             self.write_json(json_path)
         unique_unknown_words(self.dataset_dir)
 
@@ -477,7 +478,7 @@ def unique_unknown_words(dataset_dir:str):
         with open(data_fn, 'r') as fid: 
             unk_words_dict = json.load(fid)
             unknown_set.update(unk_words_dict['unknown_words_set'])
-            logging.info(len(unk_words_dict['unknown_words_set']))
+            logging.info(f"for {data_fn}, # unique unknownw words: {len(unk_words_dict['unknown_words_set'])}")
 
     unknown_set = filter_set(unknown_set)
     unknown_list = list(unknown_set)
@@ -509,4 +510,14 @@ if __name__ == "__main__":
 
     with open(args.config_path, 'r') as config_file:
         config = yaml.load(config_file) 
+
+    data_preprocessor = eval(config['dataset_name']+"Preprocessor")
+    data_preprocessor = data_preprocessor(config['dataset_dir'], 
+                                          config['dataset_files'], 
+                                          config['dataset_name'], 
+                                          config['lexicon_path'],
+                                          config['force_convert'], 
+                                          config['min_duration'], 
+                                          config['max_duration'])
+    data_preprocessor.process_datasets()
 
