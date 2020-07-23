@@ -54,19 +54,24 @@ class Preprocessor():
         self.augment_from_normal = preproc_cfg.get('augment_from_normal', False)
 
         self.tempo_gain_pitch_perturb = preproc_cfg['tempo_gain_pitch_perturb']
+        self.tempo_gain_pitch_prob = preproc_cfg.get('tempo_gain_pitch_prob', 1.0)
         self.tempo_range = preproc_cfg['tempo_range']
         self.gain_range = preproc_cfg['gain_range']
         self.pitch_range = preproc_cfg['pitch_range']
        
-        self.synthetic_gaussian_noise = preproc_cfg['synthetic_gaussian_noise']
-        self.signal_to_noise_range_db=preproc_cfg['signal_to_noise_range_db']
+        self.synthetic_gaussian_noise = preproc_cfg.get('synthetic_gaussian_noise', False)
+        self.gauss_noise_prob = preproc_cfg.get('gauss_noise_prob', 1.0)
+        self.gauss_snr_db_range = preproc_cfg.get('gauss_snr_db_range',
+                                        preproc_cfg.get('signal_to_noise_range_db'))
 
-        self.inject_noise = preproc_cfg['inject_noise']
-        self.noise_dir = preproc_cfg['noise_directory']
-        self.noise_prob = preproc_cfg['noise_prob']
-        self.noise_levels = preproc_cfg['noise_levels']       
+        self.background_noise = preproc_cfg.get('background_noise', preproc_cfg.get('inject_noise'))
+        self.noise_dir = preproc_cfg.get('background_noise_dir', preproc_cfg.get('noise_directory'))
+        self.background_noise_prob = preproc_cfg.get('background_noise_prob', preproc_cfg.get('noise_prob'))
+        self.background_noise_range = preproc_cfg.get('background_noise_range', preproc_cfg.get('noise_levels'))     
         
-        self.spec_augment = preproc_cfg['use_spec_augment']
+        self.spec_augment = preproc_cfg.get('spec_augment', preproc_cfg.get('use_spec_augment'))
+        self.spec_augment_prob = preproc_cfg.get('spec_augment_prob', 1.0)
+        self.spec_augment_policy = preproc_cfg.get('spec_augment_policy', {})
 
         # Compute data mean, std from sample
         data = read_data_json(data_json)
@@ -134,23 +139,35 @@ class Preprocessor():
 
         # sox-based tempo, gain, pitch augmentations
         if self.tempo_gain_pitch_perturb and self.train_status:
-            audio_data, samp_rate = tempo_gain_pitch_perturb(wave_file, samp_rate, self.tempo_range,
-                                                            self.gain_range, self.pitch_range, 
-                                                            self.augment_from_normal, logger=self.logger)
-    
+            if np.random.binomial(1, self.tempo_gain_pitch_prob): 
+                audio_data, samp_rate = tempo_gain_pitch_perturb(wave_file, 
+                                                                samp_rate, 
+                                                                self.tempo_range,
+                                                                self.gain_range, 
+                                                                self.pitch_range, 
+                                                                self.augment_from_normal, 
+                                                                logger=self.logger)
+                if self.use_log: self.logger.info(f"preproc: tempo_gain_pitch applied")
+
         # synthetic gaussian noise
         if self.synthetic_gaussian_noise and self.train_status:
-            if self.use_log: self.logger.info(f"preproc: synthetic_gaussian_noise_inject")
-            audio_data = synthetic_gaussian_noise_inject(audio_data, self.signal_to_noise_range_db,
-                                                        self.augment_from_normal, logger=self.logger)
+            if np.random.binomial(1, self.gauss_noise_prob): 
+                audio_data = synthetic_gaussian_noise_inject(audio_data, 
+                                                            self.gauss_snr_db_range,
+                                                            self.augment_from_normal, 
+                                                            logger=self.logger)
+                if self.use_log: self.logger.info(f"preproc: synth_gauss_noise applied")
 
         # noise injection
-        if self.inject_noise and self.train_status:
-            add_noise = np.random.binomial(1, self.noise_prob)
-            if add_noise:
-                audio_data =  inject_noise(audio_data, samp_rate, self.noise_dir, self.noise_levels, 
-                                            self.augment_from_normal, self.logger) 
-            if self.use_log: self.logger.info(f"preproc: noise injected")
+        if self.background_noise and self.train_status:
+            if np.random.binomial(1, self.background_noise_prob):
+                audio_data =  inject_noise(audio_data, 
+                                            samp_rate, 
+                                            self.noise_dir, 
+                                            self.background_noise_range, 
+                                            self.augment_from_normal, 
+                                            self.logger) 
+                if self.use_log: self.logger.info(f"preproc: noise injected")
         
         return audio_data, samp_rate
 
@@ -160,8 +177,11 @@ class Preprocessor():
         """
         # spec-augment
         if self.spec_augment and self.train_status:
-            feature_data = apply_spec_augment(feature_data, self.logger)
-            if self.use_log: self.logger.info(f"preproc: spec_aug applied")
+            if np.random.binomial(1, self.spec_augment_prob):
+                feature_data = apply_spec_augment(feature_data, 
+                                                  self.spec_augment_policy, 
+                                                  self.logger)
+                if self.use_log: self.logger.info(f"preproc: spec_aug applied")
 
         return feature_data
 
@@ -194,8 +214,6 @@ class Preprocessor():
         """
         updates an instance with new attributes
         """
-        if not hasattr(self, 'pitch_perturb'):
-            self.pitch_perturb = False
         if not hasattr(self, 'tempo_gain_pitch_perturb'):
             if hasattr(self, 'speed_vol_perturb'):
                 self.tempo_gain_pitch_perturb = self.speed_vol_pertub
@@ -206,8 +224,8 @@ class Preprocessor():
             self.train_status = True
         if not hasattr(self, 'synthetic_gaussian_noise'):
             self.synthetic_gaussian_noise = False
-        if not hasattr(self, "signal_to_noise_range_db"):
-            self.signal_to_noise_range_db=(100, 100)
+        if not hasattr(self, "gauss_snr_db_range"):
+            self.gauss_snr_db_range=(100, 100)
         if self.preprocessor == "log_spec":
             self.preprocessor = "log_spectrogram"
 
