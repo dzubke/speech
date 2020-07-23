@@ -235,11 +235,11 @@ def inject_noise_sample(data, sample_rate:int, noise_path:str, noise_level:float
         data = data.astype('float64')
         assert len(data) == len(noise_dst), f"data len: {len(data)}, noise len: {len(noise_dst)}, data size: {data.size}, noise size: {noise_dst.size}, noise_path: {noise_path}"
         
-        noise_energy = np.sqrt(noise_dst.dot(noise_dst) / noise_dst.size)
+        noise_rms = np.sqrt(noise_dst.dot(noise_dst) / noise_dst.size)
         # avoid dividing by zero
-        if noise_energy != 0:
-            data_energy = np.sqrt(np.abs(data.dot(data)) / data.size)
-            data += noise_level * noise_dst * data_energy / noise_energy
+        if noise_rms != 0:
+            data_rms = np.sqrt(np.abs(data.dot(data)) / data.size)
+            data += noise_level * noise_dst * data_rms / noise_rms
 
         if use_log: logger.info(f"noise_inj: noise_start: {noise_start}")
         if use_log: logger.info(f"noise_inj: noise_end: {noise_end}")
@@ -311,7 +311,7 @@ def synthetic_gaussian_noise_inject(audio_data: np.ndarray, snr_range:tuple=(10,
     signal-to-noise ratio (snr) bounded by the snr_range
     Arguments:
         audio_data - np.ndarry: 1d array of audio amplitudes
-        snr_range - tuple: range of values the signal-to-noise ratio (snr) can take on
+        snr_range - tuple: range of values the signal-to-noise ratio (snr) in dB
         augment_from_normal - bool: if true, augment values are chosen from normal distribution
 
     Note: Power = Amplitude^2 and here we are dealing with amplitudes = RMS
