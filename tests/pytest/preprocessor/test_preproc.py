@@ -1,23 +1,25 @@
 # third-party libraries
 import json
 import pytest
+import yaml
 # project libraries
 from speech.loader import Preprocessor, AudioDataset
 from speech.utils.config import Config
+from speech.utils.io import load_config
+from speech.utils.model_debug import get_logger
 
 def test_main():
-    config_json = "./cv-val_ctc-config.json"
-    with open(config_json, 'r') as fid:
-        config = json.load(fid)
+    config_path = "./ctc_config_ph2.yaml"
+    config = load_config(config_path)
     data_cfg = config['data']
     print(config)
-    logger = None
-    preproc = Preprocessor(data_cfg['dev_set'], config['preproc'], logger)
+    logger = get_logger('./test.log')
+    preproc = Preprocessor(data_cfg['dev_sets']['cv'], config['preproc'], logger,  max_samples=100, start_and_end=False)
     preproc.update()
     print("preproc: \n", preproc)
 
     check_empty_filename(preproc)
-    check_run_from_AudioDataset(preproc, data_cfg['dev_set'])
+    check_run_from_AudioDataset(preproc, data_cfg['dev_sets']['cv'])
 
 def check_empty_filename(preproc):
     wave_file = ""

@@ -160,7 +160,7 @@ class Preprocessor():
 
         # noise injection
         if self.background_noise and self.train_status:
-            if np.random.binomial(1, self.background_noise_prob)
+            if np.random.binomial(1, self.background_noise_prob):
                 audio_data =  inject_noise(audio_data, 
                                             samp_rate, 
                                             self.noise_dir, 
@@ -177,8 +177,10 @@ class Preprocessor():
         """
         # spec-augment
         if self.spec_augment and self.train_status:
-            if np.random.binomial(1, self.spec_augment_prob)
-                feature_data = apply_spec_augment(feature_data, self.spec_aug_policy, self.logger)
+            if np.random.binomial(1, self.spec_augment_prob):
+                feature_data = apply_spec_augment(feature_data, 
+                                                  self.spec_augment_policy, 
+                                                  self.logger)
                 if self.use_log: self.logger.info(f"preproc: spec_aug applied")
 
         return feature_data
@@ -212,8 +214,6 @@ class Preprocessor():
         """
         updates an instance with new attributes
         """
-        if not hasattr(self, 'pitch_perturb'):
-            self.pitch_perturb = False
         if not hasattr(self, 'tempo_gain_pitch_perturb'):
             if hasattr(self, 'speed_vol_perturb'):
                 self.tempo_gain_pitch_perturb = self.speed_vol_pertub
@@ -224,8 +224,8 @@ class Preprocessor():
             self.train_status = True
         if not hasattr(self, 'synthetic_gaussian_noise'):
             self.synthetic_gaussian_noise = False
-        if not hasattr(self, "signal_to_noise_range_db"):
-            self.signal_to_noise_range_db=(100, 100)
+        if not hasattr(self, "gauss_snr_db_range"):
+            self.gauss_snr_db_range=(100, 100)
         if self.preprocessor == "log_spec":
             self.preprocessor = "log_spectrogram"
 
