@@ -88,7 +88,7 @@ mount -l | grep sdb1    # or to look for the specific disk
 
 cd /mnt/disks/data_disk/home/dzubke/awni_speech/data
 
-sed -i 's#/home#/mnt/disks/data_disk/home#g' */*.json
+sed -i 's#/home#/mnt/disks/data_disk/home#g' *_dd.json
 
 
 # STEP 11: UPDATE THE /etc/fstab FILE TO MOUNT ON VM BOOT
@@ -103,10 +103,4 @@ echo UUID=`sudo blkid -s UUID -o value /dev/sdb1` /mnt/disks/data_disk ext4 ro,d
 # You can run this command to verify the fstab entry is correct
 
 cat /etc/fstab
-
-
-
-
-
-
 
