@@ -25,12 +25,13 @@ def feature_gaussian_noise_inject(inputs:np.ndarray,
 
 
 # spec-augment functions: apply_spec_augment, time_warp, spec_augment, visualize_spectrogram
-def apply_spec_augment(features:np.ndarray, logger:Logger=None)->np.ndarray:
+def apply_spec_augment(features:np.ndarray, policy:dict, logger:Logger=None)->np.ndarray:
     """
     Calls the spec_augment function on the normalized features. A policy defined 
     in the policy_dict will be chosen uniformly at random.
     Arguments:
         features - np.ndarray: normalized features with dimensional order time x freq
+        policy - dict: set of augmentation policies
         logger - Logger
     Returns:
         features - nd.ndarray: the modified features array with order time x freq
@@ -38,22 +39,11 @@ def apply_spec_augment(features:np.ndarray, logger:Logger=None)->np.ndarray:
     
     use_log = (logger is not None)
     assert type(features) == np.ndarray, "input is not numpy array"
-
-    policy_dict = {
-        0: {'time_warping_para':0, 'frequency_masking_para':0,
-            'time_masking_para':0, 'frequency_mask_num':0, 'time_mask_num':0}, 
-        1: {"time_warping_para":20, "frequency_masking_para":30,
-            "time_masking_para":30, "frequency_mask_num":1, "time_mask_num":1},
-        2: {"time_warping_para":20, "frequency_masking_para":15,
-            "time_masking_para":15, "frequency_mask_num":2, "time_mask_num":2},
-        3: {"time_warping_para":20, "frequency_masking_para":10,
-            "time_masking_para":10, "frequency_mask_num":3, "time_mask_num":3},
-            }
     
-    policy_choice = np.random.randint(low=0, high=4)
+    policy_choice = np.random.randint(low=0, high=len(policy.keys()))
     if use_log: logger.info(f"spec_aug: policy: {policy_choice}")
 
-    policy = policy_dict.get(policy_choice)
+    policy = policy.get(policy_choice)
 
     # the inputs need to be transposed and converted to torch tensor
     # as spec_augment method expects tensor with freq x time dimensions
@@ -62,11 +52,12 @@ def apply_spec_augment(features:np.ndarray, logger:Logger=None)->np.ndarray:
     features = torch.from_numpy(features.T)
 
     features = spec_augment(features, 
-                    time_warping_para=policy.get('time_warping_para'), 
-                    frequency_masking_para=policy.get('frequency_masking_para'),
-                    time_masking_para=policy.get('time_masking_para'),
-                    frequency_mask_num=policy.get('frequency_mask_num'), 
-                    time_mask_num=policy.get('time_mask_num'), logger=logger)
+                            time_warping_para=policy.get('W', 0.0), 
+                            frequency_masking_para=policy.get('F', 0.0),
+                            time_masking_para=policy.get('T', 0.0),
+                            frequency_mask_num=policy.get('m_F', 0.0), 
+                            time_mask_num=policy.get('m_T', 0.0), 
+                            logger=logger)
     
     # convert the torch tensor back to numpy array and transpose back to time x freq
     features = to_numpy(features)

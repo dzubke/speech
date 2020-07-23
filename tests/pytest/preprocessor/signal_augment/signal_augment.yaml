@@ -1,20 +1,22 @@
 data : 
-    data_set: /home/dzubke/awni_speech/data/lib-ted-cv/old_versions/dev_lib-combo-ted-cv-v4_2020-05-26.json
+    data_set: /mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-v5_2020-07-17_dd.json
     num_examples: 50
-    save_dir : ./tests/pytest/preprocessor/signal_augment/audio/normal_higher-noise-prob
+    save_dir : ./tests/pytest/preprocessor/signal_augment/audio/truncnormal-proposed_v2
 logger:
     use_log: true
-    log_file: ./tests/pytest/preprocessor/signal_augment/logs/2020-07-21_normal_higher-noise-prob.log
+    log_file: ./tests/pytest/preprocessor/signal_augment/logs/2020-07-23_truncnormal-proposed_v2.log
 preproc:
     augment_from_normal: true
     play_audio: false
     tempo_gain_pitch_perturb: true
-    tempo_range: [0.85, 1.15]
-    gain_range: [-6, 6]
-    pitch_range: [-400, 400]
-    inject_noise: true
-    noise_directory: /mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/
-    noise_prob: 0.8
-    noise_levels: [0.0, 0.5]
-    synthetic_gaussian_noise: true 
-    signal_to_noise_range_db: [10, 50]
+    tempo_gain_pitch_prob_use: 0.5
+    tempo_range: [0.80, 1.20]
+    gain_range: [-5, 5]
+    pitch_range: [-250, 250]
+    inject_background_noise: true
+    background_noise_dir: /mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/
+    background_noise_prob: 0.5
+    background_noise_level: [0.0, 0.4]
+    synthetic_gauss_noise: true 
+    gauss_noise_prob_use: 0.5
+    gauss_snr_range_db: [15, 50]
