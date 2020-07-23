@@ -1,20 +1,20 @@
 data : 
-    data_set: /home/dzubke/awni_speech/data/lib-ted-cv/old_versions/dev_lib-combo-ted-cv-v4_2020-05-26.json
+    data_set: /mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-v5_2020-07-17_dd.json
     num_examples: 50
-    save_dir : ./tests/pytest/preprocessor/signal_augment/audio/normal_higher-noise-prob
+    save_dir : ./tests/pytest/preprocessor/signal_augment/audio/uniform-proposed
 logger:
     use_log: true
-    log_file: ./tests/pytest/preprocessor/signal_augment/logs/2020-07-21_normal_higher-noise-prob.log
+    log_file: ./tests/pytest/preprocessor/signal_augment/logs/2020-07-23_uniform-proposed.log
 preproc:
-    augment_from_normal: true
+    augment_from_normal: false
     play_audio: false
     tempo_gain_pitch_perturb: true
-    tempo_range: [0.85, 1.15]
+    tempo_range: [0.80, 1.20]
     gain_range: [-6, 6]
-    pitch_range: [-400, 400]
+    pitch_range: [-250, 250]
     inject_noise: true
     noise_directory: /mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/
-    noise_prob: 0.8
-    noise_levels: [0.0, 0.5]
+    noise_prob: 0.5
+    noise_levels: [0.0, 0.4]
     synthetic_gaussian_noise: true 
     signal_to_noise_range_db: [10, 50]
