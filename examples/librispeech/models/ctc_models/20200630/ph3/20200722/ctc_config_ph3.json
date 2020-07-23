@@ -1,0 +1,73 @@
+{
+    "seed" : 2017,
+    "save_path" : "/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200630/ph3/",
+    "data" : {
+        "train_set" : "/mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-VAL_20200526.json",
+        "dev_sets" : {
+            "speak": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27.json",
+            "cv": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/dev.json",
+            "libsp": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/dev-clean.json",
+            "ted": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/dev.json"
+        },
+        "dev_set_save_reference": "cv",
+        "start_and_end" : false,
+        "num_workers": 4
+    },
+
+    "logger":{
+        "use_log": true,
+        "log_file": "logs/2020-06-30-07-06_ph3_no-feature-normalize_lib-ted-cv.log",
+        "debug_mode":false
+    },
+    "preproc":{
+        "preprocessor": "log_spectrogram",
+        "window_size": 32,
+        "step_size": 16,
+        "use_feature_normalize": false,
+        "use_spec_augment": true,
+        "inject_noise": true,
+        "noise_directory": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/",
+        "noise_prob": 0.6,
+        "noise_levels": [0,0.5], 
+        "tempo_gain_pitch_perturb":true,
+        "tempo_range": [0.85, 1.15],
+        "gain_range":[-6,6],
+        "pitch_range":[-400,400],
+        "synthetic_gaussian_noise": true, 
+        "signal_to_noise_range_db":[10,30]
+    },
+
+    "optimizer": {
+        "batch_size" : 8,
+        "run_state": [192278, 243],
+        "best_so_far": 0.950,
+        "start_epoch": 2,
+        "epochs" : 100,
+        "learning_rate" : 8e-4,
+        "momentum" : 0.9, 
+        "dampening": 0.98,
+        "sched_gamma": 0.90, 
+        "sched_step": 1
+    },
+
+    "model" : {
+        "class" : "this value is no longer used as train.py is hardcorded to use CTC_train",
+        "dropout" : 0.4,
+        "load_trained": true,
+        "trained_path": "examples/librispeech/models/ctc_models/20200630/ph3/best_model", 
+        "remove_layers": [],
+        "encoder" : {
+            "conv" : [
+			[32, 11, 41, 1, 2, 0, 20],
+			[32, 11, 21, 1, 2, 0, 10],
+			[96, 11, 21, 1, 1, 0, 10]
+             ],
+            "rnn" : {
+                "type": "LSTM",
+                "dim" : 512,
+                "bidirectional" : false,
+                "layers" : 5
+            }
+        }
+    }
+}

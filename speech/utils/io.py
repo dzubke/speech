@@ -3,6 +3,7 @@ from collections import OrderedDict
 import json 
 import os
 import pickle
+import yaml
 # third-party libraries
 import torch
 
@@ -64,6 +65,22 @@ def write_pickle(pickle_path:str, object_to_pickle):
     with open(pickle_path, 'wb') as fid:
         pickle.dump(object_to_pickle, fid) 
 
+def load_config(config_path:str)->dict:
+    """
+    loads the config file in json or yaml format
+    """
+    _, config_ext = os.path.splitext(config_path)    
+
+    if config_ext == '.json':
+        with open(config_path, 'r') as fid:
+            config = json.load(fid)
+    elif config_ext == '.yaml':
+        with open(config_path, 'r') as config_file:
+            config = yaml.load(config_file) 
+    else:
+        raise ValueError(f"config file extension {config_ext} not accepted")
+    
+    return config
 
 def load_from_trained(model, model_cfg):
     """
