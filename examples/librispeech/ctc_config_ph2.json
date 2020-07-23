@@ -15,7 +15,7 @@
     },
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-07-15-07-21_ph2_large-no-feature-norm_lib-ted-cv.log",
+        "log_file": "logs/2020-07-15-07-22_ph2_large-no-feature-norm_lib-ted-cv.log",
         "debug_mode":false
     },
     "preproc":{
