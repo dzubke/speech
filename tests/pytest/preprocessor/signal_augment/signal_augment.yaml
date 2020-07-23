@@ -1,10 +1,10 @@
 data : 
     data_set: /mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-v5_2020-07-17_dd.json
     num_examples: 50
-    save_dir : ./tests/pytest/preprocessor/signal_augment/audio/uniform-proposed
+    save_dir : ./tests/pytest/preprocessor/signal_augment/audio/truncnormal-proposed_v2
 logger:
     use_log: true
-    log_file: ./tests/pytest/preprocessor/signal_augment/logs/2020-07-23_uniform-proposed.log
+    log_file: ./tests/pytest/preprocessor/signal_augment/logs/2020-07-23_truncnormal-proposed_v2.log
 preproc:
     augment_from_normal: false
     play_audio: false
