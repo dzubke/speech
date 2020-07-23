@@ -117,9 +117,7 @@ ps aux | grep tensorboard
 # github password
 9!l2&YQCydRAkhr1f6%x
 
+./tests/pytest/preprocessor/signal_augment/.signal_augment.yaml.swp
 
-{'start_epoch': 3, 'run_state': (305807, 122.22520404263355), 'best_so_far': 0.37280472961224137, 'learning_rate': 0.000648}
-
-2020-06-25-07-21_ph4_large-model_lib-ted-cv.
-
-nohup python train.py examples/librispeech/ctc_config_ph6.json &> 2020-07-21_ph6_no-aug-feature-normalize_lib-ted-cv.out &
+2020-07-15-07-22_ph2_large-no-feature-norm_lib-ted-cv.
+logs/2020-06-30-07-22_ph3_no-feature-normalize_lib-ted-cv.logZZ
