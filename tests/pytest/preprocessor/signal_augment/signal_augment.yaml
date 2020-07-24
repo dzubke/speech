@@ -6,17 +6,17 @@ logger:
     use_log: true
     log_file: ./tests/pytest/preprocessor/signal_augment/logs/2020-07-23_truncnormal-proposed_v2.log
 preproc:
-    augment_from_normal: true
     play_audio: false
+    augment_from_normal: true
     tempo_gain_pitch_perturb: true
-    tempo_gain_pitch_prob_use: 0.5
+    tempo_gain_pitch_prob: 0.5
     tempo_range: [0.80, 1.20]
     gain_range: [-5, 5]
     pitch_range: [-250, 250]
-    inject_background_noise: true
+    synthetic_gaussian_noise: true 
+    gauss_noise_prob: 0.5
+    gauss_snr_db_range: [15, 50]
+    background_noise: true
     background_noise_dir: /mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/
     background_noise_prob: 0.5
-    background_noise_level: [0.0, 0.4]
-    synthetic_gauss_noise: true 
-    gauss_noise_prob_use: 0.5
-    gauss_snr_range_db: [15, 50]
+    background_noise_range: [0.0, 0.4]
