@@ -352,9 +352,8 @@ def get_value_from_truncnorm(center:int,
     lower_bound = (bounds[0] - center) / std_dev
     upper_bound = (bounds[1] - center) / std_dev
 
-    return scipy.stats.truncnorm.rvs(lower_bound, upper_bound, loc=center, scale=std_dev, size=None) 
-
-
+    value = scipy.stats.truncnorm.rvs(lower_bound, upper_bound, loc=center, scale=std_dev, size=None) 
+    return float(value)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Augment a file.")

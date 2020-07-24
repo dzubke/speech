@@ -1,0 +1,67 @@
+seed: 2017
+save_path: /home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200723/ph6/
+data: 
+    train_set: /mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-v5_2020-07-17_dd.json
+    dev_sets: 
+        speak: /mnt/disks/data_disk/home/dzubke/awni_speech/data/speak_test_data/2020-05-27/speak-test_2020-05-27_dd.json
+        cv: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/dev_dd.json
+        libsp: /mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/dev-clean_dd.json
+        ted: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/dev_dd.json
+    dev_set_save_reference: cv
+    start_and_end: false
+    num_workers: 4
+logger:
+    use_log: true
+    log_file: logs/2020-07-23_ph6_new-augmentation_lib-ted-cv.log
+    debug_mode: false
+preproc:
+    preprocessor: log_spectrogram
+    window_size: 32
+    step_size: 16
+    use_feature_normalize: false
+    augment_from_normal: true
+    tempo_gain_pitch_perturb: true
+    tempo_gain_pitch_prob: 0.5
+    tempo_range: [0.80, 1.20]
+    gain_range: [-5, 5]
+    pitch_range: [-250, 250]
+    synthetic_gaussian_noise: true 
+    gauss_noise_prob: 0.5
+    gauss_snr_db_range: [15, 50]
+    background_noise: true
+    background_noise_dir: /mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/
+    background_noise_prob: 0.5
+    background_noise_range: [0.0, 0.4]
+    spec_augment: true 
+    spec_augment_prob: 0.5
+    spec_augment_policy: 
+        0: {W: 20, F: 30, m_F: 1, T: 18, m_T: 1}
+        1: {W: 20, F: 15, m_F: 2, T: 9, m_T: 2} 
+        2: {W: 20, F: 10, m_F: 3, T: 6, m_T: 3} 
+optimizer: 
+    batch_size: 8
+    run_state: [0, 0]
+    best_so_far: 999
+    start_epoch: 0
+    epochs: 100
+    learning_rate: 0.001
+    momentum: 0.9 
+    dampening: 0.98
+    sched_gamma: 0.90 
+    sched_step: 1
+model: 
+    class: this value is no longer used as train.py is hardcorded to use CTC_train
+    dropout: 0.4
+    load_trained: false
+    trained_path: 'examples/librispeech/models/ctc_models/null/'
+    remove_layers: []
+    encoder: 
+        conv:
+            - [32, 11, 41, 1, 2, 0, 20]
+            - [32, 11, 21, 1, 2, 0, 10]
+            - [96, 11, 21, 1, 1, 0, 10]
+        rnn: 
+            type: LSTM
+            dim: 512
+            bidirectional: false
+            layers: 5
