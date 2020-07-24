@@ -15,26 +15,34 @@
     },
     "logger":{
         "use_log": true,
-        "log_file": "logs/2020-07-21_ph6_no-aug-feature-normalize_lib-ted-cv.log",
+        "log_file": "logs/2020-07-23_ph6_new-augmentation_lib-ted-cv.log",
         "debug_mode":false
     },
     "preproc":{
         "preprocessor": "log_spectrogram",
         "window_size": 32,
         "step_size": 16,
-        "use_feature_normalize": true,
-        "augment_from_normal": false,
-        "tempo_gain_pitch_perturb": false,
+        "use_feature_normalize": false,
+        "augment_from_normal": true,
+        "tempo_gain_pitch_perturb": true,
+        "tempo_gain_pitch_prob": 0.5,
         "tempo_range": [0.80, 1.20],
-        "gain_range":[-6, 6],
-        "pitch_range":[-300, 300],
-        "synthetic_gaussian_noise": false,
-        "signal_to_noise_range_db": [10, 50],
-        "inject_noise": false,
-        "noise_directory": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/",
-        "noise_prob": 0.8,
-        "noise_levels": [0, 0.4],
-        "use_spec_augment": false
+        "gain_range":[-5, 5],
+        "pitch_range":[-250, 250],
+        "synthetic_gaussian_noise": true,
+        "gauss_noise_prob": 0.5,
+        "gauss_snr_db_range": [10, 50],
+        "background_noise": true,
+        "background_noise_dir": "/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/",
+        "background_noise_prob": 0.8,
+        "background_noise_range": [0, 0.4],
+        "use_spec_augment": true,
+        "spec_augment_prob": 0.5,
+        "spec_augment_policy": {
+            "0": {"W": 20, "F": 30, "m_F": 1, "T":18, "m_T": 1},
+            "1": {"W": 20, "F": 15, "m_F": 2, "T": 9, "m_T": 2}, 
+            "2": {"W": 20, "F": 10, "m_F": 3, "T": 6, "m_T": 3}
+        }
     },
     "optimizer": {
         "batch_size" : 8,
