@@ -40,10 +40,10 @@ def apply_spec_augment(features:np.ndarray, policy:dict, logger:Logger=None)->np
     use_log = (logger is not None)
     assert type(features) == np.ndarray, "input is not numpy array"
     
-    policy_choice = str(np.random.randint(low=0, high=len(policy.keys())))
+    policy_choice = np.random.randint(low=0, high=len(policy.keys()))
     if use_log: logger.info(f"spec_aug: policy: {policy_choice}")
 
-    policy = policy.get(policy_choice)
+    policy = policy[policy_choice]
 
     # the inputs need to be transposed and converted to torch tensor
     # as spec_augment method expects tensor with freq x time dimensions
