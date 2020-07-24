@@ -1,5 +1,5 @@
 seed: 2017
-save_path: /home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200721/ph6/
+save_path: /home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200723/ph6/
 data: 
     train_set: /mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-v5_2020-07-17_dd.json
     dev_sets: 
@@ -12,7 +12,7 @@ data:
     num_workers: 4
 logger:
     use_log: true
-    log_file: logs/2020-07-21_ph6_no-aug-feature-normalize_lib-ted-cv.log
+    log_file: logs/2020-07-23_ph6_new-augmentation_lib-ted-cv.log
     debug_mode: false
 preproc:
     preprocessor: log_spectrogram
@@ -44,7 +44,7 @@ optimizer:
     best_so_far: 999
     start_epoch: 0
     epochs: 100
-    learning_rate: 1e-3
+    learning_rate: 0.001
     momentum: 0.9 
     dampening: 0.98
     sched_gamma: 0.90 
@@ -53,7 +53,7 @@ model:
     class: this value is no longer used as train.py is hardcorded to use CTC_train
     dropout: 0.4
     load_trained: false
-    trained_path: examples/librispeech/models/ctc_models/20200630/ph3/XXX 
+    trained_path: 'examples/librispeech/models/ctc_models/null/'
     remove_layers: []
     encoder: 
         conv:
