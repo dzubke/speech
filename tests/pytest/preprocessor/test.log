@@ -67075,3 +67075,329 @@ sox INFO sox: effects chain: output       16000Hz  1 channels
 2020-07-23 23:52:26 - INFO - preproc: normalized
 2020-07-23 23:52:26 - INFO - preproc: text encoded
 2020-07-23 23:52:26 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: ======= Entering preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: wave_file: 
+2020-07-24 20:18:52 - INFO - preproc: text: ['ah']
+2020-07-24 20:18:52 - INFO - preproc: audio_data read: 
+2020-07-24 20:18:52 - INFO - preproc: ======= Entering preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_1373592.wv
+2020-07-24 20:18:52 - INFO - preproc: text: ['g', 'uh', 'd', 'l', 'ah', 'k']
+2020-07-24 20:18:52 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_1373592.wv
+2020-07-24 20:18:52 - INFO - preproc: normalized
+2020-07-24 20:18:52 - INFO - preproc: text encoded
+2020-07-24 20:18:52 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: ======= Entering preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_18466097.wv
+2020-07-24 20:18:52 - INFO - preproc: text: ['n', 'aa', 't', 'ah', 'th', 'ih', 'ng']
+2020-07-24 20:18:52 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_18466097.wv
+2020-07-24 20:18:52 - INFO - syn_gaussian_noise: snr_level: 30.43170849957069
+2020-07-24 20:18:52 - INFO - syn_gaussian_noise: audio_rms: 778
+2020-07-24 20:18:52 - INFO - syn_gaussian_noise: noise_rms: 23.409609650938428
+2020-07-24 20:18:52 - INFO - preproc: synth_gauss_noise applied
+2020-07-24 20:18:52 - INFO - noise_inj: noise_path: /mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/161922_8043-lq.wav
+2020-07-24 20:18:52 - INFO - noise_inj: noise_level: 0.094700804798542
+2020-07-24 20:18:52 - INFO - noise_inj: noise duration (s): 77.1053125
+2020-07-24 20:18:52 - INFO - noise_inj: data duration (s): 3.672
+2020-07-24 20:18:52 - INFO - noise_inj: sox: sox stdout: 
+2020-07-24 20:18:52 - INFO - noise_inj: sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/161922_8043-lq.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:01:17.11 = 1233685 samples ~ 5782.9 CDDA sectors
+File Size      : 2.47M
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmp_r49elxy.wav'
+
+Output File    : '/tmp/tmp_r49elxy.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: trim         16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-24 20:18:52 - INFO - noise_inj: noise_start: 58.89454827544244
+2020-07-24 20:18:52 - INFO - noise_inj: noise_end: 62.566548275442436
+2020-07-24 20:18:52 - INFO - preproc: noise injected
+2020-07-24 20:18:52 - INFO - preproc: normalized
+2020-07-24 20:18:52 - INFO - preproc: text encoded
+2020-07-24 20:18:52 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: ======= Entering preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_528629.wv
+2020-07-24 20:18:52 - INFO - preproc: text: ['ay', 'b', 'ih', 'l', 'iy', 'v', 'ih', 'n', 'y', 'uw']
+2020-07-24 20:18:52 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_528629.wv
+2020-07-24 20:18:52 - INFO - tempo_gain_pitch_perturb: audio_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_528629.wv
+2020-07-24 20:18:52 - INFO - tempo_gain_pitch_perturb: tempo_value: 1.1877483294399918
+2020-07-24 20:18:52 - INFO - tempo_gain_pitch_perturb: gain_value: 0.7724474518687899
+2020-07-24 20:18:52 - INFO - tempo_gain_pitch_perturb: pitch_value: 207.89608189658884
+2020-07-24 20:18:52 - INFO - sox_pertrub: aug_audio_sox: tmpfile exists: True
+2020-07-24 20:18:52 - INFO - sox_pertrub: aug_audio_sox: sox stdout: 
+2020-07-24 20:18:52 - INFO - sox_pertrub: aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=1.188 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=0.886791 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_528629.wv' (wav)
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:01.97 = 31488 samples ~ 147.6 CDDA sectors
+File Size      : 63.1k
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmpvxgew4dm.wav'
+
+Output File    : '/tmp/tmpvxgew4dm.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch      18042.6Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-24 20:18:52 - INFO - preproc: tempo_gain_pitch applied
+2020-07-24 20:18:52 - INFO - noise_inj: noise_path: /mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/OMEETING_ch10.wav
+2020-07-24 20:18:52 - INFO - noise_inj: noise_level: 0.024004280826095438
+2020-07-24 20:18:52 - INFO - noise_inj: noise duration (s): 300.004
+2020-07-24 20:18:52 - INFO - noise_inj: data duration (s): 1.6565625
+2020-07-24 20:18:52 - INFO - noise_inj: sox: sox stdout: 
+2020-07-24 20:18:52 - INFO - noise_inj: sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/noise/feed_to_model/OMEETING_ch10.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:05:00.00 = 4800064 samples ~ 22500.3 CDDA sectors
+File Size      : 9.60M
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmpl2z9v_il.wav'
+
+Output File    : '/tmp/tmpl2z9v_il.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: trim         16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-24 20:18:52 - INFO - noise_inj: noise_start: 185.59957881150606
+2020-07-24 20:18:52 - INFO - noise_inj: noise_end: 187.25614131150607
+2020-07-24 20:18:52 - INFO - preproc: noise injected
+2020-07-24 20:18:52 - INFO - preproc: normalized
+2020-07-24 20:18:52 - INFO - preproc: text encoded
+2020-07-24 20:18:52 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: ======= Entering preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_17810827.wv
+2020-07-24 20:18:52 - INFO - preproc: text: ['y', 'uw', 'l', 'uh', 'k', 'l', 'ay', 'k', 'w', 'ah', 'n']
+2020-07-24 20:18:52 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_17810827.wv
+2020-07-24 20:18:52 - INFO - tempo_gain_pitch_perturb: audio_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_17810827.wv
+2020-07-24 20:18:52 - INFO - tempo_gain_pitch_perturb: tempo_value: 0.942175930103415
+2020-07-24 20:18:52 - INFO - tempo_gain_pitch_perturb: gain_value: -2.7456749724313063
+2020-07-24 20:18:52 - INFO - tempo_gain_pitch_perturb: pitch_value: 41.25331699937604
+2020-07-24 20:18:52 - INFO - sox_pertrub: aug_audio_sox: tmpfile exists: True
+2020-07-24 20:18:52 - INFO - sox_pertrub: aug_audio_sox: sox stdout: 
+2020-07-24 20:18:52 - INFO - sox_pertrub: aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=0.942 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=0.976596 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_17810827.wv' (wav)
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:02.18 = 34944 samples ~ 163.8 CDDA sectors
+File Size      : 70.0k
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmpaddxn7xa.wav'
+
+Output File    : '/tmp/tmpaddxn7xa.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch      16383.4Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-24 20:18:52 - INFO - preproc: tempo_gain_pitch applied
+2020-07-24 20:18:52 - INFO - syn_gaussian_noise: snr_level: 36.23483367435463
+2020-07-24 20:18:52 - INFO - syn_gaussian_noise: audio_rms: 2796
+2020-07-24 20:18:52 - INFO - syn_gaussian_noise: noise_rms: 43.13159150089718
+2020-07-24 20:18:52 - INFO - preproc: synth_gauss_noise applied
+2020-07-24 20:18:52 - INFO - preproc: normalized
+2020-07-24 20:18:52 - INFO - preproc: text encoded
+2020-07-24 20:18:52 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: ======= Entering preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_19611913.wv
+2020-07-24 20:18:52 - INFO - preproc: text: ['dh', 'iy', 'z', 'aa', 'r', 'r', 'eh', 'r']
+2020-07-24 20:18:52 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_19611913.wv
+2020-07-24 20:18:52 - INFO - preproc: normalized
+2020-07-24 20:18:52 - INFO - preproc: text encoded
+2020-07-24 20:18:52 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: ======= Entering preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_137150.wv
+2020-07-24 20:18:52 - INFO - preproc: text: ['b', 'eh', 's', 't', 'th', 'ae', 'ng', 'k', 's']
+2020-07-24 20:18:52 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_137150.wv
+2020-07-24 20:18:52 - INFO - preproc: normalized
+2020-07-24 20:18:52 - INFO - preproc: text encoded
+2020-07-24 20:18:52 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: ======= Entering preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_18468287.wv
+2020-07-24 20:18:52 - INFO - preproc: text: ['y', 'eh', 's', 'sh', 'iy', 'd', 'ah', 'z']
+2020-07-24 20:18:52 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_18468287.wv
+2020-07-24 20:18:52 - INFO - tempo_gain_pitch_perturb: audio_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_18468287.wv
+2020-07-24 20:18:52 - INFO - tempo_gain_pitch_perturb: tempo_value: 1.0419772394313207
+2020-07-24 20:18:52 - INFO - tempo_gain_pitch_perturb: gain_value: 0.5459294509798945
+2020-07-24 20:18:52 - INFO - tempo_gain_pitch_perturb: pitch_value: -143.03642912827175
+2020-07-24 20:18:52 - INFO - sox_pertrub: aug_audio_sox: tmpfile exists: True
+2020-07-24 20:18:52 - INFO - sox_pertrub: aug_audio_sox: sox stdout: 
+2020-07-24 20:18:52 - INFO - sox_pertrub: aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=1.042 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=1.08611 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_18468287.wv' (wav)
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:02.50 = 39936 samples ~ 187.2 CDDA sectors
+File Size      : 80.0k
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmprmle_hkg.wav'
+
+Output File    : '/tmp/tmprmle_hkg.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch      14731.5Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-24 20:18:52 - INFO - preproc: tempo_gain_pitch applied
+2020-07-24 20:18:52 - INFO - syn_gaussian_noise: snr_level: 29.80264444081896
+2020-07-24 20:18:52 - INFO - syn_gaussian_noise: audio_rms: 1257
+2020-07-24 20:18:52 - INFO - syn_gaussian_noise: noise_rms: 40.66334073552988
+2020-07-24 20:18:52 - INFO - preproc: synth_gauss_noise applied
+2020-07-24 20:18:52 - INFO - preproc: normalized
+2020-07-24 20:18:52 - INFO - preproc: text encoded
+2020-07-24 20:18:52 - INFO - preproc: ======= Exiting preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: ======= Entering preprocess =====
+2020-07-24 20:18:52 - INFO - preproc: wave_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_17787552.wv
+2020-07-24 20:18:52 - INFO - preproc: text: ['p', 'l', 'iy', 'z', 'b', 'r', 'ih', 'ng', 's', 'ow', 'p']
+2020-07-24 20:18:52 - INFO - preproc: audio_data read: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_17787552.wv
+2020-07-24 20:18:52 - INFO - tempo_gain_pitch_perturb: audio_file: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_17787552.wv
+2020-07-24 20:18:52 - INFO - tempo_gain_pitch_perturb: tempo_value: 0.8687761488677674
+2020-07-24 20:18:52 - INFO - tempo_gain_pitch_perturb: gain_value: -1.045215510538093
+2020-07-24 20:18:52 - INFO - tempo_gain_pitch_perturb: pitch_value: -140.83656543659652
+2020-07-24 20:18:52 - INFO - sox_pertrub: aug_audio_sox: tmpfile exists: True
+2020-07-24 20:18:52 - INFO - sox_pertrub: aug_audio_sox: sox stdout: 
+2020-07-24 20:18:52 - INFO - sox_pertrub: aug_audio_sox: sox stderr: sox:      SoX v14.4.1
+sox INFO formats: detected file format type `wav'
+sox INFO tempo: quick_search=0 factor=0.869 segment=82 search=14.6769 overlap=12.0006
+sox INFO tempo: quick_search=0 factor=1.08485 segment=82 search=14.6769 overlap=12.0006
+
+Input File     : '/mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/clips/common_voice_en_17787552.wv' (wav)
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Duration       : 00:00:02.50 = 39936 samples ~ 187.2 CDDA sectors
+File Size      : 80.0k
+Bit Rate       : 256k
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+
+sox INFO sox: Overwriting `/tmp/tmp5wk3p_9f.wav'
+
+Output File    : '/tmp/tmp5wk3p_9f.wav'
+Channels       : 1
+Sample Rate    : 16000
+Precision      : 16-bit
+Sample Encoding: 16-bit Signed Integer PCM
+Endian Type    : little
+Reverse Nibbles: no
+Reverse Bits   : no
+Comment        : 'Processed by SoX'
+
+sox INFO sox: effects chain: input        16000Hz  1 channels
+sox INFO sox: effects chain: tempo        16000Hz  1 channels
+sox INFO sox: effects chain: gain         16000Hz  1 channels
+sox INFO sox: effects chain: pitch      14748.6Hz  1 channels
+sox INFO sox: effects chain: rate         16000Hz  1 channels
+sox INFO sox: effects chain: dither       16000Hz  1 channels
+sox INFO sox: effects chain: output       16000Hz  1 channels
+
+2020-07-24 20:18:52 - INFO - preproc: tempo_gain_pitch applied
+2020-07-24 20:18:52 - INFO - preproc: normalized
+2020-07-24 20:18:52 - INFO - spec_aug: policy: 0
+2020-07-24 20:18:52 - INFO - spec_aug: features shape: (178, 257)
