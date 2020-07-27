@@ -39,10 +39,12 @@ def apply_spec_augment(features:np.ndarray, policy:dict, logger:Logger=None)->np
     
     use_log = (logger is not None)
     assert type(features) == np.ndarray, "input is not numpy array"
-    
+        
     policy_choice = np.random.randint(low=0, high=len(policy.keys()))
     if use_log: logger.info(f"spec_aug: policy: {policy_choice}")
-
+    
+    # the index of the original policy_dict is a integer in yaml 0.1.7 and a str in 0.2.5
+    # yaml 0.1.7 is being used currently. will throw 'None has no get attribute error' if yaml install is wrong
     policy = policy[policy_choice]
 
     # the inputs need to be transposed and converted to torch tensor
