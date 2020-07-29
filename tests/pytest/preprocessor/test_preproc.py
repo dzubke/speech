@@ -9,7 +9,7 @@ from speech.utils.io import load_config
 from speech.utils.model_debug import get_logger
 
 def test_main():
-    config_path = "./ctc_config_ph2.yaml"
+    config_path = "./ctc_config_ph6.yaml"
     config = load_config(config_path)
     data_cfg = config['data']
     print(config)
