@@ -71,7 +71,7 @@ class Preprocessor():
         
         self.spec_augment = preproc_cfg.get('spec_augment', preproc_cfg.get('use_spec_augment'))
         self.spec_augment_prob = preproc_cfg.get('spec_augment_prob', 1.0)
-        self.spec_augment_policy = preproc_cfg.get('spec_augment_policy', {})
+        self.spec_augment_policy = preproc_cfg['spec_augment_policy']
 
         # Compute data mean, std from sample
         data = read_data_json(data_json)
