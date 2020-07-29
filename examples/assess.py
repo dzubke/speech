@@ -102,7 +102,96 @@ class TatoebaAssessor():
         assess_dict = dict()
         audio_files = self.dataset.get_audio_files()
 
+    def test():
+        pass
+        """
+        # steps
+        # 1. join eng_sent and audio_sent on 'id' key
+        # 2. fitler joined array by `lang`=='eng' to get all English sent with audio
+        # 3. do further filtering based on rating and lang ability
+        """
 
+        eng_sent_df = pd.read_csv(eng_sent_path, sep='\t', header=None, names=['id', 'lang', 'text'])
+        audio_sent_df = pd.read_csv(audio_sent_path, sep='\t', header=None, names=['id', 'user', 'license', 'attr-url']) 
+
+        audio_eng_sent_df = pd.merge(eng_sent_df, audio_sent_df, how='inner', on='id', suffixes=('_eng', '_aud')) 
+
+        user_lang_df = pd.read_csv(user_lang_path, sep='\t', header=None, names=['lang', 'skill', 'user', 'details'])  
+        eng_skill_df = user_lang_df[user_lang_df['lang']=='eng']    # shape: (9999, 4)
+
+        audio_eng_skill_df = pd.merge(audio_eng_sent_df, eng_skill_df, how='left', on='user', suffixes=('_m', '_s')) 
+        # audio_eng_skill_df.shape = (499085, 9) compared to audio_eng_sent_df.shape = (499027, 6)
+        # extra 58 samples I think comes from usernames \N being duplicated 
+        # as there are 30 entries in eng_skill_df with username '/N'
+        # yeah, audio_eng_skill_df[audio_eng_skill_df['user']=='\\N'].shape   = (60, 9)
+        # it is two sentences that are being duplicated across the 30 entries
+
+        audio_eng_skill_df = audio_eng_skill_df.drop_duplicates(subset='id') 
+        # audio_eng_skill_df.drop_duplicates(subset='id').shape = (498959, 9)
+        # audio_eng_sent_df.drop_duplicates(subset='id').shape = (498959, 6)
+        # after drop_duplicates, audio_eng_skill_df[audio_eng_skill_df['user']=='\\N'].shape = (2, 9)
+    
+
+        """
+        # skill may not be super helpful in filtering out sentences as nearly all sentences are by skill=5 users
+        In [89]: audio_eng_skill_df['skill'].value_counts(sort=True, ascending=False)                                                                                          
+        Out[89]: 
+        5     497693
+        3         12
+        4          7
+        \N         4
+        Name: skill, dtype: int64
+
+        # not all users are skill 5 in English. It may just be that skill=5 users are the ones recording Eng sentences
+        In [90]: eng_skill_df['skill'].value_counts(sort=True, ascending=False)                                                                                                
+        Out[90]: 
+        5     4568
+        4     2057
+        3     1479
+        2     1227
+        1      430
+        \N     195
+        0       43
+
+        # like with the Tatoeba subset, CK is 99% of the sentences
+        In [91]: audio_eng_skill_df['user'].value_counts(sort=True, ascending=False)                                                                                           
+        Out[91]: 
+        CK              494779
+        papabear           877
+        RB                 805
+        Sean_Benward       742
+        pencil             348
+        jendav             235
+        Nero               194
+        BE                 178
+        dcampbell          167
+        mhattick           153
+        rhys_mcg           104
+        jaxhere             75
+        Susan1430           68
+        Kritter             58
+        Cainntear           38
+        MT                  33
+        CO                  26
+        patgfisher          19
+        Source_VOA          18
+        samir_t             12
+        arh                  7
+        Delian               6
+        RM                   4
+        bretsky              4
+        DJT                  4
+        LouiseRatty          3
+        \N                   2
+
+
+        # review is not going to helpful because of the total reviews, 99% of them as positive
+        In [97]: sent_review_df['review'].value_counts(sort=True, ascending=False)                                                                                             
+        Out[97]: 
+        1    1067165
+        0       7180
+        -1       2949
+        """
 
     
 
