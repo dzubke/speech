@@ -4,7 +4,9 @@
  1. how to increase disk size (cannot decrease disk size)
  2. how to start/stop a VM
  3. how to setup a stackdriver monitoring agent
- 3. how to setup gpu_utilization_agent
+ 4. how to setup gpu_utilization_agent
+ 5. how to combine two datasets
+ 6. how to install the wikipedia dataset script
 
 
 1. HOW TO INCREASE DISK SIZE
@@ -89,6 +91,24 @@ sudo systemctl start gpu_utilization_agent.service
 cd ~/awni_speech/data/Librispeech
 cat train-clean-460.json train-other-500.json > ./train-other-960.json
 
+6. HOW TO INSTALL WIKIPEDIA DATASET SCRIPT
+
+# install mono
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+sudo apt install apt-transport-https ca-certificates
+echo "deb https://download.mono-project.com/repo/ubuntu stable-xenial main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
+sudo apt update
+sudo apt install mono-devel
+
+# install maven
+sudo apt-get update && sudo apt-get upgrade
+sudo apt-get -y install maven
+
+sudo apt-get install -y trang
+sudo apt install openjdk-8-jdk
+
+sudo apt-get install bc
+
 
 
 X. MISC commands
@@ -108,4 +128,5 @@ gcloud compute project-info add-metadata --metadata google-compute-default-regio
 nvidia-smi --query-gpu=utilization.memory -u --format=csv
 
 google-cloud-monitoring>=0.30.1
+
 
