@@ -4,6 +4,7 @@ numpy==1.13.3
 cffi==1.11.2
 py==1.4.34
 pycparser==2.18
+yaml==0.1.7
 PyYAML==3.12
 six==1.11.0
 tqdm==4.19.4
