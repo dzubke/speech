@@ -1,0 +1,11 @@
+WARN  NewMain: could not extract all of info.json: 
+Exception in thread "main" java.nio.file.NoSuchFileException: /home/dzubke/awni_speech/wikipedia/Warwick%2c_Ontario/wiki.html
+	at sun.nio.fs.UnixException.translateToIOException(UnixException.java:86)
+	at sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:102)
+	at sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:107)
+	at sun.nio.fs.UnixFileSystemProvider.newByteChannel(UnixFileSystemProvider.java:214)
+	at java.nio.file.Files.newByteChannel(Files.java:361)
+	at java.nio.file.Files.newByteChannel(Files.java:407)
+	at java.nio.file.Files.readAllBytes(Files.java:3152)
+	at swc.startup.NewMain.tokenizeMain(NewMain.java:236)
+	at swc.startup.NewMain.main(NewMain.java:160)

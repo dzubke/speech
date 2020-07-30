@@ -183,11 +183,11 @@ class WikipediaDownloader(Downloader):
         A previous version of common voice (v4) can be downloaded here:
         "data":"https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-4-2019-12-10/en.tar.gz"
         """
-        super(CommonvoiceDownloader, self).__init__(output_dir, dataset_name)
+        super(WikipediaDownloader, self).__init__(output_dir, dataset_name)
         self.download_dict = {
             "data":"https://www2.informatik.uni-hamburg.de/nats/pub/SWC/SWC_English.tar"
         }
-        self.data_dirname = ""
+        self.data_dirname = "not-used"
         self.ext = ".tar"
     
 
@@ -294,7 +294,7 @@ if __name__ == "__main__":
             description="Download voxforge dataset.")
 
     parser.add_argument("--output-dir",
-        help="The dataset is saved in <output-dir>/voxforge.")
+        help="The dataset is saved in <output-dir>/<dataset-name>.")
     parser.add_argument("--dataset-name", type=str,
         help="Name of dataset with a capitalized first letter.")
     args = parser.parse_args()
