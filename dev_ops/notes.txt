@@ -105,7 +105,7 @@ logger = logging.getLogger("train_log")
 # source: https://www.apoehlmann.com/blog/connecting-tensorboard-your-google-cloud-vm-port-forwarding/
 # connect to tensorboard on VM
 # 1. on VM run:
-nohup tensorboard --logdir=examples/librispeech/models/ctc_models/20200721/ph6/ --port 6006 &> tb.out &
+nohup tensorboard --logdir=examples/librispeech/models/ctc_models/20200727/ph4/ --port 6006 &> tb.out &
 
 # 2. on local run:
 gcloud compute ssh dzubke@phoneme-2 --zone=us-central1-c --project=speak-ml-dev -- -NfL 6002:localhost:6002
@@ -117,7 +117,28 @@ ps aux | grep tensorboard
 # github password
 9!l2&YQCydRAkhr1f6%x
 
-./tests/pytest/preprocessor/signal_augment/.signal_augment.yaml.swp
 
-2020-07-15-07-22_ph2_large-no-feature-norm_lib-ted-cv.
-logs/2020-06-30-07-22_ph3_no-feature-normalize_lib-ted-cv.logZZ
+createPreparationJobs
+
+ aligner.jar --help crashes
+
+java -ea -jar /home/dzubke/awni_speech/speech/examples/wikipedia/code/Aligner/target/Aligner.jar tokenize \
+ \
+                                        -i "/home/dzubke/awni_speech/wikipedia/1755_Lisbon_earthquake" \
+en \
+"/home/dzubke/awni_speech/wikipedia/1755_Lisbon_earthquake/tokenized.swc"
+
+            cat > $job_file <<-EOF
+                                #!/bin/bash
+                                echo "Job '${dir}' started on '\$(hostname)' at \$(date +"%T")"
+                                cd "$(pwd)"
+                                $AUDIOJOB
+                                EOF
+                        if [[ $tokenize -eq 1 ]]; then
+                                cat > $job_file <<-EOF
+                                        java -ea -jar $install_dir/Aligner/target/Aligner.jar tokenize \\
+                                        $extraOptions \\
+                                        "$article_dir/$dir" \\
+                                        $tokLang \\
+                                        "$article_dir/$dir/$tokenized_file"
+                                        EOF
