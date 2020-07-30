@@ -44,7 +44,7 @@ class Downloader(object):
             urllib.request.urlretrieve(url, filename=save_path)
             print(f"Extracting: {name}...")
             with tarfile.open(save_path) as tf:
-                tf.extractall(path=os.path.join(save_dir, name))
+                tf.extractall(path=save_dir)
             os.remove(save_path)
             print(f"Processed: {name}")
         return save_dir
