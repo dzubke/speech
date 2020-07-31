@@ -34,6 +34,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+examples/wikipedia/code         # wikipedia dataset segmenting code
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -144,6 +145,8 @@ examples/librispeech/models/ctc_models/20200625/ph4/*model
 examples/librispeech/models/ctc_models/20200625/ph4/*/*model
 examples/librispeech/models/ctc_models/20200715/ph2/*model
 examples/librispeech/models/ctc_models/20200715/ph2/*/*model
+examples/librispeech/models/ctc_models/20200727/ph4/*model
+examples/librispeech/models/ctc_models/20200727/ph4/*/*model
 
 model_convert/torch_models/
 model_convert/onnx_models/
