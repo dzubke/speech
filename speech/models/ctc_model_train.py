@@ -17,21 +17,24 @@ from .ctc_decoder_dist import decode_dist
 
 
 class CTC_train(ctc_model.CTC):
-    def __init__(self, freq_dim, output_dim, config):
+    def __init__(self, freq_dim, output_dim, config, device):
         super().__init__(freq_dim, output_dim, config)
 
         # include the blank token
         self.blank = output_dim
         self.fc = model.LinearND(self.encoder_dim, output_dim + 1)
+        self.device = device
 
     def forward(self, x, rnn_args=None):
         #x, y, x_lens, y_lens = self.collate(*batch)
-        return self.forward_impl(x, rnn_args,  softmax=True)
+        return self.forward_impl(x, rnn_args,  softmax=False)
 
     def forward_impl(self, x, rnn_args=None, softmax=False):
         if self.is_cuda:
             x = x.cuda()
-
+        print("model: feature size: ", x.size())
+        print("model: feature type: ", type(x))
+        print("model: feature device: ", x.device)
         # padding is half the filters of the 3 conv layers. 
         # conv.children are: [Conv2d, BatchNorm2d, ReLU, Dropout, Conv2d, 
         # BatchNorm2d, ReLU, Dropout, Conv2d, BatchNorm2d, ReLU, Dropout]
