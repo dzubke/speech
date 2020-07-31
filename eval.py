@@ -28,7 +28,7 @@ def eval_loop(model, ldr):
     return list(zip(all_labels, all_preds, all_confidence)) #, all_preds_dist
 
 
-def run(model_path, dataset_json, batch_size=1, tag="best", 
+def run(model_path, dataset_json, batch_size=8, tag="best", 
     add_filename=False, add_maxdecode=False, formatted=False, 
     config_path = None, out_file=None):
     """
