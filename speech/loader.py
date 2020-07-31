@@ -28,7 +28,7 @@ class Preprocessor():
     END = "</s>"
     START = "<s>"
 
-    def __init__(self, data_json, preproc_cfg, logger=None, max_samples=1000, start_and_end=False):
+    def __init__(self, data_json, preproc_cfg, logger=None, max_samples=10, start_and_end=False):
         """
         Builds a preprocessor from a dataset.
         Arguments:
@@ -216,7 +216,7 @@ class Preprocessor():
         """
         if not hasattr(self, 'tempo_gain_pitch_perturb'):
             if hasattr(self, 'speed_vol_perturb'):
-                self.tempo_gain_pitch_perturb = self.speed_vol_pertub
+                self.tempo_gain_pitch_perturb = self.speed_vol_perturb
                 self.pitch_range = [0,0]    # no pitch augmentation
             else:
                 self.tempo_gain_pitch_perturb = False
@@ -228,6 +228,14 @@ class Preprocessor():
             self.gauss_snr_db_range=(100, 100)
         if self.preprocessor == "log_spec":
             self.preprocessor = "log_spectrogram"
+        if not hasattr(self, 'background_noise'):
+            self.background_noise = False
+        if not hasattr(self, 'use_feature_normalize'):
+            self.use_feature_normalize = False
+        # removing the old attritube to separate feature_normalize
+        # self.normalize is now a method
+        if type(self.normalize) == str:
+            del self.normalize
 
     def set_eval(self):
         """
