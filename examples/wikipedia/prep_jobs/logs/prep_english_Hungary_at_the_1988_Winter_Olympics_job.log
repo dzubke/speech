@@ -1,0 +1,8 @@
+WARN  NewMain: could not extract all of info.json: 
+INFO  NewMain: Extracting Transcript
+INFO  NewMain: Adding Preamble
+Exception in thread "main" java.lang.IllegalStateException: Title is missing
+	at swc.data.SwcXmlUtil.getArticleTitle(SwcXmlUtil.java:176)
+	at swc.transcriptextractor.TranscriptExtractor.addPreamble(TranscriptExtractor.java:204)
+	at swc.startup.NewMain.tokenizeMain(NewMain.java:251)
+	at swc.startup.NewMain.main(NewMain.java:160)

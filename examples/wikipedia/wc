@@ -1,0 +1,2 @@
+usage: Aligner extractsnippets [-h] {training,sentences,kaldi} audio align_data output_dir
+Aligner: error: unrecognized arguments: '-l'
