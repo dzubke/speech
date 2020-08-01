@@ -147,6 +147,7 @@ examples/librispeech/models/ctc_models/20200715/ph2/*model
 examples/librispeech/models/ctc_models/20200715/ph2/*/*model
 examples/librispeech/models/ctc_models/20200727/ph4/*model
 examples/librispeech/models/ctc_models/20200727/ph4/*/*model
+examples/librispeech/models/ctc_models/null/
 
 model_convert/torch_models/
 model_convert/onnx_models/
