@@ -23,7 +23,7 @@ from torch.autograd import Variable, Function
 from speech.utils.data_structs import TorchNamedParams, TorchParams, Batch
 
 
-def get_logger(logger_path:str)->Logger:
+def get_logger(logger_path:str='')->Logger:
         # create logger
         logger = logging.getLogger("log")
         logger.setLevel(logging.DEBUG)
