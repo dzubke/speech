@@ -68,7 +68,7 @@ def run_epoch(model, optimizer, train_ldr, logger, debug_mode, tbX_writer, iter_
 
         # calcuating the loss outside of model.loss to allow multi-gpu use
         inputs, labels, input_lens, label_lens = model_module.collate(*temp_batch)
-        out, rnn_args = model(inputs)
+        out, rnn_args = model(inputs, softmax=False)
         loss_fn = ctc.CTCLoss()
         loss = loss_fn(out, labels, input_lens, label_lens)
         

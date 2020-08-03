@@ -1,5 +1,5 @@
 seed: 2017
-save_path: /home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200727/ph4/
+save_path: /home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200803/ph4/
 data: 
     train_set: /mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-v5_2020-07-17_dd.json
     dev_sets: 
@@ -12,7 +12,7 @@ data:
     num_workers: 4
 logger:
     use_log: True
-    log_file: logs/2020-07-27-07-31_ph4_large-model-no-feature-norm_lib-ted-cv.log
+    log_file: logs/2020-08-03_ph4_large-model-no-feature-norm_lib-ted-cv.log
     debug_mode: False
 preproc:
     preprocessor: log_spectrogram
@@ -40,11 +40,11 @@ preproc:
         2: {W: 20, F: 10, m_F: 3, T: 6, m_T: 3} 
 optimizer: 
     batch_size: 8
-    run_state: [209668, 135.050]
-    best_so_far: 0.45236
-    start_epoch: 2
+    run_state: [0, 0]
+    best_so_far: 999
+    start_epoch: 0
     epochs: 100
-    learning_rate: 0.0009
+    learning_rate: 0.001
     momentum: 0.9 
     dampening: 0.98
     sched_gamma: 0.90 
@@ -53,7 +53,7 @@ model:
     class: this value is no longer used as train.py is hardcorded to use CTC_train
     multi_gpu: True
     dropout: 0.4
-    load_trained: True
+    load_trained: False
     trained_path:  examples/librispeech/models/ctc_models/20200727/ph4/20200731/best_model
     remove_layers: []
     encoder: 
