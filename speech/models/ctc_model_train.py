@@ -24,9 +24,10 @@ class CTC_train(ctc_model.CTC):
         self.blank = output_dim
         self.fc = model.LinearND(self.encoder_dim, output_dim + 1)
 
-    def forward(self, x, rnn_args=None):
+    def forward(self, x, rnn_args=None, softmax=False):
+        # softmax should be true for inference, false for loss calculation
         #x, y, x_lens, y_lens = self.collate(*batch)
-        return self.forward_impl(x, rnn_args,  softmax=True)
+        return self.forward_impl(x, rnn_args,  softmax=softmax)
 
     def forward_impl(self, x, rnn_args=None, softmax=False):
         if self.is_cuda:
@@ -50,7 +51,7 @@ class CTC_train(ctc_model.CTC):
 
     def loss(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
-        out, rnn_args = self.forward_impl(x)
+        out, rnn_args = self.forward_impl(x, softmax=False)
         loss_fn = ctc.CTCLoss()         # awni's ctc loss call        
         loss = loss_fn(out, y, x_lens, y_lens)
         return loss
