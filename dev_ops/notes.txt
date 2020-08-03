@@ -116,20 +116,7 @@ ps aux | grep tensorboard
 
 # will cache password in memory for 10 days
 git config credential.helper 'cache --timeout 864000'
+
 # github password
 9!l2&YQCydRAkhr1f6%x
 
-
-/home/dzubke/awni_speech/speech/examples/librispeech/models/ctc_models/20200625/ph4/
-
-/mnt/disks/data_disk/home/dzubke/awni_speech/data/lib-ted-cv/train_lib-ted-cv-v5_2020-07-17_dd.json
-
-        cv: /mnt/disks/data_disk/home/dzubke/awni_speech/data/common-voice/v5.1_2020-06-22/dev_dd.json
-        libsp: /mnt/disks/data_disk/home/dzubke/awni_speech/data/LibriSpeech/dev-clean_dd.json
-        ted: /mnt/disks/data_disk/home/dzubke/awni_speech/data/tedlium/TEDLIUM_release-3/dev_dd.json
-
-
-
-2020-07-31_ph4_large-model-no-feature-norm_lib-ted-cv
-
-2020-08-02_ph4_large-model-no-feature-norm_lib-ted-cv
