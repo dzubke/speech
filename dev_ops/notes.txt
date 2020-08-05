@@ -114,31 +114,9 @@ gcloud compute ssh dzubke@phoneme-2 --zone=us-central1-c --project=speak-ml-dev 
 ps aux | grep tensorboard
 
 
+# will cache password in memory for 10 days
+git config credential.helper 'cache --timeout 864000'
+
 # github password
 9!l2&YQCydRAkhr1f6%x
 
-
-createPreparationJobs
-
- aligner.jar --help crashes
-
-java -ea -jar /home/dzubke/awni_speech/speech/examples/wikipedia/code/Aligner/target/Aligner.jar tokenize \
- \
-                                        -i "/home/dzubke/awni_speech/wikipedia/1755_Lisbon_earthquake" \
-en \
-"/home/dzubke/awni_speech/wikipedia/1755_Lisbon_earthquake/tokenized.swc"
-
-            cat > $job_file <<-EOF
-                                #!/bin/bash
-                                echo "Job '${dir}' started on '\$(hostname)' at \$(date +"%T")"
-                                cd "$(pwd)"
-                                $AUDIOJOB
-                                EOF
-                        if [[ $tokenize -eq 1 ]]; then
-                                cat > $job_file <<-EOF
-                                        java -ea -jar $install_dir/Aligner/target/Aligner.jar tokenize \\
-                                        $extraOptions \\
-                                        "$article_dir/$dir" \\
-                                        $tokLang \\
-                                        "$article_dir/$dir/$tokenized_file"
-                                        EOF
