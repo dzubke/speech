@@ -58,7 +58,10 @@ def run_epoch(model, optimizer, train_ldr, logger, debug_mode, tbX_writer, iter_
         optimizer.zero_grad()
         if use_log: logger.info(f"train: Optimizer zero_grad")
 
+        
+        
         loss = model.loss(temp_batch)
+        
         if use_log: logger.info(f"train: Loss calculated")
 
         #print(f"loss value 1: {loss.data[0]}")

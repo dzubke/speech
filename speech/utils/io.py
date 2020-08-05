@@ -7,7 +7,7 @@ import yaml
 # third-party libraries
 import torch
 
-MODEL = "model"
+MODEL = "model.pth"
 PREPROC = "preproc.pyc"
 
 def get_names(path, tag):
