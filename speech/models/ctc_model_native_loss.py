@@ -8,7 +8,6 @@ import torch
 import torch.autograd as autograd
 import torch.nn as nn
 
-import functions.ctc as ctc #awni hannun's ctc bindings
 from speech.models import ctc_model
 from speech.models import model
 from .ctc_decoder import decode
@@ -49,17 +48,27 @@ class CTC_train(ctc_model.CTC):
             return torch.nn.functional.softmax(x, dim=2), rnn_args
         return x, rnn_args
 
-    def loss(self, batch):
+    def native_loss(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
         print(f"input size: {x.size()}, labels size: {y.size()}")
         print(f"input lens size: {x_lens.size()}, label lens size: {y_lens.size()}")
         print(f"input lens: {x_lens}, label lens: {y_lens}")
+        
         out, rnn_args = self.forward_impl(x, softmax=False)
-        loss_fn = ctc.CTCLoss()         # awni's ctc loss call        
-        loss = loss_fn(out, y, x_lens, y_lens)
-        print(f"output size: {out.size()}, loss size: {loss.size()}")
-        return loss
+        log_probs = nn.functional.log_softmax(out, dim=2)
 
+        # reshaep the log_probs and labels y
+        print(f"original log_probs size: {log_probs.size()}")
+        print(f"permuted size: {log_probs.permute(1,0,2).size()}")
+        print(f"labels rehape: {y.reshape(8, -1).size()}")
+
+        #blank_idx = out.size()[-1] - 1
+        loss_fn = torch.nn.CTCLoss(blank=self.blank, reduction='mean')        # native ctc loss     
+        loss = loss_fn(log_probs.permute(1,0,2), y.reshape(8, -1), x_lens, y_lens)
+        print(f"output size: {out.size()}, loss size: {loss.size()}")
+        print(f"loss value: {loss.item()}")
+        
+        return loss
 
     def collate(self, inputs, labels):
         max_t = max(i.shape[0] for i in inputs)
