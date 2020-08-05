@@ -7,6 +7,7 @@
  4. how to setup gpu_utilization_agent
  5. how to combine two datasets
  6. how to install the wikipedia dataset script
+ 7. how to install git large-file-storage on ubuntu
 
 
 1. HOW TO INCREASE DISK SIZE
@@ -91,7 +92,10 @@ sudo systemctl start gpu_utilization_agent.service
 cd ~/awni_speech/data/Librispeech
 cat train-clean-460.json train-other-500.json > ./train-other-960.json
 
+######
 6. HOW TO INSTALL WIKIPEDIA DATASET SCRIPT
+######
+
 
 # install mono
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
@@ -108,6 +112,14 @@ sudo apt-get install -y trang
 sudo apt install openjdk-8-jdk
 
 sudo apt-get install bc
+
+
+######
+7.  HOW TO INSTALL git large file stroage on UBUNTU
+######
+
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+sudo apt-get install git-lfs
 
 
 
